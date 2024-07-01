@@ -3,21 +3,21 @@
      <link rel="stylesheet" href="{{asset('assets/styles/vendor/datatables.min.css')}}">
      <link rel="stylesheet" href="{{asset('assets/styles/vendor/pickadate/classic.css')}}">
      <link rel="stylesheet" href="{{asset('assets/styles/vendor/pickadate/classic.date.css')}}">
-
 @endsection
+
 @section('main-content')
             <div class="breadcrumb">
                 <h1>Terminal</h1>
                 <ul>
                     <li><a href="">Selada</a></li>
-                    
+                </ul>
             </div>
             <div class="separator-breadcrumb border-top"></div>
             <div class="row mb-4">
                 <div class="col-lg-12 col-md-12 col-sm-12 d-flex justify-content-center mb-3">
                     <div class="input-group">
                         <a href="{{route('terminal_create')}}">
-                            <button class="btn btn-primary ripple m-1" type="button" @php if($username !== 'selada_produktif') echo 'disabled' @endphp>Add New</button>
+                            <button class="btn btn-warning ripple m-1 add-new-btn" type="button" @php if($username !== 'selada_produktif') echo 'disabled' @endphp>Add New</button>
                         </a>
                     </div>
                 </div>
@@ -63,7 +63,6 @@
                                         @foreach($data as $item)
                                         <tr>
                                             <th scope="row">{{ $no }}</th>
-                                            
                                             <td>{{$item->tid}}</td>
                                             <td>{{$item->merchant_id}}</td>
                                             <td>{{$item->merchant_name}}</td>
@@ -74,9 +73,8 @@
                                             <td>{{$item->status}}</td>
                                             <td>
                                                 <a href="{{route('terminal_edit',[$item->id])}}">
-                                                    <button class="btn btn-primary ripple btn-sm m-1" type="button" @php if($username !== 'selada_produktif') echo 'disabled' @endphp>Edit</button>
+                                                    <button class="btn btn-warning ripple btn-sm m-1 edit-btn" type="button" @php if($username !== 'selada_produktif') echo 'disabled' @endphp>Edit</button>
                                                 </a>
-
                                                 <button onClick="deleteConfirm({{$item->id}})" class="btn btn-danger ripple btn-sm m-1" type="button" disabled>Delete</button>
                                             </td>
                                         </tr>
@@ -101,8 +99,8 @@
      <script src="{{asset('assets/js/es5/dashboard.v4.script.js')}}"></script>
      <script src="{{asset('assets/js/vendor/pickadate/picker.js')}}"></script>
      <script src="{{asset('assets/js/vendor/pickadate/picker.date.js')}}"></script>
-
 @endsection
+
 @section('bottom-js')
 <script src="{{asset('assets/js/form.basic.script.js')}}"></script>
 <script>
@@ -126,5 +124,17 @@
         }
     }
 </script>
+    <style>
+        .add-new-btn {
+            background-color: #0a6e44;
+            border: none;
+            color: white;
+        }
 
+        .edit-btn {
+            background-color: #0182bd;
+            border: none;
+            color: white;
+        }
+</style>
 @endsection
