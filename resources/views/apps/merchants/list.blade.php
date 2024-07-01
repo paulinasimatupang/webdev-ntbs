@@ -16,7 +16,7 @@
                 <div class="col-lg-12 col-md-12 col-sm-12 d-flex justify-content-center mb-3">
                     <div class="input-group">
                         <a href="{{route('merchant_create')}}">
-                            <button class="btn btn-primary ripple m-1" type="button" @php if($username !== 'selada_produktif') echo 'disabled' @endphp>Add New</button>
+                            <button class="btn btn-warning ripple m-1 add-new-btn" type="button" @php if($username !== 'selada_produktif') echo 'disabled' @endphp>Add New</button>
                         </a>
                     </div>
                 </div>
@@ -65,7 +65,7 @@
                                             <td>{{$item->resign_at}}</td>
                                             <td>
                                                 <a href="{{route('merchant_edit',[$item->id])}}">
-                                                    <button class="btn btn-primary ripple btn-sm m-1" type="button" @php if($username !== 'selada_produktif') echo 'disabled' @endphp>Edit</button>
+                                                    <button class="btn btn-warning ripple btn-sm m-1 edit-btn" type="button" @php if($username !== 'selada_produktif') echo 'disabled' @endphp>Edit</button>
                                                 </a>
                                             </td>
                                         </tr>
@@ -94,6 +94,18 @@
 @endsection
 @section('bottom-js')
 <script src="{{asset('assets/js/form.basic.script.js')}}"></script>
+<style>
+    .add-new-btn {
+        background-color: #0a6e44;
+        border: none;
+        color: white;
+    }
+
+    .edit-btn {
+        background-color: #0182bd;
+        border: none;
+        color: white;
+    }
 
 
 @endsection
