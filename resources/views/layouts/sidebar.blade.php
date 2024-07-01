@@ -11,7 +11,7 @@ display: none;
         <ul class="navigation-left">
             <li class="nav-item {{ request()->is('dashboard') ? 'active' : '' }}">
                 <a class="nav-item-hold" href="{{route('dashboard')}}">
-                <img class="img_bintang_sidebar" src="{{asset('/assets/images/icon_bintang/dashboard.png')}}" alt="">
+                <img class="img_bintang_sidebar" src="{{asset('/assets/images/sidebar_icon/dashboard.png')}}" alt="">
                     <span class="nav-text">Dashboard</span>
                 </a>
                 <div class="triangle"></div>
@@ -19,7 +19,7 @@ display: none;
             <li class="nav-item {{ (request()->is('transaction') || request()->is('transaction/*')) ? 'active' : '' }}">
                 <a class="nav-item-hold" href="{{route('transaction')}}">
                  
-                    <img class="img_bintang_sidebar" src="{{asset('/assets/images/icon_bintang/transaction.png')}}"alt="">
+                    <img class="img_bintang_sidebar" src="{{asset('/assets/images/sidebar_icon/transaction.png')}}"alt="">
                     <span class="nav-text">Transaction</span>
                 </a>
                 <div class="triangle"></div>
@@ -27,7 +27,7 @@ display: none;
             <li class="nav-item {{ (request()->is('transactionBJB') || request()->is('transactionBJB/*')) ? 'active' : '' }}">
                 <a class="nav-item-hold" href="{{route('transactionBJB')}}">
                  
-                    <img class="img_bintang_sidebar" src="{{asset('/assets/images/icon_bintang/transaction.png')}}"alt="">
+                    <img class="img_bintang_sidebar" src="{{asset('/assets/images/sidebar_icon/transactionbjb.png')}}"alt="">
                     <span class="nav-text">Transaction BJB</span>
                 </a>
                 <div class="triangle"></div>
@@ -35,7 +35,7 @@ display: none;
 	    <li class="nav-item {{ (request()->is('terminal') || request()->is('terminal/*')) ? 'active' : '' }}" @php if(session()->get('user')->role_id == 2) echo 'id="b1"'; @endphp>
                 <a class="nav-item-hold" href="{{route('terminal')}}" >
                  
-                    <img class="img_bintang_sidebar" src="{{asset('/assets/images/icon_bintang/version.png')}}" alt="">
+                    <img class="img_bintang_sidebar" src="{{asset('/assets/images/sidebar_icon/terminal.png')}}" alt="">
                     <span class="nav-text">Terminal</span>
                 </a>
                 <div class="triangle"></div>
@@ -43,7 +43,7 @@ display: none;
 	    <li class="nav-item {{ (request()->is('merchant') || request()->is('merchant/*')) ? 'active' : '' }}" @php if(session()->get('user')->role_id == 2) echo 'id="b1"'; @endphp>
                 <a class="nav-item-hold" href="{{route('merchant')}}">
                  
-                    <img class="img_bintang_sidebar" src="{{asset('/assets/images/icon_bintang/agent.png')}}" alt="">
+                    <img class="img_bintang_sidebar" src="{{asset('/assets/images/sidebar_icon/agent.png')}}" alt="">
                     <span class="nav-text">Merchant</span>
                 </a>
                 <div class="triangle"></div>
@@ -51,7 +51,7 @@ display: none;
             <li class="nav-item {{ (request()->is('biller') || request()->is('biller/*')) ? 'active' : '' }}" @php if(session()->get('user')->role_id == 2) echo 'id="b1"'; @endphp>
                 <a class="nav-item-hold" href="{{route('biller')}}">
                  
-                    <img class="img_bintang_sidebar" src="{{asset('/assets/images/icon_bintang/biller.png')}}" alt="">
+                    <img class="img_bintang_sidebar" src="{{asset('/assets/images/sidebar_icon/biller.png')}}" alt="">
                     <span class="nav-text">Biller</span>
                 </a>
                 <div class="triangle"></div>
@@ -59,7 +59,7 @@ display: none;
             <li class="nav-item {{ request()->is('extrakits/*') ? 'active' : '' }}">
                 <a class="nav-item-hold" href="{{route('dashboard_version_11')}}">
                  
-                    <img class="img_bintang_sidebar" src="{{asset('/assets/images/icon_bintang/version.png')}}" alt="">
+                    <img class="img_bintang_sidebar" src="{{asset('/assets/images/sidebar_icon/version.png')}}" alt="">
                     <span class="nav-text">Version</span>
                 </a>
                 <div class="triangle"></div>

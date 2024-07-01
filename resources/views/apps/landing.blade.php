@@ -41,7 +41,7 @@
 		<a href="dashboard">
                 <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-4">
                     <div class="card-body text-center">
-                        <i class="i-Bar-Chart"></i>
+                        <img src="{{asset('/assets/images/sidebar_icon/dashboard.png')}}" alt="" class="mr-3" style="width: 50px">
                         <div class="content">
                             <p class="text-muted mt-2 mb-0">Jump to</p>
                             <p class="lead text-primary text-24 mb-2">Dashboard</p>
@@ -55,7 +55,7 @@
 		<a href="transaction">
                 <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-4">
                     <div class="card-body text-center">
-                        <i class="i-Financial"></i>
+                    <img src="{{asset('/assets/images/sidebar_icon/transaction.png')}}" alt="" class="mr-3" style="width: 50px">
                         <div class="content">
                             <p class="text-muted mt-2 mb-0">Jump to</p>
                             <p class="lead text-primary text-24 mb-2" style="text-align: left;">Trx PPOB</p>
@@ -69,7 +69,7 @@
 		<a href="transactionBJB">
                 <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-4">
                     <div class="card-body text-center">
-                        <i class="i-Financial"></i>
+                    <img src="{{asset('/assets/images/sidebar_icon/transactionbjb.png')}}" alt="" class="mr-3" style="width: 50px">
                         <div class="content">
                             <p class="text-muted mt-2 mb-0">Jump to</p>
                             <p class="lead text-primary text-24 mb-2">Trx BJB</p>
@@ -83,7 +83,7 @@
                 <a href="merchant">
 		<div class="card card-icon-bg card-icon-bg-primary o-hidden mb-4">
                     <div class="card-body text-center">
-                        <i class="i-Checkout-Basket"></i>
+                    <img src="{{asset('/assets/images/sidebar_icon/agent.png')}}" alt="" class="mr-3" style="width: 50px">
                         <div class="content">
                             <p class="text-muted mt-2 mb-0">Jump to</p>
                             <p class="lead text-primary text-24 mb-2">Merchants</p>
