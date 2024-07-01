@@ -10,16 +10,30 @@
         <link rel="stylesheet" href="{{asset('assets/styles/css/themes/lite-purple.min.css')}}">
         <link rel="stylesheet" href="{{asset('assets/styles/custom/bintang.css')}}">
     </head>
+    <style>
+    /* Warna default untuk tombol Sign In */
+    .btn_selada {
+        background-color: #0a6e44;
+        color: white; /* Warna teks untuk kontras */
+        border: none;
+    }
 
+    /* Warna saat tombol dihover atau diaktifkan */
+    .btn_selada:hover,
+    .btn_selada:focus {
+        background-color: #efaf32;
+        color: white; /* Warna teks saat dihover atau diaktifkan */
+    }
+</style>
     <body>
-        <div class="auth-layout-wrap align-items-md-end" style="background-image: url({{asset('assets/images/icon_bintang/bcg_signin3.svg')}})">
+        <div class="auth-layout-wrap align-items-md-end" style="background-image: url({{asset('assets/images/icon_bintang/bg-ntbs.png')}})">
             <div class="auth-content width_signin m-0">
                 <div style=" border-radius: 0px;" class="card o-hidden h-100vh border_radius_0 justify-content-center">
                     <div class="row">
                         <div class="col-md-12">
                             <div class="p-4">
                                 <div class="auth-logo text-center mb-4">
-                                    <img class="logo_bintang_signin" src="{{asset('/assets/images/icon_bintang/bjbpos-putih-trans.png')}}" alt="">
+                                    <img class="logo_bintang_signin" src="{{asset('/assets/images/icon_ntbs/Logo-Bank-NTB-Syariah.png')}}" alt="">
                                 </div>
                                 @if(Session('error'))
                                     <div class="alert alert-danger" role="alert">
@@ -35,9 +49,9 @@
                                     <div class="form-group">
                                         <label for="username">Username</label>
                                         <input id="username"
-                                            class="form-control form-control-rounded @error('username') is-invalid @enderror"
-                                            name="username" value="{{ old('username') }}" required autocomplete="username"
-                                            autofocus>
+                                        class="form-control form-control-rounded @error('username') is-invalid error @enderror"
+                                        name="username" value="{{ old('username') }}" required autocomplete="username"
+                                        autofocus>
                                         @error('username')
                                         <span class="invalid-feedback" role="alert">
                                             <strong>{{ $message }}</strong>
@@ -68,7 +82,8 @@
                                         </div>
                                     </div> -->
 
-                                    <button class="btn btn-rounded btn-primary btn_selada btn-block mt-4 mb-3 p-2">Sign In</button>
+                                    <button class="btn btn-rounded btn-warning btn_selada btn-block mt-4 mb-3 p-2">Sign In</button>
+
 
                                 </form>
                                 @if (Route::has('password.request'))
@@ -86,9 +101,7 @@
                 </div>
             </div>
         </div>
-
         <script src="{{asset('assets/js/common-bundle-script.js')}}"></script>
-
         <script src="{{asset('assets/js/script.js')}}"></script>
     </body>
 
