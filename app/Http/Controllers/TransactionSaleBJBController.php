@@ -255,7 +255,7 @@ class TransactionSaleBJBController extends Controller
     }
         /**
      * Update the specified resource in storage.
-     *
+     * 
      * @param  TransactionSaleBJBUpdateRequest $request
      * @param  string            $id
      *

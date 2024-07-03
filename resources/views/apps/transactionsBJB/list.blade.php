@@ -153,7 +153,7 @@
                                         <div class="mc-footer">
                                             <div class="row">
                                                 <div class="col-lg-12 text-center">
-                                                    <button type="submit" class="btn  btn-primary m-1">Save</button>
+                                                    <button type="submit" class="btn  btn-success m-1">Save</button>
                                                     <a href='https://report.selada.id/transactionBJB' type="button" class="btn btn-outline-secondary m-1">Clear</a>
 
 
@@ -185,34 +185,12 @@
                 <div class="col-lg-4 col-md-4 col-sm-4">
                     <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-2">
                         <div class="card-body text-center">
-                            <i class="i-Add-User"></i>
-                           <div class="content max_width_bintang ml-4">
-                                <p class="text-muted mt-2 mb-0">Total Transaction</p>
-                                <p class="text-primary text-24 line-height-1 mb-2">{{ $dataRevenue->count() }}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-4 col-md-4 col-sm-4">
-                    <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-4">
-                        <div class="card-body text-center">
-                            <i class="i-Financial"></i>
-                            <div class="content max_width_bintang ml-4">
-                                <p class="text-muted mt-2 mb-0">Amount Transaction</p>
-                                <p class="text-primary text-24 line-height-1 mb-2">@currency($dataRevenue->sum('nominal'))</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-4 col-md-4 col-sm-4">
-                    <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-4">
-                        <div class="card-body text-center">
-                            <i class="i-Financial"></i>
-                            <div class="content max_width_bintang ml-4">
-                                <p class="text-muted mt-2 mb-0">Total Fee</p>
-                                <p class="text-primary text-24 line-height-1 mb-2">@currency($dataRevenue->sum('fee'))</p>
+                            <div class="d-flex align-items-center">
+                                <img src="{{ asset('assets/images/transaction/total_transaction.png') }}" alt="Total Fee Agent" class="mr-3" style="width: 50px">
+                                <div class="text-left">
+                                    <p class="text-muted mt-2 mb-0">Total Transaction</p>
+                                    <p class="text-primary text-24 line-height-1 mb-2">{{ $dataRevenue->count() }}</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -221,34 +199,68 @@
                 <div class="col-lg-4 col-md-4 col-sm-4">
                     <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-2">
                         <div class="card-body text-center">
-                            <i class="i-Add-User"></i>
-                           <div class="content max_width_bintang ml-4">
-                                <p class="text-muted mt-2 mb-0">Total Fee Agent</p>
-                                <p class="text-primary text-24 line-height-1 mb-2">@currency($dataRevenue->sum('agent_fee'))</p>
+                            <div class="d-flex align-items-center">
+                            <img src="{{ asset('assets/images/transaction/amount_transaction.png') }}" alt="Total Fee Agent" class="mr-3" style="width: 60px">
+                                <div class="text-left">
+                                    <p class="text-muted mt-2 mb-0">Amount Transaction</p>
+                                    <p class="text-primary text-24 line-height-1 mb-2">@currency($dataRevenue->sum('nominal'))</p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="col-lg-4 col-md-4 col-sm-4">
-                    <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-4">
+                    <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-2">
                         <div class="card-body text-center">
-                            <i class="i-Financial"></i>
-                            <div class="content max_width_bintang ml-4">
-                                <p class="text-muted mt-2 mb-0">Total Fee BJB</p>
-                                <p class="text-primary text-24 line-height-1 mb-2">@currency($dataRevenue->sum('bjb_fee'))</p>
+                            <div class="d-flex align-items-center">
+                            <img src="{{ asset('assets/images/transaction/total_fee.png') }}" alt="Total Fee Agent" class="mr-3" style="width: 50px">
+                                <div class="text-left">
+                                    <p class="text-muted mt-2 mb-0">Total Fee</p>
+                                    <p class="text-primary text-24 line-height-1 mb-2">@currency($dataRevenue->sum('fee'))</p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="col-lg-4 col-md-4 col-sm-4">
-                    <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-4">
+                    <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-2">
                         <div class="card-body text-center">
-                            <i class="i-Financial"></i>
-                            <div class="content max_width_bintang ml-4">
-                                <p class="text-muted mt-2 mb-0">Total Fee Selada</p>
-                                <p class="text-primary text-24 line-height-1 mb-2">@currency($dataRevenue->sum('selada_fee'))</p>
+                            <div class="d-flex align-items-center">
+                                <img src="{{ asset('assets/images/transaction/total_fee_agent.png') }}" alt="Total Fee Agent" class="mr-3" style="width: 50px">
+                                <div class="text-left">
+                                    <p class="text-muted mt-2 mb-0">Total Fee Agent</p>
+                                    <p class="text-primary text-24 line-height-1 mb-2">@currency($dataRevenue->sum('agent_fee'))</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-4 col-sm-4">
+                    <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-2">
+                        <div class="card-body text-center">
+                            <div class="d-flex align-items-center">
+                                <img src="{{ asset('assets/images/transaction/total_fee_bjb2.png') }}" alt="Total Fee Agent" class="mr-3" style="width: 50px">
+                                <div class="text-left">
+                                    <p class="text-muted mt-2 mb-0">Total Fee BJB</p>
+                                    <p class="text-primary text-24 line-height-1 mb-2">@currency($dataRevenue->sum('bjb_fee'))</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-4 col-sm-4">
+                    <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-2">
+                        <div class="card-body text-center">
+                            <div class="d-flex align-items-center">
+                                <img src="{{ asset('assets/images/transaction/total_fee_selada.png') }}" alt="Total Fee Agent" class="mr-3" style="width: 50px">
+                                <div class="text-left">
+                                    <p class="text-muted mt-2 mb-0">Total Fee Selada</p>
+                                    <p class="text-primary text-24 line-height-1 mb-2">@currency($dataRevenue->sum('selada_fee'))</p>
+                                </div>
                             </div>
                         </div>
                     </div>

@@ -33,7 +33,7 @@
                         <div class="col-md-12">
                             <div class="p-4">
                                 <div class="auth-logo text-center mb-4">
-                                    <img class="logo_bintang_signin" src="{{asset('/assets/images/icon_ntbs/Logo-Bank-NTB-Syariah.png')}}" alt="">
+                                    <img class="logo_bintang_signin" src="{{asset('/assets/images/icon_signin/Logo-Bank-NTB-Syariah.png')}}" alt="">
                                 </div>
                                 @if(Session('error'))
                                     <div class="alert alert-danger" role="alert">
