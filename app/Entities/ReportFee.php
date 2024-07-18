@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ReportFee extends Model
 {
-    protected $connection = 'pgsql_billiton_report';
+    protected $connection = 'pgsql_report';
     protected $primaryKey = 'id';
     //
     protected $fillable = [
