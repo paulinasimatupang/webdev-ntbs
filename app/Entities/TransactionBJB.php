@@ -20,7 +20,7 @@ class TransactionBJB extends Model
 
     protected $presenter = TransactionBJBPresenter::class;
 //    public $incrementing = true;
-    protected $connection = 'pgsql_report';
+    protected $connection = 'pgsql_billiton';
 
     // protected $fillable = [
     //     'id',
@@ -32,7 +32,7 @@ class TransactionBJB extends Model
     //     'total'
     // ];
 
-    protected $table = 'report_mini_banking_view';
+    protected $table = 'minibanking_view';
 
     // protected $table = 'fee_view';
     //protected $table = 'reff_pmt_transactions';
