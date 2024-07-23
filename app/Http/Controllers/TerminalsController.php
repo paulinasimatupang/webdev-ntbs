@@ -15,6 +15,7 @@ use App\Repositories\TerminalRepository;
 use App\Validators\TerminalValidator;
 
 use App\Entities\Terminal;
+use App\Entities\TerminalType;
 use App\Entities\Merchant;
 use App\Entities\TerminalBilliton;
 use App\Entities\TerminalUserBilliton;
@@ -58,16 +59,16 @@ class TerminalsController extends Controller
     {
         $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
 
-        $data = Terminal::select('*');
+        $data = TerminalBilliton::select('*');
 
-	    $data = $data->whereHas('merchant.user', function($query){
-            $query->where(function($q){
-                $q->where('is_user_mireta', '!=', 1)->orWhereNull('is_user_mireta');
-            });
-            $query->where(function($q){
-                $q->where('is_development_user', '!=', 1)->orWhereNull('is_development_user');
-            });
-        });
+	    // $data = $data->whereHas('merchant.user', function($query){
+        //     $query->where(function($q){
+        //         $q->where('is_user_mireta', '!=', 1)->orWhereNull('is_user_mireta');
+        //     });
+        //     $query->where(function($q){
+        //         $q->where('is_development_user', '!=', 1)->orWhereNull('is_development_user');
+        //     });
+        // });
 
         if($request->has('search')){
             $data = $data->whereRaw('lower(name) like (?)',["%{$request->search}%"]);
@@ -92,17 +93,17 @@ class TerminalsController extends Controller
                 if($request->has('order_by')){
                     $data->orderBy($request->get('order_by'));
                 }else{
-                    $data->orderBy('created_at');
+                    $data->orderBy('last_login');
                 }
             }else{
                 if($request->has('order_by')){
                     $data->orderBy($request->get('order_by'), 'desc');
                 }else{
-                    $data->orderBy('created_at', 'desc');
+                    $data->orderBy('last_login', 'desc');
                 }
             }
         }else{
-            $data->orderBy('created_at', 'desc');
+            $data->orderBy('last_login', 'desc');
         } 
 
         $data = $data->get();
@@ -123,11 +124,10 @@ class TerminalsController extends Controller
     }
 
     public function create(Request $request){
-        $merchant = Merchant::where('terminal_id',null)->orderBy('name')->get();
-
+        $terminal_type = TerminalType::query()->get();
         return view('apps.terminals.add')
-                ->with('merchant', $merchant);
-    }
+                ->with('terminal_type', $terminal_type);
+    }    
 
     /**
      * Store a newly created resource in storage.
@@ -143,23 +143,8 @@ class TerminalsController extends Controller
         DB::beginTransaction();
         try {
             $this->validator->with($request->all())->passesOrFail(ValidatorInterface::RULE_CREATE);
-            $merchant = Merchant::where('id', $request->merchant_id)->first();
-            if($merchant){    
-                $reqData = $request->all();
-                $reqData['merchant_id']             = $merchant->mid;
-                $reqData['merchant_name']           = $merchant->name;
-                $reqData['merchant_address']        = $merchant->address;
-                $reqData['merchant_account_number'] = $merchant->no;
-                $data   = $this->repository->create($reqData);
-            }else{
-                $data   = $this->repository->create($request->all());
-            }
+            $data   = $this->repository->create($request->all());
             if($data){
-                if($merchant){   
-                    $merchant->terminal_id = $request->tid;
-                    $merchant->save();
-                }
-
                 DB::commit();
                 return Redirect::to('terminal')
                                     ->with('message', 'Terminal created');
