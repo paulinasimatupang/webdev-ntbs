@@ -3,7 +3,6 @@
 namespace App\Entities;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Prettus\Repository\Contracts\Transformable;
 use Prettus\Repository\Traits\TransformableTrait;
 
@@ -15,43 +14,46 @@ use Prettus\Repository\Traits\TransformableTrait;
 class Transaction extends Model implements Transformable
 {
     use TransformableTrait;
-    use SoftDeletes;
 
     public $incrementing = true;
 
     protected $fillable = [
-        'id',
+       'transacton_id',
         'service_id',
-        'code',
-        'merchant_id',
-        'merchant_no',
-        'price',
-        'vendor_price',
-        'note',
-        'status',
-        'payment_status',
-        'is_suspect'
+        'event_uid',
+        'transaction_status_id',
+        'transaction_time',
+        'amount',
+        'fee',
+        'account_number',
+        'no_resi',
+        'user_uid',
+        'card_no',
+        'trace_no',
+        'batch_no',
+        'appr_code',
     ];
 
-    protected $table = 'transactions';
+    protected $table = 'public.transaction';
+    protected $connection = 'pgsql_billiton';
 
-    public function merchant()
+    public function event()
     {
-        return $this->belongsTo(Merchant::class,'merchant_id','id');
+        return $this->belongsTo(Event::class,'event_uid','user_uid');
     }
 
     public function service()
     {
-        return $this->belongsTo(Service::class,'service_id','id');
+        return $this->belongsTo(Service::class,'service_id','user_uid');
     }
 
     public function transactionStatus()
     {
-        return $this->hasMany(TransactionStatus::class,'transaction_id','id');
+        return $this->hasMany(TransactionStatus::class,'transaction_status_id','user_uid');
     }
 
-    public function transactionPaymentStatus()
+    public function user()
     {
-        return $this->hasMany(TransactionPaymentStatus::class,'transaction_id','id');
+        return $this->hasMany(UsersBilliton::class,'user_uid','user_uid');
     }
 }

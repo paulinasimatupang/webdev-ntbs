@@ -18,12 +18,10 @@ class TransactionStatus extends Model implements Transformable
     public $incrementing = true;
 
     protected $fillable = [
-        'id',
-        'transaction_id',
-        'status',
-        'description'
+        'transaction_status_id',
+        'transaction_stats_desc',
     ];
 
-    protected $table = 'transaction_statuses';
-
+    protected $table = 'reff_transactions_status';
+    protected $connection = 'pgsql_billiton';
 }

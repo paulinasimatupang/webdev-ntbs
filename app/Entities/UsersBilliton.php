@@ -1,7 +1,13 @@
 <?php
 
 namespace App\Entities;
-
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Tymon\JWTAuth\Contracts\JWTSubject;
+use Webpatser\Uuid\Uuid;
+use DateTimeZone;
+use DateTime;
 use Illuminate\Database\Eloquent\Model;
 
 class UsersBilliton extends Model
@@ -15,18 +21,39 @@ class UsersBilliton extends Model
         'user_status_uid',
         'user_type_uid',
         'username',
-        'app_ver',
-        'need_approval',
-        'account_name',
+        'password',
+        'password_retry',
+        'msisdn',
         'card_no',
         'imei',
-        'batch_no',
+        'bahasa',
         'version',
         'brand',
         'model',
-        'os_ver'
+        'os',
+        'os_ver',
+        'reg_date',
+        'account_name',
+        'imsi',
+        'app_ver',
+        'active_via',
+        'need_approval',
+        'user_status_old',
+        'batch_no',
+        'pin',
+        'pin_retry'
     ];
-
     
     protected $table = 'public.users';
+    
+
+    public function events()
+    {
+        return $this->hasMany(Event::class, 'user_uid', 'user_uid');
+    }
+
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class, 'user_uid', 'user_uid');
+    }
 }
