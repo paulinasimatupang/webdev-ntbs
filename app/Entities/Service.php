@@ -20,29 +20,20 @@ class Service extends Model implements Transformable
     public $incrementing = true;
 
     protected $fillable = [
-        'id',
-        'category_id',
-        'provider_id',
-        'product_id',
-        'type',
-        'code',
-        'markup',
-        'biller_id',
-        'biller_code',
-        'biller_price',
-        'status',
+        'service_id',
+        'service_name',
+        'is_transaction',
+        'screen_respon',
+        'screen_start',
+        'is_to_core',
+        'service_class',
+        'param_1',
+        'param_2',
+        'trx_tbl',
+        'service_url',
         'system_markup'
     ];
+    protected $table = 'public.service';
+    protected $connection = 'pgsql_billiton';
 
-    protected $table = 'services';
-
-    public function biller()
-    {
-        return $this->belongsTo(Biller::class,'biller_id','id');
-    }
-
-    public function product()
-    {
-        return $this->belongsTo(Product::class,'product_id','id');
-    }
 }
