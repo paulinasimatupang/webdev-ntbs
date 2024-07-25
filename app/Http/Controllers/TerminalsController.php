@@ -61,15 +61,6 @@ class TerminalsController extends Controller
 
         $data = TerminalBilliton::select('*');
 
-	    // $data = $data->whereHas('merchant.user', function($query){
-        //     $query->where(function($q){
-        //         $q->where('is_user_mireta', '!=', 1)->orWhereNull('is_user_mireta');
-        //     });
-        //     $query->where(function($q){
-        //         $q->where('is_development_user', '!=', 1)->orWhereNull('is_development_user');
-        //     });
-        // });
-
         if($request->has('search')){
             $data = $data->whereRaw('lower(name) like (?)',["%{$request->search}%"]);
         }
@@ -129,43 +120,113 @@ class TerminalsController extends Controller
                 ->with('terminal_type', $terminal_type);
     }    
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  TerminalCreateRequest $request
-     *
-     * @return \Illuminate\Http\Response
-     *
-     * @throws \Prettus\Validator\Exceptions\ValidatorException
-     */
-    public function store(TerminalCreateRequest $request)
+    // /**
+    //  * Store a newly created resource in storage.
+    //  *
+    //  * @param  TerminalCreateRequest $request
+    //  *
+    //  * @return \Illuminate\Http\Response
+    //  *
+    //  * @throws \Prettus\Validator\Exceptions\ValidatorException
+    //  */
+    // public function store(TerminalCreateRequest $request)
+    // {
+    //     DB::beginTransaction();
+    //     try {
+    //         $this->validator->with($request->all())->passesOrFail(ValidatorInterface::RULE_CREATE);
+    //         $data   = $this->repository->create($request->all());
+    //         if($data){
+    //             DB::commit();
+    //             return Redirect::to('terminal')
+    //                                 ->with('message', 'Terminal created');
+    //         }else{
+    //             DB::rollBack();
+    //             return Redirect::to('terminal/create')
+    //                         ->with('error', $data->error)
+    //                         ->withInput();
+    //         }
+    //     } catch (Exception $e) {
+    //         DB::rollBack();
+    //             return Redirect::to('terminal/create')
+    //                         ->with('error', $e)
+    //                         ->withInput();
+    //     } catch (\Illuminate\Database\QueryException $e) {
+    //         DB::rollBack();
+    //             return Redirect::to('terminal/create')
+    //                         ->with('error', $e)
+    //                         ->withInput();
+    //     }
+    // }
+
+    public function store(Request $request)
     {
-        DB::beginTransaction();
         try {
-            $this->validator->with($request->all())->passesOrFail(ValidatorInterface::RULE_CREATE);
-            $data   = $this->repository->create($request->all());
-            if($data){
-                DB::commit();
-                return Redirect::to('terminal')
-                                    ->with('message', 'Terminal created');
-            }else{
-                DB::rollBack();
-                return Redirect::to('terminal/create')
-                            ->with('error', $data->error)
-                            ->withInput();
-            }
-        } catch (Exception $e) {
-            DB::rollBack();
-                return Redirect::to('terminal/create')
-                            ->with('error', $e)
-                            ->withInput();
-        } catch (\Illuminate\Database\QueryException $e) {
-            DB::rollBack();
-                return Redirect::to('terminal/create')
-                            ->with('error', $e)
-                            ->withInput();
+            $validatedData = $request->validate([
+                'terminal_id' => 'required|string|max:12',
+                'terminal_type' => 'required|string|max:1',
+                'terminal_imei' => 'required|string|max:32',
+                'terminal_name' => 'required|string|max:50',
+                'merchant_id' => 'required|string|max:20',
+            ]);
+            $terminalBilliton = new TerminalBilliton();
+            $terminalBilliton->terminal_id = $validatedData['terminal_id'];
+            $terminalBilliton->terminal_type = $validatedData['terminal_type'];
+            $terminalBilliton->terminal_imei = $validatedData['terminal_imei'];
+            $terminalBilliton->terminal_name = $validatedData['terminal_name'];
+            $terminalBilliton->merchant_id = $validatedData['merchant_id'];
+            $terminalBilliton->save();
+            return Redirect::to('terminal')->with('success', 'Data berhasil disimpan.');
+        } catch (\Exception $e) {
+            return Redirect::to('terminal/create')->with('error', 'Terjadi kesalahan saat menyimpan data: ' . $e->getMessage())->withInput();
         }
     }
+
+    public function edit($id)
+    {
+        $terminal = TerminalBilliton::findOrFail($id);
+        $terminal_type = TerminalType::all();
+        return view('apps.terminals.edit', compact('terminal', 'terminal_type'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        try {
+            $validatedData = $request->validate([
+                'terminal_id' => 'required|string|max:12',
+                'terminal_type' => 'required|string|max:1',
+                'terminal_imei' => 'required|string|max:32',
+                'terminal_name' => 'required|string|max:50',
+                'merchant_id' => 'required|string|max:20',
+            ]);
+            $terminalBilliton = TerminalBilliton::findOrFail($id);
+            $terminalBilliton->terminal_id = $validatedData['terminal_id'];
+            $terminalBilliton->terminal_type = $validatedData['terminal_type'];
+            $terminalBilliton->terminal_imei = $validatedData['terminal_imei'];
+            $terminalBilliton->terminal_name = $validatedData['terminal_name'];
+            $terminalBilliton->merchant_id = $validatedData['merchant_id'];
+            $terminalBilliton->save();
+
+            return Redirect::to('terminal')->with('success', 'Data berhasil disimpan.');
+        } catch (\Exception $e) {
+            return Redirect::route('terminal_edit', $id)
+                ->with('error', 'Terjadi kesalahan saat menyimpan data: ' . $e->getMessage())
+                ->withInput();
+        }
+    }
+
+    public function destroy($id)
+    {
+        try {
+            $terminalBilliton = TerminalBilliton::findOrFail($id);
+            $terminalBilliton->delete();
+            return Redirect::to('terminal')->with('success', 'Data berhasil dihapus.');
+        } catch (\Exception $e) {
+            return Redirect::route('terminal')
+                ->with('error', 'Terjadi kesalahan saat menghapus data: ' . $e->getMessage());
+        }
+    }
+
+
 
     /**
      * Store a newly created resource in storage.
@@ -318,38 +379,38 @@ class TerminalsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
-    {
-        $terminal = Terminal::find($id);
-        $checkTerminalBilliton = false;
-        if($terminal){
-            $terminalBilliton = TerminalBilliton::where('terminal_imei', $terminal->imei)
-                                                ->first();
+    // public function edit($id)
+    // {
+    //     $terminal = Terminal::find($id);
+    //     $checkTerminalBilliton = false;
+    //     if($terminal){
+    //         $terminalBilliton = TerminalBilliton::where('terminal_imei', $terminal->imei)
+    //                                             ->first();
 
-            if($terminalBilliton){
-                $checkTerminalBilliton = true;
-                $tidBilliton = $terminalBilliton->terminal_id;
-            } else {
-                $checkTerminalBilliton = false;
-                $tidBilliton = " ";
-            }
+    //         if($terminalBilliton){
+    //             $checkTerminalBilliton = true;
+    //             $tidBilliton = $terminalBilliton->terminal_id;
+    //         } else {
+    //             $checkTerminalBilliton = false;
+    //             $tidBilliton = " ";
+    //         }
 
-            $merchant = Merchant::where('terminal_id',null)
-                                ->orWhere('terminal_id',$terminal->tid)
-                                ->orderBy('name')
-                                ->get();
+    //         $merchant = Merchant::where('terminal_id',null)
+    //                             ->orWhere('terminal_id',$terminal->tid)
+    //                             ->orderBy('name')
+    //                             ->get();
 
-            return view('apps.terminals.edit')
-                ->with('terminal', $terminal)
-                ->with('merchant', $merchant)
-                ->with('tidBilliton', $tidBilliton)
-                ->with('checkTerminalBilliton', $checkTerminalBilliton);
-        } else {
-            return Redirect::to('terminal')
-                            ->with('error', 'Data not found');
-        }
+    //         return view('apps.terminals.edit')
+    //             ->with('terminal', $terminal)
+    //             ->with('merchant', $merchant)
+    //             ->with('tidBilliton', $tidBilliton)
+    //             ->with('checkTerminalBilliton', $checkTerminalBilliton);
+    //     } else {
+    //         return Redirect::to('terminal')
+    //                         ->with('error', 'Data not found');
+    //     }
         
-    }
+    // }
 
     /**
      * Update the specified resource in storage.
@@ -361,82 +422,82 @@ class TerminalsController extends Controller
      *
      * @throws \Prettus\Validator\Exceptions\ValidatorException
      */
-    public function update(TerminalUpdateRequest $request, $id)
-    {
-        DB::beginTransaction();
-        try {
-            $this->validator->with($request->all())->passesOrFail(ValidatorInterface::RULE_UPDATE);
+    // public function update(TerminalUpdateRequest $request, $id)
+    // {
+    //     DB::beginTransaction();
+    //     try {
+    //         $this->validator->with($request->all())->passesOrFail(ValidatorInterface::RULE_UPDATE);
             
-            if($request->has('merchant_id')){
-                $merchant = Merchant::where('mid', $request->merchant_id)->first();
-                if($merchant){
-                    $reqData['merchant_id']             = $merchant->mid;
-                    $reqData['merchant_name']           = $merchant->name;
-                    $reqData['merchant_address']        = $merchant->address;
-                    $reqData['merchant_account_number'] = $merchant->no;
-                }else{
-                    $reqData['merchant_id']             = null;
-                    $reqData['merchant_name']           = null;
-                    $reqData['merchant_address']        = null;
-                    $reqData['merchant_account_number'] = null;
-                }
-                $data = $this->repository->update($reqData, $id);
-            } else {
-                $data = $this->repository->update($request->all(), $id);
-            }
+    //         if($request->has('merchant_id')){
+    //             $merchant = Merchant::where('mid', $request->merchant_id)->first();
+    //             if($merchant){
+    //                 $reqData['merchant_id']             = $merchant->mid;
+    //                 $reqData['merchant_name']           = $merchant->name;
+    //                 $reqData['merchant_address']        = $merchant->address;
+    //                 $reqData['merchant_account_number'] = $merchant->no;
+    //             }else{
+    //                 $reqData['merchant_id']             = null;
+    //                 $reqData['merchant_name']           = null;
+    //                 $reqData['merchant_address']        = null;
+    //                 $reqData['merchant_account_number'] = null;
+    //             }
+    //             $data = $this->repository->update($reqData, $id);
+    //         } else {
+    //             $data = $this->repository->update($request->all(), $id);
+    //         }
 
-            $terminalBilliton = TerminalBilliton::where('terminal_id', '=', $request->get('tid'))->first();
-            if($terminalBilliton) {
-                if($request->get('is_update_billiton') === 'true'){
-                    try {
-                        TerminalBilliton::where('terminal_id', $request->get('tid'))
-                                                    ->update([
-                                                        'terminal_sim_number' => $request->get('iccid'),
-                                                        'terminal_name' => $request->get('serial_number'),
-                                                        'terminal_imei' => $request->get('imei')
-                                                    ]);
+    //         $terminalBilliton = TerminalBilliton::where('terminal_id', '=', $request->get('tid'))->first();
+    //         if($terminalBilliton) {
+    //             if($request->get('is_update_billiton') === 'true'){
+    //                 try {
+    //                     TerminalBilliton::where('terminal_id', $request->get('tid'))
+    //                                                 ->update([
+    //                                                     'terminal_sim_number' => $request->get('iccid'),
+    //                                                     'terminal_name' => $request->get('serial_number'),
+    //                                                     'terminal_imei' => $request->get('imei')
+    //                                                 ]);
 
-                    } catch (Exception $e) {
-                        DB::rollBack();
-                        return Redirect::to('terminal/'.$id.'/edit')
-                                    ->with('error', $e)
-                                    ->withInput();
-                    } catch (\Illuminate\Database\QueryException $e) {
-                        DB::rollBack();
-                        return Redirect::to('terminal/'.$id.'/edit')
-                                    ->with('error', $e)
-                                    ->withInput();
-                    }
-                }
-            }
+    //                 } catch (Exception $e) {
+    //                     DB::rollBack();
+    //                     return Redirect::to('terminal/'.$id.'/edit')
+    //                                 ->with('error', $e)
+    //                                 ->withInput();
+    //                 } catch (\Illuminate\Database\QueryException $e) {
+    //                     DB::rollBack();
+    //                     return Redirect::to('terminal/'.$id.'/edit')
+    //                                 ->with('error', $e)
+    //                                 ->withInput();
+    //                 }
+    //             }
+    //         }
             
-            if($data){
-                if($request->has('merchant_id')){
-                    $merchant->terminal_id = $data->tid;
-                    $merchant->save();
-                }
+    //         if($data){
+    //             if($request->has('merchant_id')){
+    //                 $merchant->terminal_id = $data->tid;
+    //                 $merchant->save();
+    //             }
                 
-                DB::commit();
-                return Redirect::to('terminal')
-                                    ->with('message', 'Terminal updated');
-            } else {
-                DB::rollBack();
-                return Redirect::to('terminal/'.$id.'/edit')
-                            ->with('error', $data->error)
-                            ->withInput();
-            }
-        } catch (Exception $e) {
-            DB::rollBack();
-            return Redirect::to('terminal/'.$id.'/edit')
-                        ->with('error', $e)
-                        ->withInput();
-        } catch (\Illuminate\Database\QueryException $e) {
-            DB::rollBack();
-            return Redirect::to('terminal/'.$id.'/edit')
-                        ->with('error', $e)
-                        ->withInput();
-        }
-    }
+    //             DB::commit();
+    //             return Redirect::to('terminal')
+    //                                 ->with('message', 'Terminal updated');
+    //         } else {
+    //             DB::rollBack();
+    //             return Redirect::to('terminal/'.$id.'/edit')
+    //                         ->with('error', $data->error)
+    //                         ->withInput();
+    //         }
+    //     } catch (Exception $e) {
+    //         DB::rollBack();
+    //         return Redirect::to('terminal/'.$id.'/edit')
+    //                     ->with('error', $e)
+    //                     ->withInput();
+    //     } catch (\Illuminate\Database\QueryException $e) {
+    //         DB::rollBack();
+    //         return Redirect::to('terminal/'.$id.'/edit')
+    //                     ->with('error', $e)
+    //                     ->withInput();
+    //     }
+    // }
 
     /**
      * Remove the specified resource from storage.
@@ -445,52 +506,52 @@ class TerminalsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
-    {
-        DB::beginTransaction();
-        try {
-            $data = Terminal::find($id);
-            if($data){
-                if($data->merchant_id != null){
-                    $merchant = Merchant::where('mid',$data->merchant_id)->first();
-                    if($merchant){
-                        $merchant->terminal_id = null;
-                        $merchant->save();
-                    }
-                }
-            }
-            $deleted = $this->repository->delete($id);
+    // public function destroy($id)
+    // {
+    //     DB::beginTransaction();
+    //     try {
+    //         $data = Terminal::find($id);
+    //         if($data){
+    //             if($data->merchant_id != null){
+    //                 $merchant = Merchant::where('mid',$data->merchant_id)->first();
+    //                 if($merchant){
+    //                     $merchant->terminal_id = null;
+    //                     $merchant->save();
+    //                 }
+    //             }
+    //         }
+    //         $deleted = $this->repository->delete($id);
 
-            if($deleted){
-                $response = [
-                    'status'  => true,
-                    'message' => 'Terminal deleted.'
-                ];
+    //         if($deleted){
+    //             $response = [
+    //                 'status'  => true,
+    //                 'message' => 'Terminal deleted.'
+    //             ];
     
-                DB::commit();
-                return response()->json($response, 200);
-            }
+    //             DB::commit();
+    //             return response()->json($response, 200);
+    //         }
             
-        } catch (Exception $e) {
-            // For rollback data if one data is error
-            DB::rollBack();
+    //     } catch (Exception $e) {
+    //         // For rollback data if one data is error
+    //         DB::rollBack();
 
-            return response()->json([
-                'status'    => false, 
-                'error'     => 'Something wrong!',
-                'exception' => $e
-            ], 500);
-        } catch (\Illuminate\Database\QueryException $e) {
-            // For rollback data if one data is error
-            DB::rollBack();
+    //         return response()->json([
+    //             'status'    => false, 
+    //             'error'     => 'Something wrong!',
+    //             'exception' => $e
+    //         ], 500);
+    //     } catch (\Illuminate\Database\QueryException $e) {
+    //         // For rollback data if one data is error
+    //         DB::rollBack();
 
-            return response()->json([
-                'status'    => false, 
-                'error'     => 'Something wrong!',
-                'exception' => $e
-            ], 500);
-        }
-    }
+    //         return response()->json([
+    //             'status'    => false, 
+    //             'error'     => 'Something wrong!',
+    //             'exception' => $e
+    //         ], 500);
+    //     }
+    // }
 
     public function deleteMerchantData($id, $mid){
         $terminal = Terminal::find($id);

@@ -46,11 +46,9 @@
                                         <tr>
                                             <th scope="col">No</th>
                                             <th scope="col">TID</th>
-                                            <th scope="col">TTYPE</th>
                                             <th scope="col">TNAME</th>
                                             <th scope="col">IMEI</th>
                                             <th scope="col">MID</th>
-                                            <th scope="col">Status</th>
                                             <th scope="col">Action</th>
                                         </tr>
                                     </thead>
@@ -62,16 +60,14 @@
                                         <tr>
                                             <th scope="row">{{ $no }}</th>
                                             <td>{{$item->terminal_id}}</td>
-                                            <td>{{$item->terminal_type}}</td>
                                             <td>{{$item->terminal_name}}</td>
                                             <td>{{$item->terminal_imei}}</td>
                                             <td>{{$item->merchant_id}}</td>
-                                            <td>{{$item->status}}</td>
                                             <td>
-                                                <a href="{{route('terminal_edit',[$item->id])}}">
+                                                <a href="{{route('terminal_edit',[$item->terminal_id])}}">
                                                     <button class="btn btn-warning ripple btn-sm m-1 edit-btn" type="button" @php if($username !== 'selada_produktif') echo 'disabled' @endphp>Edit</button>
                                                 </a>
-                                                <button onClick="deleteConfirm({{$item->id}})" class="btn btn-danger ripple btn-sm m-1" type="button" disabled>Delete</button>
+                                                <a href="#" onclick="deleteConfirm({{ $item->terminal_id }}); return false;" class="btn btn-danger ripple btn-sm m-1">Delete</a>
                                             </td>
                                         </tr>
                                         @php
