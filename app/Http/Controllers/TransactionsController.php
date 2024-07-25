@@ -1,13 +1,13 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use DB;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redirect;
 use Carbon\Carbon;
 use Validator;
-use Redirect;
-
 use App\Http\Requests;
 use Prettus\Validator\Contracts\ValidatorInterface;
 use Prettus\Validator\Exceptions\ValidatorException;
@@ -62,135 +62,138 @@ class TransactionsController extends Controller
     public function __construct(TransactionRepository $repository, TransactionValidator $validator)
     {
         $this->repository = $repository;
-        $this->validator  = $validator;
+        $this->validator = $validator;
     }
 
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
-     */  
-
+     */
     public function index(Request $request)
     {
-        // Initial default values for start_date and end_date
-        if(!$request->has('start_date') && $request->get('start_date')==''){
-            $request->request->add([
-                'start_date' => date("m-d-Y")
-            ]);
-        }
-        if(!$request->has('end_date') && $request->get('end_date')==''){
-            $request->request->add([
-                'end_date' => date("m-d-Y")
-            ]);
-        }
+        $validated = $request->validate([
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date',
+            'status' => 'nullable|string'
+        ]);
 
-        // Applying criteria to repository
-        $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
+        $start_date = $validated['start_date'] ?? now()->format('Y-m-d');
+        $end_date = $validated['end_date'] ?? now()->format('Y-m-d');
+        $status = $validated['status'] ?? '';
 
-        $data = Transaction::select('*');
-        $data = $data->with(['transactionPaymentStatus']);
+        $transactions = Transaction::with('transactionPaymentStatus')
+            ->when($status !== '', function($query) use ($status) {
+                $query->where('status', $status);
+            })
+            ->whereBetween('created_at', [$start_date . ' 00:00:00', $end_date . ' 23:59:59'])
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
 
-        if($request->has('status') && $request->get('status') != '' && $request->get('status') != 'Select Status'){
-            $status = $request->get('status');
-            if ($status == 'Pending'){
-                $data->where('status', '=', 0);
-            } else if ($status == 'Success'){
-                $data->where('status', '=', 1);
-            } else if ($status == 'Failed'){
-                $data->where('status', '=', 2);
-            }
-        }
-
-        if($request->has('stan') && $request->get('stan') != ''){
-            $data->where('stan', '=', $request->get('stan'));
-        }
-
-        if($request->has('limit')){
-            $data->take($request->get('limit'));
-
-            if($request->has('offset')){
-                $data->skip($request->get('offset'));
-            }
-        }
-
-        if($request->has('order_type')){
-            if($request->get('order_type') == 'asc'){
-                if($request->has('order_by')){
-                    $data->orderBy($request->get('order_by'));
-                } else {
-                    $data->orderBy('created_at');
-                }
-            } else {
-                if($request->has('order_by')){
-                    $data->orderBy($request->get('order_by'), 'desc');
-                } else {
-                    $data->orderBy('created_at', 'desc');
-                }
-            }
-        } else {
-            $data->orderBy('created_at', 'desc');
-        }
-
-        $data = $data->paginate(10);
-
-        foreach($data as $item){
+        $transactions->each(function ($item) {
             $item->status_text = $item->status == 0 ? 'Pending' : ($item->status == 1 ? 'Success' : 'Failed');
             $item->fee = $item->price - $item->vendor_price;
             $item->status_suspect = $item->is_suspect == 0 ? 'False' : 'True';
-        }
+        });
 
-        $user = session()->get('user');
-
-        return view('apps.transactions.list')
-                ->with('data', $data)
-                ->with('username', $user->username);
+        return view('apps.transactions.list', compact('transactions'));
     }
 
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \App\Http\Requests\TransactionCreateRequest $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(TransactionCreateRequest $request)
+    {
+        try {
+            $transaction = $this->repository->create($request->all());
+            return Redirect::route('apps.transactions.add')->with('message', 'Transaction successfully created.');
+        } catch (ValidatorException $e) {
+            return Redirect::back()->withErrors($e->getMessage())->withInput();
+        }
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \App\Http\Requests\TransactionUpdateRequest $request
+     * @param  int $id
+     * @return \Illuminate\Http\Response
+     */
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int $id
+     * @return \Illuminate\Http\Response
+     */
+
+    /**
+     * Export transactions to Excel.
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\Response
+     */
     public function export(Request $request)
     {
-        if(!$request->has('status') && $request->get('status')==''){
-            $request->request->add([
-                'status'  => 'Success'
-            ]);
-        }
-        if(!$request->has('start_date') && $request->get('start_date')==''){
-            $request->request->add([
-                'start_date'      => date("Y-m-d")
-            ]);
-        }
-        if(!$request->has('end_date') && $request->get('end_date')==''){
-            $request->request->add([
-                'end_date'      => date("Y-m-d")
-            ]);
-        }
-        $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
-
-        return (new TransactionExport($request))->download('transaction_export_'.$request->get('start_date').'_'.$request->get('end_date').'.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+        $validated = $request->validate([
+            'status' => 'nullable|string',
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date',
+        ]);
+    
+        $start_date = $validated['start_date'] ?? now()->format('Y-m-d');
+        $end_date = $validated['end_date'] ?? now()->format('Y-m-d');
+        $status = $validated['status'] ?? '';
+    
+        $transactions = Transaction::with(['transactionPaymentStatus'])
+            ->when($status !== '', function($query) use ($status) {
+                $query->where('status', $status);
+            })
+            ->whereBetween('created_at', [$start_date.' 00:00:00', $end_date.' 23:59:59'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+    
+        return (new TransactionExport($transactions))->download('transaction_export.xlsx');
     }
 
+    /**
+     * Export sales transactions to Excel.
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\Response
+     */
     public function saleExport(Request $request)
     {
-        if(!$request->has('status') && $request->get('status')==''){
-            $request->request->add([
-                'status'  => 'Success'
-            ]);
-        }
-        if(!$request->has('start_date') && $request->get('start_date')==''){
-            $request->request->add([
-                'start_date'      => date("Y-m-d")
-            ]);
-        }
-        if(!$request->has('end_date') && $request->get('end_date')==''){
-            $request->request->add([
-                'end_date'      => date("Y-m-d")
-            ]);
-        }
-        $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
+        $validated = $request->validate([
+            'status' => 'nullable|string',
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date',
+        ]);
+    
+        $start_date = $validated['start_date'] ?? now()->format('Y-m-d');
+        $end_date = $validated['end_date'] ?? now()->format('Y-m-d');
+        $status = $validated['status'] ?? '';
+    
+        $sales = Transaction::where('transaction_type', 'sale')
+            ->when($status !== '', function($query) use ($status) {
+                $query->where('status', $status);
+            })
+            ->whereBetween('created_at', [$start_date.' 00:00:00', $end_date.' 23:59:59'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+    
+        return (new TransactionSaleExport($sales))->download('transaction_sale_export.xlsx');
+    }   
 
-        return (new TransactionSaleExport($request))->download('transaction_sale_export_'.$request->get('start_date').'_'.$request->get('end_date').'.xlsx', \Maatwebsite\Excel\Excel::XLSX);
-    }
-
+    /**
+     * Export transactions to CSV.
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\Response
+     */
     public function exportCSV(Request $request)
     {
         if(!$request->has('transaction_status_id') && $request->get('transaction_status_id')==''){
@@ -261,148 +264,90 @@ class TransactionsController extends Controller
 
     public function reversal(Request $request)
     {
-        if(!$request->has('start_date') && $request->get('start_date')==''){
-            $request->request->add([
-                'start_date'      => date("Y-m-d")
-            ]);
-        }
-        if(!$request->has('end_date') && $request->get('end_date')==''){
-            $request->request->add([
-                'end_date'      => date("Y-m-d")
-            ]);
-        }
+    $validated = $request->validate([
+        'start_date' => 'nullable|date',
+        'end_date' => 'nullable|date',
+        'stan' => 'nullable|string',
+    ]);
 
-        $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
+    $start_date = $validated['start_date'] ?? now()->format('Y-m-d');
+    $end_date = $validated['end_date'] ?? now()->format('Y-m-d');
+    $stan = $validated['stan'] ?? null;
 
-        $data = TransactionLog::whereNotNull('responsecode');
-        $data->where('tx_mti', '=', '0200');
-        $data->where('proc_code', '=', '500000');
+    $query = TransactionLog::whereNotNull('responsecode')
+        ->where('tx_mti', '0200')
+        ->where('proc_code', '500000')
+        ->whereBetween('tx_time', [$start_date.' 00:00:00', $end_date.' 23:59:59']);
 
-        if($request->has('start_date') && $request->get('start_date')!=''){
-            $data->where('tx_time', '>', $request->get('start_date').' 00:00:00');
-        }
-
-        if($request->has('end_date') && $request->get('end_date')!=''){
-            $data->where('tx_time', '<=', $request->get('end_date').' 23:59:59');
-        }
-
-        if($request->has('stan') && $request->get('stan')!=''){
-            $data->where('stan', $request->get('stan'));
-        }
-
-        $dataLog = TransactionLog::select('stan')->whereNotNull('responsecode');
-        $dataLog->where('tx_mti', '=', '0200');
-        $dataLog->where('proc_code', '=', '500000');
-
-        if($request->has('start_date') && $request->get('start_date')!=''){
-            $dataLog->where('tx_time', '>', $request->get('start_date').' 00:00:00');
-        }
-
-        if($request->has('end_date') && $request->get('end_date')!=''){
-            $dataLog->where('tx_time', '<=', $request->get('end_date').' 23:59:59');
-        }
-
-        if($request->has('stan') && $request->get('stan')!=''){
-            $dataLog->where('stan', $request->get('stan'));
-        }
-
-        $dataPpob = Transaction::select('stan');
-        if($request->has('start_date') && $request->get('start_date')!=''){
-            $dataPpob->where('created_at', '>', $request->get('start_date').' 00:00:00');
-        }
-
-        if($request->has('end_date') && $request->get('end_date')!=''){
-            $dataPpob->where('created_at', '<=', $request->get('end_date').' 23:59:59');
-        }
-
-        if($request->has('stan') && $request->get('stan')!=''){
-            $dataPpob->where('stan', $request->get('stan'));
-        }
-
-        $dataLog = $dataLog->get();
-        $dataPpob = $dataPpob->get();
-
-        $arrayLength = $dataLog->count();
-        $ppobSize = $dataPpob->count();
-        
-        $array = array();
-        $i = 0;
-        $count = 0;
-        for ($i = 0; $i < $arrayLength; $i++){
-            $isIdentical = false;
-            try {
-                for ($j = 0; $j < $ppobSize; $j++){
-                    if($dataLog[$i]->stan == $dataPpob[$j]->stan){
-                        $isIdentical = true;
-                    }
-                }
-            } catch (Exception $e){
-                // echo $e;
-            }
-
-            if($isIdentical){
-                // verified
-            } else {
-                $array[$count] = $dataLog[$i]->stan;
-                $count++;
-            }
-        }
-
-        $data->whereIn('stan', $array);
-
-        $data = $data->paginate(10);
-
-        return view('apps.transactions.reversal')
-                ->with('data', $data);
+    if ($stan) {
+        $query->where('stan', $stan);
     }
 
+    $data = $query->paginate(10);
+
+    return view('apps.transactions.reversal', compact('data'));
+    }
+
+
+
+    /**
+     * Export sales transactions to CSV.
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function saleExportCSV(Request $request)
+    {
+        $validated = $request->validate([
+            'transaction_status_id' => 'nullable|string',
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date'
+        ]);
+
+        $transaction_status_id = $validated['transaction_status_id'] ?? 'Success';
+        $start_date = $validated['start_date'] ?? date("Y-m-d");
+        $end_date = $validated['end_date'] ?? date("Y-m-d");
+
+        $sales = Transaction::where('transaction_type', 'sale')
+            ->where('status', $transaction_status_id)
+            ->whereBetween('created_at', [$start_date . ' 00:00:00', $end_date . ' 23:59:59'])
+            ->get();
+
+        return (new TransactionSaleExport($sales))->download('transaction_sale_export_' . $start_date . '_' . $end_date . '.csv', \Maatwebsite\Excel\Excel::CSV, [
+            'Content-Type' => 'text/csv'
+        ]);
+    }
+
+    /**
+     * Handle reversal of transactions.
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\Response
+     */
     public function postReversal(Request $request, $additional_data)
     {
         DB::beginTransaction();
         try {
-            $dateTime = date("YmdHms");
-
-            $data = TransactionLog::select('stan')->where('additional_data', $additional_data)->first();
-
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL, "http://36.94.58.182:8080/ARRest/api");
-            curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-                'Content-Type: text/plain'
-            ));
-            curl_setopt($ch, CURLOPT_POSTFIELDS, [
-                'msg' => '{
-                    "msg_id": "' . substr($additional_data, 0, 16) . $dateTime . '",
-                    "msg_ui": "' . substr($additional_data, 0, 16) . '",
-                    "msg_si": "R82561",
-                    "msg_dt": "' . $data->stan . '"
-                }'
-            ]);
-            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-            curl_setopt($ch, CURLOPT_POST, 1);
-
-            $output = curl_exec($ch);
-            $err = curl_error($ch);
-            curl_close($ch);
-
-            if ($err) {
-                echo "cURL Error #:" . $err;
-            } else {
-                return Redirect::to('transaction')
-                    ->with('message', 'Reversal berhasil dikirim');
-            }
+            $transaction = TransactionLog::where('additional_data', $additional_data)->firstOrFail();
+    
+            $response = Curl::to("http://36.94.58.182:8080/ARRest/api")
+                ->withData([
+                    'msg' => json_encode([
+                        "msg_id" => substr($additional_data, 0, 16) . now()->format('YmdHis'),
+                        "msg_ui" => substr($additional_data, 0, 16),
+                        "msg_si" => "R82561",
+                        "msg_dt" => $transaction->stan
+                    ])
+                ])
+                ->post();
+    
+            DB::commit();
+    
+            return Redirect::to('transaction')->with('message', 'Reversal berhasil dikirim');
         } catch (Exception $e) {
             DB::rollBack();
-            return Redirect::to('transaction/reversal')
-                ->with('error', $e)
-                ->withInput();
-        } catch (\Illuminate\Database\QueryException $e) {
-            DB::rollBack();
-            return Redirect::to('transaction/reversal')
-                ->with('error', $e)
-                ->withInput();
+            Log::error($e->getMessage());
+            return Redirect::to('transaction/reversal')->with('error', 'An error occurred.');
         }
     }
 
@@ -423,54 +368,54 @@ class TransactionsController extends Controller
         DB::beginTransaction();
         try {
             $this->validator->with($request->all())->passesOrFail(ValidatorInterface::RULE_UPDATE);
-            $transaction = Transaction::find($id);
-            if ($transaction->status == 0 || $transaction->status == 1) {
-                $reqData['status'] = 2;
-            } else {
-                $reqData['status'] = 1;
-            }
+            $transaction = Transaction::findOrFail($id);
+            
+            $reqData['status'] = $transaction->status == 0 || $transaction->status == 1 ? 2 : 1;
             $data = $this->repository->update($reqData, $id);
 
             if ($data) {
                 DB::commit();
-                return Redirect::to('transaction')
-                    ->with('message', 'Status updated');
+                return Redirect::to('transaction')->with('message', 'Status updated');
             } else {
                 DB::rollBack();
-                return Redirect::to('transaction')
-                    ->with('error', $data->error)
-                    ->withInput();
+                return Redirect::to('transaction')->with('error', 'Failed to update status')->withInput();
             }
         } catch (Exception $e) {
             DB::rollBack();
-            return Redirect::to('transaction')
-                ->with('error', $e)
-                ->withInput();
+            return Redirect::to('transaction')->with('error', $e->getMessage())->withInput();
         } catch (\Illuminate\Database\QueryException $e) {
             DB::rollBack();
-            return Redirect::to('transaction')
-                ->with('error', $e)
-                ->withInput();
+            return Redirect::to('transaction')->with('error', $e->getMessage())->withInput();
         }
     }
+
 
     public function updateStatus($id)
     {
         try {
             $transaction = Transaction::find($id);
             if ($transaction) {
+                $msg_td = base64_encode($transaction->merchant->terminal->tid);
                 $msg_dt = date("YmdHms");
+                $theOtherKey = $transaction->merchant->terminal->tid.$msg_dt;
                 $base64key = base64_encode($theOtherKey);
 
                 $newEncrypter = new \Illuminate\Encryption\Encrypter($base64key, 'AES-256-CBC');
                 $encrypted = $newEncrypter->encrypt($transaction->code);
+
+                // echo $msg_td."||".$msg_dt."||".$encrypted."||".$base64key; die;
                 $ch = curl_init();
-                curl_setopt($ch, CURLOPT_URL, "http://36.94.58.180/api/core/public/index.php/api/transactions/detail/" . $id);
+                // $authorization = "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC8zNi45NC41OC4xODBcL2FwaVwvY29yZVwvcHVibGljXC9pbmRleC5waHBcL2FwaVwvYXV0aFwvbG9naW4iLCJpYXQiOjE2MjAyNzQ1MDMsImV4cCI6MTYyMTE0MzMwMywibmJmIjoxNjIwMjc0NTAzLCJqdGkiOiJndXRUaVprZElOb3c5RkVwIiwic3ViIjoiZTZhZTkwOWEtY2YzNC00ZDc2LWE5ZWQtMjJkOWJhNzU4ZmIwIiwicHJ2IjoiZjkzMDdlYjVmMjljNzJhOTBkYmFhZWYwZTI2ZjAyNjJlZGU4NmY1NSJ9.B8mm2IFt-TlYtvnmk8gctiBfAxnF5op0plemFJW6D_k";
+                // $method_request = "transaction_code=".$transaction->code;
+                // curl_setopt($ch, CURLOPT_URL, "http://36.94.58.180/api/core/public/index.php/api/transactions/checkStatus?".$method_request);
+                curl_setopt($ch, CURLOPT_URL, "http://36.94.58.180/api/core/public/index.php/api/transactions/detail/".$id);
+                // SSL important
                 curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-                    'api-key: ' . $encrypted,
-                    'msg-td: ' . $msg_td,
-                    'msg-dt: ' . $msg_dt
-                ));
+                    // $authorization,
+                    // 'msg-td: '.$msg_td,
+                    'api-key: '.$encrypted,
+                    'msg-td: '.$msg_td,
+                    'msg-dt: '.$msg_dt));
                 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
                 curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
@@ -478,21 +423,24 @@ class TransactionsController extends Controller
                 $output = curl_exec($ch);
                 $err = curl_error($ch);
                 curl_close($ch);
-
+                
                 if ($err) {
                     echo "cURL Error #:" . $err;
                 } else {
-                    return Redirect::back()->with('success', 'Status updated successfully');
+                    // print_r(json_decode($output));
+                    return Redirect::back()->with('success','Status updated successfully');
+                    // return redirect()->route('transaction')
+                    //             ->with('success','Status updated successfully');
                 }
             }
         } catch (Exception $e) {
             return Redirect::to('transaction')
-                ->with('error', $e)
-                ->withInput();
+                        ->with('error', $e)
+                        ->withInput();
         } catch (\Illuminate\Database\QueryException $e) {
             return Redirect::to('transaction')
-                ->with('error', $e)
-                ->withInput();
+                        ->with('error', $e)
+                        ->withInput();
         }
     }
 

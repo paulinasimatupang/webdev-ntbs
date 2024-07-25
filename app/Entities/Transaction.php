@@ -18,7 +18,7 @@ class Transaction extends Model implements Transformable
     public $incrementing = true;
 
     protected $fillable = [
-       'transacton_id',
+        'transacton_id',
         'service_id',
         'event_uid',
         'transaction_status_id',
@@ -36,6 +36,7 @@ class Transaction extends Model implements Transformable
 
     protected $table = 'public.transaction';
     protected $connection = 'pgsql_billiton';
+    public $timestamp = false;
 
     public function event()
     {
