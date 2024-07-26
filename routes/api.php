@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+use App\Http\Controllers\MasterDataController;
 
 /*
 |--------------------------------------------------------------------------
@@ -170,3 +171,9 @@ Route::post('users', 'UsersController@store');
 Route::get('users/{id}', 'UsersController@show');
 Route::post('users/{id}', 'UsersController@update');
 Route::delete('users/{id}', 'UsersController@destroy');
+
+// Route::get('master-data', [MasterDataController::class, 'index']); // Untuk menampilkan semua data
+// Route::post('master-data', [MasterDataController::class, 'store']); // Untuk menyimpan data baru
+// Route::get('master-data/{id}', [MasterDataController::class, 'show']); // Untuk menampilkan detail data berdasarkan ID
+// Route::post('master-data/{id}', [MasterDataController::class, 'update']); // Untuk memperbarui data berdasarkan ID
+// Route::delete('master-data/{id}', [MasterDataController::class, 'destroy']); // Untuk menghapus data berdasarkan ID
