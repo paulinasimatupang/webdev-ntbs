@@ -2,11 +2,12 @@
 
 namespace App\Entities;
 
+use Auth;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Prettus\Repository\Contracts\Transformable;
 use Prettus\Repository\Traits\TransformableTrait;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Auth;
+use App\Presenters\GroupSchemaShareholderPresenter;
 
 /**
  * Class GroupSchemaShareholder.

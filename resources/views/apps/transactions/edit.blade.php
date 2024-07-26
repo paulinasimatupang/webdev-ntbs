@@ -35,7 +35,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="form-group row">
+                                <!-- <div class="form-group row">
                                     <label class="col-sm-2 col-form-label">Agen</label>
                                     <div class="col-sm-10">
                                         <input type="text" class="form-control" value="{{!empty($transaction->merchant) ? $transaction->merchant->name : ''}}" name="name" placeholder="Agen" disabled>
@@ -43,7 +43,7 @@
                                             Nama Agen tidak boleh kosong.
                                         </div>
                                     </div>
-                                </div>
+                                </div> -->
                                 <div class="form-group row">
                                     <label class="col-sm-2 col-form-label">Transaction Code</label>
                                     <div class="col-sm-10">
@@ -53,7 +53,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="form-group row">
+                                <!-- <div class="form-group row">
                                     <label class="col-sm-2 col-form-label">Product</label>
                                     <div class="col-sm-10">
                                         <input type="text" class="form-control" value="{{$transaction->service->product->name}}" name="name" placeholder="Product" disabled>
@@ -61,7 +61,7 @@
                                             Product tidak boleh kosong.
                                         </div>
                                     </div>
-                                </div>
+                                </div> -->
                                 <div class="form-group row">
                                     <label class="col-sm-2 col-form-label">Price</label>
                                     <div class="col-sm-10">
