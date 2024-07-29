@@ -15,9 +15,10 @@ use Prettus\Repository\Traits\TransformableTrait;
 class Service extends Model implements Transformable
 {
     use TransformableTrait;
-    use SoftDeletes;
-
-    public $incrementing = true;
+    protected $connection = 'pgsql_billiton';
+    protected $table = 'service';
+    protected $primaryKey = 'service_id';
+    public $incrementing = false;
 
     protected $fillable = [
         'service_id',
@@ -33,7 +34,5 @@ class Service extends Model implements Transformable
         'service_url',
         'system_markup'
     ];
-    protected $table = 'public.service';
-    protected $connection = 'pgsql_billiton';
 
 }

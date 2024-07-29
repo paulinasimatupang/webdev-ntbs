@@ -100,6 +100,27 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/servicemeta/{id}/update', 'ServiceMetaController@update')->name('servicemeta_update');
     Route::post('/servicemeta/{id}/destroy', 'ServiceMetaController@destroy')->name('servicemeta_destroy');
 
+    Route::get('/screen', 'ScreenController@index')->name('screen');
+    Route::get('/screen/create', 'ScreenController@create')->name('screen_create');
+    Route::post('/screen/store', 'ScreenController@store')->name('screen_store');
+    Route::get('/screen/{id}/edit', 'ScreenController@edit')->name('screen_edit');
+    Route::post('/screen/{id}/update', 'ScreenController@update')->name('screen_update');
+    Route::post('/screen/{id}/destroy', 'ScreenController@destroy')->name('screen_destroy');
+
+    Route::get('/component', 'ComponentController@index')->name('component');
+    Route::get('/component/create', 'ComponentController@create')->name('component_create');
+    Route::post('/component/store', 'ComponentController@store')->name('component_store');
+    Route::get('/component/{id}/edit', 'ComponentController@edit')->name('component_edit');
+    Route::post('/component/{id}/update', 'ComponentController@update')->name('component_update');
+    Route::post('/component/{id}/destroy', 'ComponentController@destroy')->name('component_destroy');
+    
+    Route::get('/service', 'ServiceController@index')->name('service');
+    Route::get('/service/create', 'ServiceController@create')->name('service_create');
+    Route::post('/service/store', 'ServiceController@store')->name('service_store');
+    Route::get('/service/{id}/edit', 'ServiceController@edit')->name('service_edit');
+    Route::post('/service/{id}/update', 'ServiceController@update')->name('service_update');
+    Route::post('/service/{id}/destroy', 'ServiceController@destroy')->name('service_destroy');
+
 
 
 
