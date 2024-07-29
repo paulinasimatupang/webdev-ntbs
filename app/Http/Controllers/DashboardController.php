@@ -80,8 +80,7 @@ class DashboardController extends Controller
         }
 
         $fee_all = $fee_all->first();
-
-        //PPOB Fee
+        
         $data = ReportFee::select('terminal_id', 
                                         'merchant_id',	
                                         'agent_name');
