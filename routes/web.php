@@ -92,6 +92,15 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/masterdata/{id}/update', 'MasterDataController@update')->name('masterdata_update');
     Route::post('/masterdata/{id}/destroy', 'MasterDataController@destroy')->name('masterdata_destroy');
 
+    // Routes for ServiceMeta
+    Route::get('/servicemeta', 'ServiceMetaController@index')->name('servicemeta');
+    Route::get('/servicemeta/create', 'ServiceMetaController@create')->name('servicemeta_create');
+    Route::post('/servicemeta/store', 'ServiceMetaController@store')->name('servicemeta_store');
+    Route::get('/servicemeta/{id}/edit', 'ServiceMetaController@edit')->name('servicemeta_edit');
+    Route::post('/servicemeta/{id}/update', 'ServiceMetaController@update')->name('servicemeta_update');
+    Route::post('/servicemeta/{id}/destroy', 'ServiceMetaController@destroy')->name('servicemeta_destroy');
+
+
 
 
     // Route::view('/', 'starter')->name('starter');

@@ -11,8 +11,8 @@ class ReportFee extends Model
     //
     protected $fillable = [
         'id',
-        'tid',
-        'mid',
+        'terminal_id',
+        'merchant_id',  
         'total_amount_fee',
         'fee_agen',
         'fee_bjb',
@@ -20,10 +20,10 @@ class ReportFee extends Model
         'buffer',
         'total_amount_transaction',
         'total_transaction',
-        'product_name',
-        'created_at',
         'agent_name'
     ];
     
     protected $table = 'public.report_fee';
+
+
 }

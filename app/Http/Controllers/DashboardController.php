@@ -56,8 +56,8 @@ class DashboardController extends Controller
         }
 
         //All Fee
-        $fee_all = ReportFee::select('tid', 
-                                        'mid',	
+        $fee_all = ReportFee::select('terminal_id', 
+                                        'merchant_id',	
                                         'agent_name');
         $fee_all->selectRaw('SUM(CAST(total_amount_fee as int)) as total_amount_fee');
         $fee_all->selectRaw('sum(CAST(fee_agen as int)) as fee_agen');
@@ -66,7 +66,7 @@ class DashboardController extends Controller
         $fee_all->selectRaw('sum(CAST(buffer as int)) as buffer');
         $fee_all->selectRaw('SUM(CAST(total_amount_transaction as int)) as total_amount_transaction');
         $fee_all->selectRaw('count(*) as total_transaction');
-        $fee_all->groupBy('tid', 'mid', 'agent_name');
+        $fee_all->groupBy('terminal_id', 'merchant_id', 'agent_name');
         $fee_all->orderBy('total_amount_fee', 'desc');
 
         if($request->has('start_date') && $request->get('start_date')!=''){
@@ -82,8 +82,8 @@ class DashboardController extends Controller
         $fee_all = $fee_all->first();
 
         //PPOB Fee
-        $data = ReportFee::select('tid', 
-                                        'mid',	
+        $data = ReportFee::select('terminal_id', 
+                                        'merchant_id',	
                                         'agent_name');
         $data->selectRaw('SUM(CAST(total_amount_fee as int)) as total_amount_fee');
         $data->selectRaw('sum(CAST(fee_agen as int)) as fee_agen');
@@ -93,7 +93,7 @@ class DashboardController extends Controller
         $data->selectRaw('SUM(CAST(total_amount_transaction as int)) as total_amount_transaction');
         $data->selectRaw('count(*) as total_transaction');
         $data->whereIn('product_name', array('E82560', 'E82561'));
-        $data->groupBy('tid', 'mid', 'agent_name');
+        $data->groupBy('terminal_id', 'merchant_id', 'agent_name');
         $data->orderBy('total_amount_fee', 'desc');
 
         if($request->has('start_date') && $request->get('start_date')!=''){
@@ -109,8 +109,8 @@ class DashboardController extends Controller
         $data = $data->first();
 
         //Lakupandai Fee
-        $fee_lakupandai = ReportFee::select('tid', 
-                                        'mid',	
+        $fee_lakupandai = ReportFee::select('terminal_id', 
+                                        'merchant_id',	
                                         'agent_name');
         $fee_lakupandai->selectRaw('SUM(CAST(total_amount_fee as int)) as total_amount_fee');
         $fee_lakupandai->selectRaw('sum(CAST(fee_agen as int)) as fee_agen');
@@ -120,7 +120,7 @@ class DashboardController extends Controller
         $fee_lakupandai->selectRaw('SUM(CAST(total_amount_transaction as int)) as total_amount_transaction');
         $fee_lakupandai->selectRaw('count(*) as total_transaction');
         $fee_lakupandai->whereNotIn('product_name', array('E82560', 'E82561'));
-        $fee_lakupandai->groupBy('tid', 'mid', 'agent_name');
+        $fee_lakupandai->groupBy('terminal_id', 'merchant_id', 'agent_name');
         $fee_lakupandai->orderBy('total_amount_fee', 'desc');
 
         if($request->has('start_date') && $request->get('start_date')!=''){
@@ -137,8 +137,8 @@ class DashboardController extends Controller
 
 
         //Agent Reward
-        $reward_agent = ReportFee::select('tid', 
-                                        'mid',	
+        $reward_agent = ReportFee::select('terminal_id', 
+                                        'merchant_id',	
                                         'agent_name');
         $reward_agent->selectRaw('sum(CAST(fee_agen as int)) as fee_agen');
         $reward_agent->selectRaw('sum(CAST(buffer as int)) as buffer');
@@ -147,7 +147,7 @@ class DashboardController extends Controller
                                         THEN sum(CAST(buffer as int)) - 450000
                                         ELSE 0
                                         END as reward_total');
-        $reward_agent->groupBy('tid', 'mid', 'agent_name');
+        $reward_agent->groupBy('terminal_id', 'merchant_id', 'agent_name');
         $reward_agent->orderBy('buffer', 'desc');
 
         if($request->has('start_date') && $request->get('start_date')!=''){
@@ -362,8 +362,8 @@ class DashboardController extends Controller
             ]);
         }
 
-        $reward_agent = ReportFee::select('tid', 
-                                        'mid',	
+        $reward_agent = ReportFee::select('terminal_id', 
+                                        'merchant_id',	
                                         'agent_name');
         $reward_agent->selectRaw('sum(CAST(fee_agen as int)) as fee_agen');
         $reward_agent->selectRaw('sum(CAST(buffer as int)) as buffer');
@@ -372,7 +372,7 @@ class DashboardController extends Controller
                                         THEN sum(CAST(buffer as int)) - 450000
                                         ELSE 0
                                         END as reward_total');
-        $reward_agent->groupBy('tid', 'mid', 'agent_name');
+        $reward_agent->groupBy('terminal_id', 'merchant_id', 'agent_name');
         $reward_agent->orderBy('buffer', 'desc');
 
         if($request->has('start_date') && $request->get('start_date')!=''){
@@ -416,8 +416,8 @@ class DashboardController extends Controller
             ]);
         }
 
-        $data = ReportFee::select('tid', 
-                                        'mid',	
+        $data = ReportFee::select('terminal_id', 
+                                        'merchant_id',	
                                         'agent_name');
         $data->selectRaw('SUM(CAST(total_amount_fee as int)) as total_amount_fee');
         $data->selectRaw('sum(CAST(fee_agen as int)) as fee_agen');
@@ -427,7 +427,7 @@ class DashboardController extends Controller
         $data->selectRaw('SUM(CAST(total_amount_transaction as int)) as total_amount_transaction');
         $data->selectRaw('count(*) as total_transaction');
         
-        $data->groupBy('tid', 'mid', 'agent_name');
+        $data->groupBy('terminal_id', 'merchant_id', 'agent_name');
         $data->orderBy('total_amount_fee', 'desc');
 
         if($request->has('start_date') && $request->get('start_date')!=''){
@@ -470,8 +470,8 @@ class DashboardController extends Controller
             ]);
         }
 
-        $data = ReportFee::select('tid', 
-                                        'mid',	
+        $data = ReportFee::select('terminal_id', 
+                                        'merchant_id',	
                                         'agent_name');
         $data->selectRaw('SUM(CAST(total_amount_fee as int)) as total_amount_fee');
         $data->selectRaw('sum(CAST(fee_agen as int)) as fee_agen');
@@ -482,7 +482,7 @@ class DashboardController extends Controller
         $data->selectRaw('count(*) as total_transaction');
         $data->whereIn('product_name', array('E82560', 'E82561'));
 
-        $data->groupBy('tid', 'mid', 'agent_name');
+        $data->groupBy('terminal_id', 'merchant_id', 'agent_name');
         $data->orderBy('total_amount_fee', 'desc');
 
         if($request->has('start_date') && $request->get('start_date')!=''){
@@ -525,8 +525,8 @@ class DashboardController extends Controller
             ]);
         }
 
-        $data = ReportFee::select('tid', 
-                                        'mid',	
+        $data = ReportFee::select('terminal_id', 
+                                        'merchant_id',	
                                         'agent_name');
         $data->selectRaw('SUM(CAST(total_amount_fee as int)) as total_amount_fee');
         $data->selectRaw('sum(CAST(fee_agen as int)) as fee_agen');
@@ -537,7 +537,7 @@ class DashboardController extends Controller
         $data->selectRaw('count(*) as total_transaction');
         $data->whereNotIn('product_name', array('E82560', 'E82561'));
         
-        $data->groupBy('tid', 'mid', 'agent_name');
+        $data->groupBy('terminal_id', 'merchant_id', 'agent_name');
         $data->orderBy('total_amount_fee', 'desc');
 
         if($request->has('start_date') && $request->get('start_date')!=''){
@@ -814,7 +814,7 @@ class DashboardController extends Controller
         //         foreach($userGroups as $userGroup){
         //             $merchant = Merchant::where('user_id', $userGroup->user_id)->first();
         //             if($merchant){
-        //                 $revenues = TransactionBJB::where('mid', $merchant->mid)
+        //                 $revenues = TransactionBJB::where('merchant_id', $merchant->mid)
         //                                 // ->whereDate('tx_time', $date)
         //                                 ->where('status', '00')
         //                                 ->get();
