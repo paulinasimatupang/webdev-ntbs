@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Redirect;
 use DB;
 use App\Entities\ServiceMeta;
+use App\Entities\MetaType;
+use App\Entities\Service;
 use Exception;
 
 class ServiceMetaController extends Controller
@@ -34,7 +36,11 @@ class ServiceMetaController extends Controller
      */
     public function create()
     {
-        return view('apps.servicemeta.add');
+        $meta_type = MetaType::query()->get();
+        $service = Service::query()->get();
+        return view('apps.servicemeta.add')
+                ->with('meta_type', $meta_type)
+                ->with('service', $service);
     }
 
     /**
@@ -77,7 +83,9 @@ class ServiceMetaController extends Controller
     {
         try {
             $group = ServiceMeta::findOrFail($id);
-            return view('apps.servicemeta.edit', compact('group'));
+            $meta_type = MetaType::query()->get();
+            $service = Service::query()->get();
+            return view('apps.servicemeta.edit', compact('group', 'meta_type', 'service'));
         } catch (Exception $e) {
             return redirect()->route('servicemeta')
                 ->with('error', 'Data tidak ditemukan: ' . $e->getMessage());

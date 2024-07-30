@@ -15,8 +15,10 @@ use Prettus\Repository\Traits\TransformableTrait;
 class ServiceMeta extends Model implements Transformable
 {
     use TransformableTrait;
-
-    public $incrementing = true;
+    protected $connection = 'pgsql_billiton';
+    protected $table = 'service_meta';
+    public $incrementing = false;
+    public $timestamps = false;
 
     protected $fillable = [
         'meta_id',
@@ -26,15 +28,15 @@ class ServiceMeta extends Model implements Transformable
         'meta_default',
         'influx'
     ];
-
-    protected $table = 'public.service_meta';
-    protected $connection = 'pgsql_billiton';
-    public $timestamps = false;
-
     
     public function service()
     {
         return $this->belongsTo(Service::class, 'service_id', 'service_id');
+    }
+
+    public function metaType()
+    {
+        return $this->belongsTo(MetaType::class, 'meta_type_id', 'meta_type_id');
     }
     
 }

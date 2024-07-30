@@ -107,16 +107,14 @@
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label">Visible</label>
                             <div class="col-sm-10">
-                                <p>Debug: {{ old('visible', $component->visible) }}</p>
-
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" id="visible_true" name="visible" value="t" {{ old('visible', $component->visible) === 't' ? 'checked' : '' }}>
+                                    <input class="form-check-input" type="radio" id="visible_true" name="visible" value="t" {{old('visible', $component->visible ? 't' : 'f') === 't' ? 'checked' : '' }}>
                                     <label class="form-check-label" for="visible_true">
                                         True
                                     </label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" id="visible_false" name="visible" value="f" {{ old('visible', $component->visible) === 'f' ? 'checked' : '' }}>
+                                    <input class="form-check-input" type="radio" id="visible_false" name="visible" value="f" {{ old('visible', $component->visible ? 't' : 'f') === 'f' ? 'checked' : '' }}>
                                     <label class="form-check-label" for="visible_false">
                                         False
                                     </label>
@@ -128,15 +126,14 @@
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label">Mandatory</label>
                             <div class="col-sm-10">
-                                <p>Debug: {{ old('mandatory', $component->mandatory) }}</p>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" id="mandatory_true" name="mandatory" value="t" {{ old('mandatory', $component->mandatory) == 't' ? 'checked' : '' }}>
+                                    <input class="form-check-input" type="radio" id="mandatory_true" name="mandatory" value="t" {{ old('mandatory', $component->mandatory ? 't' : 'f') === 't' ? 'checked' : '' }}>
                                     <label class="form-check-label" for="mandatory_true">
                                         True
                                     </label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" id="mandatory_false" name="mandatory" value="f" {{ old('mandatory', $component->mandatory) == 'f' ? 'checked' : '' }}>
+                                    <input class="form-check-input" type="radio" id="mandatory_false" name="mandatory" value="f" {{ old('mandatory', $component->mandatory ? 't' : 'f') === 'f' ? 'checked' : '' }}>
                                     <label class="form-check-label" for="mandatory_false">
                                         False
                                     </label>
@@ -147,15 +144,14 @@
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label">Disabled</label>
                             <div class="col-sm-10">
-                                <p>Debug: {{ old('disabled', $component->disabled) }}</p>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" id="disabled_true" name="disabled" value="t" {{ old('disabled', $component->disabled) == 't' ? 'checked' : '' }}>
+                                    <input class="form-check-input" type="radio" id="disabled_true" name="disabled" value="t" {{ old('disabled', $component->disabled ? 't' : 'f') === 't' ? 'checked' : '' }}>
                                     <label class="form-check-label" for="disabled_true">
                                         True
                                     </label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" id="disabled_false" name="disabled" value="f" {{ old('disabled', $component->disabled) == 'f' ? 'checked' : '' }}>
+                                    <input class="form-check-input" type="radio" id="disabled_false" name="disabled" value="f" {{ old('disabled', $component->disabled ? 't' : 'f') === 'f' ? 'checked' : '' }}>
                                     <label class="form-check-label" for="disabled_false">
                                         False
                                     </label>

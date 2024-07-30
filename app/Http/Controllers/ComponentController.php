@@ -69,11 +69,11 @@ class ComponentController extends Controller
                 'comp_id' => 'required|string|max:5',
                 'component_type_id' => 'required|string|max:2',
                 'comp_content_type' => 'required|string|max:2',
-                'visible' => 'required|boolean',
+                'visible' => ['required', 'string', 'in:t,f'],
                 'comp_lbl' => 'required|string|max:100',
                 'comp_act' => 'nullable|string|max:100',
-                'mandatory' => 'required|boolean',
-                'disabled' => 'required|boolean',
+                'mandatory' => ['required', 'string', 'in:t,f'],
+                'disabled' => ['required', 'string', 'in:t,f'],
                 'min_length' => 'required|integer|max:4',
                 'max_length' => 'required|integer\max:4',
                 'comp_lbl_en' => 'nullable|string|max:100',
@@ -100,6 +100,7 @@ class ComponentController extends Controller
     public function edit($id)
     {
         $component = Component::findOrFail($id);
+        // dd($component);
         $component_type = ComponentType::all();
         $component_content_type = ComponentContentType::all();
         return view('apps.component.edit')
@@ -115,11 +116,11 @@ class ComponentController extends Controller
                 'comp_id' => 'required|string|max:5',
                 'component_type_id' => 'required|string|max:2',
                 'comp_content_type' => 'required|string|max:2',
-                'visible' => 'required|boolean',
+                'visible' => ['required', 'string', 'in:t,f'],
                 'comp_lbl' => 'required|string|max:100',
                 'comp_act' => 'nullable|string|max:100',
-                'mandatory' => 'required|boolean',
-                'disabled' => 'required|boolean',
+                'mandatory' => ['required', 'string', 'in:t,f'],
+                'disabled' => ['required', 'string', 'in:t,f'],
                 'min_length' => 'required|integer|max:4',
                 'max_length' => 'required|integer\max:4',
                 'comp_lbl_en' => 'nullable|string|max:100',

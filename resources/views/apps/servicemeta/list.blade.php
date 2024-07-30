@@ -25,7 +25,7 @@
         <div class="card text-left">
             <div class="card-body">
                 <div class="row">
-                    <h4 class=" col-sm-12 col-md-6 card-title mb-3">List Terminal </h4>
+                    <h4 class=" col-sm-12 col-md-6 card-title mb-3">List Service Meta </h4>
                 </div>
 
                 @if ($message = Session::get('success'))
@@ -66,7 +66,7 @@
                                 <td>{{ $group->seq }}</td>
                                 <td>{{ $group->meta_type_id }}</td>
                                 <td>{{ $group->meta_default }}</td>
-                                <td>{{ $group->influx ? 'Yes' : 'No' }}</td>
+                                <td>{{ $group->influx}}</td>
                                 <td>
                                     <a href="{{route('servicemeta_edit',[$group->meta_id])}}">
                                         <button class="btn btn-warning ripple btn-sm m-1 edit-btn" type="button" @php if($username !=='selada_produktif' ) echo 'disabled' @endphp>Edit</button>
