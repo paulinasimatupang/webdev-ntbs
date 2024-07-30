@@ -16,6 +16,7 @@ class ScreenComponent extends Model implements Transformable
     use TransformableTrait;
     protected $connection = 'pgsql_billiton';
     protected $table = 'screen_component';
+    protected $primaryKey = 'screen_id';
     public $incrementing = false;
 
     protected $fillable = [

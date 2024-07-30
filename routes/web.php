@@ -124,13 +124,11 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/screen-component', 'ScreenComponentController@index')->name('screen_component');
     Route::get('/screen-component/create', 'ScreenComponentController@create')->name('screen_component_create');
     Route::post('/screen-component/store', 'ScreenComponentController@store')->name('screen_component_store');
-    Route::get('/screen-component/{id}/edit', 'ScreenComponentController@edit')->name('screen_component_edit');
-    Route::post('/screen-component/{id}/update', 'ScreenComponentController@update')->name('screen_component_update');
-    Route::post('/screen-component/{id}/destroy', 'ScreenComponentController@destroy')->name('screen_component_destroy');
+    Route::get('/screen-component/{screen_id}/edit', 'ScreenComponentController@edit')->name('screen_component_edit');
+    Route::post('/screen-component/{screen_id}/update', 'ScreenComponentController@update')->name('screen_component_update');
+    Route::post('/screen-component/{screen_id}/destroy', 'ScreenComponentController@destroy')->name('screen_component_destroy');
 
-
-
-
+    Route::get('/new_features', 'NewFeaturesController@index')->name('new_features');
 
     // Route::view('/', 'starter')->name('starter');
     Route::get('large-compact-sidebar/dashboard/dashboard1', function () {

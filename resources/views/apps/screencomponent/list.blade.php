@@ -62,10 +62,10 @@
                                 <td>{{$item->comp_id}}</td>
                                 <td>{{$item->sequence}}</td>
                                 <td>
-                                    <a href="{{route('screen_component_edit',[$item->id])}}">
+                                    <a href="{{route('screen_component_edit',[$item->screen_id])}}">
                                         <button class="btn btn-warning ripple btn-sm m-1 edit-btn" type="button" @php if($username !=='selada_produktif' ) echo 'disabled' @endphp>Edit</button>
                                     </a>
-                                    <a href="#" onclick="deleteConfirm({{ $item->id }}); return false;" class="btn btn-danger ripple btn-sm m-1">Delete</a>
+                                    <a href="#" onclick="deleteConfirm({{ $item->screen_id }}); return false;" class="btn btn-danger ripple btn-sm m-1">Delete</a>
                                 </td>
                             </tr>
                             @php

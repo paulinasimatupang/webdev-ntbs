@@ -22,21 +22,21 @@
         <div class="col-md-12">
             <div class="card mb-5">
                 <div class="card-body">
-                    <form action="{{ route('screen_component_update', [$screenComponent->id]) }}" method="POST">
+                    <form action="{{ route('screen_component_update', [$screenComponent->screen_id]) }}" method="POST">
                         @csrf
                         @method('POST')
 
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label">Screen ID</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" value="{{ $screenComponent->screen_id }}" name="screen_id" placeholder="Screen ID" required>
+                                <input type="text" class="form-control" value="{{ $screenComponent->screen_id }}" name="screen_id" placeholder="Screen ID" readonly>
                             </div>
                         </div>
 
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label">Component ID</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" value="{{ $screenComponent->comp_id }}" name="comp_id" placeholder="Component ID" required>
+                                <input type="text" class="form-control" value="{{ $screenComponent->comp_id }}" name="comp_id" placeholder="Component ID" readonly>
                             </div>
                         </div>
 

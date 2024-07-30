@@ -30,7 +30,7 @@
                                 <select name="screen_id" class="form-control">
                                     <option value="">Select Screen ID</option>
                                     @foreach($screens as $screen)
-                                        <option value="{{ $screen->screen_id }}">{{ $screen->screen_id }}</option>
+                                        <option value="{{ $screen->screen_id }}">{{ $screen->screen_id }} - {{ $screen->screen_title }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -41,7 +41,7 @@
                                 <select name="comp_id" class="form-control">
                                     <option value="">Select Component ID</option>
                                     @foreach($components as $component)
-                                        <option value="{{ $component->comp_id }}">{{ $component->comp_id }}</option>
+                                        <option value="{{ $component->comp_id }}">{{ $component->comp_id }} - {{ $component-> comp_lbl }}</option>
                                     @endforeach
                                 </select>
                             </div>
