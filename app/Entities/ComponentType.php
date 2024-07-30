@@ -14,15 +14,13 @@ use Prettus\Repository\Traits\TransformableTrait;
 class ComponentType extends Model implements Transformable
 {
     use TransformableTrait;
-
-    public $incrementing = true;
+    protected $connection = 'pgsql_billiton';
+    protected $table = 'reff_component_type';
     protected $primaryKey = 'component_type_id';
+    public $incrementing = false;
 
     protected $fillable = [
         'component_type_id',
-        'component_type_naem'
+        'componenet_type_name'
     ];
-
-    protected $connection = 'pgsql_billiton';
-    protected $table = 'public.reff_component_type';
 }

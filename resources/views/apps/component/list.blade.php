@@ -7,7 +7,7 @@
 
 @section('main-content')
             <div class="breadcrumb">
-                <h1>Screen</h1>
+                <h1>Component</h1>
                 <ul>
                     <li><a href="">Selada</a></li>
                 </ul>
@@ -16,7 +16,7 @@
             <div class="row mb-4">
                 <div class="col-lg-12 col-md-12 col-sm-12 d-flex justify-content-center mb-3">
                     <div class="input-group">
-                        <a href="{{route('terminal_create')}}">
+                        <a href="{{route('component_create')}}">
                              
                             <button class="btn btn-warning ripple m-1 add-new-btn" type="button">Add New</button>
                         </a>
@@ -61,8 +61,8 @@
                                         <tr>
                                             <th scope="row">{{ $no }}</th>
                                             <td>{{$item->comp_id}}</td>
-                                            <td>{{$item->componentType->component_type_name ?? ''}}</td>
-                                            <td>{{$item->componentContentType->comp_content_type_name ?? ''}}</td>
+                                            <td>{{$item->component_type_id}}</td>
+                                            <td>{{$item->comp_content_type}}</td>
                                             <td>{{$item->comp_lbl}}</td>
                                             <td>
                                                 <a href="{{route('component_edit',[$item->comp_id])}}">

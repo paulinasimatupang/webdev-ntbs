@@ -43,23 +43,23 @@ class ComponentController extends Controller
         }
 
         $data = $data->get();
-        $comp_type = ComponentType::all();
-        $comp_content_type = ComponentContentType::all();
+        $component_type = ComponentType::all();
+        $component_content_type = ComponentContentType::all();
         $user = session()->get('user');
 
         return view('apps.component.list')
             ->with('data', $data)
-            ->with('comp_type', $comp_type)
-            ->with('comp_cont_type', $comp_content_type)
+            ->with('component_type', $component_type)
+            ->with('component_content_type', $component_content_type)
             ->with('username', $user->username);
     }
 
     public function create(Request $request){
-        $comp_type = ComponentType::query()->get();
-        $comp_content_type = ComponentContentType::query()->get();
+        $component_type = ComponentType::all();
+        $component_content_type = ComponentContentType::all();
         return view('apps.component.add')
-                ->with('comp_type', $comp_type)
-                ->with('comp_content_type', $comp_content_type);
+                ->with('component_type', $component_type)
+                ->with('component_content_type', $component_content_type);
     }
 
     public function store(Request $request)
@@ -76,7 +76,7 @@ class ComponentController extends Controller
                 'disabled' => 'required|boolean',
                 'min_length' => 'required|integer|max:4',
                 'max_length' => 'required|integer\max:4',
-                'comp_lbl_en' => 'required|string|max:100',
+                'comp_lbl_en' => 'nullable|string|max:100',
             ]);
             $component = new Component();
             $component->comp_id = $validatedData['comp_id'];
@@ -100,9 +100,12 @@ class ComponentController extends Controller
     public function edit($id)
     {
         $component = Component::findOrFail($id);
-        $comp_type = ComponentType::all();
-        $comp_content_type = ComponentContentType::all();
-        return view('apps.screen.edit', compact('component', 'comp_type', 'comp_content_type'));
+        $component_type = ComponentType::all();
+        $component_content_type = ComponentContentType::all();
+        return view('apps.component.edit')
+                ->with('component', $component)
+                ->with('component_type', $component_type)
+                ->with('component_content_type', $component_content_type);
     }
 
     public function update(Request $request, $id)
@@ -119,7 +122,7 @@ class ComponentController extends Controller
                 'disabled' => 'required|boolean',
                 'min_length' => 'required|integer|max:4',
                 'max_length' => 'required|integer\max:4',
-                'comp_lbl_en' => 'required|string|max:100',
+                'comp_lbl_en' => 'nullable|string|max:100',
             ]);
             $component = Component::findOrFail($id);
             $component->comp_id = $validatedData['comp_id'];

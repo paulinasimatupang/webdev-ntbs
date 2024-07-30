@@ -16,6 +16,13 @@ display: none;
                 </a>
                 <div class="triangle"></div>
             </li>
+            <li class="nav-item {{ request()->is('dashboard') ? 'active' : '' }}">
+                <a class="nav-item-hold" href="{{route('dashboard')}}">
+                <img class="img_bintang_sidebar" src="{{asset('/assets/images/sidebar_icon/new_features.png')}}" alt="">
+                    <span class="nav-text">New Features</span>
+                </a>
+                <div class="triangle"></div>
+            </li>
             <li class="nav-item {{ (request()->is('transaction') || request()->is('transaction/*')) ? 'active' : '' }}">
                 <a class="nav-item-hold" href="{{route('transaction')}}">
                  

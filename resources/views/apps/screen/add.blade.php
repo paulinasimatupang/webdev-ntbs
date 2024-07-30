@@ -35,7 +35,7 @@
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label">Screen Type</label>
                             <div class="col-sm-10">
-                                <select name="terminal_type" class="form-control">
+                                <select name="screen_type_id" class="form-control">
                                     <option value="">Select Screen  Type</option>
                                     @foreach($screen_type as $item)
                                         <option value="{{ $item->screen_type_id }}">{{ $item->screen_type_name }}</option>

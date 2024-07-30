@@ -14,8 +14,10 @@ use Prettus\Repository\Traits\TransformableTrait;
 class Component extends Model implements Transformable
 {
     use TransformableTrait;
-
-    public $incrementing = true;
+    protected $connection = 'pgsql_billiton';
+    protected $table = 'component';
+    protected $primaryKey = 'comp_id';
+    public $incrementing = false;
 
     protected $fillable = [
         'comp_id',
@@ -24,13 +26,12 @@ class Component extends Model implements Transformable
         'visible',
         'comp_lbl',
         'comp_act',
+        'mandatory',
+        'disabled',
         'min_length',
         'max_length',
         'comp_lbl_en'
     ];
-
-    protected $connection = 'pgsql_billiton';
-    protected $table = 'public.component';
 
     public function componentType()
     {

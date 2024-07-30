@@ -15,12 +15,10 @@ use Prettus\Repository\Traits\TransformableTrait;
 class ComponentContentType extends Model implements Transformable
 {
     use TransformableTrait;
-
-    public $incrementing = true;
     protected $connection = 'pgsql_billiton';
-    protected $table = 'public.reff_comp_content_type';
-
-    protected $primaryKey = 'comp_content_type'; 
+    protected $table = 'reff_comp_content_type';
+    protected $primaryKey = 'comp_content_type';
+    public $incrementing = false;
     protected $fillable = [
         'comp_content_type', 
         'comp_content_type_name'
