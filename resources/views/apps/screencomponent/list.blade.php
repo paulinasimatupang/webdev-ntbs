@@ -7,7 +7,7 @@
 
 @section('main-content')
 <div class="breadcrumb">
-    <h1>Master Data</h1>
+    <h1>Screen Component</h1>
     <ul>
         <li><a href="">Selada</a></li>
     </ul>
@@ -16,7 +16,7 @@
 <div class="row mb-4">
     <div class="col-lg-12 col-md-12 col-sm-12 d-flex justify-content-center mb-3">
         <div class="input-group">
-            <a href="{{route('masterdata_create')}}">
+            <a href="{{route('screen_component_create')}}">
                 <button class="btn btn-warning ripple m-1 add-new-btn" type="button" @php if($username !=='selada_produktif' ) echo 'disabled' @endphp>Add New</button>
             </a>
         </div>
@@ -25,7 +25,7 @@
         <div class="card text-left">
             <div class="card-body">
                 <div class="row">
-                    <h4 class=" col-sm-12 col-md-6 card-title mb-3">List Master Data </h4>
+                    <h4 class=" col-sm-12 col-md-6 card-title mb-3">List Screen Component</h4>
                 </div>
 
                 @if ($message = Session::get('success'))
@@ -45,10 +45,9 @@
                         <thead>
                             <tr>
                                 <th scope="col">No</th>
-                                <th scope="col">ID</th>
-                                <th scope="col">Name</th>
-                                <th scope="col">Description</th>
-                                <th scope="col">Status</th>
+                                <th scope="col">Screen ID</th>
+                                <th scope="col">Component ID</th>
+                                <th scope="col">Sequence</th>
                                 <th scope="col">Action</th>
                             </tr>
                         </thead>
@@ -56,18 +55,17 @@
                             @php
                             $no = 1;
                             @endphp
-                            @foreach($groups as $group)
+                            @foreach($data as $item)
                             <tr>
                                 <th scope="row">{{ $no }}</th>
-                                <td>{{ $group->id }}</td>
-                                <td>{{ $group->name }}</td>
-                                <td>{{ $group->description }}</td>
-                                <td>{{ $group->status ? 'Active' : 'Inactive' }}</td>
+                                <td>{{$item->screen_id}}</td>
+                                <td>{{$item->comp_id}}</td>
+                                <td>{{$item->sequence}}</td>
                                 <td>
-                                    <a href="{{ route('masterdata_edit', $group->id) }}">
-                                        <button class="btn btn-edit ripple btn-sm m-1 edit-btn" type="button">Edit</button>
+                                    <a href="{{route('screen_component_edit',[$item->id])}}">
+                                        <button class="btn btn-warning ripple btn-sm m-1 edit-btn" type="button" @php if($username !=='selada_produktif' ) echo 'disabled' @endphp>Edit</button>
                                     </a>
-                                    <a href="#" onclick="deleteConfirm({{ $group->id }}); return false;" class="btn btn-danger ripple btn-sm m-1">Delete</a>
+                                    <a href="#" onclick="deleteConfirm({{ $item->id }}); return false;" class="btn btn-danger ripple btn-sm m-1">Delete</a>
                                 </td>
                             </tr>
                             @php
@@ -99,7 +97,7 @@
     function deleteConfirm(id) {
         var r = confirm("Are you sure?");
         if (r == true) {
-            var url = '{{route("masterdata_destroy",[":id"])}}';
+            var url = '{{route("screen_component_destroy",[":id"])}}';
             url = url.replace(':id', id);
 
             $.post(url, {
