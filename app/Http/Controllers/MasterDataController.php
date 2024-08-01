@@ -130,4 +130,54 @@ class MasterDataController extends Controller
                 ->with('error', 'Terjadi kesalahan saat menghapus data: ' . $e->getMessage());
         }
     }
+
+    public function showChart()
+    {
+        try {
+            // Ambil data yang diperlukan untuk grafik
+            $data = MasterData::select('name', 'status', DB::raw('count(*) as total'))
+                ->groupBy('name', 'status')
+                ->get()
+                ->groupBy('name')
+                ->map(function ($item) {
+                    return $item->pluck('total', 'status')->toArray();
+                });
+
+            $labels = array_keys($data->first()); // Nama-nama dari entitas
+            $activeData = [];
+            $inactiveData = [];
+
+            foreach ($data as $item) {
+                $activeData[] = $item[1] ?? 0; // Status 1 untuk aktif
+                $inactiveData[] = $item[0] ?? 0; // Status 0 untuk non-aktif
+            }
+
+            // Konversi data menjadi format yang dapat digunakan oleh library grafik
+            $chartData = [
+                'labels' => $labels,
+                'datasets' => [
+                    [
+                        'label' => 'Active',
+                        'data' => $activeData,
+                        'borderColor' => '#36A2EB',
+                        'backgroundColor' => 'rgba(54, 162, 235, 0.2)',
+                        'fill' => false,
+                    ],
+                    [
+                        'label' => 'Inactive',
+                        'data' => $inactiveData,
+                        'borderColor' => '#FF6384',
+                        'backgroundColor' => 'rgba(255, 99, 132, 0.2)',
+                        'fill' => false,
+                    ],
+                ],
+            ];
+
+            // Kirim data ke view untuk ditampilkan dalam grafik
+            return view('apps.masterdata.chart', compact('chartData'));
+        } catch (Exception $e) {
+            return redirect()->route('masterdata_chart')
+                ->with('error', 'Terjadi kesalahan saat memuat data grafik: ' . $e->getMessage());
+        }
+    }
 }

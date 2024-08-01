@@ -91,6 +91,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/masterdata/{id}/edit', 'MasterDataController@edit')->name('masterdata_edit');
     Route::post('/masterdata/{id}/update', 'MasterDataController@update')->name('masterdata_update');
     Route::post('/masterdata/{id}/destroy', 'MasterDataController@destroy')->name('masterdata_destroy');
+    Route::get('/masterdata/chart', 'MasterDataController@showChart')->name('masterdata_chart');
 
     // Routes for ServiceMeta
     Route::get('/servicemeta', 'ServiceMetaController@index')->name('servicemeta');
