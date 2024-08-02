@@ -2,7 +2,7 @@
 
 @section('main-content')
     <div class="breadcrumb">
-        <h1>Add Screen Component</h1>
+        <h1>Add Service Meta</h1>
         <ul>
             <li><a href="">Selada</a></li>
         </ul>
@@ -44,7 +44,7 @@
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label">Sequence</label>
                             <div class="col-sm-10">
-                                <input type="number" class="form-control" value="{{ old('sequence') }}" name="sequence" placeholder="Sequence" required>
+                                <input type="number" class="form-control" value="{{ old('seq') }}" name="seq" placeholder="Seq" required>
                             </div>
                         </div>
                         <div class="form-group row">

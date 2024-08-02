@@ -129,6 +129,13 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/screen-component/{screen_id}/update', 'ScreenComponentController@update')->name('screen_component_update');
     Route::post('/screen-component/{screen_id}/destroy', 'ScreenComponentController@destroy')->name('screen_component_destroy');
 
+    Route::get('/billers', 'BillersController@index')->name('billers');
+    Route::get('/billers/create', 'BillersController@create')->name('billers_create');
+    Route::post('/billers/store', 'BillersController@store')->name('billers_store');
+    Route::get('/billers/{id}/edit', 'BillersController@edit')->name('billers_edit');
+    Route::post('/billers/{id}/update', 'BillersController@update')->name('billers_update');
+    Route::post('/billers/{id}/destroy', 'BillersController@destroy')->name('billers_destroy');
+
     Route::get('/new_features', 'NewFeaturesController@index')->name('new_features');
 
     // Route::view('/', 'starter')->name('starter');

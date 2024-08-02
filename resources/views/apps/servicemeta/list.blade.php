@@ -68,8 +68,8 @@
                                 <td>{{ $group->meta_default }}</td>
                                 <td>{{ $group->influx}}</td>
                                 <td>
-                                    <a href="{{route('servicemeta_edit',[$group->meta_id])}}">
-                                        <button class="btn btn-warning ripple btn-sm m-1 edit-btn" type="button" @php if($username !=='selada_produktif' ) echo 'disabled' @endphp>Edit</button>
+                                    <a href="{{route('servicemeta_edit', $group->meta_id)}}">
+                                        <button class="btn btn-edit ripple btn-sm m-1 edit-btn" type="button">Edit</button>
                                     </a>
                                     <a href="#" onclick="deleteConfirm({{ $group->meta_id }}); return false;" class="btn btn-danger ripple btn-sm m-1">Delete</a>
                                 </td>
@@ -103,7 +103,7 @@
     function deleteConfirm(id) {
         var r = confirm("Are you sure?");
         if (r == true) {
-            var url = '{{route("terminal_destroy",[":id"])}}';
+            var url = '{{route("servicemeta_destroy",[":id"])}}';
             url = url.replace(':id', id);
 
             $.post(url, {

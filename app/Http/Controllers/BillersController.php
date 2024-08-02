@@ -4,108 +4,74 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use DB;
-
-use App\Http\Requests;
 use Prettus\Validator\Contracts\ValidatorInterface;
 use Prettus\Validator\Exceptions\ValidatorException;
 use App\Http\Requests\BillerCreateRequest;
 use App\Http\Requests\BillerUpdateRequest;
 use App\Repositories\BillerRepository;
 use App\Validators\BillerValidator;
-
 use App\Entities\Biller;
+use Exception;
 
-/**
- * Class BillersController.
- *
- * @package namespace App\Http\Controllers;
- */
 class BillersController extends Controller
 {
-    /**
-     * @var BillerRepository
-     */
     protected $repository;
-
-    /**
-     * @var BillerValidator
-     */
     protected $validator;
 
-    /**
-     * BillersController constructor.
-     *
-     * @param BillerRepository $repository
-     * @param BillerValidator $validator
-     */
     public function __construct(BillerRepository $repository, BillerValidator $validator)
     {
         $this->repository = $repository;
         $this->validator  = $validator;
     }
 
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index(Request $request)
     {
         $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
 
         $data = Biller::select('*');
 
-        if($request->has('search')){
-            $data = $data->whereRaw('lower(name) like (?)',["%{$request->search}%"]);
+        if ($request->has('search')) {
+            $data = $data->whereRaw('lower(name) like (?)', ["%{$request->search}%"]);
         }
 
-        if($request->has('status')){
-            $data = $data->where('status',$request->status);
+        if ($request->has('status')) {
+            $data = $data->where('status', $request->status);
         }
 
         $total = $data->count();
-    
-        if($request->has('limit')){
+
+        if ($request->has('limit')) {
             $data->take($request->get('limit'));
-            
-            if($request->has('offset')){
-            	$data->skip($request->get('offset'));
+
+            if ($request->has('offset')) {
+                $data->skip($request->get('offset'));
             }
         }
 
-        if($request->has('order_type')){
-            if($request->get('order_type') == 'asc'){
-                if($request->has('order_by')){
-                    $data->orderBy($request->get('order_by'));
-                }else{
-                    $data->orderBy('created_at');
-                }
-            }else{
-                if($request->has('order_by')){
-                    $data->orderBy($request->get('order_by'), 'desc');
-                }else{
-                    $data->orderBy('created_at', 'desc');
-                }
-            }
-        }else{
+        if ($request->has('order_type')) {
+            $orderType = $request->get('order_type') == 'asc' ? 'asc' : 'desc';
+            $orderBy = $request->has('order_by') ? $request->get('order_by') : 'created_at';
+            $data->orderBy($orderBy, $orderType);
+        } else {
             $data->orderBy('created_at', 'desc');
-        } 
+        }
 
         $data = $data->get();
 
-        return view('apps.billers.list')
-                ->with('data', $data);
+        // Ambil username dari autentikasi atau sesi
+        $username = auth()->user() ? auth()->user()->username : '';
+
+        return view('apps.billers.list', compact('data', 'total', 'username'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  BillerCreateRequest $request
-     *
-     * @return \Illuminate\Http\Response
-     *
-     * @throws \Prettus\Validator\Exceptions\ValidatorException
-     */
+    public function create()
+    {
+        // Ambil data yang dibutuhkan di halaman create
+        $groups = Biller::all(); // Misalnya Anda ingin menampilkan semua biller sebagai opsi grup
+
+        return view('apps.billers.add', compact('groups'));
+    }
+
     public function store(BillerCreateRequest $request)
     {
         DB::beginTransaction();
@@ -114,77 +80,34 @@ class BillersController extends Controller
 
             $data = $this->repository->create($request->all());
 
-            $response = [
-                'status'  => true,
-                'message' => 'Biller created.',
-                'data'    => $data->toArray(),
-            ];
-
             DB::commit();
-            return response()->json($response, 200);
+
+            return redirect()->route('billers')->with('success', 'Biller created.');
+        } catch (ValidatorException $e) {
+            DB::rollBack();
+
+            return redirect()->route('billers_create')->withErrors($e->getMessageBag())->withInput();
         } catch (Exception $e) {
-            // For rollback data if one data is error
             DB::rollBack();
 
-            return response()->json([
-                'status'    => false, 
-                'error'     => 'Something wrong!',
-                'exception' => $e
-            ], 500);
-        } catch (\Illuminate\Database\QueryException $e) {
-            // For rollback data if one data is error
-            DB::rollBack();
+            // Log error
+            \Log::error('Error creating biller: ', ['error' => $e->getMessage()]);
 
-            return response()->json([
-                'status'    => false, 
-                'error'     => 'Something wrong!',
-                'exception' => $e
-            ], 500);
+            return redirect()->route('billers_create')->with('error', 'Something went wrong!')->withInput();
         }
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int $id
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        $data = $this->repository->find($id);
-        
-        $response = [
-            'status'  => true,
-            'message' => 'Success',
-            'data'    => $data,
-        ];
-
-        return response()->json($response, 200);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int $id
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function edit($id)
     {
-        //
+        try {
+            $data = $this->repository->findOrFail($id); // Gunakan findOrFail untuk menangani data tidak ditemukan
+
+            return view('apps.billers.edit', compact('data'));
+        } catch (Exception $e) {
+            return redirect()->route('billers')->with('error', 'Biller not found: ' . $e->getMessage());
+        }
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  BillerUpdateRequest $request
-     * @param  string            $id
-     *
-     * @return Response
-     *
-     * @throws \Prettus\Validator\Exceptions\ValidatorException
-     */
     public function update(BillerUpdateRequest $request, $id)
     {
         DB::beginTransaction();
@@ -193,76 +116,41 @@ class BillersController extends Controller
 
             $data = $this->repository->update($request->all(), $id);
 
-            $response = [
-                'status'  => true,
-                'message' => 'Biller updated.',
-                'data'    => $data->toArray(),
-            ];
-
             DB::commit();
-            return response()->json($response, 200);
+
+            return redirect()->route('billers')->with('success', 'Biller updated.');
+        } catch (ValidatorException $e) {
+            DB::rollBack();
+
+            return redirect()->route('billers_edit', $id)->withErrors($e->getMessageBag())->withInput();
         } catch (Exception $e) {
-            // For rollback data if one data is error
             DB::rollBack();
 
-            return response()->json([
-                'status'    => false, 
-                'error'     => 'Something wrong!',
-                'exception' => $e
-            ], 500);
-        } catch (\Illuminate\Database\QueryException $e) {
-            // For rollback data if one data is error
-            DB::rollBack();
+            // Log error
+            \Log::error('Error updating biller: ', ['error' => $e->getMessage()]);
 
-            return response()->json([
-                'status'    => false, 
-                'error'     => 'Something wrong!',
-                'exception' => $e
-            ], 500);
+            return redirect()->route('billers_edit', $id)->with('error', 'Something went wrong!')->withInput();
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int $id
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
         DB::beginTransaction();
         try {
-            $deleted = $this->repository->delete($id);
+            // Temukan Biller berdasarkan ID atau lemparkan pengecualian jika tidak ditemukan
+            $biller = $this->repository->findOrFail($id);
 
-            if($deleted){
-                $response = [
-                    'status'  => true,
-                    'message' => 'Biller deleted.'
-                ];
-    
-                DB::commit();
-                return response()->json($response, 200);
-            }
-            
+            // Hapus Biller dari database
+            $biller->delete();
+
+            DB::commit();
+
+            return redirect()->route('billers')->with('success', 'Biller berhasil dihapus.');
         } catch (Exception $e) {
-            // For rollback data if one data is error
             DB::rollBack();
 
-            return response()->json([
-                'status'    => false, 
-                'error'     => 'Something wrong!',
-                'exception' => $e
-            ], 500);
-        } catch (\Illuminate\Database\QueryException $e) {
-            // For rollback data if one data is error
-            DB::rollBack();
-
-            return response()->json([
-                'status'    => false, 
-                'error'     => 'Something wrong!',
-                'exception' => $e
-            ], 500);
+            return redirect()->route('billers')
+                ->with('error', 'Terjadi kesalahan saat menghapus biller: ' . $e->getMessage());
         }
     }
 }

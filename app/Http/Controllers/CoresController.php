@@ -344,6 +344,19 @@ class CoresController extends Controller
                         'sig'   => $sig,
                     ];
 
+		    if ($request->has('vcr')){
+			
+		    	$reqData = [
+                        'cmd'   => $request->cmd,
+                        'tid'   => $request->tid,
+                        'nop'   => $request->nop,
+                        'vcr'   => $request->vcr,
+                        'uid'   => $biller->username,
+                        'sig'   => $sig,
+                    ];
+
+		    }
+
                     $responseCurl = Curl::to($data->url)
                                         ->withData($reqData)
                                         ->asJson()
@@ -450,6 +463,8 @@ class CoresController extends Controller
                     $reqData['bln'] = $request->bln;
                 }elseif($request->has('voc')){
                     $reqData['voc'] = $request->voc;
+                }elseif($request->has('vcr')){
+                    $reqData['vcr'] = $request->vcr;
                 }
                 
                 
@@ -471,7 +486,7 @@ class CoresController extends Controller
                         ];
 
                         DB::commit();
-                        return response()->json($response, 200);
+                        return $response;
                     }else{
                         $response = [
                             'status'  => false,
@@ -479,7 +494,7 @@ class CoresController extends Controller
                         ];
             
                         DB::rollBack();
-                        return response()->json($response, 500);
+                        return $response;
                     }
                 }else{
                     $response = [
@@ -488,7 +503,7 @@ class CoresController extends Controller
                     ];
         
                     DB::rollBack();
-                    return response()->json($response, 404);
+                    return $response;
                 }
             }else{
                 $response = [
@@ -497,26 +512,30 @@ class CoresController extends Controller
                 ];
     
                 DB::rollBack();
-                return response()->json($response, 404);
+                return $response;
             }
         } catch (Exception $e) {
             // For rollback data if one data is error
             DB::rollBack();
 
-            return response()->json([
+            $response = [
                 'status'    => false, 
                 'error'     => 'Something wrong!',
                 'exception' => $e
-            ], 500);
+            ];
+
+            return $response;
         } catch (\Illuminate\Database\QueryException $e) {
             // For rollback data if one data is error
             DB::rollBack();
 
-            return response()->json([
+            $response = [
                 'status'    => false, 
                 'error'     => 'Something wrong!',
                 'exception' => $e
-            ], 500);
+            ];
+            
+            return $response;
         }
     }
 
@@ -560,7 +579,7 @@ class CoresController extends Controller
                             'error'   => 'Request to server failed'
                         ];
             
-                        return response()->json($response, 500);
+                        return $response;
                     }
                 }else{
                     $response = [
@@ -568,7 +587,7 @@ class CoresController extends Controller
                         'error'   => 'Biller Detail not found'
                     ];
         
-                    return response()->json($response, 404);
+                    return $response;
                 }
             }else{
                 $response = [
@@ -576,24 +595,28 @@ class CoresController extends Controller
                     'error'   => 'Biller not found'
                 ];
     
-                return response()->json($response, 404);
+                return $response;
             }
         } catch (Exception $e) {
             // For rollback data if one data is error
 
-            return response()->json([
+            $response = [
                 'status'    => false, 
                 'error'     => 'Something wrong!',
                 'exception' => $e
-            ], 500);
+            ];
+            
+            return $response;
         } catch (\Illuminate\Database\QueryException $e) {
             // For rollback data if one data is error
 
-            return response()->json([
+            $response = [
                 'status'    => false, 
                 'error'     => 'Something wrong!',
                 'exception' => $e
-            ], 500);
+            ];
+            
+            return $response;
         }
     }
 }

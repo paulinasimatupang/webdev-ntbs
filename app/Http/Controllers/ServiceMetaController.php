@@ -12,15 +12,10 @@ use Exception;
 
 class ServiceMetaController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
         try {
-            $username = auth()->user()->username; // Atau cara lain untuk mendapatkan username
+            $username = auth()->user()->username; // Cara mendapatkan username
             $groups = ServiceMeta::all();
             return view('apps.servicemeta.list', compact('groups', 'username'));
         } catch (Exception $e) {
@@ -29,87 +24,60 @@ class ServiceMetaController extends Controller
         }
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
-        $meta_type = MetaType::query()->get();
-        $service = Service::query()->get();
-        return view('apps.servicemeta.add')
-                ->with('meta_type', $meta_type)
-                ->with('service', $service);
+        $meta_type = MetaType::all();
+        $service = Service::all();
+        return view('apps.servicemeta.add', compact('meta_type', 'service'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
         DB::beginTransaction();
         try {
             $validatedData = $request->validate([
                 'meta_id' => 'required|integer',
-                'service_id' => 'required|integer',
+                'service_id' => 'required|string',
                 'seq' => 'required|integer',
-                'meta_type_id' => 'required|integer',
+                'meta_type_id' => 'required|string',
                 'meta_default' => 'nullable|string',
-                'influx' => 'nullable|boolean',
+                'influx' => 'nullable|string',
             ]);
+
 
             ServiceMeta::create($validatedData);
             DB::commit();
             return redirect()->route('servicemeta')->with('success', 'Data berhasil ditambahkan.');
         } catch (Exception $e) {
             DB::rollBack();
-            return redirect()->route('servicemetacreate')
+            return redirect()->route('servicemeta_create')
                 ->with('error', 'Terjadi kesalahan saat menyimpan data: ' . $e->getMessage())
                 ->withInput();
         }
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int $id
-     * @return \Illuminate\Http\Response
-     */
     public function edit($id)
     {
         try {
             $group = ServiceMeta::findOrFail($id);
-            $meta_type = MetaType::query()->get();
-            $service = Service::query()->get();
-            return view('apps.servicemeta.edit', compact('group', 'meta_type', 'service'));
+            return view('apps.servicemeta.edit', compact('group'));
         } catch (Exception $e) {
             return redirect()->route('servicemeta')
                 ->with('error', 'Data tidak ditemukan: ' . $e->getMessage());
         }
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request $request
-     * @param  int $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, $id)
     {
         DB::beginTransaction();
         try {
             $validatedData = $request->validate([
                 'meta_id' => 'required|integer',
-                'service_id' => 'required|integer',
+                'service_id' => 'required|string',
                 'seq' => 'required|integer',
-                'meta_type_id' => 'required|integer',
+                'meta_type_id' => 'required|string',
                 'meta_default' => 'nullable|string',
-                'influx' => 'nullable|boolean',
+                'influx' => 'nullable|string',
             ]);
 
             $group = ServiceMeta::findOrFail($id);
@@ -124,12 +92,6 @@ class ServiceMetaController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
         DB::beginTransaction();
