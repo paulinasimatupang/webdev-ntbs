@@ -19,6 +19,8 @@ use App\Repositories\TransactionRepository;
 use App\Validators\TransactionValidator;
 use Ixudra\Curl\Facades\Curl;
 
+use App\Services\TransactionService;
+
 use App\Entities\Merchant;
 use App\Entities\Service;
 use App\Entities\Transaction;
@@ -56,6 +58,8 @@ class TransactionsController extends Controller
      * @var TransactionValidator
      */
     protected $validator;
+    protected $transactionService;
+
 
     /**
      * TransactionsController constructor.
@@ -63,11 +67,13 @@ class TransactionsController extends Controller
      * @param TransactionRepository $repository
      * @param TransactionValidator $validator
      */
-    public function __construct(TransactionRepository $repository, TransactionValidator $validator)
+    public function __construct(TransactionRepository $repository, TransactionValidator $validator, TransactionService $transactionService)
     {
         $this->repository = $repository;
-        $this->validator  = $validator;
+        $this->validator = $validator;
+        $this->transactionService = $transactionService;
     }
+
 
     /**
      * Display a listing of the resource.
@@ -77,17 +83,17 @@ class TransactionsController extends Controller
     public function index(Request $request)
     {
 
-        if(!$request->has('status') && $request->get('status')==''){
+        if (!$request->has('status') && $request->get('status') == '') {
             $request->request->add([
                 'status'  => 'Success'
             ]);
         }
-        if(!$request->has('start_date') && $request->get('start_date')==''){
+        if (!$request->has('start_date') && $request->get('start_date') == '') {
             $request->request->add([
                 'start_date'      => date("m-d-Y")
             ]);
         }
-        if(!$request->has('end_date') && $request->get('end_date')==''){
+        if (!$request->has('end_date') && $request->get('end_date') == '') {
             $request->request->add([
                 'end_date'      => date("m-d-Y")
             ]);
@@ -105,75 +111,70 @@ class TransactionsController extends Controller
         //         });
         // }
 
-        if($request->has('start_date') && $request->get('start_date')!=''){
-            $data->where('transaction_time', '>', $request->get('start_date').' 00:00:00');
+        if ($request->has('start_date') && $request->get('start_date') != '') {
+            $data->where('transaction_time', '>', $request->get('start_date') . ' 00:00:00');
         }
 
-        if($request->has('end_date') && $request->get('end_date')!=''){
-            $data->where('transaction_time', '<=', $request->get('end_date').' 23:59:59');
+        if ($request->has('end_date') && $request->get('end_date') != '') {
+            $data->where('transaction_time', '<=', $request->get('end_date') . ' 23:59:59');
         }
 
 
-        if($request->has('terminal_id') && $request->get('terminal_id')!=''){
-            $data->whereHas('terminal',function($query) use ($request)
-                {
-                    $query->where('terminal_id', '=', $request->get('terminal_id'));
-                });
+        if ($request->has('terminal_id') && $request->get('terminal_id') != '') {
+            $data->whereHas('terminal', function ($query) use ($request) {
+                $query->where('terminal_id', '=', $request->get('terminal_id'));
+            });
         }
 
-        if($request->has('merchant_id') && $request->get('merchant_id')!=''){
-            $data->whereHas('terminal',function($query) use ($request)
-                {
-                    $query->where('merchant_id', '=', $request->get('merchant_id'));
-                });
+        if ($request->has('merchant_id') && $request->get('merchant_id') != '') {
+            $data->whereHas('terminal', function ($query) use ($request) {
+                $query->where('merchant_id', '=', $request->get('merchant_id'));
+            });
         }
 
-        if($request->has('status') && $request->get('status')!='' && $request->get('status')!='Select Status'){
+        if ($request->has('status') && $request->get('status') != '' && $request->get('status') != 'Select Status') {
             $status = $request->get('status');
-            if ($status == 'Success'){
+            if ($status == 'Success') {
                 $data->where('transaction_status_id', '=', 0);
-            }
-            else if ($status == 'Failed'){
+            } else if ($status == 'Failed') {
                 $data->where('transaction_status_id', '=', 1);
-                
-            } else if ($status == 'Pending'){
+            } else if ($status == 'Pending') {
                 $data->where('transaction_status_id', '=', 2);
             }
-            
         }
         // if($request->has('stan') && $request->get('stan')!=''){
         //     $data->where('stan', '=', $request->get('stan'));
         // }
-    
+
         // if($request->has('limit')){
         //     $data->take($request->get('limit'));
-            
+
         //     if($request->has('offset')){
         //     	$data->skip($request->get('offset'));
         //     }
         // }
 
-        if($request->has('order_type')){
-            if($request->get('order_type') == 'asc'){
-                if($request->has('order_by')){
+        if ($request->has('order_type')) {
+            if ($request->get('order_type') == 'asc') {
+                if ($request->has('order_by')) {
                     $data->orderBy($request->get('order_by'));
-                }else{
+                } else {
                     $data->orderBy('transaction_time');
                 }
-            }else{
-                if($request->has('order_by')){
+            } else {
+                if ($request->has('order_by')) {
                     $data->orderBy($request->get('order_by'), 'desc');
-                }else{
+                } else {
                     $data->orderBy('transaction_time', 'desc');
                 }
             }
-        }else{
+        } else {
             $data->orderBy('transaction_time', 'desc');
         }
         // $data->where('is_development','!=',1);
         // $data->where('is_marked_as_failed','!=',1);
 
-        $dataRevenue = Array();
+        $dataRevenue = array();
         $dataRevenue['total_trx'] = $data->count();
         $dataRevenue['amount_trx']   = $data->sum('amount');
         $dataRevenue['total_fee']   = $data->sum('amount') - $data->sum('fee');
@@ -183,46 +184,46 @@ class TransactionsController extends Controller
 
         $total = $data->count();
 
-        if($request->has('order_type')){
-            if($request->get('order_type') == 'asc'){
-                if($request->has('order_by')){
+        if ($request->has('order_type')) {
+            if ($request->get('order_type') == 'asc') {
+                if ($request->has('order_by')) {
                     $data->orderBy($request->get('order_by'));
-                }else{
+                } else {
                     $data->orderBy('transaction_time');
                 }
-            }else{
-                if($request->has('order_by')){
+            } else {
+                if ($request->has('order_by')) {
                     $data->orderBy($request->get('order_by'), 'desc');
-                }else{
+                } else {
                     $data->orderBy('transaction_time', 'desc');
                 }
             }
-        }else{
+        } else {
             $data->orderBy('transaction_time', 'desc');
         }
 
         $data = $data->paginate(10);
-        
-        foreach($data as $item){
-            if($item->status == 0){
+
+        foreach ($data as $item) {
+            if ($item->status == 0) {
                 $item->status_text = 'Success';
             }
 
-            if($item->status == 1){
+            if ($item->status == 1) {
                 $item->status_text = 'Failed';
             }
 
-            if($item->status == 2){
+            if ($item->status == 2) {
                 $item->status_text = 'Pending';
             }
 
             $item->fee = $item->price - $item->vendor_price;
 
-            if($item->is_suspect == 0){
+            if ($item->is_suspect == 0) {
                 $item->status_suspect = 'False';
             }
 
-            if($item->is_suspect == 1){
+            if ($item->is_suspect == 1) {
                 $item->status_suspect = 'True';
             }
         }
@@ -230,330 +231,162 @@ class TransactionsController extends Controller
         $user = session()->get('user');
 
         return view('apps.transactions.list')
-                ->with('data', $data)
-                ->with('dataRevenue', $dataRevenue)
-                ->with('username', $user->username);
+            ->with('data', $data)
+            ->with('dataRevenue', $dataRevenue)
+            ->with('username', $user->username);
     }
 
     public function export(Request $request)
     {
 
-        if(!$request->has('status') && $request->get('status')==''){
+        if (!$request->has('status') && $request->get('status') == '') {
             $request->request->add([
                 'status'  => 'Success'
             ]);
         }
-        if(!$request->has('start_date') && $request->get('start_date')==''){
+        if (!$request->has('start_date') && $request->get('start_date') == '') {
             $request->request->add([
                 'start_date'      => date("Y-m-d")
             ]);
         }
-        if(!$request->has('end_date') && $request->get('end_date')==''){
+        if (!$request->has('end_date') && $request->get('end_date') == '') {
             $request->request->add([
                 'end_date'      => date("Y-m-d")
             ]);
         }
         $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
 
-        return (new TransactionExport($request))->download('transaction_export_'.$request->get('start_date').'_'.$request->get('end_date').'.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+        return (new TransactionExport($request))->download('transaction_export_' . $request->get('start_date') . '_' . $request->get('end_date') . '.xlsx', \Maatwebsite\Excel\Excel::XLSX);
     }
 
     public function saleExport(Request $request)
     {
 
-        if(!$request->has('status') && $request->get('status')==''){
+        if (!$request->has('status') && $request->get('status') == '') {
             $request->request->add([
                 'status'  => 'Success'
             ]);
         }
-        if(!$request->has('start_date') && $request->get('start_date')==''){
+        if (!$request->has('start_date') && $request->get('start_date') == '') {
             $request->request->add([
                 'start_date'      => date("Y-m-d")
             ]);
         }
-        if(!$request->has('end_date') && $request->get('end_date')==''){
+        if (!$request->has('end_date') && $request->get('end_date') == '') {
             $request->request->add([
                 'end_date'      => date("Y-m-d")
             ]);
         }
         $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
 
-        return (new TransactionSaleExport($request))->download('transaction_sale_export_'.$request->get('start_date').'_'.$request->get('end_date').'.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+        return (new TransactionSaleExport($request))->download('transaction_sale_export_' . $request->get('start_date') . '_' . $request->get('end_date') . '.xlsx', \Maatwebsite\Excel\Excel::XLSX);
     }
 
 
-public function exportCSV(Request $request)
+    public function exportCSV(Request $request)
     {
 
-        if(!$request->has('status') && $request->get('status')==''){
+        if (!$request->has('status') && $request->get('status') == '') {
             $request->request->add([
                 'status'  => 'Success'
             ]);
         }
-        if(!$request->has('start_date') && $request->get('start_date')==''){
+        if (!$request->has('start_date') && $request->get('start_date') == '') {
             $request->request->add([
                 'start_date'      => date("Y-m-d")
             ]);
         }
-        if(!$request->has('end_date') && $request->get('end_date')==''){
+        if (!$request->has('end_date') && $request->get('end_date') == '') {
             $request->request->add([
                 'end_date'      => date("Y-m-d")
             ]);
         }
         $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
 
-        return (new TransactionExport($request))->download('transaction_export_'.$request->get('start_date').'_'.$request->get('end_date').'.csv', \Maatwebsite\Excel\Excel::CSV,[
-                'Content-Type' => 'text/csv'
+        return (new TransactionExport($request))->download('transaction_export_' . $request->get('start_date') . '_' . $request->get('end_date') . '.csv', \Maatwebsite\Excel\Excel::CSV, [
+            'Content-Type' => 'text/csv'
         ]);
     }
 
-   public function exportPDF(Request $request)
+    public function exportPDF(Request $request)
     {
 
-        if(!$request->has('status') && $request->get('status')==''){
+        if (!$request->has('status') && $request->get('status') == '') {
             $request->request->add([
                 'status'  => 'Success'
             ]);
         }
-        if(!$request->has('start_date') && $request->get('start_date')==''){
+        if (!$request->has('start_date') && $request->get('start_date') == '') {
             $request->request->add([
                 'start_date'      => date("Y-m-d")
             ]);
         }
-        if(!$request->has('end_date') && $request->get('end_date')==''){
+        if (!$request->has('end_date') && $request->get('end_date') == '') {
             $request->request->add([
                 'end_date'      => date("Y-m-d")
             ]);
         }
         $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
 
-        return (new TransactionExport($request))->download('transaction_export_'.$request->get('start_date').'_'.$request->get('end_date').'.pdf', \Maatwebsite\Excel\Excel::DOMPDF);
+        return (new TransactionExport($request))->download('transaction_export_' . $request->get('start_date') . '_' . $request->get('end_date') . '.pdf', \Maatwebsite\Excel\Excel::DOMPDF);
     }
 
     public function feeExport(Request $request)
     {
 
-        if(!$request->has('status') && $request->get('status')==''){
+        if (!$request->has('status') && $request->get('status') == '') {
             $request->request->add([
                 'status'  => 'Success'
             ]);
         }
-        if(!$request->has('start_date') && $request->get('start_date')==''){
+        if (!$request->has('start_date') && $request->get('start_date') == '') {
             $request->request->add([
                 'start_date'      => date("Y-m-d")
             ]);
         }
-        if(!$request->has('end_date') && $request->get('end_date')==''){
+        if (!$request->has('end_date') && $request->get('end_date') == '') {
             $request->request->add([
                 'end_date'      => date("Y-m-d")
             ]);
         }
         $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
 
-	    return (new TransactionFeeSaleExport($request))->download('transaction_fee_sale_export_'.$request->get('start_date').'_'.$request->get('end_date').'.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+        return (new TransactionFeeSaleExport($request))->download('transaction_fee_sale_export_' . $request->get('start_date') . '_' . $request->get('end_date') . '.xlsx', \Maatwebsite\Excel\Excel::XLSX);
     }
 
-    // public function reversal(Request $request)
-    // {
-    //     if(!$request->has('start_date') && $request->get('start_date')==''){
-    //         $request->request->add([
-    //             'start_date'      => date("Y-m-d")
-    //         ]);
-    //     }
-    //     if(!$request->has('end_date') && $request->get('end_date')==''){
-    //         $request->request->add([
-    //             'end_date'      => date("Y-m-d")
-    //         ]);
-    //     }
-
-    //     $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
-
-    //     $data = TransactionLog::whereNotNull('responsecode');
-    //     $data->where('tx_mti', '=', '0200');
-    //     $data->where('proc_code', '=', '500000');
-
-    //     if($request->has('start_date') && $request->get('start_date')!=''){
-    //         $data->where('tx_time', '>', $request->get('start_date').' 00:00:00');
-    //     }
-
-    //     if($request->has('end_date') && $request->get('end_date')!=''){
-    //         $data->where('tx_time', '<=', $request->get('end_date').' 23:59:59');
-    //     }
-
-    //     if($request->has('stan') && $request->get('stan')!=''){
-    //         $data->where('stan', $request->get('stan'));
-    //     }
-
-    //     $dataLog = TransactionLog::select('stan')->whereNotNull('responsecode');
-    //     $dataLog->where('tx_mti', '=', '0200');
-    //     $dataLog->where('proc_code', '=', '500000');
-
-    //     if($request->has('start_date') && $request->get('start_date')!=''){
-    //         $dataLog->where('tx_time', '>', $request->get('start_date').' 00:00:00');
-    //     }
-
-    //     if($request->has('end_date') && $request->get('end_date')!=''){
-    //         $dataLog->where('tx_time', '<=', $request->get('end_date').' 23:59:59');
-    //     }
-
-    //     if($request->has('stan') && $request->get('stan')!=''){
-    //         $dataLog->where('stan', $request->get('stan'));
-    //     }
-
-    //     $dataPpob = Transaction::select('stan');
-    //     if($request->has('start_date') && $request->get('start_date')!=''){
-    //         $dataPpob->where('transaction_time', '>', $request->get('start_date').' 00:00:00');
-    //     }
-
-    //     if($request->has('end_date') && $request->get('end_date')!=''){
-    //         $dataPpob->where('transaction_time', '<=', $request->get('end_date').' 23:59:59');
-    //     }
-
-    //     if($request->has('stan') && $request->get('stan')!=''){
-    //         $dataPpob->where('stan', $request->get('stan'));
-    //     }
-
-    //     $dataLog = $dataLog->get();
-    //     $dataPpob = $dataPpob->get();
-
-    //     $arrayLength = $dataLog->count();
-    //     $ppobSize = $dataPpob->count();
-        
-    //     $array = array();
-    //     $i = 0;
-    //     $count = 0;
-    //     for ($i = 0; $i < $arrayLength; $i++){
-    //         $isIdentical = false;
-    //         try {
-    //             for ($j = 0; $j < $ppobSize; $j++){
-    //                 if($dataLog[$i]->stan == $dataPpob[$j]->stan){
-    //                     $isIdentical = true;
-    //                 }
-    //             }
-    //         } catch (Exception $e){
-
-    //         }
-
-    //         if($isIdentical){
-
-    //         } else {
-    //             $array[$count] = $dataLog[$i]->stan;
-    //             $count++;
-    //         }
-    //     }
-
-    //     $data->whereIn('stan', $array);
-
-    //     $data = $data->paginate(10);
-
-    //     return view('apps.transactions.reversal')
-    //             ->with('data', $data);
-    // }
-
-    // public function postReversal(Request $request, $additional_data)
-    // {
-
-    //     DB::beginTransaction();
-    //     try {
-    //         $dateTime = date("YmdHms");
-
-    //         $data = TransactionLog::select('stan')->where('additional_data', $additional_data)->first();
-
-    //         $ch = curl_init();
-    //             curl_setopt($ch, CURLOPT_URL, "http://36.94.58.182:8080/ARRest/api");
-    //             curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-    //             'Content-Type: text/plain'));
-                
-    //             curl_setopt($ch, CURLOPT_POSTFIELDS, [ 'msg' => '{
-    //                                                 "msg_id": "'. substr($additional_data, 0, 16) . $dateTime . '",
-    //                                                 "msg_ui": "'. substr($additional_data, 0, 16) .'",
-    //                                                 "msg_si": "R82561",
-    //                                                 "msg_dt": "'. $data->stan .'"
-    //                                             }'] );
-    //             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-    //             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    //             curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-    //             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1 );
-    //             curl_setopt($ch, CURLOPT_POST,           1 );
-
-    //             $output = curl_exec($ch);
-    //             $err = curl_error($ch);
-    //             curl_close($ch);
-
-    //             $value = '{ msg: {
-    //                                                 "msg_id": "'. substr($additional_data, 0, 16) . $dateTime . '",
-    //                                                 "msg_ui": "'. substr($additional_data, 0, 16) .'",
-    //                                                 "msg_si": "R82561",
-    //                                                 "msg_dt": "'. $data->stan .'"
-    //                                             } }';
-
-    //             echo $output . $value;die;
-                
-    //             if ($err) {
-    //                 echo "cURL Error #:" . $err;
-    //             } else {
-    //                 return Redirect::to('transaction')
-    //                     ->with('message', 'Reversal berhasil dikirim');
-    //             }
-
-    //     } catch (Exception $e) {
-    //         DB::rollBack();
-    //         return Redirect::to('transaction/reversal')
-    //                     ->with('error', $e)
-    //                     ->withInput();
-    //     } catch (\Illuminate\Database\QueryException $e) {
-    //         DB::rollBack();
-    //         return Redirect::to('transaction/reversal')
-    //                     ->with('error', $e)
-    //                     ->withInput();
-    //     }
-    // }
-
-    // public function edit($id)
-    // {
-    //     $transaction = Transaction::find($id);
-    //     if($transaction){
-    //         return view('apps.transactions.edit')
-    //             ->with('transaction', $transaction);
-    //     }else{
-    //         return Redirect::to('transaction')
-    //                         ->with('error', 'Data not found');
-    //     }
-    // }
-
-public function update(TransactionUpdateRequest $request, $id)
+    public function update(TransactionUpdateRequest $request, $id)
     {
         DB::beginTransaction();
         try {
             $this->validator->with($request->all())->passesOrFail(ValidatorInterface::RULE_UPDATE);
             $transaction = Transaction::find($id);
-                if ($transaction->status == 0 || $transaction->status == 1) {
-                    $reqData['status']               = 2;
-                } else {
-                    $reqData['status']               = 1;
-                }
-                $data = $this->repository->update($reqData, $id);
-            
-            if($data){    
+            if ($transaction->status == 0 || $transaction->status == 1) {
+                $reqData['status']               = 2;
+            } else {
+                $reqData['status']               = 1;
+            }
+            $data = $this->repository->update($reqData, $id);
+
+            if ($data) {
                 DB::commit();
                 return Redirect::to('transaction')
-                                    ->with('message', 'Status updated');
-            }else{
+                    ->with('message', 'Status updated');
+            } else {
                 DB::rollBack();
                 return Redirect::to('transaction')
-                            ->with('error', $data->error)
-                            ->withInput();
+                    ->with('error', $data->error)
+                    ->withInput();
             }
         } catch (Exception $e) {
             DB::rollBack();
             return Redirect::to('transaction')
-                        ->with('error', $e)
-                        ->withInput();
+                ->with('error', $e)
+                ->withInput();
         } catch (\Illuminate\Database\QueryException $e) {
             DB::rollBack();
             return Redirect::to('transaction')
-                        ->with('error', $e)
-                        ->withInput();
+                ->with('error', $e)
+                ->withInput();
         }
     }
 
@@ -564,7 +397,7 @@ public function update(TransactionUpdateRequest $request, $id)
             if ($transaction) {
                 $msg_td = base64_encode($transaction->merchant->terminal->tid);
                 $msg_dt = date("YmdHms");
-                $theOtherKey = $transaction->merchant->terminal->tid.$msg_dt;
+                $theOtherKey = $transaction->merchant->terminal->tid . $msg_dt;
                 $base64key = base64_encode($theOtherKey);
 
                 $newEncrypter = new \Illuminate\Encryption\Encrypter($base64key, 'AES-256-CBC');
@@ -572,13 +405,14 @@ public function update(TransactionUpdateRequest $request, $id)
 
                 $ch = curl_init();
 
-                curl_setopt($ch, CURLOPT_URL, "http://36.94.58.180/api/core/public/index.php/api/transactions/detail/".$id);
+                curl_setopt($ch, CURLOPT_URL, "http://36.94.58.180/api/core/public/index.php/api/transactions/detail/" . $id);
 
                 curl_setopt($ch, CURLOPT_HTTPHEADER, array(
 
-                    'api-key: '.$encrypted,
-                    'msg-td: '.$msg_td,
-                    'msg-dt: '.$msg_dt));
+                    'api-key: ' . $encrypted,
+                    'msg-td: ' . $msg_td,
+                    'msg-dt: ' . $msg_dt
+                ));
                 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
                 curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
@@ -586,21 +420,21 @@ public function update(TransactionUpdateRequest $request, $id)
                 $output = curl_exec($ch);
                 $err = curl_error($ch);
                 curl_close($ch);
-                
+
                 if ($err) {
                     echo "cURL Error #:" . $err;
                 } else {
-                    return Redirect::back()->with('success','Status updated successfully');
+                    return Redirect::back()->with('success', 'Status updated successfully');
                 }
             }
         } catch (Exception $e) {
             return Redirect::to('transaction')
-                        ->with('error', $e)
-                        ->withInput();
+                ->with('error', $e)
+                ->withInput();
         } catch (\Illuminate\Database\QueryException $e) {
             return Redirect::to('transaction')
-                        ->with('error', $e)
-                        ->withInput();
+                ->with('error', $e)
+                ->withInput();
         }
     }
 
@@ -614,38 +448,37 @@ public function update(TransactionUpdateRequest $request, $id)
             return Redirect::to('transaction')
                 ->with('stan', $stan)
                 ->with('date', $date);
-             $transaction = TransactionLog::where('stan', '=', $stan)->first();
+            $transaction = TransactionLog::where('stan', '=', $stan)->first();
 
-                foreach($transaction as $trx){
-                    if(strpos($trx->tx_time, $date) !== false){
-                        $reqData['tx_mti']               = '0400';
-                        $reqData['rp_mti']               = '0410';
+            foreach ($transaction as $trx) {
+                if (strpos($trx->tx_time, $date) !== false) {
+                    $reqData['tx_mti']               = '0400';
+                    $reqData['rp_mti']               = '0410';
 
-                        $data = $this->repository->update($reqData, $stan);
-            
-                        if($data){    
-                            DB::commit();
-                            return Redirect::to('transaction')
-                                                ->with('message', 'Status updated');
-                        }else{
-                            DB::rollBack();
-                            return Redirect::to('transaction')
-                                        ->with('error', $data->error)
-                                        ->withInput();
-                        }
+                    $data = $this->repository->update($reqData, $stan);
+
+                    if ($data) {
+                        DB::commit();
+                        return Redirect::to('transaction')
+                            ->with('message', 'Status updated');
+                    } else {
+                        DB::rollBack();
+                        return Redirect::to('transaction')
+                            ->with('error', $data->error)
+                            ->withInput();
                     }
                 }
-            
+            }
         } catch (Exception $e) {
             DB::rollBack();
             return Redirect::to('transaction')
-                        ->with('error', $e)
-                        ->withInput();
+                ->with('error', $e)
+                ->withInput();
         } catch (\Illuminate\Database\QueryException $e) {
             DB::rollBack();
             return Redirect::to('transaction')
-                        ->with('error', $e)
-                        ->withInput();
+                ->with('error', $e)
+                ->withInput();
         }
     }
 
@@ -657,22 +490,22 @@ public function update(TransactionUpdateRequest $request, $id)
             $group_id       = $request->group_id;
             $schema_id      = $request->schema_id;
             $dataCalculate  = $this->calculate($group_id, $date);
-            
+
 
             $groupSchema = GroupSchema::where('group_id', $group_id)
-                                        ->where('schema_id', $schema_id)
-                                        ->first();
-            if($groupSchema){
-                $revenue = $dataCalculate['revenue'] * $groupSchema->share/100;
+                ->where('schema_id', $schema_id)
+                ->first();
+            if ($groupSchema) {
+                $revenue = $dataCalculate['revenue'] * $groupSchema->share / 100;
 
-                if($groupSchema->is_shareable ==  true){
+                if ($groupSchema->is_shareable ==  true) {
                     $shareholders = GroupSchemaShareholder::where('group_schema_id', $groupSchema->id)
-                                                        ->with('shareholder')
-                                                        ->get();
-                    foreach($shareholders as $sh){
-                        $sh->revenue = $sh->share/100 * $revenue;
+                        ->with('shareholder')
+                        ->get();
+                    foreach ($shareholders as $sh) {
+                        $sh->revenue = $sh->share / 100 * $revenue;
                     }
-                }else{
+                } else {
                     $shareholders = [];
                 }
 
@@ -682,9 +515,9 @@ public function update(TransactionUpdateRequest $request, $id)
                     'amount_trx'     => $dataCalculate['amount'],
                     'shareholder'   => $shareholders
                 ];
-            }else{
+            } else {
                 return response()->json([
-                    'status'    => false, 
+                    'status'    => false,
                     'error'     => 'Group has not schema'
                 ], 404);
             }
@@ -696,7 +529,7 @@ public function update(TransactionUpdateRequest $request, $id)
             DB::rollBack();
 
             return response()->json([
-                'status'    => false, 
+                'status'    => false,
                 'error'     => 'Something wrong!',
                 'exception' => $e
             ], 500);
@@ -705,7 +538,7 @@ public function update(TransactionUpdateRequest $request, $id)
             DB::rollBack();
 
             return response()->json([
-                'status'    => false, 
+                'status'    => false,
                 'error'     => 'Something wrong!',
                 'exception' => $e
             ], 500);
@@ -722,20 +555,20 @@ public function update(TransactionUpdateRequest $request, $id)
         $result['total_fee']   = 0;
         $result['total_hpp']   = 0;
         // Count
-        $count = Transaction::where('status',1)
-        ->count();
+        $count = Transaction::where('status', 1)
+            ->count();
         $result['count'] = $count;
 
         // Sum
-        $sum = Transaction::where('status',1)
-                ->sum('price');
+        $sum = Transaction::where('status', 1)
+            ->sum('price');
         $result['amount'] = $sum;
 
-        $fee = Transaction::where('status',1)
-                ->sum('fee');
+        $fee = Transaction::where('status', 1)
+            ->sum('fee');
         $result['total_fee'] = $fee;
 
-        $result['total_hpp'] = $sum-$fee;
+        $result['total_hpp'] = $sum - $fee;
 
         return $result;
     }
@@ -749,21 +582,27 @@ public function update(TransactionUpdateRequest $request, $id)
         $result['total_fee']   = 0;
         $result['total_hpp']   = 0;
         // Count
-        $count = Transaction::where('status',1)->where('is_development','!=',1)
-        ->count();
+        $count = Transaction::where('status', 1)->where('is_development', '!=', 1)
+            ->count();
         $result['count'] = $count;
 
         // Sum
-        $sum = Transaction::where('status',1)->where('is_development','!=',1)
-                ->sum('price');
+        $sum = Transaction::where('status', 1)->where('is_development', '!=', 1)
+            ->sum('price');
         $result['amount'] = $sum;
 
-        $total_hpp = Transaction::where('status',1)->where('is_development','!=',1)
-                ->sum('vendor_price');
+        $total_hpp = Transaction::where('status', 1)->where('is_development', '!=', 1)
+            ->sum('vendor_price');
         $result['total_hpp'] = $total_hpp;
-        
-        $result['total_fee'] = $sum-$total_hpp;
+
+        $result['total_fee'] = $sum - $total_hpp;
 
         return $result;
+    }
+
+    public function rankTransactions()
+    {
+        $rankedTransactions = $this->transactionService->rankTransactionsByMerchantUser();
+        return view('apps.transactions.rank', compact('rankedTransactions'));
     }
 }

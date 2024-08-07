@@ -56,4 +56,9 @@ class UsersBilliton extends Model
     {
         return $this->hasMany(Transaction::class, 'user_uid', 'user_uid');
     }
+
+    public function merchants()
+    {
+        return $this->hasMany(Merchant::class, 'user_id', 'user_uid');
+    }
 }

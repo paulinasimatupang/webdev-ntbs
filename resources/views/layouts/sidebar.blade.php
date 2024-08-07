@@ -27,7 +27,7 @@ display: none;
                 <a class="nav-item-hold" href="{{route('transaction')}}">
                  
                     <img class="img_bintang_sidebar" src="{{asset('/assets/images/sidebar_icon/transaction.png')}}"alt="">
-                    <span class="nav-text">Transaction</span>
+                    <span class="nav-text">Transaction Laku Pandai</span>
                 </a>
                 <div class="triangle"></div>
             </li>
@@ -35,7 +35,7 @@ display: none;
                 <a class="nav-item-hold" href="{{route('transactionBJB')}}">
                  
                     <img class="img_bintang_sidebar" src="{{asset('/assets/images/sidebar_icon/transactionbjb.png')}}"alt="">
-                    <span class="nav-text">Transaction BJB</span>
+                    <span class="nav-text">Transaction BJB (PPOB)</span>
                 </a>
                 <div class="triangle"></div>
             </li>

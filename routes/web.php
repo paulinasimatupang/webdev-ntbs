@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\RankingLakuPandaiController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -20,14 +22,15 @@ Route::get('/logout', 'AuthController@logout')->name('logout');
 
 Route::group(['middleware' => 'auth'], function () {
 
-    Route::get('/dashboard', 'DashboardController@dashboard')->name('dashboard');
-    Route::get('/dashboard/ppob', 'DashboardController@detailDashboardPpob')->name('detail_dashboard_ppob');
-    Route::get('/dashboard/lakupandai', 'DashboardController@detailDashboardLakupandai')->name('detail_dashboard_lakupandai');
-    Route::get('/dashboard/all', 'DashboardController@detailDashboardAll')->name('detail_dashboard_all');
-    Route::get('/dashboard/reward', 'DashboardController@agentReward')->name('agent_reward');
-    Route::get('/dashboard/activeAgent', 'DashboardController@agentActive')->name('agent_active');
-    Route::get('/dashboard/resignAgent', 'DashboardController@agentResign')->name('agent_resign');
-    Route::get('/dashboard/allAgent', 'DashboardController@agentAll')->name('agent_all');
+    // Route::get('/dashboard', 'DashboardController@dashboard')->name('dashboard');
+    // Route::get('/dashboard/ppob', 'DashboardController@detailDashboardPpob')->name('detail_dashboard_ppob');
+    // Route::get('/dashboard/lakupandai', 'DashboardController@detailDashboardLakupandai')->name('detail_dashboard_lakupandai');
+    // Route::get('/dashboard/all', 'DashboardController@detailDashboardAll')->name('detail_dashboard_all');
+    // Route::get('/dashboard/reward', 'DashboardController@agentReward')->name('agent_reward');
+    // Route::get('/dashboard/activeAgent', 'DashboardController@agentActive')->name('agent_active');
+    // Route::get('/dashboard/resignAgent', 'DashboardController@agentResign')->name('agent_resign');
+    // Route::get('/dashboard/allAgent', 'DashboardController@agentAll')->name('agent_all');
+    Route::get('/dashboard', 'DashboardBaruController@index')->name('dashboard');
     Route::get('/landing', function () {
         return view('apps.landing');
     })->name('landing');
@@ -49,6 +52,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/transaction/feeExport', 'TransactionsController@feeExport');
     Route::get('/transaction/reversal', 'TransactionsController@reversal');
     Route::get('/transaction/reversal/{additional_data}', 'TransactionsController@postReversal')->name('transaction_postReversal');
+    Route::get('/transaction/rank', 'TransactionsController@rankTransactions')->name('transaction_rank');
+
 
     Route::get('/transactionSaleBJB', 'TransactionSaleBJBController@indexSale')->name('transactionSaleBJB');
     // Route::post('/transactionSaleBJB/{id}/updatebjb', 'TransactionSaleBJBController@updatebjb')->name('transaction_updatebjb');
@@ -62,15 +67,27 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/transaction_log/store', 'TransactionLogController@store')->name('transactionlog_store');
     Route::post('/transaction_log/updatestatus/{additional_data}', 'TransactionsController@updateStatus')->name('transactionlog_updatestatus');
 
-    Route::post('/transactionBJB/{id}/updatebjb', 'TransactionBJBsController@updatebjb')->name('transaction_updatebjb');
-    Route::post('/transactionBJB/{id}/update', 'TransactionBJBsController@update')->name('transactionBJB_update');
-    Route::get('/transactionBJB/{id}/edit', 'TransactionBJBsController@edit')->name('transactionBJB_edit');
+    // Route::post('/transactionBJB/{id}/updatebjb', 'TransactionBJBsController@updatebjb')->name('transaction_updatebjb');
+    // Route::post('/transactionBJB/{id}/update', 'TransactionBJBsController@update')->name('transactionBJB_update');
+    // Route::get('/transactionBJB/{id}/edit', 'TransactionBJBsController@edit')->name('transactionBJB_edit');
+    // Route::get('/transactionBJB', 'TransactionBJBsController@index')->name('transactionBJB');
+    // Route::get('/transactionBJB/export', 'TransactionBJBsController@export');
+    // Route::get('/transactionBJB/exportPDF', 'TransactionBJBsController@exportPDF');
+    // Route::get('/transactionBJB/exportCSV', 'TransactionBJBsController@exportCSV');
+    // Route::get('/transactionBJB/feeExport', 'TransactionBJBsController@feeExport');
+    // Route::get('/transactionBJB/edit/{id}', 'TransactionBJBsController@edit');
+
     Route::get('/transactionBJB', 'TransactionBJBsController@index')->name('transactionBJB');
+    Route::get('/transactionBJB/updateStatus/{code}', 'TransactionBJBsController@updateStatus')->name('transactionBJB_updateStatus');
+    Route::get('/transactionBJB/{id}/edit', 'TransactionBJBsController@edit')->name('transactionBJB_edit');
+    Route::post('/transactionBJB/{id}/update', 'TransactionBJBsController@update')->name('transactionBJB_update');
     Route::get('/transactionBJB/export', 'TransactionBJBsController@export');
     Route::get('/transactionBJB/exportPDF', 'TransactionBJBsController@exportPDF');
     Route::get('/transactionBJB/exportCSV', 'TransactionBJBsController@exportCSV');
+    Route::get('/transactionBJB/saleExport', 'TransactionBJBsController@saleExport');
     Route::get('/transactionBJB/feeExport', 'TransactionBJBsController@feeExport');
-    Route::get('/transactionBJB/edit/{id}', 'TransactionBJBsController@edit');
+    Route::get('/transactionBJB/reversal', 'TransactionBJBsController@reversal');
+    Route::get('/transactionBJB/reversal/{additional_data}','TransactionBJBsController@postReversal')->name('transactionBJB_postReversal');
 
     Route::get('/biller', 'BillersController@index')->name('biller');
 
@@ -137,6 +154,9 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/billers/{id}/destroy', 'BillersController@destroy')->name('billers_destroy');
 
     Route::get('/new_features', 'NewFeaturesController@index')->name('new_features');
+
+    
+    Route::get('/ranking_lakupandai', 'RankingLakuPandaiController@index')->name('ranking_lakupandai');
 
     // Route::view('/', 'starter')->name('starter');
     Route::get('large-compact-sidebar/dashboard/dashboard1', function () {

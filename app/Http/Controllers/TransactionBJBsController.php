@@ -8,58 +8,62 @@ use Illuminate\Support\Facades\Log;
 use DB;
 use Carbon\Carbon;
 use Validator;
-use Excel;
-use App\Exports\TransactionBJBExport;
-use App\Exports\TransactionFeeLakupandaiExport;
-use App\Exports\TransactionFeeSaleExport;
+use Redirect;
 
 use App\Http\Requests;
 use Prettus\Validator\Contracts\ValidatorInterface;
 use Prettus\Validator\Exceptions\ValidatorException;
-use App\Http\Requests\TransactionBJBCreateRequest;
-use App\Http\Requests\TransactionBJBUpdateRequest;
-use App\Repositories\TransactionBJBRepository;
-use App\Validators\TransactionBJBValidator;
+use App\Http\Requests\TransactionCreateRequest;
+use App\Http\Requests\TransactionUpdateRequest;
+use App\Repositories\TransactionRepository;
+use App\Validators\TransactionValidator;
 use Ixudra\Curl\Facades\Curl;
 
 use App\Entities\Merchant;
 use App\Entities\Service;
-use App\Entities\TransactionBJB;
+use App\Entities\Transaction;
+use App\Entities\TransactionStatus;
+use App\Entities\transactionPaymentStatus;
 use App\Entities\Group;
 use App\Entities\UserGroup;
-use App\Entities\Revenue;
-use App\Entities\Transaction;
 use App\Entities\GroupSchema;
 use App\Entities\GroupSchemaShareholder;
-use App\Entities\MessageLog;
+use App\Entities\TransactionBJB;
 use App\Entities\TransactionLog;
-use App\Exports\TransactionExportFeeLakupandai;
-use App\Entities\ReportMiniBanking;
+use App\Entities\TransactionSaleBJB;
+use App\Exports\TransactionExport;
+use App\Exports\TransactionSaleExport;
+use App\Exports\TransactionFeeSaleExport;
+use App\Http\Controllers\CoresController as Core;
+use App\Http\Requests\TransactionBJBUpdateRequest;
+use Exception;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Str;
 
 /**
- * Class TransactionBJBsController.
+ * Class TransactionsController.
  *
  * @package namespace App\Http\Controllers;
  */
 class TransactionBJBsController extends Controller
 {
     /**
-     * @var TransactionBJBRepository
+     * @var TransactionRepository
      */
     protected $repository;
 
     /**
-     * @var TransactionBJBValidator
+     * @var TransactionValidator
      */
     protected $validator;
 
     /**
-     * TransactionBJBsController constructor.
+     * TransactionsController constructor.
      *
-     * @param TransactionBJBRepository $repository
-     * @param TransactionBJBValidator $validator
+     * @param TransactionRepository $repository
+     * @param TransactionValidator $validator
      */
-    public function __construct(TransactionBJBRepository $repository, TransactionBJBValidator $validator)
+    public function __construct(TransactionRepository $repository, TransactionValidator $validator)
     {
         $this->repository = $repository;
         $this->validator  = $validator;
@@ -72,31 +76,9 @@ class TransactionBJBsController extends Controller
      */
     public function index(Request $request)
     {
-        if(!$request->has('status') && $request->get('status')==''){
-            $request->request->add([
-                'status'  => 'Success'
-            ]);
-        }
-        if(!$request->has('start_date') && $request->get('start_date')==''){
-            $request->request->add([
-                'start_date'      => date("Y-m-d")
-            ]);
-        }
-        if(!$request->has('end_date') && $request->get('end_date')==''){
-            $request->request->add([
-                'end_date'      => date("Y-m-d")
-            ]);
-        }
-
-        // if(!$request->has('limit') && $request->get('limit')==''){
-        //     $request->request->add([
-        //         'limit'      => '1000'
-        //     ]);
-        // }
-
         // $request->request->add([
         //     'group_id'  => 1,
-        //     'date'      => date("Y-m-d"),
+        //     'date'      => date("Y-m-d H:i:s"),
         //     'schema_id' => 1,
         // ]);
 
@@ -112,343 +94,103 @@ class TransactionBJBsController extends Controller
         //     return response()->json(['status'=> false, 'error'=> $validator->messages()],403);
         // }
 
-        // $getInfo    = $this->getInfo($request)->original;
-        
-        // $dataRevenue= (object) $getInfo;
-        // $data->merchants = $sorted;
+        if(!$request->has('status') && $request->get('status')==''){
+            $request->request->add([
+                'status'  => 'Success'
+            ]);
+        }
+        if(!$request->has('start_date') && $request->get('start_date')==''){
+            $request->request->add([
+                'start_date'      => date("m-d-Y")
+            ]);
+        }
+        if(!$request->has('end_date') && $request->get('end_date')==''){
+            $request->request->add([
+                'end_date'      => date("m-d-Y")
+            ]);
+        }
+
+        // $getInfo     = $this->getInfo($request)->original;
+        // // $dataRevenue = (object) $getInfo;
+
+
+        // $dataCalculate  = $this->calculateOnly();
         
         // $response = [   
         //     'status'    => true, 
         //     'message'   => 'Success',
-        //     'data'      => $data,
+        //     'data'      => $dataRevenue,
         // ];
 
         // return response()->json($response, 200);
 
         $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
-        $quote = "'";
-        $quotes = '"';
-        $quoteFee = "'fee'";
-        DB::connection()->enableQueryLog();
-        
-        //START QUERY
-        // $data = MessageLog::select(DB::raw("channel.transaction_log.stan,
-        //                     messagelog.request_time,
-        //                     channel.transaction_log.tx_time,
-        //                     messagelog.terminal_id AS tid,
-        //                     terminal.merchant_id AS mid,
-        //                     users.brand AS agent_name,
-        //                     messagelog.service_id AS product_name,
-        //                     service.service_name AS transaction_name,
-        //                         CASE
-        //                             WHEN messagelog.service_id::text = ANY (ARRAY['P00031'::character varying::text, 'P00033'::character varying::text]) THEN channel.transaction_log.tx_amount / 100::double precision
-        //                             ELSE
-        //                             CASE
-        //                                 WHEN channel.transaction_log.tx_mti::text = '0400'::text THEN channel.transaction_log.tx_amount / 100::double precision
-        //                                 ELSE channel.transaction_log.tx_amount
-        //                             END
-        //                         END AS nominal,
-        //                         CASE
-        //                             WHEN d.value IS NOT NULL THEN
-        //                             CASE
-        //                                 WHEN d.value::text <> 'null'::text THEN d.value::double precision
-        //                                 ELSE 0::double precision
-        //                             END
-        //                             ELSE 0::double precision
-        //                         END AS fee,
-        //                         CASE
-        //                             WHEN d.value IS NOT NULL THEN
-        //                             CASE
-        //                                 WHEN d.value::text <> 'null'::text THEN d.value::double precision * 0.6::double precision
-        //                                 ELSE 0::double precision
-        //                             END
-        //                             ELSE 0::double precision
-        //                         END AS agent_fee,
-        //                         CASE
-        //                             WHEN d.value IS NOT NULL THEN
-        //                             CASE
-        //                                 WHEN d.value::text <> 'null'::text THEN d.value::double precision * 0.2::double precision
-        //                                 ELSE 0::double precision
-        //                             END
-        //                             ELSE 0::double precision
-        //                         END AS bjb_fee,
-        //                         CASE
-        //                             WHEN d.value IS NOT NULL THEN
-        //                             CASE
-        //                                 WHEN d.value::text <> 'null'::text THEN d.value::double precision * 0.2::double precision
-        //                                 ELSE 0::double precision
-        //                             END
-        //                             ELSE 0::double precision
-        //                         END AS selada_fee,
-        //                         CASE
-        //                             WHEN messagelog.service_id::text = ANY (ARRAY['P00031'::character varying::text, 'P00033'::character varying::text]) THEN channel.transaction_log.tx_amount / 100::double precision
-        //                             ELSE
-        //                             CASE
-        //                                 WHEN channel.transaction_log.tx_mti::text = '0400'::text THEN channel.transaction_log.tx_amount / 100::double precision
-        //                                 ELSE channel.transaction_log.tx_amount
-        //                             END
-        //                         END +
-        //                         CASE
-        //                             WHEN d.value IS NOT NULL THEN
-        //                             CASE
-        //                                 WHEN d.value::text <> 'null'::text THEN d.value::double precision
-        //                                 ELSE 0::double precision
-        //                             END
-        //                             ELSE 0::double precision
-        //                         END AS total,
-        //                     gb.value AS billid,
-        //                     channel.transaction_log.proc_code,
-        //                     messagelog.message_status,
-        //                     channel.transaction_log.responsecode AS rc,
-        //                         CASE
-        //                             WHEN reversal_view.reversal_stan IS NOT NULL THEN 'Reversed'::text
-        //                             ELSE
-        //                             CASE
-        //                                 WHEN channel.transaction_log.responsecode::text = '00'::text THEN 'Success'::text
-        //                                 ELSE 'Failed'::text
-        //                             END
-        //                         END AS status,
-        //                     reversal_view.reversal_stan,
-        //                     reversal_view.reversal_rc,
-        //                     reversal_view.reversal_time,
-        //                     reversal_view.reversal_service_id,
-        //                     channel.transaction_log.host_ref,
-        //                     channel.transaction_log.tx_pan,
-        //                     channel.transaction_log.src_account,
-        //                     channel.transaction_log.dst_account,
-        //                     messagelog.message_id,
-        //                     to_char(messagelog.request_time, 'YYYY-MM-DD hh:mm:ss'::text) AS created_at,
-        //                     NULL::text AS deleted_at"))
-        //                     ->leftjoin('channel.transaction_log','messagelog.message_id', '=', 'channel.transaction_log.additional_data')
-        //                     ->leftjoin('users', 'messagelog.terminal_id', '=', 'users.username')
-        //                     ->leftjoin('terminal', 'messagelog.terminal_id', '=', 'terminal.terminal_id')
-        //                     ->leftjoin('service', 'service.service_id', '=', 'messagelog.service_id')
-        //                     ->leftjoin("reversal_view", "reversal_view.reversal_stan", "=", "channel.transaction_log.stan")
-        //                     ->leftjoin('service_data as d', function($join){
-        //                                     $join->on('message_id', '=', 'd.message_id');
-        //                                     $join->whereRaw("(d.name = 'fee' OR d.name = 'margin' OR d.name = 'dynfee')");
-        //                                 })
-        //                     ->leftjoin('service_data as gb', function($join){
-        //                         $join->on('message_id', '=', 'gb.message_id');
-        //                         $join->whereRaw("gb.name = 'billid'");
-        //                     })
-        //                     ->whereNotNull('message_status')
-        //                     ->whereRaw("((messagelog.service_id = ANY (ARRAY['MA0021'::character varying::text, 'MA0023'::character varying::text, 'MA0031'::character varying::text, 'MA0033'::character varying::text, 'MA0041'::character varying::text, 'MA0043'::character varying::text, 'MA0010'::character varying::text, 'MA0012'::character varying::text, 'MA0081'::character varying::text, 'MA0083'::character varying::text, 'MA0091'::character varying::text, 'MA0093'::character varying::text])) OR (messagelog.service_id::text = ANY (ARRAY['MA0060'::character varying::text, 'MA0063'::character varying::text, 'MA0050'::character varying::text, 'MA0051'::character varying::text, 'MA0073'::character varying::text, 'MA0071'::character varying::text, 'P00031'::character varying::text, 'P00033'::character varying::text])))");
-        //END QUERY
 
-
-                        //     WHERE 1 = 1 AND m.message_status IS NOT NULL AND ((m.service_id::text = ANY (ARRAY['MA0021'::character varying::text, 'MA0023'::character varying::text, 'MA0031'::character varying::text, 'MA0033'::character varying::text, 'MA0041'::character varying::text, 'MA0043'::character varying::text, 'MA0010'::character varying::text, 'MA0012'::character varying::text, 'MA0081'::character varying::text, 'MA0083'::character varying::text, 'MA0091'::character varying::text, 'MA0093'::character varying::text])) OR (m.service_id::text = ANY (ARRAY['MA0060'::character varying::text, 'MA0063'::character varying::text, 'MA0050'::character varying::text, 'MA0051'::character varying::text, 'MA0073'::character varying::text, 'MA0071'::character varying::text, 'P00031'::character varying::text, 'P00033'::character varying::text])))
-                        // ORDER BY m.request_time DESC
-                        // limit 10 offset 0"))->get();
-  
-        // set_time_limit(1000);
-        // $data = TransactionBJB::select('*');
-        // $data = TransactionBJB::select('*')->skip(0)->take(10)->get();
-
-        if($request->has('start_date') || $request->has('end_date') || $request->has('status')){
-            //skip
-        } else {
-        //     $checkTime = ReportMiniBanking::select('tx_time')->orderBy('tx_time', 'desc')->first();
-        //     $limit = 100;
-        //     $offset = 0;
-
-        //     $getMiniBankingView = TransactionBJB::select('*')
-        //                             ->where('tx_time', '>', $checkTime->tx_time)
-        //                             ->whereNotNull('stan')
-        //                             ->orderBy('tx_time', 'asc')
-        //                             ->limit($limit)
-        //                             ->offset($offset)
-        //                             ->get();
-            
-
-        //     if($getMiniBankingView->count() > 0){
-        //         foreach($getMiniBankingView as $item) {
-        //             $report = new ReportMiniBanking();
-        //             $report->stan                   = $item->stan;
-        //             $report->request_time           = $item->request_time;
-        //             $report->tx_time                = $item->tx_time;
-        //             $report->tid                    = $item->tid;
-        //             $report->mid                    = $item->mid;
-        //             $report->agent_name             = $item->agent_name;
-        //             $report->product_name           = $item->product_name;
-        //             $report->transaction_name       = $item->transaction_name;
-        //             $report->nominal                = $item->nominal;
-        //             $report->fee                    = $item->fee;
-        //             $report->agent_fee              = $item->agent_fee;
-        //             $report->bjb_fee                = $item->bjb_fee;
-        //             $report->selada_fee             = $item->selada_fee;
-        //             $report->total                  = $item->total;
-        //             $report->billid                 = $item->billid;
-        //             $report->proc_code              = $item->proc_code;
-        //             $report->message_status         = $item->message_status;
-        //             $report->rc                     = $item->rc;
-        //             $report->status                 = $item->status;
-        //             $report->reversal_stan          = $item->reversal_stan;
-        //             $report->reversal_rc            = $item->reversal_rc;
-        //             $report->reversal_time          = $item->reversal_time;
-        //             $report->reversal_service_id    = $item->reversal_service_id;
-        //             $report->host_ref               = $item->host_ref;
-        //             $report->tx_pan                 = $item->tx_pan;
-        //             $report->src_account            = $item->src_account;
-        //             $report->dst_account            = $item->dst_account;
-        //             $report->message_id             = $item->message_id;
-        //             $report->save();
-        //         }
-        //     }
-        }
-
-        // $data = ReportMiniBanking::select('*');
         $data = TransactionBJB::select('*');
-        if(($request->has('start_date') || $request->has('end_date') || $request->has('status')) && $request->get('start_date')!=''){
-            $data->where('tx_time', '>', $request->get('start_date').' 00:00:00')
-                    ->where('tx_time', '<=', $request->get('end_date').' 23:59:59');
-        } 
-        // else {
-        //     $data->where('tx_time', '>', date("Y-m-d").' 00:00:00')
-        //             ->where('tx_time', '<=', date("Y-m-d").' 23:59:59');
+        $data = $data->with(['merchant.terminal','merchant.user','service.product.provider.category','transactionStatus','transactionPaymentStatus']);
+
+        // if($request->has('search') && $request->get('search')!=''){
+        //     $data->where('code', 'like', '%'.$request->get('code').'%');
         // }
 
         if(session()->get('user')->role_id == 2) {
-            $data->where('tid', '=', session()->get('user')->username);
+            // $data = $data->where('terminal_id', '=', $request->get('tid'));
+            $data->whereHas('merchant',function($query) use ($request)
+                {
+                    $query->where('terminal_id', '=', session()->get('user')->username);
+                });
         }
-        
-        // $data = $data->where('tx_time', '>', $request->get('start_date').' 00:00:00')
-        //                 ->where('tx_time', '<=', $request->get('end_date').' 23:59:59');
 
-        if($request->has('search') && $request->get('search')!=''){
-            $data->where(function($query) use ($request)
-            {
-                $query->where('tid', 'like', '%' . $request->get('search') . '%')
-                ->orWhere('mid', 'like', '%' . $request->get('search') . '%')
-                ->orWhere('agent_name', 'like', '%' . $request->get('search') . '%')
-                ->orWhere('transaction_name', 'like', '%' . $request->get('search') . '%')
-                ->orWhere('product_name', 'like', '%' . $request->get('search') . '%')
-                ->orWhere('stan', 'like', '%' . $request->get('search') . '%')
-                ->orWhere('message_id', 'like', '%'.$request->get("search").'%')
-                ->orWhere('status', 'like', '%' . $request->get('search') . '%')
-                ->orWhere('rc', 'like', '%' . $request->get('search') . '%')
-                ->orWhere('message_status', 'like', '%' . $request->get('search') . '%')
-                ->orWhere('tx_pan', 'like', '%' . $request->get('search') . '%')
-                ->orWhere('src_account', 'like', '%' . $request->get('search') . '%')
-                ->orWhere('dst_account', 'like', '%' . $request->get('search') . '%');
-            });
+        if($request->has('start_date') && $request->get('start_date')!=''){
+            $data->where('created_at', '>', $request->get('start_date').' 00:00:00');
         }
+
+        if($request->has('end_date') && $request->get('end_date')!=''){
+            $data->where('created_at', '<=', $request->get('end_date').' 23:59:59');
+        }
+
 
         if($request->has('tid') && $request->get('tid')!=''){
-            $data->where('tid', '=', $request->get('tid'));
+            $data->whereHas('merchant',function($query) use ($request)
+                {
+                    $query->where('terminal_id', '=', $request->get('tid'));
+                });
+            // $data->whereHas('merchant.terminal.tid', '=', $request->get('tid'));
         }
         if($request->has('mid') && $request->get('mid')!=''){
-            $data->where('mid', '=', $request->get('mid'));
+            // $data->where('merchant.mid', '=', $request->get('mid'));
+            $data->whereHas('merchant',function($query) use ($request)
+                {
+                    $query->where('mid', '=', $request->get('mid'));
+                });
         }
         if($request->has('agent_name') && $request->get('agent_name')!=''){
-            $data->where('agent_name', '=', $request->get('agent_name'));
-        }
-        if($request->has('message_status') && $request->get('message_status')!=''){
-            $data->where('message_status', '=', $request->get('message_status'));
+            // $data->where('merchant.name', '=', $request->get('agent_name'));
+            $data->whereHas('merchant',function($query) use ($request)
+                {
+                    $query->where('name', '=', $request->get('agent_name'));
+                });
         }
         if($request->has('status') && $request->get('status')!='' && $request->get('status')!='Select Status'){
-	        if ($request->get('status') == 'Success'){
-                $data->where('status', '=', 'Success');
-                $data->whereNull('reversal_stan');
-            } else {
-                $data->where(function($query)
-                {
-                    $query->where('rc', '!=', '00')
-                    ->orWhereNotNull('reversal_stan');
-                });
+            $status = $request->get('status');
+            if ($status == 'Pending'){
+                $data->where('status', '=', 0);
             }
+            else if ($status == 'Success'){
+                $data->where('status', '=', 1);
+                
+            } else if ($status == 'Failed'){
+                $data->where('status', '=', 2);
+            }
+            
         }
-        if($request->has('rc') && $request->get('rc')!=''){
-            $data->where('rc', '=', $request->get('rc'));
-        }
-
         if($request->has('stan') && $request->get('stan')!=''){
             $data->where('stan', '=', $request->get('stan'));
         }
-        if($request->has('message_id') && $request->get('message_id')!=''){
-            $data->where('message_id', '=', $request->get('message_id'));
-        }
-        if($request->has('service') && $request->get('service')!='' && $request->get('service')!='Select Service'){
-            $service = $request->get('service');
-            if ($service == 'Tarik Tunai'){
-                $data->where(function($query)
-                {
-                    $query->where('service_id', '=', 'MA0010')
-                        ->orWhere('service_id', '=', 'MA0012');
-                });
-            }
-            else if ($service == 'Payment Transfer Antar Bank'){
-                $data->where(function($query)
-                {
-                    $query->where('service_id', '=', 'MA0021')
-                    ->orWhere('service_id', '=', 'MA0023');
-                });
-            }
-            else if ($service == 'Pemindahbukuan'){
-                $data->where(function($query)
-                {
-                    $query->where('service_id', '=', 'MA0031')
-                ->orWhere('service_id', '=', 'MA0033');
-            });
-            
-            }
-            else if ($service == 'Setor Tunai'){
-                $data->where(function($query)
-                {
-                    $query->where('service_id', '=', 'MA0041')
-                ->orWhere('service_id', '=', 'MA0043');
-            });
-            
-            }
-            else if ($service == 'Mini Statement'){
-                $data->where(function($query)
-                {
-                    $query->where('service_id', '=', 'MA0050')
-                ->orWhere('service_id', '=', 'MA0051');
-            });
-            
-            }
-            else if ($service == 'Info Saldo'){
-                $data->where(function($query)
-                {
-                    $query->where('service_id', '=', 'MA0060')
-                ->orWhere('service_id', '=', 'MA0063');
-            });
-            
-            }
-            else if ($service == 'Ganti PIN'){
-                $data->where(function($query)
-                {
-                    $query->where('service_id', '=', 'MA0071')
-                ->orWhere('service_id', '=', 'MA0073');
-            });
-            
-            }
-            else if ($service == 'Buka Rekening'){
-                $data->where(function($query)
-                {
-                    $query->where('service_id', '=', 'MA0081')
-                ->orWhere('service_id', '=', 'MA0083');
-            });
-            
-            }
-            else if ($service == 'Batal Rekening'){
-                $data->where(function($query)
-                {
-                    $query->where('service_id', '=', 'MA0091')
-                ->orWhere('service_id', '=', 'MA0093');
-            });
-            }   
-            else if ($service == 'PBB'){
-                $data->where(function($query)
-                {
-                    $query->where('service_id', '=', 'P00031')
-                ->orWhere('service_id', '=', 'P00033');
-            });
-            
-            }
-        }
-
+        // if($request->has('service') && $request->get('service')!=''){
+        //     $data->where('service.product.name', '=', $request->get('service'));
+        // }
+    
         if($request->has('limit')){
             $data->take($request->get('limit'));
             
@@ -457,50 +199,88 @@ class TransactionBJBsController extends Controller
             }
         }
 
-        if($request->has('fee')){
-            if($request->get('fee') == 'true'){
-                $data->where('fee', '<>', '0');
+        if($request->has('order_type')){
+            if($request->get('order_type') == 'asc'){
+                if($request->has('order_by')){
+                    $data->orderBy($request->get('order_by'));
+                }else{
+                    $data->orderBy('created_at');
+                }
+            }else{
+                if($request->has('order_by')){
+                    $data->orderBy($request->get('order_by'), 'desc');
+                }else{
+                    $data->orderBy('created_at', 'desc');
+                }
+            }
+        }else{
+            $data->orderBy('created_at', 'desc');
+        }
+        $data->where('is_development','!=',1);
+        $data->where('is_marked_as_failed','!=',1);
+
+        $dataRevenue = Array();
+        $dataRevenue['total_trx'] = $data->count();
+        $dataRevenue['amount_trx']   = $data->sum('price');
+        $dataRevenue['total_fee']   = $data->sum('price') - $data->sum('vendor_price');
+        $dataRevenue['total_fee_agent']   = $dataRevenue['total_fee'] * 0.6;
+        $dataRevenue['total_fee_bjb']   = $dataRevenue['total_fee'] * 0.2;
+        $dataRevenue['total_fee_selada']   = $dataRevenue['total_fee'] * 0.2;
+
+        $total = $data->count();
+
+        if($request->has('order_type')){
+            if($request->get('order_type') == 'asc'){
+                if($request->has('order_by')){
+                    $data->orderBy($request->get('order_by'));
+                }else{
+                    $data->orderBy('created_at');
+                }
+            }else{
+                if($request->has('order_by')){
+                    $data->orderBy($request->get('order_by'), 'desc');
+                }else{
+                    $data->orderBy('created_at', 'desc');
+                }
+            }
+        }else{
+            $data->orderBy('created_at', 'desc');
+        }
+
+        $data = $data->paginate(10);
+        // dd($data->toSql());die();
+        
+        foreach($data as $item){
+            if($item->status == 0){
+                $item->status_text = 'Pending';
+            }
+
+            if($item->status == 1){
+                $item->status_text = 'Success';
+            }
+
+            if($item->status == 2){
+                $item->status_text = 'Failed';
+            }
+
+            $item->fee = $item->price - $item->vendor_price;
+
+            if($item->is_suspect == 0){
+                $item->status_suspect = 'False';
+            }
+
+            if($item->is_suspect == 1){
+                $item->status_suspect = 'True';
             }
         }
 
-        // if($request->has('order_type')){
-        //     if($request->get('order_type') == 'asc'){
-        //         if($request->has('order_by')){
-        //             $data->orderBy($request->get('order_by'));
-        //         }else{
-        //             $data->orderBy('created_at');
-        //         }
-        //     }else{
-        //         if($request->has('order_by')){
-        //             $data->orderBy($request->get('order_by'), 'desc');
-        //         }else{
-        //             $data->orderBy('created_at', 'desc');
-        //         }
-        //     }
-        // }else{
-        //     $data->orderBy('created_at', 'desc');
-        // }
-
-        // $dataRevenue = Array();
-        // $dataRevenue['total_trx'] = $data->get()->count();
-        // $dataRevenue['amount_trx']   = $data->get()->sum("nominal");
-        // $dataRevenue['total_fee']   = $data->get()->sum("fee");
-        // $dataRevenue['total_fee_agent']   = $data->get()->sum("agent_fee");
-        // $dataRevenue['total_fee_bjb']   = $data->get()->sum("bjb_fee");
-        // $dataRevenue['total_fee_selada']   = $data->get()->sum("selada_fee");
-
-        // $total = $data->count();
-
-        $data->orderBy('request_time', 'desc');
-        $dataRevenue = $data->get();
-        // $data = $data->take('50');
-        $data = $data->paginate(10);
-        // ->skip(0)->take(100);
-
+        $user = session()->get('user');
 
         return view('apps.transactionsBJB.list')
                 ->with('data', $data)
-                ->with('dataRevenue', $dataRevenue);
+                // ->with('dataRevenue', $dataRevenue);
+                ->with('dataRevenue', $dataRevenue)
+                ->with('username', $user->username);
     }
 
     public function export(Request $request)
@@ -523,7 +303,30 @@ class TransactionBJBsController extends Controller
         }
         $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
 
-	    return (new TransactionBJBExport($request))->download('transaction_bjb_export_'.$request->get('start_date').'_'.$request->get('end_date').'.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+        return (new TransactionExport($request))->download('transaction_export_'.$request->get('start_date').'_'.$request->get('end_date').'.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+    }
+
+    public function saleExport(Request $request)
+    {
+
+        if(!$request->has('status') && $request->get('status')==''){
+            $request->request->add([
+                'status'  => 'Success'
+            ]);
+        }
+        if(!$request->has('start_date') && $request->get('start_date')==''){
+            $request->request->add([
+                'start_date'      => date("Y-m-d")
+            ]);
+        }
+        if(!$request->has('end_date') && $request->get('end_date')==''){
+            $request->request->add([
+                'end_date'      => date("Y-m-d")
+            ]);
+        }
+        $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
+
+        return (new TransactionSaleExport($request))->download('transaction_sale_export_'.$request->get('start_date').'_'.$request->get('end_date').'.xlsx', \Maatwebsite\Excel\Excel::XLSX);
     }
 
     public function exportCSV(Request $request)
@@ -546,12 +349,12 @@ class TransactionBJBsController extends Controller
         }
         $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
 
-        return (new TransactionBJBExport($request))->download('transaction_bjb_export_'.$request->get('start_date').'_'.$request->get('end_date').'.csv', \Maatwebsite\Excel\Excel::CSV,[
-		'Content-Type' => 'text/csv'
-	    ]);
+        return (new TransactionExport($request))->download('transaction_export_'.$request->get('start_date').'_'.$request->get('end_date').'.csv', \Maatwebsite\Excel\Excel::CSV,[
+                'Content-Type' => 'text/csv'
+        ]);
     }
 
-    public function exportPDF(Request $request)
+   public function exportPDF(Request $request)
     {
 
         if(!$request->has('status') && $request->get('status')==''){
@@ -571,7 +374,434 @@ class TransactionBJBsController extends Controller
         }
         $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
 
-        return (new TransactionBJBExport($request))->download('transaction_bjb_export_'.$request->get('start_date').'_'.$request->get('end_date').'.pdf', \Maatwebsite\Excel\Excel::DOMPDF);
+        return (new TransactionExport($request))->download('transaction_export_'.$request->get('start_date').'_'.$request->get('end_date').'.pdf', \Maatwebsite\Excel\Excel::DOMPDF);
+    }
+
+    public function feeExport(Request $request)
+    {
+
+        if(!$request->has('status') && $request->get('status')==''){
+            $request->request->add([
+                'status'  => 'Success'
+            ]);
+        }
+        if(!$request->has('start_date') && $request->get('start_date')==''){
+            $request->request->add([
+                'start_date'      => date("Y-m-d")
+            ]);
+        }
+        if(!$request->has('end_date') && $request->get('end_date')==''){
+            $request->request->add([
+                'end_date'      => date("Y-m-d")
+            ]);
+        }
+        $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
+
+	    return (new TransactionFeeSaleExport($request))->download('transaction_fee_sale_export_'.$request->get('start_date').'_'.$request->get('end_date').'.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+    }
+
+    public function reversal(Request $request)
+    {
+        if(!$request->has('start_date') && $request->get('start_date')==''){
+            $request->request->add([
+                'start_date'      => date("Y-m-d")
+            ]);
+        }
+        if(!$request->has('end_date') && $request->get('end_date')==''){
+            $request->request->add([
+                'end_date'      => date("Y-m-d")
+            ]);
+        }
+
+        $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
+
+        $data = TransactionLog::whereNotNull('responsecode');
+        $data->where('tx_mti', '=', '0200');
+        $data->where('proc_code', '=', '500000');
+
+        if($request->has('start_date') && $request->get('start_date')!=''){
+            $data->where('tx_time', '>', $request->get('start_date').' 00:00:00');
+        }
+
+        if($request->has('end_date') && $request->get('end_date')!=''){
+            $data->where('tx_time', '<=', $request->get('end_date').' 23:59:59');
+        }
+
+        if($request->has('stan') && $request->get('stan')!=''){
+            $data->where('stan', $request->get('stan'));
+        }
+
+        $dataLog = TransactionLog::select('stan')->whereNotNull('responsecode');
+        $dataLog->where('tx_mti', '=', '0200');
+        $dataLog->where('proc_code', '=', '500000');
+
+        if($request->has('start_date') && $request->get('start_date')!=''){
+            $dataLog->where('tx_time', '>', $request->get('start_date').' 00:00:00');
+        }
+
+        if($request->has('end_date') && $request->get('end_date')!=''){
+            $dataLog->where('tx_time', '<=', $request->get('end_date').' 23:59:59');
+        }
+
+        if($request->has('stan') && $request->get('stan')!=''){
+            $dataLog->where('stan', $request->get('stan'));
+        }
+
+        $dataPpob = Transaction::select('stan');
+        if($request->has('start_date') && $request->get('start_date')!=''){
+            $dataPpob->where('created_at', '>', $request->get('start_date').' 00:00:00');
+        }
+
+        if($request->has('end_date') && $request->get('end_date')!=''){
+            $dataPpob->where('created_at', '<=', $request->get('end_date').' 23:59:59');
+        }
+
+        if($request->has('stan') && $request->get('stan')!=''){
+            $dataPpob->where('stan', $request->get('stan'));
+        }
+        // $data = $data->paginate(10);
+
+        $dataLog = $dataLog->get();
+        $dataPpob = $dataPpob->get();
+
+        $arrayLength = $dataLog->count();
+        $ppobSize = $dataPpob->count();
+        
+        $array = array();
+        $i = 0;
+        $count = 0;
+        for ($i = 0; $i < $arrayLength; $i++){
+            $isIdentical = false;
+            try {
+                for ($j = 0; $j < $ppobSize; $j++){
+                    if($dataLog[$i]->stan == $dataPpob[$j]->stan){
+                        $isIdentical = true;
+                    }
+                }
+            } catch (Exception $e){
+                // echo $e;
+            }
+
+            if($isIdentical){
+                //verified
+                // echo 'isIdentical ';
+            } else {
+                $array[$count] = $dataLog[$i]->stan;
+                $count++;
+                // $data->orWhere('stan', "'".$dataLog[$i]->stan."'");
+                // echo 'NotIdentical '.$dataLog[$i]->stan . ' ';
+            }
+        }
+        
+        // if(substr($array, strlen($array)-1, 1) == ','){
+        //     $array = substr($array, 0, strlen($array)-1); 
+        // }
+
+        $data->whereIn('stan', $array);
+
+        $data = $data->paginate(10);
+
+        return view('apps.transactionsBJB.reversal')
+                ->with('data', $data);
+    }
+
+    public function postReversal(Request $request, $additional_data)
+    {
+
+        DB::beginTransaction();
+        try {
+            $dateTime = date("YmdHms");
+
+            $data = TransactionLog::select('stan')->where('additional_data', $additional_data)->first();
+
+            $ch = curl_init();
+                // $authorization = "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC8zNi45NC41OC4xODBcL2FwaVwvY29yZVwvcHVibGljXC9pbmRleC5waHBcL2FwaVwvYXV0aFwvbG9naW4iLCJpYXQiOjE2MjAyNzQ1MDMsImV4cCI6MTYyMTE0MzMwMywibmJmIjoxNjIwMjc0NTAzLCJqdGkiOiJndXRUaVprZElOb3c5RkVwIiwic3ViIjoiZTZhZTkwOWEtY2YzNC00ZDc2LWE5ZWQtMjJkOWJhNzU4ZmIwIiwicHJ2IjoiZjkzMDdlYjVmMjljNzJhOTBkYmFhZWYwZTI2ZjAyNjJlZGU4NmY1NSJ9.B8mm2IFt-TlYtvnmk8gctiBfAxnF5op0plemFJW6D_k";
+                // $method_request = "transaction_code=".$transaction->code;
+                // curl_setopt($ch, CURLOPT_URL, "http://36.94.58.180/api/core/public/index.php/api/transactions/checkStatus?".$method_request);
+                curl_setopt($ch, CURLOPT_URL, "http://36.94.58.182:8080/ARRest/api");
+                // SSL important
+                curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                'Content-Type: text/plain'));
+                // curl_setopt($ch, CURLOPT_POSTFIELDS, ['msg'=>'{
+                //                                     "msg_id": "'. $additional_data . $dateTime . '",
+                //                                     "msg_ui": "'. $additional_data .'",
+                //                                     "msg_si": "R82561",
+                //                                     "msg_dt": "'. $data->stan .'",
+                //                                 }']);
+                
+                curl_setopt($ch, CURLOPT_POSTFIELDS, [ 'msg' => '{
+                                                    "msg_id": "'. substr($additional_data, 0, 16) . $dateTime . '",
+                                                    "msg_ui": "'. substr($additional_data, 0, 16) .'",
+                                                    "msg_si": "R82561",
+                                                    "msg_dt": "'. $data->stan .'"
+                                                }'] );
+                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1 );
+                curl_setopt($ch, CURLOPT_POST,           1 );
+
+                $output = curl_exec($ch);
+                $err = curl_error($ch);
+                curl_close($ch);
+
+                $value = '{ msg: {
+                                                    "msg_id": "'. substr($additional_data, 0, 16) . $dateTime . '",
+                                                    "msg_ui": "'. substr($additional_data, 0, 16) .'",
+                                                    "msg_si": "R82561",
+                                                    "msg_dt": "'. $data->stan .'"
+                                                } }';
+
+                echo $output . $value;die;
+                
+                if ($err) {
+                    echo "cURL Error #:" . $err;
+                } else {
+                    // print_r(json_decode($output));
+                    return Redirect::to('transactionBJB')
+                        ->with('message', 'Reversal berhasil dikirim');
+                    // return redirect()->route('transaction')
+                    //             ->with('success','Status updated successfully');
+                }
+
+            // if($data){
+            //     $reqData = [
+            //         'msg'                   => '{
+            //                                         "msg_id": "'. $additional_data . $dateTime . '",
+            //                                         "msg_ui": "'. $additional_data .'",
+            //                                         "msg_si": "R82561",
+            //                                         "msg_dt": "'. $data->stan .'",
+            //                                     }',
+            //     ];
+
+            //     //  $reqData = [
+            //     //     'msg_id'                   => $additional_data . $dateTime,
+            //     //     'msg_ui'                   => $additional_data,
+            //     //     'msg_si'                   => 'R82561',
+            //     //     'msg_dt'                   => $data->stan,
+            //     // ];
+
+            //     $responseCurl = Curl::to(config('app.url_reversal'))
+            //                         ->withData($reqData)
+            //                         ->asJson()
+            //                         ->post();
+                
+            //     if($responseCurl->status == true){   
+            //         DB::commit();
+            //         return Redirect::to('transaction/reversal')
+            //             ->with('message', 'Reversal berhasil dikirim');
+            //     }else{
+            //         DB::rollBack();
+            //         return Redirect::to('transaction/reversal')
+            //             ->with('error', 'Failed to save mireta')
+            //             ->withInput();
+            //     }
+            // }
+        } catch (Exception $e) {
+            DB::rollBack();
+            return Redirect::to('transactionBJB/reversal')
+                        ->with('error', $e)
+                        ->withInput();
+        } catch (\Illuminate\Database\QueryException $e) {
+            DB::rollBack();
+            return Redirect::to('transactionBJB/reversal')
+                        ->with('error', $e)
+                        ->withInput();
+        }
+    }
+
+    public function edit($id)
+    {
+        $transaction = TransactionBJB::find($id);
+        if($transaction){
+            return view('apps.transactionsBJB.edit')
+                ->with('transaction', $transaction);
+        }else{
+            return Redirect::to('transactionBJB')
+                            ->with('error', 'Data not found');
+        }
+    }
+
+    public function update(TransactionUpdateRequest $request, $id)
+    {
+        DB::beginTransaction();
+        try {
+            $this->validator->with($request->all())->passesOrFail(ValidatorInterface::RULE_UPDATE);
+            $transaction = TransactionBJB::find($id);
+                if ($transaction->status == 0 || $transaction->status == 1) {
+                    $reqData['status']               = 2;
+                } else {
+                    $reqData['status']               = 1;
+                }
+                $data = $this->repository->update($reqData, $id);
+            
+            if($data){    
+                DB::commit();
+                return Redirect::to('transactionBJB')
+                                    ->with('message', 'Status updated');
+            }else{
+                DB::rollBack();
+                return Redirect::to('transactionBJB')
+                            ->with('error', $data->error)
+                            ->withInput();
+            }
+        } catch (Exception $e) {
+            DB::rollBack();
+            return Redirect::to('transactionBJB')
+                        ->with('error', $e)
+                        ->withInput();
+        } catch (\Illuminate\Database\QueryException $e) {
+            DB::rollBack();
+            return Redirect::to('transactionBJB')
+                        ->with('error', $e)
+                        ->withInput();
+        }
+    }
+
+    public function updateStatus($id)
+    {
+        try {
+            $transaction = TransactionBJB::find($id);
+            if ($transaction) {
+                $msg_td = base64_encode($transaction->merchant->terminal->tid);
+                $msg_dt = date("YmdHms");
+                $theOtherKey = $transaction->merchant->terminal->tid.$msg_dt;
+                $base64key = base64_encode($theOtherKey);
+
+                $newEncrypter = new \Illuminate\Encryption\Encrypter($base64key, 'AES-256-CBC');
+                $encrypted = $newEncrypter->encrypt($transaction->code);
+
+                // echo $msg_td."||".$msg_dt."||".$encrypted."||".$base64key; die;
+                $ch = curl_init();
+                // $authorization = "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC8zNi45NC41OC4xODBcL2FwaVwvY29yZVwvcHVibGljXC9pbmRleC5waHBcL2FwaVwvYXV0aFwvbG9naW4iLCJpYXQiOjE2MjAyNzQ1MDMsImV4cCI6MTYyMTE0MzMwMywibmJmIjoxNjIwMjc0NTAzLCJqdGkiOiJndXRUaVprZElOb3c5RkVwIiwic3ViIjoiZTZhZTkwOWEtY2YzNC00ZDc2LWE5ZWQtMjJkOWJhNzU4ZmIwIiwicHJ2IjoiZjkzMDdlYjVmMjljNzJhOTBkYmFhZWYwZTI2ZjAyNjJlZGU4NmY1NSJ9.B8mm2IFt-TlYtvnmk8gctiBfAxnF5op0plemFJW6D_k";
+                // $method_request = "transaction_code=".$transaction->code;
+                // curl_setopt($ch, CURLOPT_URL, "http://36.94.58.180/api/core/public/index.php/api/transactions/checkStatus?".$method_request);
+                curl_setopt($ch, CURLOPT_URL, "http://36.94.58.180/api/core/public/index.php/api/transactions/detail/".$id);
+                // SSL important
+                curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                    // $authorization,
+                    // 'msg-td: '.$msg_td,
+                    'api-key: '.$encrypted,
+                    'msg-td: '.$msg_td,
+                    'msg-dt: '.$msg_dt));
+                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+
+                $output = curl_exec($ch);
+                $err = curl_error($ch);
+                curl_close($ch);
+                
+                if ($err) {
+                    echo "cURL Error #:" . $err;
+                } else {
+                    // print_r(json_decode($output));
+                    return Redirect::back()->with('success','Status updated successfully');
+                    // return redirect()->route('transaction')
+                    //             ->with('success','Status updated successfully');
+                }
+            }
+        } catch (Exception $e) {
+            return Redirect::to('transactionBJB')
+                        ->with('error', $e)
+                        ->withInput();
+        } catch (\Illuminate\Database\QueryException $e) {
+            return Redirect::to('transactionBJB')
+                        ->with('error', $e)
+                        ->withInput();
+        }
+    }
+
+    public function updatebjb(TransactionBJBUpdateRequest $request, $id)
+    {
+        // list($stan, $date) = explode("|", $id);
+        // $transaction = DB::table('transaction_log')
+        //                 ->select('*')
+        //                 ->where('stan', '=', $stan)
+        //                 ->where('tx_time', '>', $date . ' 00:00:00')
+        //                 ->get();
+
+        // $data = DB::table('transaction_log')
+        //                     ->updateOrInsert(
+        //                         ['tx_mti' => '0400', 'rp_mti' => '0410']
+        //                     );
+
+        // if($data){
+        //     return Redirect::to('transaction')
+        //     ->with('success', 'Data berhasil di rubah');
+        // } else {
+        //     return Redirect::to('transaction')
+        //     ->with('error', 'Data not found');
+        // }
+
+        DB::beginTransaction();
+        try {
+            $this->validator->with($request->all())->passesOrFail(ValidatorInterface::RULE_UPDATE);
+            list($stan, $date) = explode("_", $id);
+            return Redirect::to('transactionBJB')
+                ->with('stan', $stan)
+                ->with('date', $date);
+             $transaction = TransactionLog::where('stan', '=', $stan)->first();
+            // $transaction = DB::table('transaction_log')
+            //             ->select('*')
+            //             ->where('stan', '=', $stan)
+            //             ->where('tx_time', '>', $date . ' 00:00:00')
+            //             ->get();
+
+                foreach($transaction as $trx){
+                    if(strpos($trx->tx_time, $date) !== false){
+                        $reqData['tx_mti']               = '0400';
+                        $reqData['rp_mti']               = '0410';
+
+                        $data = $this->repository->update($reqData, $stan);
+            
+                        if($data){    
+                            DB::commit();
+                            return Redirect::to('transactionBJB')
+                                                ->with('message', 'Status updated');
+                        }else{
+                            DB::rollBack();
+                            return Redirect::to('transactionBJB')
+                                        ->with('error', $data->error)
+                                        ->withInput();
+                        }
+
+                        // if($type == 'Reversal') {
+                        //     $reqData['tx_mti']               = 0400;
+                        //     $reqData['rp_mti']               = 0410;
+
+                        //     $data = DB::table('transaction_log')
+                        //     ->updateOrInsert(
+                        //         ['tx_mti' => '0400', 'rp_mti' => '0410']
+                        //     );
+
+                        //     if($data){    
+                        //         DB::commit();
+                        //         return Redirect::to('transaction')
+                        //                             ->with('message', 'Status updated');
+                        //     }else{
+                        //         DB::rollBack();
+                        //         return Redirect::to('transaction')
+                        //                     ->with('error', $data->error)
+                        //                     ->withInput();
+                        //     }
+                        // } else {
+                        //     //skip
+                        // }
+                    }
+                }
+            
+        } catch (Exception $e) {
+            DB::rollBack();
+            return Redirect::to('transactionBJB')
+                        ->with('error', $e)
+                        ->withInput();
+        } catch (\Illuminate\Database\QueryException $e) {
+            DB::rollBack();
+            return Redirect::to('transactionBJB')
+                        ->with('error', $e)
+                        ->withInput();
+        }
     }
 
     private function getInfo(Request $request)
@@ -581,7 +811,7 @@ class TransactionBJBsController extends Controller
             $date           = $request->date;
             $group_id       = $request->group_id;
             $schema_id      = $request->schema_id;
-            $dataCalculate  = $this->calculate($group_id, $date, $request);
+            $dataCalculate  = $this->calculate($group_id, $date);
             
             // Check 
             $groupSchema = GroupSchema::where('group_id', $group_id)
@@ -604,11 +834,8 @@ class TransactionBJBsController extends Controller
 
                 $response = [
                     'revenue'       => $revenue,
-                    'total_trx'     => $dataCalculate['count'],
-                    'amount_trx'    => $dataCalculate['amount'],
-                    'total_fee'    => $dataCalculate['fee'],
-                    'total_fee_agent'    => $dataCalculate['fee_agent'],
-                    'total_fee_bjb'    => $dataCalculate['amount'],
+                    'total_trx'      => $dataCalculate['count'],
+                    'amount_trx'     => $dataCalculate['amount'],
                     'shareholder'   => $shareholders
                 ];
             }else{
@@ -641,339 +868,30 @@ class TransactionBJBsController extends Controller
         }
     }
 
-    public function feeExport(Request $request)
-    {
-
-        if(!$request->has('status') && $request->get('status')==''){
-            $request->request->add([
-                'status'  => 'Success'
-            ]);
-        }
-        if(!$request->has('start_date') && $request->get('start_date')==''){
-            $request->request->add([
-                'start_date'      => date("Y-m-d")
-            ]);
-        }
-        if(!$request->has('end_date') && $request->get('end_date')==''){
-            $request->request->add([
-                'end_date'      => date("Y-m-d")
-            ]);
-        }
-        $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
-
-	    return (new TransactionExportFeeLakupandai($request))->download('transaction_fee_lakupandai_export_'.$request->get('start_date').'_'.$request->get('end_date').'.xlsx', \Maatwebsite\Excel\Excel::XLSX);
-    }
-
-    public function updateBjb(TransactionBJBUpdateRequest $request, $id)
-    {
-        DB::beginTransaction();
-        try {
-            $this->validator->with($request->all())->passesOrFail(ValidatorInterface::RULE_UPDATE);
-            $transaction = TransactionBJB::where('stan', $id);
-            foreach($transaction as $trx){
-                if($trx->proc_code == '500000') {
-                    $reqData['tx_mti']               = '0400';
-                    $reqData['rp_mti']               = '0410';
-
-                    $data = $this->repository->update($reqData, $id);
-        
-                    if($data){    
-                        DB::commit();
-                        return Redirect::to('transactionBJB')
-                                            ->with('message', 'Status updated');
-                    }else{
-                        DB::rollBack();
-                        return Redirect::to('transactionBJB')
-                                    ->with('error', $data->error)
-                                    ->withInput();
-                    }
-                }
-            }
-        } catch (Exception $e) {
-            DB::rollBack();
-            return Redirect::to('transactionBJB')
-                        ->with('error', $e)
-                        ->withInput();
-        } catch (\Illuminate\Database\QueryException $e) {
-            DB::rollBack();
-            return Redirect::to('transactionBJB')
-                        ->with('error', $e)
-                        ->withInput();
-        }
-    }
-
-    public function edit($id)
-    {
-        $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
-        $data = TransactionBJB::where('stan', '=', $id)->first();
-            // $data->where('stan', '=', $id);
-            if($data) {
-                $item = TransactionBJB::where('message_id',$data->message_id)
-                                ->orWhere('stan',$data->stan)
-                                ->get();
-                foreach($item as $trx){
-                    return view('apps.transactionsBJB.edit')
-                    ->with('data', $trx);
-                }
-            }                
-    }
-
-    // public function edit($id)
-    // {
-    //     try {
-    //         list($stan, $date) = explode("_", $id);
-    //         $date = substr($date, 0, 10);
-    //         $dateClause = $date . " 00:00:00";
-    //         $transaction = TransactionBJB::select('*');
-    //         $transaction->where('stan', '=', $stan);
-    //         $transaction->where('tx_time', '>', $dateClause);
-    //         // $transaction = TransactionBJB::find($stan);
-    //         if($transaction){
-    //             $data = TransactionBJB::where('message_id', '99000867034246320210228092531')
-    //                             ->get();
-    //             return view('apps.transactionsBJB.edit')
-    //                     ->with('data', $data);
-    //             // foreach($transaction as $trx){
-    //             //     echo "masuk 1";
-    //             //     if(strpos($trx->tx_time, $date) !== false){
-                        
-    //             //     }
-    //             // }
-    //         } else {
-    //             return Redirect::to('transactionBJB')
-    //                             ->with('error', 'Data not found');
-    //         }
-    //     } catch (Exception $e) {
-    //         return Redirect::to('transactionBJB')
-    //                         ->with('error', $e);
-    //     } catch (\Illuminate\Database\QueryException $e) {
-    //         return Redirect::to('transactionBJB')
-    //                         ->with('error', $e);
-    //     }
-    // }
-
-        /**
-     * Update the specified resource in storage.
-     *
-     * @param  TransactionBJBUpdateRequest $request
-     * @param  string            $id
-     *
-     * @return Response
-     *
-     * @throws \Prettus\Validator\Exceptions\ValidatorException
-     */
-    public function update(TransactionBJBUpdateRequest $request, $id)
-    {
-        DB::beginTransaction();
-        try {
-            $this->validator->with($request->all())->passesOrFail(ValidatorInterface::RULE_UPDATE);
-            $data = $this->repository->update($request->all(), $id);
-            // $item = TransactionLog::where('additional_data',$id)
-            //                     ->orWhere('stan',$request->stan)
-            //                     ->get();
-            //                     echo $item;die();
-
-            $affected = DB::table('channel.transaction_log')
-              ->where('additional_data', $id)
-              ->update(['tx_mti' => '0400']);
-                // foreach($item as $trx){
-                //     $trx->tx_mti = '0400';
-                //     $trx->rp_mti = '0410';
-                //     $trx->save();
-                // }
-                DB::commit();
-                return Redirect::to('transactionBJB')
-                                    ->with('message', 'Reversal updated');
-            // if($data){
-            //     // $transaction = TransactionLog::where('additional_data',$id)
-            //     // ->update([
-            //     //     'tx_mti' => '0400',
-            //     //     'rp_mti' => '0410'
-            //     // ]);
-            //     // echo $transaction;
-            //     $item = TransactionLog::where('additional_data',$id)
-            //                     ->orWhere('stan',$request->stan)
-            //                     ->get();
-            //                     echo $item;
-            //     foreach($item as $trx){
-            //         $trx->tx_mti = '0400';
-            //         $trx->rp_mti = '0410';
-            //         $trx->save();
-            //     }
-            //     DB::commit();
-            //     return Redirect::to('transactionBJB')
-            //                         ->with('message', 'Reversal updated');
-            // }else{
-            //     DB::rollBack();
-            //     return Redirect::to('transactionBJB/'.$id.'/edit')
-            //                 ->with('error', $data->error)
-            //                 ->withInput();
-            // }
-        } catch (Exception $e) {
-            DB::rollBack();
-            return Redirect::to('transactionBJB/'.$id.'/edit')
-                        ->with('error', $e)
-                        ->withInput();
-        } catch (\Illuminate\Database\QueryException $e) {
-            DB::rollBack();
-            return Redirect::to('transactionBJB/'.$id.'/edit')
-                        ->with('error', $e)
-                        ->withInput();
-        }
-    }
-
-    private function calculate($group_id, $date, $request)
+    private function calculate($group_id, $date)
     {
         $groups = Group::where('parent_id', $group_id)->get();
         $result = [];
         $result['revenue']  = 0;
         $result['count']    = 0;
         $result['amount']   = 0;
+        $result['total_fee']   = 0;
+        $result['total_hpp']   = 0;
+        // Count
+        $count = TransactionBJB::where('status',1)
+        ->count();
+        $result['count'] = $count;
 
         // Sum
-        $data = TransactionBJB::whereRaw("1 = 1");
-        if($request->has('search') && $request->get('search')!=''){
-            $data->where(function($query) use ($request)
-            {
-                $query->where('tid', 'like', '%' . $request->get('search') . '%')
-                ->orWhere('mid', 'like', '%' . $request->get('search') . '%')
-                ->orWhere('agent_name', 'like', '%' . $request->get('search') . '%')
-                ->orWhere('transaction_name', 'like', '%' . $request->get('search') . '%')
-                ->orWhere('product_name', 'like', '%' . $request->get('search') . '%')
-                ->orWhere('stan', 'like', '%' . $request->get('search') . '%')
-                ->orWhere('message_id', 'like', '%'.$request->get("search").'%')
-                ->orWhere('status', 'like', '%' . $request->get('search') . '%')
-                ->orWhere('rc', 'like', '%' . $request->get('search') . '%')
-                ->orWhere('message_status', 'like', '%' . $request->get('search') . '%')
-                ->orWhere('tx_pan', 'like', '%' . $request->get('search') . '%')
-                ->orWhere('src_account', 'like', '%' . $request->get('search') . '%')
-                ->orWhere('dst_account', 'like', '%' . $request->get('search') . '%');
-            });
-        }
+        $sum = TransactionBJB::where('status',1)
+                ->sum('price');
+        $result['amount'] = $sum;
 
-        if($request->has('start_date') && $request->get('start_date')!=''){
-            $data->where('request_time', '>', $request->get('start_date').' 00:00:00');
-        }
+        $fee = TransactionBJB::where('status',1)
+                ->sum('fee');
+        $result['total_fee'] = $fee;
 
-        if($request->has('end_date') && $request->get('end_date')!=''){
-            $data->where('request_time', '<=', $request->get('end_date').' 23:59:59');
-        }
-
-
-        if($request->has('tid') && $request->get('tid')!=''){
-            $data->where('tid', '=', $request->get('tid'));
-        }
-        if($request->has('mid') && $request->get('mid')!=''){
-            $data->where('mid', '=', $request->get('mid'));
-        }
-        if($request->has('agent_name') && $request->get('agent_name')!=''){
-            $data->where('agent_name', '=', $request->get('agent_name'));
-        }
-        if($request->has('message_status') && $request->get('message_status')!=''){
-            $data->where('message_status', '=', $request->get('message_status'));
-        }
-        if($request->has('status') && $request->get('status')!='' && $request->get('status')!='Select Status'){
-            $data->where('status', '=', $request->get('status'));
-        }
-        if($request->has('rc') && $request->get('rc')!=''){
-            $data->where('rc', '=', $request->get('rc'));
-        }
-
-        if($request->has('stan') && $request->get('stan')!=''){
-            $data->where('stan', '=', $request->get('stan'));
-        }
-        if($request->has('message_id') && $request->get('message_id')!=''){
-            $data->where('message_id', '=', $request->get('message_id'));
-        }
-        if($request->has('service') && $request->get('service')!='' && $request->get('status')!='Select Service'){
-            $service = $request->get('service');
-            if ($service == 'Tarik Tunai'){
-                $data->where(function($query)
-                {
-                    $query->where('product_name', '=', 'MA0010')
-                        ->orWhere('product_name', '=', 'MA0012');
-                });
-                // $data->whereIn('product_name', ['MA0010','MA0012']);
-            }
-            else if ($service == 'Payment Transfer Antar Bank'){
-                $data->where(function($query)
-                {
-                    $query->where('product_name', '=', 'MA0021')
-                    ->orWhere('product_name', '=', 'MA0023');
-                });
-            }
-            else if ($service == 'Pemindahbukuan'){
-                $data->where(function($query)
-                {
-                    $query->where('product_name', '=', 'MA0031')
-                ->orWhere('product_name', '=', 'MA0033');
-            });
-            
-            }
-            else if ($service == 'Setor Tunai'){
-                $data->where(function($query)
-                {
-                    $query->where('product_name', '=', 'MA0041')
-                ->orWhere('product_name', '=', 'MA0043');
-            });
-            
-            }
-            else if ($service == 'Mini Statement'){
-                $data->where(function($query)
-                {
-                    $query->where('product_name', '=', 'MA0050')
-                ->orWhere('product_name', '=', 'MA0051');
-            });
-            
-            }
-            else if ($service == 'Info Saldo'){
-                $data->where(function($query)
-                {
-                    $query->where('product_name', '=', 'MA0060')
-                ->orWhere('product_name', '=', 'MA0063');
-            });
-            
-            }
-            else if ($service == 'Ganti PIN'){
-                $data->where(function($query)
-                {
-                    $query->where('product_name', '=', 'MA0071')
-                ->orWhere('product_name', '=', 'MA0073');
-            });
-            
-            }
-            else if ($service == 'Buka Rekening'){
-                $data->where(function($query)
-                {
-                    $query->where('product_name', '=', 'MA0081')
-                ->orWhere('product_name', '=', 'MA0083');
-            });
-            
-            }
-            else if ($service == 'Batal Rekening'){
-                $data->where(function($query)
-                {
-                    $query->where('product_name', '=', 'MA0091')
-                ->orWhere('product_name', '=', 'MA0093');
-            });
-            }   
-            else if ($service == 'PBB'){
-                $data->where(function($query)
-                {
-                    $query->where('product_name', '=', 'P00031')
-                ->orWhere('product_name', '=', 'P00033');
-            });
-            
-            }
-        }
-                
-        $result['count'] = $data->count();
-
-        $result['amount']   = $data->sum('total');
-        $result['fee']   = $data->sum('fee');
-        $result['agent_fee']   = $data->sum('agent_fee');
-        $result['bjb_fee']   = $data->sum('bjb_fee');
-        $result['selada_fee']   = $data->sum('selada_fee');
+        $result['total_hpp'] = $sum-$fee;
         // foreach ($groups as $item){
         //     // Check if id is leaf or not
         //     $check = Group::where('parent_id', $item->id)->first();
@@ -985,26 +903,90 @@ class TransactionBJBsController extends Controller
         //         foreach($userGroups as $userGroup){
         //             $merchant = Merchant::where('user_id', $userGroup->user_id)->first();
         //             if($merchant){
-        //                 $revenues = TransactionBJB::where('mid', $merchant->mid)
-        //                                 // ->whereDate('created_at', $date)
-        //                                 ->where('status', '00')
+        //                 $revenues = Transaction::where('merchant_id', $merchant->id)
+        //                                 // ->whereDate('date', $date)
+        //                                 ->where('status', 1)
         //                                 ->get();
         //                 // Revenue
         //                 foreach($revenues as $revenue){
-        //                    $result['revenue'] = $result['revenue'] + $revenue->fee;
+        //                     $result['revenue'] = $result['revenue'] + ($revenue->price - $revenue->vendor_price);
         //                 }
 
         //                 // Count
-        //                 $count = TransactionBJB::where('mid', $merchant->mid)
-        //                                     ->where('status','00')
+        //                 $count = Transaction::where('merchant_id', $merchant->id)
+        //                                     ->where('status',1)
         //                                     ->count();
         //                 $result['count'] = $result['count'] + $count;
 
         //                 // Sum
-        //                 $sum = TransactionBJB::where('mid', $merchant->mid)
-        //                                     ->where('status','00')
-        //                                     ->sum('total');
+        //                 $sum = Transaction::where('merchant_id', $merchant->id)
+        //                                     ->where('status',1)
+        //                                     ->sum('price');
         //                 $result['amount'] = $result['amount'] + $sum;
+
+        //             }
+        //         }
+        //     }
+        // }
+        return $result;
+    }
+
+    private function calculateOnly()
+    {
+        $result = [];
+        $result['revenue']  = 0;
+        $result['count']    = 0;
+        $result['amount']   = 0;
+        $result['total_fee']   = 0;
+        $result['total_hpp']   = 0;
+        // Count
+        $count = TransactionBJB::where('status',1)->where('is_development','!=',1)
+        ->count();
+        $result['count'] = $count;
+
+        // Sum
+        $sum = TransactionBJB::where('status',1)->where('is_development','!=',1)
+                ->sum('price');
+        $result['amount'] = $sum;
+
+        $total_hpp = TransactionBJB::where('status',1)->where('is_development','!=',1)
+                ->sum('vendor_price');
+        $result['total_hpp'] = $total_hpp;
+        
+        $result['total_fee'] = $sum-$total_hpp;
+
+        // foreach ($groups as $item){
+        //     // Check if id is leaf or not
+        //     $check = Group::where('parent_id', $item->id)->first();
+        //     if($check){
+        //         $result = $this->calculate($item->id, $date);
+        //     }else{
+        //         // Count amount of transactions
+        //         $userGroups = UserGroup::where('group_id', $item->id)->get();
+        //         foreach($userGroups as $userGroup){
+        //             $merchant = Merchant::where('user_id', $userGroup->user_id)->first();
+        //             if($merchant){
+        //                 $revenues = Transaction::where('merchant_id', $merchant->id)
+        //                                 // ->whereDate('date', $date)
+        //                                 ->where('status', 1)
+        //                                 ->get();
+        //                 // Revenue
+        //                 foreach($revenues as $revenue){
+        //                     $result['revenue'] = $result['revenue'] + ($revenue->price - $revenue->vendor_price);
+        //                 }
+
+        //                 // Count
+        //                 $count = Transaction::where('merchant_id', $merchant->id)
+        //                                     ->where('status',1)
+        //                                     ->count();
+        //                 $result['count'] = $result['count'] + $count;
+
+        //                 // Sum
+        //                 $sum = Transaction::where('merchant_id', $merchant->id)
+        //                                     ->where('status',1)
+        //                                     ->sum('price');
+        //                 $result['amount'] = $result['amount'] + $sum;
+
         //             }
         //         }
         //     }

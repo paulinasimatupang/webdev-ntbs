@@ -2,45 +2,56 @@
 
 namespace App\Entities;
 
-use Auth;
 use Illuminate\Database\Eloquent\Model;
-use App\Presenters\TransactionBJBPresenter;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Prettus\Repository\Contracts\Transformable;
 use Prettus\Repository\Traits\TransformableTrait;
 
 /**
- * Class TransactionBJB.
+ * Class Transactions.
  *
  * @package namespace App\Entities;
  */
-class TransactionBJB extends Model
+class TransactionBJB extends Model implements Transformable
 {
-//    use TransformableTrait;
-//    use SoftDeletes;
+    use TransformableTrait;
+    use SoftDeletes;
 
-    protected $presenter = TransactionBJBPresenter::class;
-//    public $incrementing = true;
-    protected $connection = 'pgsql_report';
+    public $incrementing = true;
 
-    // protected $fillable = [
-    //     'id',
-    //     'transaction_name',
-    //     'transaction_code',
-    //     'product_name',
-    //     'nominal',
-    //     'fee',
-    //     'total'
-    // ];
+    protected $fillable = [
+        'id',
+        'service_id',
+        'code',
+        'merchant_id',
+        'merchant_no',
+        'price',
+        'vendor_price',
+        'note',
+        'status',
+        'payment_status',
+        'is_suspect'
+    ];
 
-    protected $table = 'report_mini_banking_view';
+    protected $table = 'transactions';
 
-    // protected $table = 'fee_view';
-    //protected $table = 'reff_pmt_transactions';
+    public function merchant()
+    {
+        return $this->belongsTo(Merchant::class,'merchant_id','id');
+    }
 
-    // public function productTransaction()
-    // {
-    //     return $this->hasOne(Transaction::class,'stan','stan');
-    // }
+    public function service()
+    {
+        return $this->belongsTo(Service::class,'service_id','id');
+    }
 
+    public function transactionStatus()
+    {
+        return $this->hasMany(TransactionStatus::class,'transaction_id','id');
+    }
+
+    public function transactionPaymentStatus()
+    {
+        return $this->hasMany(TransactionPaymentStatus::class,'transaction_id','id');
+    }
 }

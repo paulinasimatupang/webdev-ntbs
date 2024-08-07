@@ -1,7 +1,7 @@
 @extends('layouts.master')
 @section('main-content')
     <div class="breadcrumb">
-                <h1>Transaction BJB</h1>
+                <h1>Ubah Status Transaksi</h1>
                 <ul>
                     <li><a href="">Selada</a></li>
                    
@@ -24,75 +24,77 @@
                 <div class="col-md-12">
                     <div class="card mb-5">
                         <div class="card-body">
-                            <form action="{{route('transactionBJB_update', [$data->message_id])}}" method="POST">
+                            <form action="{{route('transactionBJB_update', $transaction->id)}}" method="POST">
                                 <div class="form-group row">
                                     <input name="_token" type="hidden" value="{{ csrf_token() }}"/>
-                                    <label class="col-sm-2 col-form-label">STAN</label>
+                                    <label class="col-sm-2 col-form-label">Username</label>
                                     <div class="col-sm-10">
-                                        <input type="text" class="form-control" value="{{$data->stan}}" name="stan" placeholder="STAN" required disabled>
+                                        <input type="text" class="form-control" value="{{!empty($transaction->merchant->user) ? $transaction->merchant->user->username : ''}}" name="username" placeholder="Username" disabled>
                                         <div class="invalid-tooltip">
-                                            Nama Lengkap tidak boleh kosong.
+                                            TID tidak boleh kosong.
                                         </div>
                                     </div>
                                 </div>
                                 <div class="form-group row">
-                                    <input name="_token" type="hidden" value="{{ csrf_token() }}"/>
-                                    <label class="col-sm-2 col-form-label">Date</label>
+                                    <label class="col-sm-2 col-form-label">Agen</label>
                                     <div class="col-sm-10">
-                                        <input type="text" class="form-control" value="{{$data->tx_time}}" name="tx_time" placeholder="Date" required disabled>
+                                        <input type="text" class="form-control" value="{{!empty($transaction->merchant) ? $transaction->merchant->name : ''}}" name="name" placeholder="Agen" disabled>
                                         <div class="invalid-tooltip">
-                                            Nama Toko tidak boleh kosong.
+                                            Nama Agen tidak boleh kosong.
                                         </div>
                                     </div>
                                 </div>
                                 <div class="form-group row">
-                                    <input name="_token" type="hidden" value="{{ csrf_token() }}"/>
-                                    <label class="col-sm-2 col-form-label">Trx Amount</label>
+                                    <label class="col-sm-2 col-form-label">Transaction Code</label>
                                     <div class="col-sm-10">
-                                        <input type="text" class="form-control" value="{{$data->total}}" name="total" placeholder="Trx Amount" required disabled>
+                                        <input type="text" class="form-control" value="{{$transaction->code}}" name="code" placeholder="Transaction Code" disabled>
                                         <div class="invalid-tooltip">
-                                            Nama Merek tidak boleh kosong.
+                                            Transaction Code tidak boleh kosong.
                                         </div>
                                     </div>
                                 </div>
                                 <div class="form-group row">
-                                    <input name="_token" type="hidden" value="{{ csrf_token() }}"/>
-                                    <label class="col-sm-2 col-form-label">Response Code</label>
+                                    <label class="col-sm-2 col-form-label">Product</label>
                                     <div class="col-sm-10">
-                                        <input type="text" class="form-control" value="{{$data->rc}}" name="rc" placeholder="RC" required disabled>
+                                        <input type="text" class="form-control" value="{{$transaction->service->product->name}}" name="name" placeholder="Product" disabled>
                                         <div class="invalid-tooltip">
-                                            Alamat Toko tidak boleh kosong.
+                                            Product tidak boleh kosong.
                                         </div>
                                     </div>
                                 </div>
                                 <div class="form-group row">
-                                    <input name="_token" type="hidden" value="{{ csrf_token() }}"/>
-                                    <label class="col-sm-2 col-form-label">Status Reversal 1</label>
+                                    <label class="col-sm-2 col-form-label">Price</label>
                                     <div class="col-sm-10">
-                                        <select class="form-control" name="tx_mti" placeholder="Select Status">
-                                                        <option>Select Status</option>
-                                                        <option @if($data->tx_mti == '0200') selected @endif value="0200">Non Reversal</option>
-                                                        <option @if($data->tx_mti == '0400') selected @endif value="0400">Reversal</option>
-                                        </select>    
+                                        <input type="number" min="1" step="any" class="form-control" value="{{$transaction->price}}" name="price" placeholder="Price" disabled>
+                                        <div class="invalid-tooltip">
+                                            Price tidak boleh kosong.
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="form-group row">
-                                    <input name="_token" type="hidden" value="{{ csrf_token() }}"/>
-                                    <label class="col-sm-2 col-form-label">Status Reversal 2</label>
+                                    <label class="col-sm-2 col-form-label">Status</label>
                                     <div class="col-sm-10">
-                                        <select class="form-control" name="rp_mti" placeholder="Select Status">
-                                                        <option>Select Status</option>
-                                                        <option @if($data->rp_mti == '0210') selected @endif value="0210">Non Reversal</option>
-                                                        <option @if($data->rp_mti == '0410') selected @endif value="0410">Reversal</option>
-                                        </select>    
+                                        <select class="form-control" name="status_text" id="status_text" placeholder="Select Status">
+                                                        <option disabled>Select Status</option>
+                                                        <option @php if ($transaction->status == '0') echo 'selected' @endphp value="0">Pending</option>
+                                                        <option @php if ($transaction->status == '2') echo 'selected' @endphp value="2">Failed</option>
+                                                        <option @php if ($transaction->status == '1') echo 'selected' @endphp value="1">Success</option>
+                                                    </select>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-2 col-form-label">Status Suspect</label>
+                                    <div class="col-sm-10">
+                                        <select class="form-control" name="status_suspect" id="status_suspect" placeholder="Select Status">
+                                                        <option disabled>Select Status</option>
+                                                        <option @php if ($transaction->is_suspect == 1) echo 'selected' @endphp value="1">True</option>
+                                                        <option @php if ($transaction->is_suspect !== 1) echo 'selected' @endphp value="0">False</option>
+                                                    </select>
                                     </div>
                                 </div>
                             
                                 <div class="form-group row">
                                     <div class="col-sm-12 text-right">
-                                        <a href="{{route('transactionBJB')}}">
-                                            <button type="button" class="btn btn-primary">Back</button>
-                                        </a>
                                         <button type="submit" class="btn btn-primary">Simpan</button>
                                     </div>
                                 </div>

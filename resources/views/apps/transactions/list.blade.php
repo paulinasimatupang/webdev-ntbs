@@ -440,9 +440,9 @@ display: none;
         if (r == true) {
             // var e = document.getElementById("change_status_bjb");
             // var strType = e.options[e.selectedIndex].text;
-            // var url = '{{route("transaction_updatebjb",[":stan|:date|:type"])}}';
+            // var url = '{{route("transaction_update",[":stan|:date|:type"])}}';
             var split = "|";
-            var url = '{{route("transaction_updatebjb",[":id_:date"])}}';
+            var url = '{{route("transaction_update",[":id_:date"])}}';
             url = url.replace(':id', id);
             // url = url.replace(':id', id + split + date.substring(0,10));
             url = url.replace(':date', date.substring(0,10));

@@ -18,7 +18,7 @@ class Transaction extends Model implements Transformable
     public $incrementing = true;
 
     protected $fillable = [
-        'transacton_id',
+        'transaction_id',
         'service_id',
         'event_uid',
         'transaction_status_id',
@@ -34,27 +34,28 @@ class Transaction extends Model implements Transformable
         'appr_code',
     ];
 
+    protected $primaryKey = 'transaction_id';
     protected $table = 'public.transaction';
     protected $connection = 'pgsql_billiton';
-    public $timestamp = false;
+    public $timestamps = false;
 
     public function event()
     {
-        return $this->belongsTo(Event::class,'event_uid','user_uid');
+        return $this->belongsTo(Event::class, 'event_uid', 'user_uid');
     }
 
     public function service()
     {
-        return $this->belongsTo(Service::class,'service_id','user_uid');
+        return $this->belongsTo(Service::class, 'service_id', 'user_uid');
     }
 
     public function transactionStatus()
     {
-        return $this->hasMany(TransactionStatus::class,'transaction_status_id','user_uid');
+        return $this->hasMany(TransactionStatus::class, 'transaction_status_id', 'user_uid');
     }
 
     public function user()
     {
-        return $this->hasMany(UsersBilliton::class,'user_uid','user_uid');
+        return $this->belongsTo(UsersBilliton::class, 'user_uid', 'user_uid');
     }
 }
