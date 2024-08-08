@@ -2,7 +2,7 @@
 
 @section('main-content')
     <div class="breadcrumb">
-        <h1>Edit Terminal</h1>
+        <h1>Edit Screen</h1>
         <ul>
             <li><a href="">Selada</a></li>
         </ul>
@@ -24,8 +24,6 @@
                 <div class="card-body">
                     <form action="{{ route('screen_update', [$screen->screen_id]) }}" method="POST">
                         @csrf
-                        @method('POST')
-
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label">Screen ID</label>
                             <div class="col-sm-10">
@@ -36,18 +34,18 @@
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label">Screen Type</label>
                             <div class="col-sm-10">
-                                <select name="screen_type" class="form-control">
-                                    <option value="">Select Screen Type</option>
-                                    @if(isset($screen_type) && is_iterable($screen_type))
-                                        @foreach($screen_type as $item)
-                                            <option value="{{ $item->screen_type_id }}" {{ $item->screen_type_id == $screen->screen_type_id ? 'selected' : '' }}>
-                                                {{ $item->screen_type_name }}
-                                            </option>
-                                        @endforeach
-                                    @else
-                                        <option value="">No Screen types available</option>
-                                    @endif
-                                </select>
+                            <select name="screen_type_id" class="form-control">
+                                <option value="">Select Screen Type</option>
+                                @if(isset($screen_type) && is_iterable($screen_type))
+                                    @foreach($screen_type as $item)
+                                        <option value="{{ $item->screen_type_id }}" {{ $item->screen_type_id == $screen->screen_type_id ? 'selected' : '' }}>
+                                            {{ $item->screen_type_name }}
+                                        </option>
+                                    @endforeach
+                                @else
+                                    <option value="">No Screen types available</option>
+                                @endif
+                            </select>
                             </div>
                         </div>
 

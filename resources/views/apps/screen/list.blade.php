@@ -99,20 +99,20 @@
     function deleteConfirm(id) {
         var r = confirm("Are you sure?");
         if (r == true) {
-            var url = '{{route("screen_destroy",[":id"])}}';
-            url = url.replace(':id', id);
-            
-            $.post(url,
-            {
+            var url = '{{ route("screen_destroy", ":id") }}'.replace(':id', id);
+            console.log("Request URL:", url);
+
+            $.post(url, {
                 _token: "{{ csrf_token() }}",
-            },
-            function(data,status){
-                location.reload(true);
-            }).done(function() {
-                location.reload(true);
-            }).fail(function() {
-                alert( "Error, Please try again later!" );
             })
+            .done(function(response) {
+                console.log("Response:", response);
+                location.reload(true);
+            })
+            .fail(function(jqXHR, textStatus, errorThrown) {
+                console.log("Error:", textStatus, errorThrown);
+                alert("Error, Please try again later!");
+            });
         }
     }
 </script>

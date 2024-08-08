@@ -18,6 +18,8 @@ class Screen extends Model implements Transformable
     protected $table = 'screen';
     protected $primaryKey = 'screen_id';
     public $incrementing = false;
+    public $timestamps = false;
+
 
     protected $fillable = [
         'screen_id',
@@ -26,8 +28,6 @@ class Screen extends Model implements Transformable
         'version',
         'action_url',
         'screen_title_en',
-        'print',
-        'print_text'
     ];
     
     public function screenType()

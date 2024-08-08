@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
+use DB;
+use Redirect;
+use Prettus\Validator\Contracts\ValidatorInterface;
+use Prettus\Validator\Exceptions\ValidatorException;
 use App\Entities\Screen; 
-use App\Entities\Service;
 use App\Entities\ScreenType; 
 
 class ScreenController extends Controller
@@ -100,6 +102,7 @@ class ScreenController extends Controller
                 'version' => 'required|string|max:10',
                 'action_url' => 'nullable|string|max:256',
             ]);
+
             $screen = Screen::findOrFail($id);
             $screen->screen_id = $validatedData['screen_id'];
             $screen->screen_type_id = $validatedData['screen_type_id'];
@@ -107,6 +110,7 @@ class ScreenController extends Controller
             $screen->version = $validatedData['version'];
             $screen->action_url = $validatedData['action_url'];
             $screen->save();
+
             return Redirect::to('screen')->with('success', 'Data berhasil disimpan.');
         } catch (\Exception $e) {
             return Redirect::route('screen_edit', $id)
@@ -115,15 +119,16 @@ class ScreenController extends Controller
         }
     }
 
+
     public function destroy($id)
     {
         try {
             $screen = Screen::findOrFail($id);
             $screen->delete();
-            return Redirect::to('screen')->with('success', 'Data berhasil dihapus.');
+            return response()->json(['success' => 'Data berhasil dihapus.']); 
         } catch (\Exception $e) {
-            return Redirect::route('screen')
-                ->with('error', 'Terjadi kesalahan saat menghapus data: ' . $e->getMessage());
+            return response()->json(['error' => 'Terjadi kesalahan saat menghapus data: ' . $e->getMessage()], 500); 
         }
+
     }
 }

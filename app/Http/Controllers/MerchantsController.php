@@ -14,6 +14,8 @@ use App\Http\Requests\MerchantUpdateRequest;
 use App\Repositories\MerchantRepository;
 use App\Validators\MerchantValidator;
 use Ixudra\Curl\Facades\Curl;
+use Illuminate\Support\Facades\Log;
+
 
 use App\Entities\Merchant;
 use App\Entities\Role;
@@ -22,6 +24,7 @@ use App\Entities\Terminal;
 use App\Entities\Group;
 use App\Entities\TerminalBilliton;
 use App\Entities\UserGroup;
+
 
 /**
  * Class MerchantsController.
@@ -158,116 +161,160 @@ class MerchantsController extends Controller
      *
      * @throws \Prettus\Validator\Exceptions\ValidatorException
      */
-    public function store(MerchantCreateRequest $request)
+    public function store(Request $request)
     {
-        DB::beginTransaction();
-        try {
-            $check = User::where('username', $request->username)
-                            ->orWhere('email',$request->email)
-                            ->first();
-            if($check){
-                return response()->json([
-                    'status'=> false, 
-                    'error'=> 'Username already used'
-                ], 403);
-            }
+        $accountNo = $request->input('no');
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, "http://108.137.154.8:8080/ARRest/api/");
+        $data = json_encode([
+            'msg'=>([
+            'msg_id' => '35347104505869220240719160201',
+            'msg_ui' => '353471045058692',
+            'msg_si' => 'INF001',
+            'msg_dt' => 'admin|'. $accountNo
+            ])
+        ]);
 
-            //check for role merchant
-            $role = Role::where('name','Merchant')->first();
-            if($role){
-                $role_id = $role->id;
-            }else{
-                return response()->json([
-                    'status'=> false, 
-                    'error'=> 'Role not found'
-                ], 404);
-            }
-            
-            $user = User::create([
-                            'role_id'           => $role_id,
-                            'username'          => $request->username,
-                            'fullname'          => $request->fullname,
-                            'email'             => $request->email,
-                            'password'          => bcrypt($request->password),
-                            'is_user_mireta'    => $request->is_user_mireta,
-                        ]);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 
-            $this->validator->with($request->all())->passesOrFail(ValidatorInterface::RULE_CREATE);
-            $reqData = $request->all();
-            $reqData['user_id'] = $user->id;
-            $reqData['name']    = $user->fullname;
-            $reqData['status_agen']    = 0;
-            $data   = $this->repository->create($reqData);
+        $output = curl_exec($ch);
+        $err = curl_error($ch);
+        $info = curl_getinfo($ch);
+        curl_close($ch);
 
-            // Create to user_groups
-            $checkGroup = Group::where('name','Agent')->first();
-            if($checkGroup){
-                $checkUG = UserGroup::where('user_id',$user->id)
-                                    ->where('group_id',$checkGroup->id)
-                                    ->first();
-                if(!$checkGroup){
-                    $userGroup = UserGroup::create([
-                        'user_id'   => $user->id,
-                        'group_id'  => $checkGroup->id
-                    ]);
-                }
-            }
-            
-            if($data){
-                // $terminal = Terminal::where('tid',$reqData['terminal_id'])->first();
-                // if($terminal){
-                //     $terminal->merchant_id              = $data->mid;
-                //     $terminal->merchant_name            = $data->name;
-                //     $terminal->merchant_address         = $data->address;
-                //     $terminal->merchant_account_number  = $data->no;
-                //     $terminal->save();
-                // }
+        Log::info('cURL Request URL: '  . $info['url']);
+        Log::info('cURL Request Data: ' . $data);
+        Log::info('cURL Response: ' . $output);
 
-                //add to mireta
-                $reqData = [
-                    'username'              => $request->username,
-                    'email'                 => $request->email,
-                    'password'              => $request->password,
-                    'fullname'              => $request->fullname,
-                    'registration_email'    => $request->email,
-                    'brand_name'            => $request->fullname,
-                    'store_name'            => $request->fullname,
-                    'store_address'         => $request->address,
-                    'store_phone'           => $request->phone,
-                ];
-                
-                $responseCurl = Curl::to(config('app.url_mireta'))
-                                    ->withData($reqData)
-                                    ->asJson()
-                                    ->post();
-                
-                if($responseCurl->status == true){   
-                    DB::commit();
-                    return Redirect::to('merchant')
-                        ->with('message', 'Merchant created');
-                }else{
-                    DB::rollBack();
-                    return Redirect::to('merchant/create')
-                        ->with('error', 'Failed to save mireta')
-                        ->withInput();
-                }
-            }else{
-                DB::rollBack();
-                return Redirect::to('merchant/create')
-                            ->with('error', $data->error)
-                            ->withInput();
-            }
-        } catch (Exception $e) {
-            DB::rollBack();
-                return Redirect::to('merchant/create')
-                            ->with('error', $e)
-                            ->withInput();
-        } catch (\Illuminate\Database\QueryException $e) {
-            DB::rollBack();
-                return Redirect::to('merchant/create')
-                            ->with('error', $e)
-                            ->withInput();
+        if ($err) {
+            Log::error('cURL Error: ' . $err);
+        
         }
+
+        if ($output !== "{}") {
+            return Redirect::to('merchant/create')
+                            ->with('error', 'Merchant Sudah Terdaftar')
+                            ->withInput();
+        } else {
+            DB::beginTransaction();
+            try {
+                $check = User::where('username', $request->username)
+                                ->orWhere('email',$request->email)
+                                ->first();
+                if($check){
+                    return response()->json([
+                        'status'=> false, 
+                        'error'=> 'Username already used'
+                    ], 403);
+                }
+
+                //check for role merchant
+                $role = Role::where('name','Merchant')->first();
+                if($role){
+                    $role_id = $role->id;
+                }else{
+                    return response()->json([
+                        'status'=> false, 
+                        'error'=> 'Role not found'
+                    ], 404);
+                }
+                
+                $user = User::create([
+                                'role_id'           => $role_id,
+                                'username'          => $request->username,
+                                'fullname'          => $request->fullname,
+                                'email'             => $request->email,
+                                'password'          => bcrypt($request->password),
+                                'is_user_mireta'    => $request->is_user_mireta,
+                            ]);
+
+                // $this->validator->with($request->all())->passesOrFail(ValidatorInterface::RULE_CREATE);
+                $reqData = $request->all();
+                $reqData['user_id'] = $user->id;
+                $reqData['name']    = $user->fullname;
+                $reqData['status_agen']    = 0;
+                $data   = $this->repository->create($reqData);
+
+                // Create to user_groups
+                $checkGroup = Group::where('name','Agent')->first();
+                if($checkGroup){
+                    $checkUG = UserGroup::where('user_id',$user->id)
+                                        ->where('group_id',$checkGroup->id)
+                                        ->first();
+                    if(!$checkGroup){
+                        $userGroup = UserGroup::create([
+                            'user_id'   => $user->id,
+                            'group_id'  => $checkGroup->id
+                        ]);
+                    }
+                }
+                DB::commit();
+                return Redirect::to('merchant')
+                                ->with('message', 'Merchant created');
+                
+                // if($data){
+                    // $terminal = Terminal::where('tid',$reqData['terminal_id'])->first();
+                    // if($terminal){
+                    //     $terminal->merchant_id              = $data->mid;
+                    //     $terminal->merchant_name            = $data->name;
+                    //     $terminal->merchant_address         = $data->address;
+                    //     $terminal->merchant_account_number  = $data->no;
+                    //     $terminal->save();
+                    // }
+
+                    //add to mireta
+                    // $reqData = [
+                    //     'username'              => $request->username,
+                    //     'email'                 => $request->email,
+                    //     'password'              => $request->password,
+                    //     'fullname'              => $request->fullname,
+                    //     'registration_email'    => $request->email,
+                    //     'brand_name'            => $request->fullname,
+                    //     'store_name'            => $request->fullname,
+                    //     'store_address'         => $request->address,
+                    //     'store_phone'           => $request->phone,
+                    // ];
+                    
+                    // $responseCurl = Curl::to(config('app.url_mireta'))
+                    //                     ->withData($reqData)
+                    //                     ->asJson()
+                    //                     ->post();
+                    
+                    // if($responseCurl->status == true){   
+                    //     DB::commit();
+                    //     return Redirect::to('merchant')
+                    //         ->with('message', 'Merchant created');
+                    // }else{
+                    //     DB::rollBack();
+                    //     return Redirect::to('merchant/create')
+                    //         ->with('error', 'Failed to save mireta')
+                    //         ->withInput();
+                    // }
+                // }else{
+                //     DB::rollBack();
+                //     return Redirect::to('merchant/create')
+                //                 ->with('error', $data->error)
+                //                 ->withInput();
+                // }
+            } catch (Exception $e) {
+                DB::rollBack();
+                    return Redirect::to('merchant/create')
+                                ->with('error', $e)
+                                ->withInput();
+            } catch (\Illuminate\Database\QueryException $e) {
+                DB::rollBack();
+                    return Redirect::to('merchant/create')
+                                ->with('error', $e)
+                                ->withInput();
+            }
+        }
+    }
+
+    public function save(){
+        
     }
 
     /**
