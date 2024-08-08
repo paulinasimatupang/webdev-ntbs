@@ -51,6 +51,6 @@ class Merchant extends Model implements Transformable
 
     public function user()
     {
-        return $this->belongsTo(UsersBilliton::class,'user_id','user_uid');
+        return $this->belongsTo(User::class,'user_id','id');
     }
 }
