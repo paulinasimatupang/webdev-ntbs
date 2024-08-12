@@ -15,7 +15,7 @@
             <div class="row mb-4">
                 <div class="col-lg-12 col-md-12 col-sm-12 d-flex justify-content-center mb-3">
                     <div class="input-group">
-                        <a href="{{route('merchant_create')}}">
+                        <a href="{{route('merchant_inquiry_nik')}}">
                             <button class="btn btn-warning ripple m-1 add-new-btn" type="button" @php if($username !== 'selada_produktif') echo 'disabled' @endphp>Add New</button>
                         </a>
                     </div>

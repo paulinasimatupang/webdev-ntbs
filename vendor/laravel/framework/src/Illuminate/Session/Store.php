@@ -125,12 +125,27 @@ class Store implements Session
     {
         $this->ageFlashData();
 
-        $this->handler->write($this->getId(), $this->prepareForStorage(
-            serialize($this->attributes)
-        ));
+        foreach ($this->attributes as $key => $value) {
+            if ($value instanceof \Closure || is_resource($value)) {
+                $this->attributes[$key] = null;
+                \Log::warning("Invalid data found in session attribute: $key has been replaced with null.");
+            }
+        }
+
+        try {
+            $serializedData = serialize($this->attributes);
+            $this->handler->write($this->getId(), $this->prepareForStorage($serializedData));
+        } catch (\Exception $e) {
+            \Log::error("Serialization failed: " . $e->getMessage());
+            \Log::debug("Attributes: ", $this->attributes);
+            throw $e;
+        }
 
         $this->started = false;
     }
+
+
+
 
     /**
      * Prepare the serialized session data for storage.

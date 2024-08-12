@@ -152,27 +152,121 @@ class MerchantsController extends Controller
                 // ->with('terminal', $terminal);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  MerchantCreateRequest $request
-     *
-     * @return \Illuminate\Http\Response
-     *
-     * @throws \Prettus\Validator\Exceptions\ValidatorException
-     */
-    public function store(Request $request)
-    {
-        $accountNo = $request->input('no');
+    public function create_cif(Request $request){
+        return view('apps.merchants.add-cif');
+    }
+
+    public function store_cif(Request $request){
+        $nama_lengkap = $request->input('nama_lengkap');
+        $nama_alias = $request->input('nama_alias');
+        $ibu_kandung = $request->input('ibu_kandung');
+        $tempat_lahir = $request->input('tempat_lahir');
+        $tgl_lahir = $request->input('tgl_lahir');
+        $jenis_kelamin = $request->input('jenis_kelamin');
+        $agama = $request->input('agama');
+        $status_nikah = $request->input('status_nikah');
+        $alamat = $request->input('alamat');
+        $rt = $request->input('rt');
+        $rw = $request->input('rw');
+        $kecamatan = $request->input('kecamatan');
+        $kelurahan = $request->input('kelurahan');
+        $kab_kota = $request->input('kab_kota');
+        $provinsi = $request->input('provinsi');
+        $kode_pos = $request->input('kode_pos');
+        $status_penduduk = $request->input('status_penduduk');
+        $kewarganegaraan = $request->input('kewarganegaraan');
+        $no_telp = $request->input('no_telp');
+        $no_hp = $request->input('no_hp');
+        $npwp = $request->input('npwp');
+        $jenis_identitas = $request->input('jenis_identitas');
+        $no_identitas = $request->input('no_identitas');
+        $golongan_darah = $request->input('golongan_darah');
+        $expired_identitas = $request->input('expired_identitas');
+        $pendidikan_terakhir = $request->input('pendidikan_terakhir');
+        $email = $request->input('email');
+        $branchid = $request->input('branchid');
+
+        $terminal = '353471045058692';
+        $dateTime = date("YmdHms");
+
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, "http://108.137.154.8:8080/ARRest/api/");
         $data = json_encode([
-            'msg'=>([
-            'msg_id' => '35347104505869220240719160201',
-            'msg_ui' => '353471045058692',
-            'msg_si' => 'INF001',
-            'msg_dt' => 'admin|'. $accountNo
-            ])
+            'msg'=>[
+                'msg_id' =>  "$terminal$dateTime",
+                'msg_ui' => "$terminal",
+                'msg_si' => 'CC0001',
+                'msg_dt' => 'admin|' . $nama_lengkap . '|' . $nama_alias . '|' . $ibu_kandung . '|' . $tempat_lahir . '|' . $tgl_lahir . '|' . $jenis_kelamin . '|' . $agama . '|' 
+                    . $status_nikah . '|' . $alamat . '|' . $rt . '|' . $rw . '|' . $kecamatan . '|' . $kelurahan . '|' . $kab_kota . '|'. $provinsi . '|' . $kode_pos . '|'. $status_penduduk . '|' . $kewarganegaraan . '|'
+                    . $no_telp . '|' . $no_hp . '|' . $npwp . '|' . $jenis_identitas . '|' . $no_identitas . '|' . $golongan_darah . '|' . $expired_identitas . '|' . $pendidikan_terakhir . '|'
+                    . $email . '|' . $branchid
+            ]
+        ]);
+
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+
+        $output = curl_exec($ch);
+        $err = curl_error($ch);
+        $info = curl_getinfo($ch);
+        curl_close($ch);
+
+        Log::info('cURL Request URL: '  . $info['url']);
+        Log::info('cURL Request Data: ' . $data);
+        Log::info('cURL Response: ' . $output);
+
+        if ($err) {
+            Log::error('cURL Error: ' . $err);
+        }else {
+            $responseArray = json_decode($output, true);
+        
+            $cifid = null;
+            if (isset($responseArray['screen']['comps']['comp'])) {
+                foreach ($responseArray['screen']['comps']['comp'] as $comp) {
+                    if ($comp['comp_lbl'] === 'ID CIF') {
+                        $cifid = $comp['comp_values']['comp_value'][0]['value'];
+                    }
+                }
+            }
+        }
+
+        if ($output !== "{}") {
+            //Create Merchant
+            return Redirect::to('/merchant/create/rekening')
+                            ->with('nama_lengkap', $nama_lengkap)
+                            ->with('branchid', $branchid)
+                            ->with('no_cif', $cifid);
+        } else {
+            //Create CIF
+            return Redirect::to('/merchant/create/cif')->with('error', "Create CIF Gagal");
+        }
+    }
+
+    public function create_rekening(Request $request){
+        return view('apps.merchants.add-rekening');
+    }
+
+    public function store_rekening(Request $request){
+        $nama_lengkap = $request->input('nama_lengkap');
+        $no_cif = $request->input('no_cif');
+        $kode_produk = $request->input('kode_produk');
+        $no_registrasi = $request->input('no_registrasi');
+        $branchid = $request->input('branchid');
+
+        $terminal = '353471045058692';
+        $dateTime = date("YmdHms");
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, "http://108.137.154.8:8080/ARRest/api/");
+        $data = json_encode([
+            'msg'=>[
+                'msg_id' =>  "$terminal$dateTime",
+                'msg_ui' => "$terminal",
+                'msg_si' => 'CRS001',
+                'msg_dt' => 'admin|' . $nama_lengkap . '|' . $no_cif . '|' . $kode_produk . '|' . $no_registrasi . '|' . $branchid
+            ]
         ]);
 
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
@@ -192,14 +286,50 @@ class MerchantsController extends Controller
         if ($err) {
             Log::error('cURL Error: ' . $err);
         
+        }else {
+            // Mengambil value No Rekening
+            $responseArray = json_decode($output, true);
+        
+            $noRekening = null;
+            $noCIF = null;
+            if (isset($responseArray['screen']['comps']['comp'])) {
+                foreach ($responseArray['screen']['comps']['comp'] as $comp) {
+                    if ($comp['comp_lbl'] === 'No Rekening') {
+                        $noRekening = $comp['comp_values']['comp_value'][0]['value'];
+                    }
+                    else if ($comp['comp_lbl'] === 'ID CIF') {
+                        $noCIF = $comp['comp_values']['comp_value'][0]['value'];
+                    }
+                }
+            }
         }
 
         if ($output !== "{}") {
-            return Redirect::to('merchant/create')
-                            ->with('error', 'Merchant Sudah Terdaftar')
-                            ->withInput();
+            //Create Merchant
+            return Redirect::to('/merchant/create')
+                            ->with('no', $noRekening)
+                            ->with('nocif', $noCIF)
+                            ->with('no_registrasi', $no_registrasi)
+                            ->with('fullname', $nama_lengkap)
+                            ->with('branchid', $branchid);
         } else {
-            DB::beginTransaction();
+            //Create CIF
+            return Redirect::to('/merchant/create/rekening')->with('error', "Rekening Gagal Terdaftar");
+        }
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  MerchantCreateRequest $request
+     *
+     * @return \Illuminate\Http\Response
+     *
+     * @throws \Prettus\Validator\Exceptions\ValidatorException
+     */
+
+    public function store(Request $request){
+        DB::beginTransaction();
             try {
                 $check = User::where('username', $request->username)
                                 ->orWhere('email',$request->email)
@@ -228,14 +358,45 @@ class MerchantsController extends Controller
                                 'fullname'          => $request->fullname,
                                 'email'             => $request->email,
                                 'password'          => bcrypt($request->password),
-                                'is_user_mireta'    => $request->is_user_mireta,
                             ]);
 
+                $uploadPath = public_path('uploads/');
+                $filePaths = [
+                    'file_ktp' => null,
+                    'file_kk' => null,
+                    'file_npwp' => null
+                ];
+
+                foreach ($filePaths as $fileKey => &$filePath) {
+                    if ($request->hasFile($fileKey)) {
+                        $file = $request->file($fileKey);
+                        Log::info("File '$fileKey' received with size: " . $file->getSize());
+                
+                        if ($file->isValid()) {
+                            $namaFile = $file->hashName();
+                
+                            if ($file->move($uploadPath, $namaFile)) {
+                                $filePath = $namaFile;
+                            } else {
+                                return back()->with('error', 'Gagal memindahkan file ' . $fileKey . '. Silakan coba lagi.');
+                            }
+                        } else {
+                            return back()->with('error', 'File ' . $fileKey . ' yang diunggah tidak valid.');
+                        }
+                    } else {
+                        Log::info("File '$fileKey' not found in request.");
+                    }
+                }
+
+
                 // $this->validator->with($request->all())->passesOrFail(ValidatorInterface::RULE_CREATE);
-                $reqData = $request->all();
+                $reqData = $request->except(['file_ktp', 'file_kk', 'file_npwp']); 
                 $reqData['user_id'] = $user->id;
                 $reqData['name']    = $user->fullname;
                 $reqData['status_agen']    = 0;
+                $reqData['file_ktp'] = $filePaths['file_ktp'];
+                $reqData['file_kk'] = $filePaths['file_kk'];
+                $reqData['file_npwp'] = $filePaths['file_npwp'];
                 $data   = $this->repository->create($reqData);
 
                 // Create to user_groups
@@ -254,51 +415,6 @@ class MerchantsController extends Controller
                 DB::commit();
                 return Redirect::to('merchant')
                                 ->with('message', 'Merchant created');
-                
-                // if($data){
-                    // $terminal = Terminal::where('tid',$reqData['terminal_id'])->first();
-                    // if($terminal){
-                    //     $terminal->merchant_id              = $data->mid;
-                    //     $terminal->merchant_name            = $data->name;
-                    //     $terminal->merchant_address         = $data->address;
-                    //     $terminal->merchant_account_number  = $data->no;
-                    //     $terminal->save();
-                    // }
-
-                    //add to mireta
-                    // $reqData = [
-                    //     'username'              => $request->username,
-                    //     'email'                 => $request->email,
-                    //     'password'              => $request->password,
-                    //     'fullname'              => $request->fullname,
-                    //     'registration_email'    => $request->email,
-                    //     'brand_name'            => $request->fullname,
-                    //     'store_name'            => $request->fullname,
-                    //     'store_address'         => $request->address,
-                    //     'store_phone'           => $request->phone,
-                    // ];
-                    
-                    // $responseCurl = Curl::to(config('app.url_mireta'))
-                    //                     ->withData($reqData)
-                    //                     ->asJson()
-                    //                     ->post();
-                    
-                    // if($responseCurl->status == true){   
-                    //     DB::commit();
-                    //     return Redirect::to('merchant')
-                    //         ->with('message', 'Merchant created');
-                    // }else{
-                    //     DB::rollBack();
-                    //     return Redirect::to('merchant/create')
-                    //         ->with('error', 'Failed to save mireta')
-                    //         ->withInput();
-                    // }
-                // }else{
-                //     DB::rollBack();
-                //     return Redirect::to('merchant/create')
-                //                 ->with('error', $data->error)
-                //                 ->withInput();
-                // }
             } catch (Exception $e) {
                 DB::rollBack();
                     return Redirect::to('merchant/create')
@@ -310,11 +426,57 @@ class MerchantsController extends Controller
                                 ->with('error', $e)
                                 ->withInput();
             }
-        }
     }
 
-    public function save(){
+    public function inquiry_nik(Request $request){
+        return view('apps.merchants.inquiry-nik');
+    }
+
+    public function store_inquiry_nik(Request $request)
+    {
+        // Inquiry CIF By NIK
+        $nik = $request->input('nik');
+        $terminal = '353471045058692';
+        $dateTime = date("YmdHms");
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, "http://108.137.154.8:8080/ARRest/api/");
+        $data = json_encode([
+            'msg'=>([
+            'msg_id' =>  "$terminal$dateTime",
+            'msg_ui' => "$terminal",
+            'msg_si' => 'INF002',
+            'msg_dt' => 'admin|'. $nik
+            ])
+        ]);
+
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+
+        $output = curl_exec($ch);
+        $err = curl_error($ch);
+        $info = curl_getinfo($ch);
+        curl_close($ch);
+
+        Log::info('cURL Request URL: '  . $info['url']);
+        Log::info('cURL Request Data: ' . $data);
+        Log::info('cURL Response: ' . $output);
+
+        if ($err) {
+            Log::error('cURL Error: ' . $err);
         
+        }
+
+        if ($output !== "{}") {
+            //Create Merchant
+            return Redirect::to('/merchant/create');
+        } else {
+            //Create CIF
+            return Redirect::to('/merchant/create/cif')
+                            ->with('no_identitas', $nik);
+        }
     }
 
     /**

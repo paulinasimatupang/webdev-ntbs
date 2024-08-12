@@ -39,7 +39,14 @@ class Merchant extends Model implements Transformable
         'mid',
         'status_agen',
         'active_at',
-        'resign_at'
+        'resign_at',
+        'branchid',
+        'no_cif',
+        'kode_produk',
+        'no_registrasi',
+        'file_ktp',
+        'file_kk',
+        'file_npwp'
     ];
 
     protected $table = 'merchants';
