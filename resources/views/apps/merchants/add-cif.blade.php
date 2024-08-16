@@ -20,11 +20,53 @@
                     <div class="card mb-5">
                         <div class="card-body">
                             <form action="{{route('merchant_store_cif')}}" method="POST">
-                                <div class="form-group row">
-                                    <input name="_token" type="hidden" value="{{ csrf_token() }}"/>
-                                    <label class="col-sm-2 col-form-label">Kode Cabang </label>
+                            <div class="form-group row">
+                                <label class="col-sm-2 col-form-label">Kode Cabang</label>
                                     <div class="col-sm-10">
-                                        <input type="text" class="form-control" value="{{Request::old('branchid')}}" name="branchid" placeholder="Kode Cabang" required>
+                                        <select class="form-control" name="branchid">
+                                            <option value="">-- Pilih Kode Cabang --</option>
+                                            <option value="000" {{ Request::old('branchid') == '000' ? 'selected' : '' }}>KANTOR PUSAT</option>
+                                            <option value="001" {{ Request::old('branchid') == '001' ? 'selected' : '' }}>KC ISLAMIC CENTER</option>
+                                            <option value="002" {{ Request::old('branchid') == '002' ? 'selected' : '' }}>KC SELONG PAHLAWAN</option>
+                                            <option value="003" {{ Request::old('branchid') == '003' ? 'selected' : '' }}>KC PRAYA SUDIRMAN</option>
+                                            <option value="004" {{ Request::old('branchid') == '004' ? 'selected' : '' }}>KC SUMBAWA DR. WAHIDIN</option>
+                                            <option value="005" {{ Request::old('branchid') == '005' ? 'selected' : '' }}>KC BIMA SOEKARNO HATTA</option>
+                                            <option value="006" {{ Request::old('branchid') == '006' ? 'selected' : '' }}>KCP MATARAM CAKRANEGARA</option>
+                                            <option value="007" {{ Request::old('branchid') == '007' ? 'selected' : '' }}>KC DOMPU NUSANTARA</option>
+                                            <option value="008" {{ Request::old('branchid') == '008' ? 'selected' : '' }}>KC TANJUNG</option>
+                                            <option value="009" {{ Request::old('branchid') == '009' ? 'selected' : '' }}>KCP ALAS</option>
+                                            <option value="010" {{ Request::old('branchid') == '010' ? 'selected' : '' }}>KCP NARMADA</option>
+                                            <option value="011" {{ Request::old('branchid') == '011' ? 'selected' : '' }}>KCP AIKMEL</option>
+                                            <option value="012" {{ Request::old('branchid') == '012' ? 'selected' : '' }}>KCP SWETA</option>
+                                            <option value="013" {{ Request::old('branchid') == '013' ? 'selected' : '' }}>KC TENTE</option>
+                                            <option value="014" {{ Request::old('branchid') == '014' ? 'selected' : '' }}>KCP BOLO</option>
+                                            <option value="015" {{ Request::old('branchid') == '015' ? 'selected' : '' }}>KCP KOPANG</option>
+                                            <option value="016" {{ Request::old('branchid') == '016' ? 'selected' : '' }}>KCP KERUAK</option>
+                                            <option value="017" {{ Request::old('branchid') == '017' ? 'selected' : '' }}>KC TALIWANG SUDIRMAN</option>
+                                            <option value="018" {{ Request::old('branchid') == '018' ? 'selected' : '' }}>KCP MANGGELEWA</option>
+                                            <option value="019" {{ Request::old('branchid') == '019' ? 'selected' : '' }}>KCP SAPE</option>
+                                            <option value="020" {{ Request::old('branchid') == '020' ? 'selected' : '' }}>KCP PLAMPANG</option>
+                                            <option value="021" {{ Request::old('branchid') == '021' ? 'selected' : '' }}>KC SURABAYA DARMO</option>
+                                            <option value="022" {{ Request::old('branchid') == '022' ? 'selected' : '' }}>KC GERUNG</option>
+                                            <option value="023" {{ Request::old('branchid') == '023' ? 'selected' : '' }}>KCP LUNYUK</option>
+                                            <option value="024" {{ Request::old('branchid') == '024' ? 'selected' : '' }}>KCP LOPOK</option>
+                                            <option value="025" {{ Request::old('branchid') == '025' ? 'selected' : '' }}>KCP PEKAT</option>
+                                            <option value="026" {{ Request::old('branchid') == '026' ? 'selected' : '' }}>KCP PRINGGABAYA</option>
+                                            <option value="027" {{ Request::old('branchid') == '027' ? 'selected' : '' }}>KCP PAGESANGAN</option>
+                                            <option value="028" {{ Request::old('branchid') == '028' ? 'selected' : '' }}>KCP Ampenan</option>
+                                            <option value="029" {{ Request::old('branchid') == '029' ? 'selected' : '' }}>KCP Gunungsari</option>
+                                            <option value="030" {{ Request::old('branchid') == '030' ? 'selected' : '' }}>KCP Mujur</option>
+                                            <option value="501" {{ Request::old('branchid') == '501' ? 'selected' : '' }}>KC MASBAGIK</option>
+                                            <option value="502" {{ Request::old('branchid') == '502' ? 'selected' : '' }}>KCP PASAR TALIWANG</option>
+                                            <option value="503" {{ Request::old('branchid') == '503' ? 'selected' : '' }}>KCP KEMPO</option>
+                                            <option value="504" {{ Request::old('branchid') == '504' ? 'selected' : '' }}>KC SRIWIJAYA MATARAM</option>
+                                            <option value="505" {{ Request::old('branchid') == '505' ? 'selected' : '' }}>KCP PEMENANG</option>
+                                            <option value="506" {{ Request::old('branchid') == '506' ? 'selected' : '' }}>KCP MALUK</option>
+                                            <option value="507" {{ Request::old('branchid') == '507' ? 'selected' : '' }}>KCP KEDIRI</option>
+                                            <option value="508" {{ Request::old('branchid') == '508' ? 'selected' : '' }}>KCP WAWO</option>
+                                            <option value="509" {{ Request::old('branchid') == '509' ? 'selected' : '' }}>KCP UTAN</option>
+                                            <option value="510" {{ Request::old('branchid') == '510' ? 'selected' : '' }}>KCP PUJUT</option>
+                                        </select>
                                     </div>
                                 </div>
                                 <div class="form-group row">
@@ -159,22 +201,22 @@
                                     </div>
                                 </div>
                                 <div class="form-group row">
-                                    <label class="col-sm-2 col-form-label">Status Penduduk</label>
-                                    <div class="col-sm-10">
-                                        <select class="form-control" name="status_penduduk">
-                                            <option value="">-- Pilih Jenis Identitas --</option>
-                                            <option value="0" {{ Request::old('status_penduduk') == '0' ? 'selected' : '' }}>Tidak Menetap</option>
-                                            <option value="1" {{ Request::old('status_penduduk') == '1' ? 'selected' : '' }}>Menetap</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="form-group row">
                                     <label class="col-sm-2 col-form-label">Kewarganegaraan</label>
                                     <div class="col-sm-10">
                                         <select class="form-control" name="kewarganegaarn">
                                             <option value="">-- Pilih Kewarganegaraan --</option>
                                             <option value="1" {{ Request::old('kewarganegaarn') == '1' ? 'selected' : '' }}>WNI</option>
                                             <option value="2" {{ Request::old('kewarganegaarn') == '2' ? 'selected' : '' }}>WNA</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-2 col-form-label">Status Penduduk</label>
+                                    <div class="col-sm-10">
+                                        <select class="form-control" name="status_penduduk">
+                                        <option value="">-- Pilih Status Penduduk --</option>
+                                            <option value="0" {{ Request::old('status_penduduk') == '0' ? 'selected' : '' }}>Tidak Menetap</option>
+                                            <option value="1" {{ Request::old('status_penduduk') == '1' ? 'selected' : '' }}>Menetap</option>
                                         </select>
                                     </div>
                                 </div>

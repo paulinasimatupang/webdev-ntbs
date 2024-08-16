@@ -152,11 +152,67 @@ class MerchantsController extends Controller
                 // ->with('terminal', $terminal);
     }
 
+    public function inquiry_nik(Request $request){
+        return view('apps.merchants.inquiry-nik');
+    }
+
+    public function store_inquiry_nik(Request $request)
+    {
+        // Inquiry CIF By NIK
+        $nik = $request->input('nik');
+        $terminal = '353471045058692';
+        $dateTime = date("YmdHms");
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, "http://108.137.154.8:8080/ARRest/api/");
+        $data = json_encode([
+            'msg'=>([
+            'msg_id' =>  "$terminal$dateTime",
+            'msg_ui' => "$terminal",
+            'msg_si' => 'INF002',
+            'msg_dt' => 'admin|'. $nik
+            ])
+        ]);
+       
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: text/plain'
+        ]);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+
+        $output = curl_exec($ch);
+        $err = curl_error($ch);
+        $info = curl_getinfo($ch);
+        curl_close($ch);
+
+        Log::info('cURL Request URL: '  . $info['url']);
+        Log::info('cURL Request Data: ' . $data);
+        Log::info('cURL Response: ' . $output);
+
+        if ($err) {
+            Log::error('cURL Error: ' . $err);
+        
+        }
+
+        $responseArray = json_decode($output, true);
+
+        if (isset($responseArray['screen']['title']) && $responseArray['screen']['title'] === 'Gagal') {
+            return Redirect::to('/merchant/create/cif')
+                            ->with('no_identitas', $nik);
+        } else {
+            return Redirect::to('/merchant/create');
+        }
+    }
+
     public function create_cif(Request $request){
         return view('apps.merchants.add-cif');
     }
 
+
     public function store_cif(Request $request){
+        $status_penduduk = $request->input('status_penduduk');
         $nama_lengkap = $request->input('nama_lengkap');
         $nama_alias = $request->input('nama_alias');
         $ibu_kandung = $request->input('ibu_kandung');
@@ -173,7 +229,6 @@ class MerchantsController extends Controller
         $kab_kota = $request->input('kab_kota');
         $provinsi = $request->input('provinsi');
         $kode_pos = $request->input('kode_pos');
-        $status_penduduk = $request->input('status_penduduk');
         $kewarganegaraan = $request->input('kewarganegaraan');
         $no_telp = $request->input('no_telp');
         $no_hp = $request->input('no_hp');
@@ -196,13 +251,16 @@ class MerchantsController extends Controller
                 'msg_id' =>  "$terminal$dateTime",
                 'msg_ui' => "$terminal",
                 'msg_si' => 'CC0001',
-                'msg_dt' => 'admin|' . $nama_lengkap . '|' . $nama_alias . '|' . $ibu_kandung . '|' . $tempat_lahir . '|' . $tgl_lahir . '|' . $jenis_kelamin . '|' . $agama . '|' 
-                    . $status_nikah . '|' . $alamat . '|' . $rt . '|' . $rw . '|' . $kecamatan . '|' . $kelurahan . '|' . $kab_kota . '|'. $provinsi . '|' . $kode_pos . '|'. $status_penduduk . '|' . $kewarganegaraan . '|'
-                    . $no_telp . '|' . $no_hp . '|' . $npwp . '|' . $jenis_identitas . '|' . $no_identitas . '|' . $golongan_darah . '|' . $expired_identitas . '|' . $pendidikan_terakhir . '|'
+                'msg_dt' => 'admin|' . $no_identitas . '|' . $nama_lengkap . '|' . $nama_alias . '|' . $ibu_kandung . '|' . $tempat_lahir . '|' . $tgl_lahir . '|' . $jenis_kelamin . '|' 
+                    . $agama . '|' . $status_nikah . '|' . $alamat . '|' . $rt . '|' . $rw . '|' . $kecamatan . '|' . $kelurahan . '|'. $kab_kota . '|' . $provinsi . '|'. $kode_pos . '|' . $status_penduduk . '|'
+                    . $kewarganegaraan . '|' . $no_telp . '|' . $no_hp . '|' . $npwp . '|' . $jenis_identitas . '|' . $golongan_darah . '|' . $expired_identitas . '|' . $pendidikan_terakhir . '|'
                     . $email . '|' . $branchid
             ]
         ]);
 
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: text/plain'
+        ]);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -216,12 +274,12 @@ class MerchantsController extends Controller
         Log::info('cURL Request URL: '  . $info['url']);
         Log::info('cURL Request Data: ' . $data);
         Log::info('cURL Response: ' . $output);
+        
+        $responseArray = json_decode($output, true);
 
         if ($err) {
             Log::error('cURL Error: ' . $err);
         }else {
-            $responseArray = json_decode($output, true);
-        
             $cifid = null;
             if (isset($responseArray['screen']['comps']['comp'])) {
                 foreach ($responseArray['screen']['comps']['comp'] as $comp) {
@@ -232,16 +290,15 @@ class MerchantsController extends Controller
             }
         }
 
-        if ($output !== "{}") {
-            //Create Merchant
+        if (isset($responseArray['screen']['title']) && $responseArray['screen']['title'] === 'Gagal') {
+            return Redirect::to('/merchant/create/cif')->with('error', "Create CIF Gagal");
+        } else {
             return Redirect::to('/merchant/create/rekening')
                             ->with('nama_lengkap', $nama_lengkap)
                             ->with('branchid', $branchid)
                             ->with('no_cif', $cifid);
-        } else {
-            //Create CIF
-            return Redirect::to('/merchant/create/cif')->with('error', "Create CIF Gagal");
         }
+        
     }
 
     public function create_rekening(Request $request){
@@ -269,6 +326,10 @@ class MerchantsController extends Controller
             ]
         ]);
 
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: text/plain'
+        ]);
+
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -283,13 +344,12 @@ class MerchantsController extends Controller
         Log::info('cURL Request Data: ' . $data);
         Log::info('cURL Response: ' . $output);
 
+        $responseArray = json_decode($output, true);
+
         if ($err) {
             Log::error('cURL Error: ' . $err);
         
         }else {
-            // Mengambil value No Rekening
-            $responseArray = json_decode($output, true);
-        
             $noRekening = null;
             $noCIF = null;
             if (isset($responseArray['screen']['comps']['comp'])) {
@@ -304,17 +364,15 @@ class MerchantsController extends Controller
             }
         }
 
-        if ($output !== "{}") {
-            //Create Merchant
+        if (isset($responseArray['screen']['title']) && $responseArray['screen']['title'] === 'Gagal') {
+            return Redirect::to('/merchant/create/rekening')->with('error', "Rekening Gagal Terdaftar");
+        } else {
             return Redirect::to('/merchant/create')
                             ->with('no', $noRekening)
                             ->with('nocif', $noCIF)
                             ->with('no_registrasi', $no_registrasi)
                             ->with('fullname', $nama_lengkap)
                             ->with('branchid', $branchid);
-        } else {
-            //Create CIF
-            return Redirect::to('/merchant/create/rekening')->with('error', "Rekening Gagal Terdaftar");
         }
     }
 
@@ -426,57 +484,6 @@ class MerchantsController extends Controller
                                 ->with('error', $e)
                                 ->withInput();
             }
-    }
-
-    public function inquiry_nik(Request $request){
-        return view('apps.merchants.inquiry-nik');
-    }
-
-    public function store_inquiry_nik(Request $request)
-    {
-        // Inquiry CIF By NIK
-        $nik = $request->input('nik');
-        $terminal = '353471045058692';
-        $dateTime = date("YmdHms");
-
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, "http://108.137.154.8:8080/ARRest/api/");
-        $data = json_encode([
-            'msg'=>([
-            'msg_id' =>  "$terminal$dateTime",
-            'msg_ui' => "$terminal",
-            'msg_si' => 'INF002',
-            'msg_dt' => 'admin|'. $nik
-            ])
-        ]);
-
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-
-        $output = curl_exec($ch);
-        $err = curl_error($ch);
-        $info = curl_getinfo($ch);
-        curl_close($ch);
-
-        Log::info('cURL Request URL: '  . $info['url']);
-        Log::info('cURL Request Data: ' . $data);
-        Log::info('cURL Response: ' . $output);
-
-        if ($err) {
-            Log::error('cURL Error: ' . $err);
-        
-        }
-
-        if ($output !== "{}") {
-            //Create Merchant
-            return Redirect::to('/merchant/create');
-        } else {
-            //Create CIF
-            return Redirect::to('/merchant/create/cif')
-                            ->with('no_identitas', $nik);
-        }
     }
 
     /**
