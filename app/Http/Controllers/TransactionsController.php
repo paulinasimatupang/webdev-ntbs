@@ -3,14 +3,15 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use DB;
-use Carbon\Carbon;
-use Validator;
 use Redirect;
+use Exception;
+use Validator;
+use Carbon\Carbon;
+use App\Entities\Bank;
 
 use App\Http\Requests;
+<<<<<<< Updated upstream
 use Prettus\Validator\Contracts\ValidatorInterface;
 use Prettus\Validator\Exceptions\ValidatorException;
 use App\Http\Requests\TransactionCreateRequest;
@@ -26,21 +27,38 @@ use App\Entities\Service;
 use App\Entities\Transaction;
 use App\Entities\TransactionStatus;
 use App\Entities\transactionPaymentStatus;
+=======
+>>>>>>> Stashed changes
 use App\Entities\Group;
+use App\Entities\Service;
+use App\Entities\Merchant;
 use App\Entities\UserGroup;
+use Illuminate\Support\Str;
+use Illuminate\Http\Request;
 use App\Entities\GroupSchema;
-use App\Entities\GroupSchemaShareholder;
+
+use App\Entities\Transaction;
+use Ixudra\Curl\Facades\Curl;
 use App\Entities\TransactionBJB;
 use App\Entities\TransactionLog;
-use App\Entities\TransactionSaleBJB;
+use App\Entities\TerminalBilliton;
 use App\Exports\TransactionExport;
+use App\Entities\TransactionStatus;
+use Illuminate\Support\Facades\Log;
+use App\Entities\TransactionSaleBJB;
 use App\Exports\TransactionSaleExport;
+use Illuminate\Support\Facades\Config;
+use App\Entities\GroupSchemaShareholder;
+use App\Validators\TransactionValidator;
 use App\Exports\TransactionFeeSaleExport;
+use App\Entities\transactionPaymentStatus;
+use App\Repositories\TransactionRepository;
+use App\Http\Requests\TransactionCreateRequest;
+use App\Http\Requests\TransactionUpdateRequest;
 use App\Http\Controllers\CoresController as Core;
 use App\Http\Requests\TransactionBJBUpdateRequest;
-use Exception;
-use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Str;
+use Prettus\Validator\Contracts\ValidatorInterface;
+use Prettus\Validator\Exceptions\ValidatorException;
 
 /**
  * Class TransactionsController.
@@ -80,8 +98,15 @@ class TransactionsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+
+     public function __construct(TransactionRepository $repository, TransactionValidator $validator)
+     {
+         $this->repository = $repository;
+         $this->validator = $validator;
+     }
+     public function index()
     {
+<<<<<<< Updated upstream
 
         if (!$request->has('status') && $request->get('status') == '') {
             $request->request->add([
@@ -234,6 +259,47 @@ class TransactionsController extends Controller
             ->with('data', $data)
             ->with('dataRevenue', $dataRevenue)
             ->with('username', $user->username);
+=======
+        $transactions = Transaction::with('merchant', 'terminal', 'bank')->get();
+        return view('apps.transaction.list', compact('transactions'));
+    }
+    
+    public function create()
+    {
+        $merchants = Merchant::all();
+        $terminals = TerminalBilliton::all();
+        $banks = Bank::all();
+        return view('apps.transactions.add', compact('merchants', 'terminals', 'banks'));
+    }
+
+    public function store(Request $request)
+    {
+        DB::beginTransaction();
+        try {
+            $validator = Validator::make($request->all(), [
+                'amount' => 'required|numeric',
+                'merchant_id' => 'required|exists:merchants,id',
+                'terminal_id' => 'required|exists:terminals,id',
+                'bank_id' => 'required|exists:banks,id',
+                'status' => 'required|integer',
+            ]);
+
+            if ($validator->fails()) {
+                return Redirect::to('transaction/create')->withErrors($validator)->withInput();
+            }
+
+            $transaction = new Transaction();
+            $transaction->fill($request->only(['amount', 'merchant_id', 'terminal_id', 'bank_id', 'status']));
+            $transaction->save();
+
+            DB::commit();
+            return Redirect::to('transaction')->with('message', 'Transaction created successfully');
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::error('Error creating transaction: ' . $e->getMessage());
+            return Redirect::to('transaction/create')->with('error', 'Error creating transaction')->withInput();
+        }
+>>>>>>> Stashed changes
     }
 
     public function export(Request $request)
@@ -351,13 +417,186 @@ class TransactionsController extends Controller
         }
         $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
 
+<<<<<<< Updated upstream
         return (new TransactionFeeSaleExport($request))->download('transaction_fee_sale_export_' . $request->get('start_date') . '_' . $request->get('end_date') . '.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+=======
+	    return (new TransactionFeeSaleExport($request))->download('transaction_fee_sale_export_'.$request->get('start_date').'_'.$request->get('end_date').'.xlsx', \Maatwebsite\Excel\Excel::XLSX);
     }
 
-    public function update(TransactionUpdateRequest $request, $id)
+    public function reversal(Request $request)
+    {
+        if(!$request->has('start_date') && $request->get('start_date')==''){
+            $request->request->add([
+                'start_date'      => date("Y-m-d")
+            ]);
+        }
+        if(!$request->has('end_date') && $request->get('end_date')==''){
+            $request->request->add([
+                'end_date'      => date("Y-m-d")
+            ]);
+        }
+
+        $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
+
+        $data = TransactionLog::whereNotNull('responsecode');
+        $data->where('tx_mti', '=', '0200');
+        $data->where('proc_code', '=', '500000');
+
+        if($request->has('start_date') && $request->get('start_date')!=''){
+            $data->where('tx_time', '>', $request->get('start_date').' 00:00:00');
+        }
+
+        if($request->has('end_date') && $request->get('end_date')!=''){
+            $data->where('tx_time', '<=', $request->get('end_date').' 23:59:59');
+        }
+
+        if($request->has('stan') && $request->get('stan')!=''){
+            $data->where('stan', $request->get('stan'));
+        }
+
+        $dataLog = TransactionLog::select('stan')->whereNotNull('responsecode');
+        $dataLog->where('tx_mti', '=', '0200');
+        $dataLog->where('proc_code', '=', '500000');
+
+        if($request->has('start_date') && $request->get('start_date')!=''){
+            $dataLog->where('tx_time', '>', $request->get('start_date').' 00:00:00');
+        }
+
+        if($request->has('end_date') && $request->get('end_date')!=''){
+            $dataLog->where('tx_time', '<=', $request->get('end_date').' 23:59:59');
+        }
+
+        if($request->has('stan') && $request->get('stan')!=''){
+            $dataLog->where('stan', $request->get('stan'));
+        }
+
+        $dataPpob = Transaction::select('stan');
+        if($request->has('start_date') && $request->get('start_date')!=''){
+            $dataPpob->where('created_at', '>', $request->get('start_date').' 00:00:00');
+        }
+
+        if($request->has('end_date') && $request->get('end_date')!=''){
+            $dataPpob->where('created_at', '<=', $request->get('end_date').' 23:59:59');
+        }
+
+        if($request->has('stan') && $request->get('stan')!=''){
+            $dataPpob->where('stan', $request->get('stan'));
+        }
+
+        $dataLog = $dataLog->get();
+        $dataPpob = $dataPpob->get();
+
+        $arrayLength = $dataLog->count();
+        $ppobSize = $dataPpob->count();
+        
+        $array = array();
+        $i = 0;
+        $count = 0;
+        for ($i = 0; $i < $arrayLength; $i++){
+            $isIdentical = false;
+            try {
+                for ($j = 0; $j < $ppobSize; $j++){
+                    if($dataLog[$i]->stan == $dataPpob[$j]->stan){
+                        $isIdentical = true;
+                    }
+                }
+            } catch (Exception $e){
+                // echo $e;
+            }
+
+            if($isIdentical){
+                //verified
+                // echo 'isIdentical ';
+            } else {
+                $array[$count] = $dataLog[$i]->stan;
+                $count++;
+            }
+        }
+        
+        $data->whereIn('stan', $array);
+
+        $data = $data->paginate(10);
+
+        return view('apps.transactions.reversal')
+                ->with('data', $data);
+    }
+
+    public function postReversal(Request $request, $additional_data)
+    {
+
+        DB::beginTransaction();
+        try {
+            $dateTime = date("YmdHms");
+
+            $data = TransactionLog::select('stan')->where('additional_data', $additional_data)->first();
+
+            $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL, "http://36.94.58.182:8080/ARRest/api");
+                // SSL important
+                curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                'Content-Type: text/plain'));
+
+                curl_setopt($ch, CURLOPT_POSTFIELDS, [ 'msg' => '{
+                                                    "msg_id": "'. substr($additional_data, 0, 16) . $dateTime . '",
+                                                    "msg_ui": "'. substr($additional_data, 0, 16) .'",
+                                                    "msg_si": "R82561",
+                                                    "msg_dt": "'. $data->stan .'"
+                                                }'] );
+                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1 );
+                curl_setopt($ch, CURLOPT_POST,           1 );
+
+                $output = curl_exec($ch);
+                $err = curl_error($ch);
+                curl_close($ch);
+
+                $value = '{ msg: {
+                                                    "msg_id": "'. substr($additional_data, 0, 16) . $dateTime . '",
+                                                    "msg_ui": "'. substr($additional_data, 0, 16) .'",
+                                                    "msg_si": "R82561",
+                                                    "msg_dt": "'. $data->stan .'"
+                                                } }';
+
+                echo $output . $value;die;
+                
+                if ($err) {
+                    echo "cURL Error #:" . $err;
+                } else {
+                    // print_r(json_decode($output));
+                    return Redirect::to('transaction')
+                        ->with('message', 'Reversal berhasil dikirim');
+                }
+
+        } catch (Exception $e) {
+            DB::rollBack();
+            return Redirect::to('transaction/reversal')
+                        ->with('error', $e)
+                        ->withInput();
+        } catch (\Illuminate\Database\QueryException $e) {
+            DB::rollBack();
+            return Redirect::to('transaction/reversal')
+                        ->with('error', $e)
+                        ->withInput();
+        }
+    }
+
+    public function edit($id)
+    {
+        $transaction = Transaction::findOrFail($id);
+        $merchants = Merchant::all();
+        $terminals = Terminal::all();
+        $banks = Bank::all();
+        return view('transactions.edit', compact('transaction', 'merchants', 'terminals', 'banks'));
+>>>>>>> Stashed changes
+    }
+
+    public function update(Request $request, $id)
     {
         DB::beginTransaction();
         try {
+<<<<<<< Updated upstream
             $this->validator->with($request->all())->passesOrFail(ValidatorInterface::RULE_UPDATE);
             $transaction = Transaction::find($id);
             if ($transaction->status == 0 || $transaction->status == 1) {
@@ -387,21 +626,57 @@ class TransactionsController extends Controller
             return Redirect::to('transaction')
                 ->with('error', $e)
                 ->withInput();
+=======
+            // Validasi request
+            $validator = Validator::make($request->all(), [
+                'status' => 'required|integer',
+            ]);
+    
+            if ($validator->fails()) {
+                DB::rollBack();
+                return Redirect::to('transaction')->withErrors($validator)->withInput();
+            }
+    
+            // Temukan transaksi
+            $transaction = Transaction::findOrFail($id);
+    
+            // Tentukan status baru
+            $reqData['status'] = ($transaction->status == 0 || $transaction->status == 1) ? 2 : 1;
+    
+            // Perbarui transaksi
+            $data = $this->repository->update($reqData, $id);
+    
+            if ($data) {
+                DB::commit();
+                return Redirect::to('transaction')->with('message', 'Status updated');
+            } else {
+                DB::rollBack();
+                return Redirect::to('transaction')->with('error', 'Update failed')->withInput();
+            }
+        } catch (Exception $e) {
+            DB::rollBack();
+            return Redirect::to('transaction')->with('error', $e->getMessage())->withInput();
+        } catch (QueryException $e) {
+            DB::rollBack();
+            return Redirect::to('transaction')->with('error', $e->getMessage())->withInput();
+>>>>>>> Stashed changes
         }
     }
 
     public function updateStatus($id)
     {
         try {
-            $transaction = Transaction::find($id);
+            $transaction = Transaction::findOrFail($id);
+    
             if ($transaction) {
                 $msg_td = base64_encode($transaction->merchant->terminal->tid);
                 $msg_dt = date("YmdHms");
                 $theOtherKey = $transaction->merchant->terminal->tid . $msg_dt;
                 $base64key = base64_encode($theOtherKey);
-
+    
                 $newEncrypter = new \Illuminate\Encryption\Encrypter($base64key, 'AES-256-CBC');
                 $encrypted = $newEncrypter->encrypt($transaction->code);
+<<<<<<< Updated upstream
 
                 $ch = curl_init();
 
@@ -413,21 +688,38 @@ class TransactionsController extends Controller
                     'msg-td: ' . $msg_td,
                     'msg-dt: ' . $msg_dt
                 ));
+=======
+    
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL, "http://36.94.58.180/api/core/public/index.php/api/transactions/detail/" . $id);
+                curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                    'api-key: ' . $encrypted,
+                    'msg-td: ' . $msg_td,
+                    'msg-dt: ' . $msg_dt
+                ]);
+>>>>>>> Stashed changes
                 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
                 curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-
+    
                 $output = curl_exec($ch);
                 $err = curl_error($ch);
                 curl_close($ch);
+<<<<<<< Updated upstream
 
+=======
+    
+>>>>>>> Stashed changes
                 if ($err) {
-                    echo "cURL Error #:" . $err;
+                    return Redirect::to('transaction')->with('error', "cURL Error: " . $err);
                 } else {
                     return Redirect::back()->with('success', 'Status updated successfully');
                 }
+            } else {
+                return Redirect::to('transaction')->with('error', 'Transaction not found');
             }
         } catch (Exception $e) {
+<<<<<<< Updated upstream
             return Redirect::to('transaction')
                 ->with('error', $e)
                 ->withInput();
@@ -435,16 +727,35 @@ class TransactionsController extends Controller
             return Redirect::to('transaction')
                 ->with('error', $e)
                 ->withInput();
+=======
+            return Redirect::to('transaction')->with('error', $e->getMessage())->withInput();
+        } catch (QueryException $e) {
+            return Redirect::to('transaction')->with('error', $e->getMessage())->withInput();
+>>>>>>> Stashed changes
         }
     }
+    
 
-    public function updatebjb(TransactionBJBUpdateRequest $request, $id)
+    public function updatebjb(Request $request, $id)
     {
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
         DB::beginTransaction();
         try {
-            $this->validator->with($request->all())->passesOrFail(ValidatorInterface::RULE_UPDATE);
+            // Validasi request
+            $validator = Validator::make($request->all(), [
+                'status' => 'required|integer',
+            ]);
+    
+            if ($validator->fails()) {
+                DB::rollBack();
+                return Redirect::to('transaction')->withErrors($validator)->withInput();
+            }
+    
             list($stan, $date) = explode("_", $id);
+<<<<<<< Updated upstream
             return Redirect::to('transaction')
                 ->with('stan', $stan)
                 ->with('date', $date);
@@ -479,13 +790,45 @@ class TransactionsController extends Controller
             return Redirect::to('transaction')
                 ->with('error', $e)
                 ->withInput();
+=======
+    
+            $transaction = TransactionLog::where('stan', $stan)
+                ->where('tx_time', '>', $date . ' 00:00:00')
+                ->first();
+    
+            if ($transaction) {
+                $reqData['tx_mti'] = '0400';
+                $reqData['rp_mti'] = '0410';
+    
+                $data = $this->repository->update($reqData, $stan);
+    
+                if ($data) {
+                    DB::commit();
+                    return Redirect::to('transaction')->with('message', 'Status updated');
+                } else {
+                    DB::rollBack();
+                    return Redirect::to('transaction')->with('error', 'Update failed')->withInput();
+                }
+            } else {
+                DB::rollBack();
+                return Redirect::to('transaction')->with('error', 'Transaction not found');
+            }
+        } catch (Exception $e) {
+            DB::rollBack();
+            return Redirect::to('transaction')->with('error', $e->getMessage())->withInput();
+        } catch (QueryException $e) {
+            DB::rollBack();
+            return Redirect::to('transaction')->with('error', $e->getMessage())->withInput();
+>>>>>>> Stashed changes
         }
     }
+    
 
     private function getInfo(Request $request)
     {
         DB::beginTransaction();
         try {
+<<<<<<< Updated upstream
             $date           = $request->date;
             $group_id       = $request->group_id;
             $schema_id      = $request->schema_id;
@@ -507,47 +850,86 @@ class TransactionsController extends Controller
                     }
                 } else {
                     $shareholders = [];
+=======
+            $date = $request->date;
+            $group_id = $request->group_id;
+            $schema_id = $request->schema_id;
+    
+            $dataCalculate = $this->calculate($group_id, $date);
+    
+            $groupSchema = GroupSchema::where('group_id', $group_id)
+                ->where('schema_id', $schema_id)
+                ->first();
+    
+            if ($groupSchema) {
+                $revenue = $dataCalculate['revenue'] * $groupSchema->share / 100;
+    
+                $shareholders = [];
+                if ($groupSchema->is_shareable) {
+                    $shareholders = GroupSchemaShareholder::where('group_schema_id', $groupSchema->id)
+                        ->with('shareholder')
+                        ->get();
+    
+                    foreach ($shareholders as $sh) {
+                        $sh->revenue = $sh->share / 100 * $revenue;
+                    }
+>>>>>>> Stashed changes
                 }
-
+    
                 $response = [
-                    'revenue'       => $revenue,
-                    'total_trx'      => $dataCalculate['count'],
-                    'amount_trx'     => $dataCalculate['amount'],
-                    'shareholder'   => $shareholders
+                    'revenue' => $revenue,
+                    'total_trx' => $dataCalculate['count'],
+                    'amount_trx' => $dataCalculate['amount'],
+                    'shareholder' => $shareholders
                 ];
             } else {
                 return response()->json([
+<<<<<<< Updated upstream
                     'status'    => false,
                     'error'     => 'Group has not schema'
+=======
+                    'status' => false,
+                    'error' => 'Group has not schema'
+>>>>>>> Stashed changes
                 ], 404);
             }
-
+    
             DB::commit();
             return response()->json($response, 200);
         } catch (Exception $e) {
-            // For rollback data if one data is error
             DB::rollBack();
-
             return response()->json([
+<<<<<<< Updated upstream
                 'status'    => false,
                 'error'     => 'Something wrong!',
                 'exception' => $e
+=======
+                'status' => false,
+                'error' => 'Something wrong!',
+                'exception' => $e->getMessage()
+>>>>>>> Stashed changes
             ], 500);
-        } catch (\Illuminate\Database\QueryException $e) {
-            // For rollback data if one data is error
+        } catch (QueryException $e) {
             DB::rollBack();
-
             return response()->json([
+<<<<<<< Updated upstream
                 'status'    => false,
                 'error'     => 'Something wrong!',
                 'exception' => $e
+=======
+                'status' => false,
+                'error' => 'Something wrong!',
+                'exception' => $e->getMessage()
+>>>>>>> Stashed changes
             ], 500);
         }
     }
+    
 
     private function calculate($group_id, $date)
     {
         $groups = Group::where('parent_id', $group_id)->get();
+<<<<<<< Updated upstream
         $result = [];
         $result['revenue']  = 0;
         $result['count']    = 0;
@@ -570,11 +952,33 @@ class TransactionsController extends Controller
 
         $result['total_hpp'] = $sum - $fee;
 
+=======
+        $result = [
+            'revenue' => 0,
+            'count' => 0,
+            'amount' => 0,
+            'total_fee' => 0,
+            'total_hpp' => 0
+        ];
+    
+        $count = Transaction::where('status', 1)->count();
+        $result['count'] = $count;
+    
+        $sum = Transaction::where('status', 1)->sum('price');
+        $result['amount'] = $sum;
+    
+        $fee = Transaction::where('status', 1)->sum('fee');
+        $result['total_fee'] = $fee;
+    
+        $result['total_hpp'] = $sum - $fee;
+    
+>>>>>>> Stashed changes
         return $result;
     }
-
+    
     private function calculateOnly()
     {
+<<<<<<< Updated upstream
         $result = [];
         $result['revenue']  = 0;
         $result['count']    = 0;
@@ -597,6 +1001,33 @@ class TransactionsController extends Controller
 
         $result['total_fee'] = $sum - $total_hpp;
 
+=======
+        $result = [
+            'revenue' => 0,
+            'count' => 0,
+            'amount' => 0,
+            'total_fee' => 0,
+            'total_hpp' => 0
+        ];
+    
+        $count = Transaction::where('status', 1)
+            ->where('is_development', '!=', 1)
+            ->count();
+        $result['count'] = $count;
+    
+        $sum = Transaction::where('status', 1)
+            ->where('is_development', '!=', 1)
+            ->sum('price');
+        $result['amount'] = $sum;
+    
+        $total_fee = Transaction::where('status', 1)
+            ->where('is_development', '!=', 1)
+            ->sum('fee');
+        $result['total_fee'] = $total_fee;
+    
+        $result['total_hpp'] = $sum - $total_fee;
+    
+>>>>>>> Stashed changes
         return $result;
     }
 

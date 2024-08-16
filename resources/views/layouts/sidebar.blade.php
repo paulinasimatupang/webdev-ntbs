@@ -47,14 +47,6 @@ display: none;
                 </a>
                 <div class="triangle"></div>
             </li>
-	    <li class="nav-item {{ (request()->is('merchant') || request()->is('merchant/*')) ? 'active' : '' }}" @php if(session()->get('user')->role_id == 2) echo 'id="b1"'; @endphp>
-                <a class="nav-item-hold" href="{{route('merchant')}}">
-                 
-                    <img class="img_bintang_sidebar" src="{{asset('/assets/images/sidebar_icon/agent.png')}}" alt="">
-                    <span class="nav-text">Merchant</span>
-                </a>
-                <div class="triangle"></div>
-            </li>
             <li class="nav-item {{ (request()->is('biller') || request()->is('biller/*')) ? 'active' : '' }}" @php if(session()->get('user')->role_id == 2) echo 'id="b1"'; @endphp>
                 <a class="nav-item-hold" href="{{route('biller')}}">
                  

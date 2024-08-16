@@ -19,7 +19,6 @@ class CreatePublicTerminalTable extends Migration
             $table->text('terminal_imei');
             $table->text('terminal_name');
             $table->text('merchant_id');
-            $table->text('terminal_sim_number');
             $table->timestamps();
         });
     }

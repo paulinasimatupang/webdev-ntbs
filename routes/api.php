@@ -70,14 +70,14 @@ Route::post('groupSchemas', 'GroupSchemasController@store');
 Route::post('groupSchemas/{id}', 'GroupSchemasController@update');
 Route::delete('groupSchemas/{id}', 'GroupSchemasController@destroy');
 
-Route::get('merchants', 'MerchantsController@index');
-Route::post('merchants', 'MerchantsController@store');
-Route::get('merchants/getMerchant', 'MerchantsController@getMerchant');
-Route::post('merchants/updateBalance', 'MerchantsController@updateBalance');
-Route::get('merchants/lastestNumber', 'MerchantsController@lastestNumber');
-Route::get('merchants/{id}', 'MerchantsController@show');
-Route::post('merchants/{id}', 'MerchantsController@update');
-Route::delete('merchants/{id}', 'MerchantsController@destroy');
+// Route::get('merchants', 'MerchantsController@index');
+// Route::post('merchants', 'MerchantsController@store');
+// Route::get('merchants/getMerchant', 'MerchantsController@getMerchant');
+// Route::post('merchants/updateBalance', 'MerchantsController@updateBalance');
+// Route::get('merchants/lastestNumber', 'MerchantsController@lastestNumber');
+// Route::get('merchants/{id}', 'MerchantsController@show');
+// Route::post('merchants/{id}', 'MerchantsController@update');
+// Route::delete('merchants/{id}', 'MerchantsController@destroy');
 
 Route::get('privileges', 'PrivilegesController@index');
 Route::post('privileges', 'PrivilegesController@store');
