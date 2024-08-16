@@ -337,7 +337,7 @@ class MerchantsController extends Controller
                 if($check){
                     return response()->json([
                         'status'=> false, 
-                        'error'=> 'Username already used'
+                        'error'=> 'Username or Email already used'
                     ], 403);
                 }
 
