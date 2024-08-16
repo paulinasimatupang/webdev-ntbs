@@ -1,6 +1,6 @@
     <div class="main-header">
             <div class="logo_bintang_header">
-                <img src="{{asset('assets/images/icon_bintang/selada-transparant-final.png')}}" alt="">
+                <img src="{{asset('assets/images/icon_bintang/ntbs-transparan.png')}}" alt="">
             </div>
 
             <div class="menu-toggle">

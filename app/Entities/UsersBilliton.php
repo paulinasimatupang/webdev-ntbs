@@ -45,8 +45,7 @@ class UsersBilliton extends Model
     ];
     
     protected $table = 'public.users';
-<<<<<<< Updated upstream
-    
+
 
     public function events()
     {
@@ -61,11 +60,5 @@ class UsersBilliton extends Model
     public function merchants()
     {
         return $this->hasMany(Merchant::class, 'user_id', 'user_uid');
-=======
-
-    public function transactions()
-    {
-        return $this->hasMany(Transaction::class, 'user_uid');
->>>>>>> Stashed changes
     }
 }

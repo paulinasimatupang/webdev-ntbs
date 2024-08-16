@@ -73,7 +73,7 @@
                     <div class="card height_card_dashboard card-icon-bg card-icon-bg-primary o-hidden mb-3">
                         <div class="card-body align-items-center text-center">
                         <div class="logo_card">
-                            <img src="{{asset('assets/images/icon_bintang/selada-transparant-final.png')}}" alt="">
+                            <img src="{{asset('assets/images/icon_bintang/ntbs-transparan.png')}}" alt="">
                         </div>
                           
                             <div class="content max_width_bintang ml-4">

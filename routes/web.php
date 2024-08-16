@@ -35,6 +35,10 @@ Route::group(['middleware' => 'auth'], function () {
         return view('apps.landing');
     })->name('landing');
 
+    // Route::get('/dashboard', function () {
+    //     return view('apps.landing');
+    // })->name('landing');
+
     Route::get('/merchant', 'MerchantsController@index')->name('merchant');
     Route::get('/merchant/create', 'MerchantsController@create')->name('merchant_create');
     Route::post('/merchant/store', 'MerchantsController@store')->name('merchant_store');

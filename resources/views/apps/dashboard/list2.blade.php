@@ -54,7 +54,7 @@
             </a>
         </div>
 
-        <div class="col-lg-4 col-md-4 col-sm-4">
+        <!-- <div class="col-lg-4 col-md-4 col-sm-4">
             <a href="/component" class="card-link">
                 <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-2">
                     <div class="card-body text-center">
@@ -112,6 +112,6 @@
                     </div>
                 </div>
             </a>
-        </div>
+        </div> -->
     </div>
 @endsection
