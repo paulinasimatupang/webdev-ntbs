@@ -23,11 +23,10 @@
                 <!-- User avatar dropdown -->
                 <div class="dropdown">
                     <div  class="user col align-self-end">
-                        <span style="font-size:24px;" class="nav-icon i-Administrator cursor-pointer" id="userDropdown" alt="" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"></span>
-
+                        <img src="{{ asset('assets/images/sidebar_icon/profile.png') }}" style="width:24px; height:24px;" class="nav-icon cursor-pointer" id="userDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"/>
                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
                             <div class="dropdown-header">
-                                <i class="i-Lock-User mr-1"></i> {{ Auth::user()->fullname }}
+                               {{ Auth::user()->fullname }}
                             </div>
                             <!-- <a class="dropdown-item" href="{{route('user-profile')}}">Ubah Profile</a> -->
                            
