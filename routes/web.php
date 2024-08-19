@@ -30,6 +30,7 @@ Route::group(['middleware' => 'auth'], function () {
     // Route::get('/dashboard/activeAgent', 'DashboardController@agentActive')->name('agent_active');
     // Route::get('/dashboard/resignAgent', 'DashboardController@agentResign')->name('agent_resign');
     // Route::get('/dashboard/allAgent', 'DashboardController@agentAll')->name('agent_all');
+    Route::get('/dashboard/rank', 'TransactionsController@rankTransactions')->name('transaction_rank');
     Route::get('/dashboard', 'DashboardBaruController@index')->name('dashboard');
     Route::get('/landing', function () {
         return view('apps.landing');
@@ -64,7 +65,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/transaction/feeExport', 'TransactionsController@feeExport');
     Route::get('/transaction/reversal', 'TransactionsController@reversal');
     Route::get('/transaction/reversal/{additional_data}', 'TransactionsController@postReversal')->name('transaction_postReversal');
-    Route::get('/transaction/rank', 'TransactionsController@rankTransactions')->name('transaction_rank');
+
 
 
     Route::get('/transactionSaleBJB', 'TransactionSaleBJBController@indexSale')->name('transactionSaleBJB');

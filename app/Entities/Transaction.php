@@ -18,7 +18,7 @@ class Transaction extends Model implements Transformable
     public $incrementing = true;
 
     protected $fillable = [
-        'transaction_id',
+        'transaction_code',
         'service_id',
         'event_uid',
         'transaction_status_id',

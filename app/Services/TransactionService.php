@@ -11,7 +11,7 @@ class TransactionService
     {
         // Ambil data transaksi dari database billiton
         $transactions = DB::connection('pgsql_billiton')->table('transaction')
-            ->select('account_number', DB::raw('COUNT(transaction_id) as transaction_count'))
+            ->select('account_number', DB::raw('COUNT(transaction_code) as transaction_count'))
             ->groupBy('account_number')
             ->get(); // Get as collection
 

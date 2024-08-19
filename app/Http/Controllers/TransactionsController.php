@@ -87,36 +87,36 @@ class TransactionsController extends Controller
             $request->request->add(['status' => 'Success']);
         }
     
-        // Jika start_date tidak ada di request, tambahkan default start_date (hari ini)
-        if (!$request->has('start_date') || $request->get('start_date') == '') {
-            $request->request->add(['start_date' => date("Y-m-d")]); // Format Y-m-d untuk keperluan filtering
-        }
-    
-        // Jika end_date tidak ada di request, tambahkan default end_date (hari ini)
-        if (!$request->has('end_date') || $request->get('end_date') == '') {
-            $request->request->add(['end_date' => date("Y-m-d")]); // Format Y-m-d untuk keperluan filtering
-        }
-    
         $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
     
         // Membuat query untuk mendapatkan data transaksi
         $data = Transaction::select('*')
             ->with(['event', 'service', 'transactionStatus', 'user', 'merchant']);
     
-        // dd($data);
-            
-        // Filter berdasarkan start_date dan end_date
-        $startDate = $request->get('start_date');
-        $endDate = $request->get('end_date');
-        $data->whereBetween('transaction_time', [
-            $startDate . ' 00:00:00',
-            $endDate . ' 23:59:59'
-        ]);
-    
-        // Filter berdasarkan transaction_id
-        if ($request->has('transaction_id') && $request->get('transaction_id') != '') {
-            $transactionId = $request->get('transaction_id');
-            $data->where('transaction_id', $transactionId);
+        // Filter berdasarkan transaction_code jika diberikan
+        if ($request->has('transaction_code') && $request->get('transaction_code') != '') {
+            $transactionId = $request->get('transaction_code');
+            $data->where('transaction_code', $transactionId);
+        } else {
+            // Jika transaction_code tidak diberikan, baru filter berdasarkan start_date dan end_date
+            if ($request->has('start_date') && $request->get('start_date') != '' &&
+                $request->has('end_date') && $request->get('end_date') != '') {
+                
+                $startDate = $request->get('start_date');
+                $endDate = $request->get('end_date');
+                $data->whereBetween('transaction_time', [
+                    $startDate . ' 00:00:00',
+                    $endDate . ' 23:59:59'
+                ]);
+            } else {
+                // Tambahkan default start_date dan end_date jika tidak ada yang diberikan
+                $startDate = date("Y-m-d");
+                $endDate = date("Y-m-d");
+                $data->whereBetween('transaction_time', [
+                    $startDate . ' 00:00:00',
+                    $endDate . ' 23:59:59'
+                ]);
+            }
         }
     
         // Filter berdasarkan status
@@ -140,15 +140,16 @@ class TransactionsController extends Controller
         $orderBy = $request->get('order_by', 'transaction_time');
         $data->orderBy($orderBy, $orderType);
     
-        // Hitung total dan fee
+        // Hitung total amount dan total fee
         $totalAmount = $data->sum('amount');
-        $totalFee = $totalAmount - $data->sum('fee');
+        $totalFee = $data->sum('fee');
+    
         $dataRevenue = [
             'total_trx' => $data->count(),
             'amount_trx' => $totalAmount,
             'total_fee' => $totalFee,
             'total_fee_agent' => $totalFee * 0.6,
-            'total_fee_bjb' => $totalFee * 0.2,
+            'total_fee_ntbs' => $totalFee * 0.2,
             'total_fee_selada' => $totalFee * 0.2,
         ];
     
@@ -157,7 +158,6 @@ class TransactionsController extends Controller
     
         foreach ($data as $item) {
             $item->status_text = $this->getStatusText($item->transaction_status_id);
-            $item->fee = $item->amount - $item->fee; // Disesuaikan dengan field yang benar
             $item->status_suspect = $item->is_suspect ? 'True' : 'False';
         }
     
@@ -169,7 +169,6 @@ class TransactionsController extends Controller
             ->with('username', $user->username);
     }
     
-
     public function getStatusText($statusId)
     {
         switch ($statusId) {
@@ -184,7 +183,7 @@ class TransactionsController extends Controller
         }
     }
 
-    
+
     public function export(Request $request)
     {
 

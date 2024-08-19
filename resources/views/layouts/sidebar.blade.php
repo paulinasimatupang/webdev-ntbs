@@ -9,7 +9,7 @@ display: none;
     {{-- @php if(session()->get('user')->role_id == 1) echo 'id="hide_menu_admin"'; @endphp --}}
     <div class="sidebar-left open rtl-ps-none" data-perfect-scrollbar data-suppress-scroll-x="true" >
         <ul class="navigation-left">
-            <li class="nav-item {{ request()->is('dashboard') ? 'active' : '' }}">
+            <li class="nav-item {{ (request()->is('dashboard') || request()->is('dashboard/*')) ? 'active' : '' }}">
                 <a class="nav-item-hold" href="{{route('dashboard')}}">
                 <img class="img_bintang_sidebar" src="{{asset('/assets/images/sidebar_icon/dashboard.png')}}" alt="">
                     <span class="nav-text">Dashboard</span>

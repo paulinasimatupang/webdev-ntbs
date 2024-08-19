@@ -15,9 +15,9 @@
 
 <div class="breadcrumb">
     <h1>Message Log</h1>
-    <ul>
+    <!-- <ul>
         <li><a href="#">Selada</a></li>
-    </ul>
+    </ul> -->
 </div>
 
 <div class="separator-breadcrumb border-top"></div>

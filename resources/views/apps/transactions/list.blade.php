@@ -16,8 +16,8 @@
 </style>
 <div class="breadcrumb">
     <h1>Transaction</h1>
-    <ul>
-        <li><a href="">Selada</a></li>
+    <!-- <ul>
+        <li><a href="">Selada</a></li> -->
 
 </div>
 <div class="separator-breadcrumb border-top"></div>
@@ -33,8 +33,8 @@
 
                             <div class="form-row">
                                 <div class="form-group col-md-12">
-                                    <label for="inputtext11" class="ul-form__label">Transaction ID:</label>
-                                    <input type="text" class="form-control" value="{{app('request')->input('search')}}" name="search" id="search" placeholder="Transaction ID">
+                                    <label for="inputtext11" class="ul-form__label">Transaction Code :</label>
+                                    <input type="text" class="form-control" value="{{app('request')->input('search')}}" name="search" id="search" placeholder="Transaction Code">
                                 </div>
                             </div>
 
@@ -186,8 +186,8 @@
                 <div class="d-flex align-items-center">
                     <img src="{{ asset('assets/images/transaction/total_fee_bjb2.png') }}" alt="Total Fee Agent" class="mr-3" style="width: 50px">
                     <div class="text-left">
-                        <p class="text-muted mt-2 mb-0">Total Fee BJB</p>
-                        <p class="text-primary text-24 line-height-1 mb-2">@currency($dataRevenue['total_fee_bjb'])</p>
+                        <p class="text-muted mt-2 mb-0">Total Fee NTBS</p>
+                        <p class="text-primary text-24 line-height-1 mb-2">@currency($dataRevenue['total_fee_ntbs'])</p>
                     </div>
                 </div>
             </div>
@@ -271,7 +271,7 @@
                             <tr>
                                 <th scope="col">No</th>
                                 <th scope="col">Name</th>
-                                <th scope="col">Transaction ID</th>
+                                <th scope="col">Transaction Code</th>
                                 <th scope="col">Amount</th>
                                 <th scope="col">Fee</th>
                                 <th scope="col">Date</th>
@@ -289,11 +289,22 @@
                                 <th scope="row">{{ $no }}</th>
 
                                 <td>{{!empty($item->merchant) ? $item->merchant->name : ''}}</td>
-                                <td>{{$item->transaction_id}}</td>
+                                <td>{{$item->transaction_code}}</td>
                                 <td>@currency($item->amount)</td>
                                 <td>@currency($item->fee)</td>
                                 <td>{{$item->transaction_time}}</td>
-                                <td>{{ $item->transactionStatus->status_text ?? 'N/A' }}</td>
+                                <td>
+                                    @if ($item->transaction_status_id == 0)
+                                    Success
+                                    @elseif ($item->transaction_status_id == 1)
+                                    Failed
+                                    @elseif ($item->transaction_status_id == 2)
+                                    Pending
+                                    @else
+                                    Unknown
+                                    @endif
+                                </td>
+                                <!-- <td>{{ $item->transaction_status_id }}</td> -->
                                 <!-- <td> -->
                                 <!-- <a href="{{route('transaction_updateStatus',[$item->id])}}">
                                                     <button class="btn btn-primary ripple btn-sm m-1" type="button" @php if ($item->status_text == 'Success' || $item->status_text == 'Failed') echo 'id="b1" ' @endphp @php if($username !== 'selada_produktif') echo 'disabled' @endphp>Update</button>
