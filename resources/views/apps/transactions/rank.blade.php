@@ -9,10 +9,10 @@
 @section('main-content')
 <div class="breadcrumb">
     <h1>Transaction Ranking</h1>
-    <ul>
+    <!-- <ul>
         <li><a href="">Home</a></li>
         <li><a href="#">Transaction Ranking</a></li>
-    </ul>
+    </ul> -->
 </div>
 <div class="separator-breadcrumb border-top"></div>
 <div class="row mb-4">

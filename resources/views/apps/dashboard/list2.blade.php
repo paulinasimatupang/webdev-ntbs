@@ -41,7 +41,7 @@
                 <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-2">
                     <div class="card-body text-center">
                         <div class="d-flex align-items-center">
-                            <img src="{{ asset('assets/images/new_features/screen.png') }}" alt="Total Transaction" class="mr-3" style="width: 50px">
+                            <img src="{{ asset('assets/images/new_features/ranking.png') }}" alt="Total Transaction" class="mr-3" style="width: 50px">
                             <div class="text-left">
                                 <p class="text-muted mt-2 mb-0">Ranking Laku Pandai</p>
                             </div>
