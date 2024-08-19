@@ -51,6 +51,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/merchant/create/rekening', 'MerchantsController@create_rekening')->name('merchant_create_rekening');
     Route::post('/merchant/store/rekening', 'MerchantsController@store_rekening')->name('merchant_store_rekening');
 
+    Route::get('/message', 'MessageLogController@index')->name('message_log');
+
     Route::get('/transaction', 'TransactionsController@index')->name('transaction');
     Route::get('/transaction/updateStatus/{code}', 'TransactionsController@updateStatus')->name('transaction_updateStatus');
     Route::get('/transaction/{id}/edit', 'TransactionsController@edit')->name('transaction_edit');

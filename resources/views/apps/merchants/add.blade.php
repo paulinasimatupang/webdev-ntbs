@@ -40,6 +40,12 @@
                             </div>
                         </div>
                         <div class="form-group row">
+                            <label class="col-sm-2 col-form-label">Password</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" value="{{ old('password') }}" name="password" placeholder="Password" required>
+                            </div>
+                        </div>
+                        <div class="form-group row">
                             <label class="col-sm-2 col-form-label">Email</label>
                             <div class="col-sm-10">
                                 <input type="email" class="form-control" value="{{ old('email') }}" name="email" placeholder="Email" required>
