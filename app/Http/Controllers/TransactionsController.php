@@ -82,160 +82,109 @@ class TransactionsController extends Controller
      */
     public function index(Request $request)
     {
-
-        if (!$request->has('status') && $request->get('status') == '') {
-            $request->request->add([
-                'status'  => 'Success'
-            ]);
+        // Jika status tidak ada di request, tambahkan default status "Success"
+        if (!$request->has('status') || $request->get('status') == '') {
+            $request->request->add(['status' => 'Success']);
         }
-        if (!$request->has('start_date') && $request->get('start_date') == '') {
-            $request->request->add([
-                'start_date'      => date("m-d-Y")
-            ]);
+    
+        // Jika start_date tidak ada di request, tambahkan default start_date (hari ini)
+        if (!$request->has('start_date') || $request->get('start_date') == '') {
+            $request->request->add(['start_date' => date("Y-m-d")]); // Format Y-m-d untuk keperluan filtering
         }
-        if (!$request->has('end_date') && $request->get('end_date') == '') {
-            $request->request->add([
-                'end_date'      => date("m-d-Y")
-            ]);
+    
+        // Jika end_date tidak ada di request, tambahkan default end_date (hari ini)
+        if (!$request->has('end_date') || $request->get('end_date') == '') {
+            $request->request->add(['end_date' => date("Y-m-d")]); // Format Y-m-d untuk keperluan filtering
         }
-
+    
         $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
-
-        $data = Transaction::select('*');
-        $data = $data->with(['terminal', 'event', 'service', 'transactionStatus', 'user']);
-
-        // if(session()->get('user')->role_id == 2) {
-        //     $data->whereHas('merchant',function($query) use ($request)
-        //         {
-        //             $query->where('terminal_id', '=', session()->get('user')->username);
-        //         });
-        // }
-
-        if ($request->has('start_date') && $request->get('start_date') != '') {
-            $data->where('transaction_time', '>', $request->get('start_date') . ' 00:00:00');
+    
+        // Membuat query untuk mendapatkan data transaksi
+        $data = Transaction::select('*')
+            ->with(['event', 'service', 'transactionStatus', 'user', 'merchant']);
+    
+        // dd($data);
+            
+        // Filter berdasarkan start_date dan end_date
+        $startDate = $request->get('start_date');
+        $endDate = $request->get('end_date');
+        $data->whereBetween('transaction_time', [
+            $startDate . ' 00:00:00',
+            $endDate . ' 23:59:59'
+        ]);
+    
+        // Filter berdasarkan transaction_id
+        if ($request->has('transaction_id') && $request->get('transaction_id') != '') {
+            $transactionId = $request->get('transaction_id');
+            $data->where('transaction_id', $transactionId);
         }
-
-        if ($request->has('end_date') && $request->get('end_date') != '') {
-            $data->where('transaction_time', '<=', $request->get('end_date') . ' 23:59:59');
-        }
-
-
-        if ($request->has('terminal_id') && $request->get('terminal_id') != '') {
-            $data->whereHas('terminal', function ($query) use ($request) {
-                $query->where('terminal_id', '=', $request->get('terminal_id'));
-            });
-        }
-
-        if ($request->has('merchant_id') && $request->get('merchant_id') != '') {
-            $data->whereHas('terminal', function ($query) use ($request) {
-                $query->where('merchant_id', '=', $request->get('merchant_id'));
-            });
-        }
-
+    
+        // Filter berdasarkan status
         if ($request->has('status') && $request->get('status') != '' && $request->get('status') != 'Select Status') {
             $status = $request->get('status');
-            if ($status == 'Success') {
-                $data->where('transaction_status_id', '=', 0);
-            } else if ($status == 'Failed') {
-                $data->where('transaction_status_id', '=', 1);
-            } else if ($status == 'Pending') {
-                $data->where('transaction_status_id', '=', 2);
+            switch ($status) {
+                case 'Success':
+                    $data->where('transaction_status_id', 0);
+                    break;
+                case 'Failed':
+                    $data->where('transaction_status_id', 1);
+                    break;
+                case 'Pending':
+                    $data->where('transaction_status_id', 2);
+                    break;
             }
         }
-        // if($request->has('stan') && $request->get('stan')!=''){
-        //     $data->where('stan', '=', $request->get('stan'));
-        // }
-
-        // if($request->has('limit')){
-        //     $data->take($request->get('limit'));
-
-        //     if($request->has('offset')){
-        //     	$data->skip($request->get('offset'));
-        //     }
-        // }
-
-        if ($request->has('order_type')) {
-            if ($request->get('order_type') == 'asc') {
-                if ($request->has('order_by')) {
-                    $data->orderBy($request->get('order_by'));
-                } else {
-                    $data->orderBy('transaction_time');
-                }
-            } else {
-                if ($request->has('order_by')) {
-                    $data->orderBy($request->get('order_by'), 'desc');
-                } else {
-                    $data->orderBy('transaction_time', 'desc');
-                }
-            }
-        } else {
-            $data->orderBy('transaction_time', 'desc');
-        }
-        // $data->where('is_development','!=',1);
-        // $data->where('is_marked_as_failed','!=',1);
-
-        $dataRevenue = array();
-        $dataRevenue['total_trx'] = $data->count();
-        $dataRevenue['amount_trx']   = $data->sum('amount');
-        $dataRevenue['total_fee']   = $data->sum('amount') - $data->sum('fee');
-        $dataRevenue['total_fee_agent']   = $dataRevenue['total_fee'] * 0.6;
-        $dataRevenue['total_fee_bjb']   = $dataRevenue['total_fee'] * 0.2;
-        $dataRevenue['total_fee_selada']   = $dataRevenue['total_fee'] * 0.2;
-
-        $total = $data->count();
-
-        if ($request->has('order_type')) {
-            if ($request->get('order_type') == 'asc') {
-                if ($request->has('order_by')) {
-                    $data->orderBy($request->get('order_by'));
-                } else {
-                    $data->orderBy('transaction_time');
-                }
-            } else {
-                if ($request->has('order_by')) {
-                    $data->orderBy($request->get('order_by'), 'desc');
-                } else {
-                    $data->orderBy('transaction_time', 'desc');
-                }
-            }
-        } else {
-            $data->orderBy('transaction_time', 'desc');
-        }
-
+    
+        // Order by handling
+        $orderType = $request->get('order_type', 'desc');
+        $orderBy = $request->get('order_by', 'transaction_time');
+        $data->orderBy($orderBy, $orderType);
+    
+        // Hitung total dan fee
+        $totalAmount = $data->sum('amount');
+        $totalFee = $totalAmount - $data->sum('fee');
+        $dataRevenue = [
+            'total_trx' => $data->count(),
+            'amount_trx' => $totalAmount,
+            'total_fee' => $totalFee,
+            'total_fee_agent' => $totalFee * 0.6,
+            'total_fee_bjb' => $totalFee * 0.2,
+            'total_fee_selada' => $totalFee * 0.2,
+        ];
+    
+        // Pagination
         $data = $data->paginate(10);
-
+    
         foreach ($data as $item) {
-            if ($item->status == 0) {
-                $item->status_text = 'Success';
-            }
-
-            if ($item->status == 1) {
-                $item->status_text = 'Failed';
-            }
-
-            if ($item->status == 2) {
-                $item->status_text = 'Pending';
-            }
-
-            $item->fee = $item->price - $item->vendor_price;
-
-            if ($item->is_suspect == 0) {
-                $item->status_suspect = 'False';
-            }
-
-            if ($item->is_suspect == 1) {
-                $item->status_suspect = 'True';
-            }
+            $item->status_text = $this->getStatusText($item->transaction_status_id);
+            $item->fee = $item->amount - $item->fee; // Disesuaikan dengan field yang benar
+            $item->status_suspect = $item->is_suspect ? 'True' : 'False';
         }
-
+    
         $user = session()->get('user');
-
+    
         return view('apps.transactions.list')
             ->with('data', $data)
             ->with('dataRevenue', $dataRevenue)
             ->with('username', $user->username);
     }
+    
 
+    public function getStatusText($statusId)
+    {
+        switch ($statusId) {
+            case 0:
+                return 'Success';
+            case 1:
+                return 'Failed';
+            case 2:
+                return 'Pending';
+            default:
+                return 'Unknown';
+        }
+    }
+
+    
     public function export(Request $request)
     {
 

@@ -36,10 +36,10 @@ class EventBilliton extends Model implements Transformable
 
     protected $table = 'event';
     
-    public function transactions()
-    {
-        return $this->hasMany(Transaction::class, 'event_uid');
-    }
+    // public function transactions()
+    // {
+    //     return $this->hasMany(Transaction::class, 'event_uid');
+    // }
 
     //ada relasi sama tabel response code 
     //ada relasi sama user billiton yg mengatur user_uid

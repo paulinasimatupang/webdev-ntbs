@@ -41,22 +41,31 @@ class Transaction extends Model implements Transformable
 
     public function event()
     {
-        return $this->belongsTo(Event::class, 'event_uid', 'user_uid');
+        return $this->belongsTo(Event::class, 'event_uid', 'event_uid');
     }
 
     public function service()
     {
-        return $this->belongsTo(Service::class, 'service_id', 'user_uid');
+        return $this->belongsTo(Service::class, 'service_id', 'service_id');
     }
 
     public function transactionStatus()
     {
-        return $this->hasMany(TransactionStatus::class, 'transaction_status_id', 'user_uid');
+        return $this->belongsTo(TransactionStatus::class, 'transaction_status_id', 'transaction_status_id');
     }
 
     public function user()
     {
-        return $this->hasOneThrough(User::class, Merchant::class,
-            'user_id', 'id', 'account_number', 'user_id');
+        return $this->belongsTo(User::class, 'user_uid', 'id');
     }
+
+    public function merchant()
+    {
+        return $this->belongsTo(Merchant::class, 'account_number', 'no');
+    }
+
+    // public function terminal()
+    // {
+    //     return $this->belongsTo(Terminal::class, 'terminal_id', 'id');
+    // }
 }

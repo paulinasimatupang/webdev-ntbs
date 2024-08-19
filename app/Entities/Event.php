@@ -15,7 +15,7 @@ use Prettus\Repository\Traits\TransformableTrait;
 class Event extends Model implements Transformable
 {
     use TransformableTrait;
-    use SoftDeletes;
+    // use SoftDeletes;
 
     public $incrementing = true;
 
@@ -40,11 +40,16 @@ class Event extends Model implements Transformable
     public function service()
     {
         return $this->belongsTo(Service::class, 'service_id', 'service_id');
-    }
+    } 
 
     public function user()
     {
         return $this->belongsTo(UsersBilliton::class, 'user_uid', 'user_uid');
     }
     
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class, 'event_uid', 'event_uid');
+    }   
+
 }

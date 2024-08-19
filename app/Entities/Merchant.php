@@ -15,7 +15,7 @@ use Prettus\Repository\Traits\TransformableTrait;
 class Merchant extends Model implements Transformable
 {
     use TransformableTrait;
-    use SoftDeletes;
+    // use SoftDeletes;
 
     public $incrementing = true;
 
@@ -50,6 +50,7 @@ class Merchant extends Model implements Transformable
     ];
 
     protected $table = 'merchants';
+    protected $connection = 'pgsql';
 
     public function terminal()
     {
@@ -60,4 +61,10 @@ class Merchant extends Model implements Transformable
     {
         return $this->belongsTo(User::class,'user_id','id');
     }
+
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class, 'account_number', 'no');
+    }
+
 }
