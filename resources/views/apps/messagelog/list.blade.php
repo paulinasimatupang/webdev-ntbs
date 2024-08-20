@@ -28,8 +28,8 @@
             <div class="card-body">
                 <div class="form-row">
                     <div class="form-group col-md-12">
-                        <label for="message_id" class="ul-form__label">Message ID:</label>
-                        <input type="text" class="form-control" value="{{ request('message_id') }}" name="message_id" id="message_id" placeholder="Message ID">
+                        <label for="inputtext11" class="ul-form__label">Message ID:</label>
+                        <input type="text" class="form-control" value="{{ request('search') }}" name="search" id="search" placeholder="Message ID">
                     </div>
                 </div>
 

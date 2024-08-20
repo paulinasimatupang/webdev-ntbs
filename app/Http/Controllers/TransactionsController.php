@@ -82,42 +82,27 @@ class TransactionsController extends Controller
      */
     public function index(Request $request)
     {
-        // Jika status tidak ada di request, tambahkan default status "Success"
-        if (!$request->has('status') || $request->get('status') == '') {
-            $request->request->add(['status' => 'Success']);
-        }
-    
         $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
     
         // Membuat query untuk mendapatkan data transaksi
         $data = Transaction::select('*')
-            ->with(['event', 'service', 'transactionStatus', 'user', 'merchant']);
-    
-        // Filter berdasarkan transaction_code jika diberikan
-        if ($request->has('transaction_code') && $request->get('transaction_code') != '') {
-            $transactionId = $request->get('transaction_code');
-            $data->where('transaction_code', $transactionId);
-        } else {
-            // Jika transaction_code tidak diberikan, baru filter berdasarkan start_date dan end_date
-            if ($request->has('start_date') && $request->get('start_date') != '' &&
-                $request->has('end_date') && $request->get('end_date') != '') {
-                
-                $startDate = $request->get('start_date');
-                $endDate = $request->get('end_date');
-                $data->whereBetween('transaction_time', [
-                    $startDate . ' 00:00:00',
-                    $endDate . ' 23:59:59'
-                ]);
-            } else {
-                // Tambahkan default start_date dan end_date jika tidak ada yang diberikan
-                $startDate = date("Y-m-d");
-                $endDate = date("Y-m-d");
-                $data->whereBetween('transaction_time', [
-                    $startDate . ' 00:00:00',
-                    $endDate . ' 23:59:59'
-                ]);
-            }
+            ->with(['event','transactionStatus', 'user','service', 'merchant']);
+
+        if ($request->has('search') && $request->get('search') != '') {
+            $data->where('transaction_code', '=', $request->get('search'));
+        } 
+
+        if($request->has('start_date') && $request->get('start_date')!=''){
+            $data->where('request_time', '>', $request->get('start_date'). ' 00:00:00.000');
         }
+
+        if($request->has('end_date') && $request->get('end_date')!=''){
+            $data->where('request_time', '<=', $request->get('end_date'). ' 23:59:59.999');
+        }
+
+        // if($request->has('service') && $request->get('service')!=''){
+        //     $data->where('service', '=', $request->get('service'). ' 23:59:59.999');
+        // }
     
         // Filter berdasarkan status
         if ($request->has('status') && $request->get('status') != '' && $request->get('status') != 'Select Status') {
@@ -139,8 +124,6 @@ class TransactionsController extends Controller
         $orderType = $request->get('order_type', 'desc');
         $orderBy = $request->get('order_by', 'transaction_time');
         $data->orderBy($orderBy, $orderType);
-    
-        // Hitung total amount dan total fee
         $totalAmount = $data->sum('amount');
         $totalFee = $data->sum('fee');
     
@@ -155,11 +138,6 @@ class TransactionsController extends Controller
     
         // Pagination
         $data = $data->paginate(10);
-    
-        foreach ($data as $item) {
-            $item->status_text = $this->getStatusText($item->transaction_status_id);
-            $item->status_suspect = $item->is_suspect ? 'True' : 'False';
-        }
     
         $user = session()->get('user');
     

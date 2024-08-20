@@ -191,18 +191,53 @@ class MerchantsController extends Controller
         Log::info('cURL Request Data: ' . $data);
         Log::info('cURL Response: ' . $output);
 
+        $match = false;
+
         if ($err) {
             Log::error('cURL Error: ' . $err);
-        
+        }else {
+            $cifid = null;
+            $nama_rek = null;
+            $alamat = null;
+            $email = null;
+            $no_hp = null;
+            if (isset($responseArray['screen']['comps']['comp'])) {
+                foreach ($responseArray['screen']['comps']['comp'] as $comp) {
+                    if ($comp['comp_lbl'] === 'No CIF') {
+                        $cifid = $comp['comp_values']['comp_value'][0]['value'];
+                        $match = Merchant::where('no_cif', $cifid)->exists();
+                    }
+                    if ($comp['comp_lbl'] === 'Nama Rekening') {
+                        $nama_rek = $comp['comp_values']['comp_value'][0]['value'];
+                    }
+                    if ($comp['comp_lbl'] === 'Alamat') {
+                        $alamat = $comp['comp_values']['comp_value'][0]['value'];
+                    }
+                    if ($comp['comp_lbl'] === 'Email') {
+                        $email = $comp['comp_values']['comp_value'][0]['value'];
+                    }
+                    if ($comp['comp_lbl'] === 'Nomor Handphone') {
+                        $no_hp = $comp['comp_values']['comp_value'][0]['value'];
+                    }
+                }
+            }
         }
 
         $responseArray = json_decode($output, true);
 
-        if (isset($responseArray['screen']['title']) && $responseArray['screen']['title'] === 'Gagal') {
+        if ($match){
+            return Redirect::to('/merchant/create/inquiry')->with('error', "Merchant Sudah Terdaftar CIF Gagal");
+        }
+        else if (isset($responseArray['screen']['title']) && $responseArray['screen']['title'] === 'Gagal') {
             return Redirect::to('/merchant/create/cif')
                             ->with('no_identitas', $nik);
         } else {
-            return Redirect::to('/merchant/create');
+            return Redirect::to('/merchant/create')
+                            ->with('no_cif', $cifid)
+                            ->with('fullname', $nama_rek)
+                            ->with('address', $alamat)
+                            ->with('email', $email)
+                            ->with('phone', $no_hp);
         }
     }
 
@@ -369,7 +404,7 @@ class MerchantsController extends Controller
         } else {
             return Redirect::to('/merchant/create')
                             ->with('no', $noRekening)
-                            ->with('nocif', $noCIF)
+                            ->with('no_cif', $noCIF)
                             ->with('no_registrasi', $no_registrasi)
                             ->with('fullname', $nama_lengkap)
                             ->with('branchid', $branchid);

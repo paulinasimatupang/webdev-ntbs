@@ -12,21 +12,10 @@ class MessageLogController extends Controller
 {
     public function index(Request $request)
     {
-        if(!$request->has('start_date') && $request->get('start_date')==''){
-            $request->request->add([
-                'start_date'      => date("Y-m-d")
-            ]);
-        }
-        if(!$request->has('end_date') && $request->get('end_date')==''){
-            $request->request->add([
-                'end_date'      => date("Y-m-d")
-            ]);
-        }
-
         $data = MessageLog::select('*');
 
-        if($request->has('message_id') && $request->get('message_id')!=''){
-            $data->where('message_id', '=', $request->get('message_id'));
+        if($request->has('search') && $request->get('search')!=''){
+            $data->where('message_id', '=', $request->get('search'));
         }
 
         if($request->has('start_date') && $request->get('start_date')!=''){

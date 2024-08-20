@@ -29,8 +29,6 @@
                 <div class="card mb-4">
                     <form method="GET" action="transaction" id="transaction_filter_form">
                         <div class="card-body">
-
-
                             <div class="form-row">
                                 <div class="form-group col-md-12">
                                     <label for="inputtext11" class="ul-form__label">Transaction Code :</label>

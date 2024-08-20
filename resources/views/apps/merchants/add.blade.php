@@ -48,19 +48,19 @@
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label">Email</label>
                             <div class="col-sm-10">
-                                <input type="email" class="form-control" value="{{ old('email') }}" name="email" placeholder="Email" required>
+                                <input type="email" class="form-control" value="{{ old('email', session('email', null)) }}" name="email" placeholder="Email" required>
                             </div>
                         </div>
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label">Nomor Handphone</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" value="{{ old('phone') }}" name="phone" placeholder="Phone" required>
+                                <input type="text" class="form-control" value="{{ old('phone', session('phone', null)) }}" name="phone" placeholder="Phone" required>
                             </div>
                         </div>
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label">Alamat</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" value="{{ old('address') }}" name="address" placeholder="Address" required>
+                                <input type="text" class="form-control" value="{{ old('address', session('address', null)) }}" name="address" placeholder="Address" required>
                             </div>
                         </div>
                         <div class="form-group row">
@@ -84,7 +84,7 @@
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label">Nomor CIF</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" value="{{ old('no_cif', session('nocif', null)) }}" name="no_cif" placeholder="Nomor CIF" required>
+                                <input type="text" class="form-control" value="{{ old('no_cif', session('no_cif', null)) }}" name="no_cif" placeholder="Nomor CIF" required>
                             </div>
                         </div>
                         <div class="form-group row">

@@ -63,9 +63,4 @@ class Transaction extends Model implements Transformable
     {
         return $this->belongsTo(Merchant::class, 'account_number', 'no');
     }
-
-    // public function terminal()
-    // {
-    //     return $this->belongsTo(Terminal::class, 'terminal_id', 'id');
-    // }
 }
