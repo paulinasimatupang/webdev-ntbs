@@ -51,6 +51,10 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/merchant/store/cif', 'MerchantsController@store_cif')->name('merchant_store_cif');
     Route::get('/merchant/create/rekening', 'MerchantsController@create_rekening')->name('merchant_create_rekening');
     Route::post('/merchant/store/rekening', 'MerchantsController@store_rekening')->name('merchant_store_rekening');
+    Route::post('/merchant/{id}/activateMerchant', 'MerchantsController@activateMerchant')->name('merchant_activate');
+    Route::post('/merchant/{id}/deactivateMerchant', 'MerchantsController@deactivateMerchant')->name('merchant_deactivate');
+    Route::get('/dashboard/merchant/request', 'MerchantsController@request_list')->name('merchant_request');
+    Route::get('/dashboard/merchant/request/{id}', 'MerchantsController@detail_request')->name('merchant_request_detail');
 
     Route::get('/message', 'MessageLogController@index')->name('message_log');
 

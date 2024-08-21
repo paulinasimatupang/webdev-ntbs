@@ -192,7 +192,7 @@ class TerminalsController extends Controller
      * @throws \Prettus\Validator\Exceptions\ValidatorException
      */
     
-     public function activateBilliton(TerminalUpdateRequest $request, $id)
+    public function activateBilliton(TerminalUpdateRequest $request, $id)
     {
         DB::beginTransaction();
             $this->validator->with($request->all())->passesOrFail(ValidatorInterface::RULE_UPDATE);
