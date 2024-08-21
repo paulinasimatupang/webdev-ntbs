@@ -93,11 +93,11 @@ class TransactionsController extends Controller
         } 
 
         if($request->has('start_date') && $request->get('start_date')!=''){
-            $data->where('request_time', '>', $request->get('start_date'). ' 00:00:00.000');
+            $data->where('transaction_time', '>', $request->get('start_date'). ' 00:00:00.000');
         }
 
         if($request->has('end_date') && $request->get('end_date')!=''){
-            $data->where('request_time', '<=', $request->get('end_date'). ' 23:59:59.999');
+            $data->where('transaction_time', '<=', $request->get('end_date'). ' 23:59:59.999');
         }
 
         // if($request->has('service') && $request->get('service')!=''){
