@@ -16,7 +16,7 @@
                 <div class="col-lg-12 col-md-12 col-sm-12 d-flex justify-content-center mb-3">
                     <div class="input-group">
                         <a href="{{route('merchant_inquiry_nik')}}">
-                            <button class="btn btn-warning ripple m-1 add-new-btn" type="button" @php if($username !== 'selada_produktif') echo 'disabled' @endphp>Add New</button>
+                            <button class="btn btn-warning ripple m-1 add-new-btn" type="button">Add New</button>
                         </a>
                     </div>
                 </div>
@@ -26,7 +26,17 @@
                             <div class="row">
                                 <h4 class=" col-sm-12 col-md-6 card-title mb-3">List Merchant </h4>
                             </div>
-                        
+                            @if ($message = Session::get('success'))
+                                <div class="alert alert-success">
+                                    <p>{{ $message }}</p>
+                                </div>
+                            @endif
+
+                            @if ($message = Session::get('failed'))
+                                <div class="alert alert-failed">
+                                    <p>{{ $message }}</p>
+                                </div>
+                            @endif
                             <div class="table-responsive">
                             <table id="deafult_ordering_table" class="display table table-striped table-bordered" style="width:100%">
                                     <thead>
@@ -42,7 +52,7 @@
                                             <th scope="col">Status Agen</th>
                                             <th scope="col">Active Date</th>
                                             <th scope="col">Resign Date</th>
-                                            <th scope="col">Action</th>
+                                            <th scope="col" {{ session()->get('user')->role_id == 2 ? 'id=b1' : '' }}>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -65,7 +75,7 @@
                                             <td>{{$item->resign_at}}</td>
                                             <td>
                                                 <a href="{{route('merchant_edit',[$item->id])}}">
-                                                    <button class="btn btn-warning ripple btn-sm m-1 edit-btn" type="button" @php if($username !== 'selada_produktif') echo 'disabled' @endphp>Edit</button>
+                                                    <button class="btn btn-warning ripple btn-sm m-1 edit-btn" type="button"  @php if(session()->get('user')->role_id == 2) echo 'id="b1"'; @endphp>Edit</button>
                                                 </a>
                                             </td>
                                         </tr>

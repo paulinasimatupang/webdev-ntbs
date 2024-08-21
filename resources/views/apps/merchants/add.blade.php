@@ -45,6 +45,16 @@
                                 <input type="text" class="form-control" value="{{ old('password') }}" name="password" placeholder="Password" required>
                             </div>
                         </div>
+                        <div class="form-group row" @php if(session()->get('user')->role_id == 2) echo 'id="b1"'; @endphp>
+                            <label class="col-sm-2 col-form-label">Role</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" name="role_id">
+                                    <option value="">Pilih Role</option>
+                                    <option value="1" {{ old('role_id') == '1' ? 'selected' : '' }}>Admin</option>
+                                    <option value="2" {{ old('role_id') == '2' ? 'selected' : '' }}>Merchant</option>
+                                </select>
+                            </div>
+                        </div>
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label">Email</label>
                             <div class="col-sm-10">

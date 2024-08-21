@@ -64,25 +64,8 @@ class MerchantsController extends Controller
     {
         $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
 
-        $data = Merchant::select('*');
-
-//	$data = $data->whereHas('user', function($query){
-//		$query->where('is_user_mireta', '!=', 1)->orWhereNull('is_user_mireta');
-//	});
-
-	    $data = $data->whereHas('user', function($query){
-                $query->where(function($q)
-                {
-                    $q->where('is_user_mireta', '!=', 1)->orWhereNull('is_user_mireta');
-                });
-                $query->where(function($q)
-                {
-                    $q->where('is_development_user', '!=', 1)->orWhereNull('is_development_user');
-                });
-        });
-
-
-//	$data = $data->with('user')->where('is_user_mireta', '!=', 't');
+        $data = Merchant::select('*')
+                ->whereIn('status_agen', [1, 2]);
 
         if($request->has('search')){
             $data = $data->whereRaw('lower(name) like (?)',["%{$request->search}%"]);
@@ -119,9 +102,7 @@ class MerchantsController extends Controller
         $data = $data->get();
 
         foreach($data as $merchant) {
-            if($merchant->status_agen == 0){
-                $merchant->status_text = 'Pending';
-            } else if ($merchant->status_agen == 1){
+            if ($merchant->status_agen == 1){
                 $merchant->status_text = 'Active';
             } else {
                 $merchant->status_text = 'Resign';
@@ -142,6 +123,47 @@ class MerchantsController extends Controller
         return view('apps.merchants.list')
                 ->with('data', $data)
                 ->with('username', $user->username);
+    }
+
+    public function request_list(Request $request)
+    {
+        $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
+
+        $data = Merchant::select('*');
+
+        $data = $data->where('status_agen', 0);
+
+        if($request->has('search')){
+            $data = $data->whereRaw('lower(name) like (?)', ["%{$request->search}%"]);
+        }
+
+        $total = $data->count();
+
+        if($request->has('order_type')){
+            if($request->get('order_type') == 'asc'){
+                if($request->has('order_by')){
+                    $data->orderBy($request->get('order_by'));
+                } else {
+                    $data->orderBy('created_at');
+                }
+            } else {
+                if($request->has('order_by')){
+                    $data->orderBy($request->get('order_by'), 'desc');
+                } else {
+                    $data->orderBy('created_at', 'desc');
+                }
+            }
+        } else {
+            $data->orderBy('created_at', 'desc');
+        }
+
+        $data = $data->get();
+
+        $user = session()->get('user');
+
+        return view('apps.merchants.list-request')
+            ->with('data', $data)
+            ->with('username', $user->username);
     }
     
     public function create(Request $request){
@@ -434,15 +456,18 @@ class MerchantsController extends Controller
                     ], 403);
                 }
 
-                //check for role merchant
-                $role = Role::where('name','Merchant')->first();
-                if($role){
-                    $role_id = $role->id;
-                }else{
-                    return response()->json([
-                        'status'=> false, 
-                        'error'=> 'Role not found'
-                    ], 404);
+                if ($request->has('role_id')) {
+                    $role_id = $request->role_id;
+                } else {
+                    $role = Role::where('name', 'Merchant')->first();
+                    if ($role) {
+                        $role_id = $role->id;
+                    } else {
+                        return response()->json([
+                            'status' => false, 
+                            'error' => 'Role not found'
+                        ], 404);
+                    }
                 }
                 
                 $user = User::create([
@@ -451,6 +476,7 @@ class MerchantsController extends Controller
                                 'fullname'          => $request->fullname,
                                 'email'             => $request->email,
                                 'password'          => bcrypt($request->password),
+                                'status'            => 0
                             ]);
 
                 $uploadPath = public_path('uploads/');
@@ -562,6 +588,20 @@ class MerchantsController extends Controller
         }
     }
 
+    public function detail_request($id)
+    {
+        $merchant = Merchant::find($id);
+        if($merchant){
+            $user = User::find($merchant->user_id);
+            return view('apps.merchants.detail-request')
+                ->with('merchant', $merchant)
+                ->with('user', $user);
+        }else{
+            return Redirect::to('terminal')
+                            ->with('error', 'Data not found');
+        }
+    }
+
     /**
      * Update the specified resource in storage.
      *
@@ -572,6 +612,7 @@ class MerchantsController extends Controller
      *
      * @throws \Prettus\Validator\Exceptions\ValidatorException
      */
+    
     public function update(MerchantUpdateRequest $request, $id)
     {
         DB::beginTransaction();
@@ -646,6 +687,69 @@ class MerchantsController extends Controller
             return Redirect::to('merchant/'.$id.'/edit')
                         ->with('error', $e)
                         ->withInput();
+        }
+    }
+
+    public function activateMerchant(Request $request, $id)
+    {
+        DB::beginTransaction();
+
+        try {
+            $this->validator->with($request->all())->passesOrFail(ValidatorInterface::RULE_UPDATE);
+            
+            $merchant = Merchant::where('id', $id)->first();
+            
+            if ($merchant) {
+                $merchant->status_agen = 1;
+                $merchant->active_at = now();
+                $merchant->save();
+
+                $user = User::where('id', $merchant->user_id)->first();
+                
+                if ($user) {
+                    $user->status = 1;
+                    $user->save();
+                }
+            }
+
+            DB::commit();
+            return Redirect::to('/dashboard/merchant/request')
+                            ->with('success', 'Activate Successfully');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return Redirect::to('/dashboard/merchant/request')
+                            ->with('failed', 'Activate Failed');
+        }
+    }
+
+    public function deactivateMerchant(Request $request, $id)
+    {
+        DB::beginTransaction();
+
+        try {
+            $this->validator->with($request->all())->passesOrFail(ValidatorInterface::RULE_UPDATE);
+            
+            $merchant = Merchant::where('id', $id)->first();
+            
+            if ($merchant) {
+                $merchant->status_agen = 2;
+                $merchant->resign_at = now();
+                $merchant->save(); 
+
+                $user = User::where('id', $merchant->user_id)->first();
+                
+                if ($user) {
+                    $user->status = 2;
+                    $user->save();
+                }
+            } else {
+                throw new \Exception("Merchant not found");
+            }
+            DB::commit();
+            return redirect()->route('merchant')->with('success', 'Deactivate Successfully');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->route('merchant')->with('failed', 'Deactivate Failed: ' . $e->getMessage());
         }
     }
 
