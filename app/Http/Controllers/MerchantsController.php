@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use DB;
 use Redirect;
+use Validator;
 
 use App\Http\Requests;
 use Prettus\Validator\Contracts\ValidatorInterface;
@@ -699,26 +700,29 @@ class MerchantsController extends Controller
             
             $merchant = Merchant::where('id', $id)->first();
             
-            if ($merchant) {
-                $merchant->status_agen = 1;
-                $merchant->active_at = now();
-                $merchant->save();
+            if (!$merchant) {
+                throw new \Exception("Merchant not found");
+            }
 
-                $user = User::where('id', $merchant->user_id)->first();
-                
-                if ($user) {
-                    $user->status = 1;
-                    $user->save();
-                }
+            if ($merchant->status_agen == 2 || $merchant->status_agen == 0) {
+                $merchant->status_agen = 1;
+                $merchant->resign_at = null; // Reset resignation date
+                $merchant->save();
+            } 
+
+            $user = User::where('id', $merchant->user_id)->first();
+            
+            if ($user) {
+                $user->status = 1;
+                $user->save();
             }
 
             DB::commit();
-            return Redirect::to('/dashboard/merchant/request')
-                            ->with('success', 'Activate Successfully');
+            return redirect()->route('merchant')->with('success', 'Merchant activated successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return Redirect::to('/dashboard/merchant/request')
-                            ->with('failed', 'Activate Failed');
+            Log::error('Agent activation failed', ['error' => $e->getMessage()]);
+            return redirect()->route('merchant')->with('failed', 'Activation failed: ' . $e->getMessage());
         }
     }
 
@@ -728,30 +732,36 @@ class MerchantsController extends Controller
 
         try {
             $this->validator->with($request->all())->passesOrFail(ValidatorInterface::RULE_UPDATE);
-            
+
             $merchant = Merchant::where('id', $id)->first();
             
-            if ($merchant) {
-                $merchant->status_agen = 2;
-                $merchant->resign_at = now();
-                $merchant->save(); 
-
-                $user = User::where('id', $merchant->user_id)->first();
-                
-                if ($user) {
-                    $user->status = 2;
-                    $user->save();
-                }
-            } else {
+            if (!$merchant) {
                 throw new \Exception("Merchant not found");
             }
+
+            if ($merchant->status_agen == 1) {
+                $merchant->status_agen = 2;
+                $merchant->resign_at = now();
+                $merchant->save();
+            }
+
+            $user = User::where('id', $merchant->user_id)->first();
+            
+            if ($user) {
+                $user->status = 2;
+                $user->save();
+            }
+
             DB::commit();
-            return redirect()->route('merchant')->with('success', 'Deactivate Successfully');
+            return redirect()->route('merchant')->with('success', 'Merchant deactivated successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->route('merchant')->with('failed', 'Deactivate Failed: ' . $e->getMessage());
+            Log::error('Agent deactivation failed', ['error' => $e->getMessage()]);
+            return redirect()->route('merchant')->with('failed', 'Deactivation failed: ' . $e->getMessage());
         }
     }
+
+
 
     /**
      * Remove the specified resource from storage.

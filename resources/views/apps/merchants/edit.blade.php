@@ -13,7 +13,9 @@
                 <div class="col-md-12">
                     <div class="card mb-5">
                         <div class="card-body">
-                            <form action="{{route('merchant_update',[$merchant->id])}}" method="POST">
+                            <form action="{{ route('merchant_activate', [$merchant->id]) }}" method="POST">
+                                @csrf
+                                @method('POST')
                                 <div class="form-group row">
                                     <label class="col-sm-2 col-form-label">Merchant ID</label>
                                     <div class="col-sm-10">
@@ -158,26 +160,28 @@
                                 <div class="form-group row">
                                     <label class="col-sm-2 col-form-label">Activate Merchant</label>
                                     <div class="col-sm-10">
-                                        <a href="{{ route('merchant_activate', [$merchant->id]) }}">
-                                            <button type="button" class="btn btn-primary" {{ $merchant->status_agen == 1 ? 'disabled' : '' }}>
+                                        <form action="{{ route('merchant_update', [$merchant->id]) }}" method="POST">
+                                            @csrf
+                                            @method('POST')
+                                            <button type="submit" class="btn btn-primary" {{ $merchant->status_agen == 1 ? 'disabled' : '' }}>
                                                 {{ $merchant->status_agen == 1 ? 'Activated' : 'Activate' }}
-                                            </button>
-                                        </a>
+                                            </button>    
+                                        </form>
                                         @if ($merchant->status_agen == 1)
-                                            <label class="col-sm-10 col-form-label">Merchant Telah aktif</label>
+                                            <label class="col-sm-10 col-form-label">Merchant Sudah aktif</label>
                                         @endif
                                     </div>
                                 </div>
                                 <div class="form-group row">
                                     <label class="col-sm-2 col-form-label">Deactivate Merchant</label>
                                     <div class="col-sm-10">
-                                    <form action="{{ route('merchant_deactivate', [$merchant->id]) }}" method="POST" style="display:inline;">
-                                        @csrf
-                                        @method('POST')
-                                        <button type="submit" class="btn btn-primary" {{ $merchant->status_agen == 2 ? 'disabled' : '' }}>
-                                            {{ $merchant->status_agen == 2 ? 'Deactivated' : 'Deactivate' }}
-                                        </button>
-                                    </form>
+                                        <form action="{{ route('merchant_deactivate', [$merchant->id]) }}" method="POST">
+                                            @csrf
+                                            @method('POST')
+                                            <button type="submit" class="btn btn-primary" {{ $merchant->status_agen == 2 ? 'disabled' : '' }}>
+                                                {{ $merchant->status_agen == 2 ? 'Deactivated' : 'Deactivate' }}
+                                            </button>
+                                        </form>
                                         @if ($merchant->status_agen == 2)
                                             <label class="col-sm-10 col-form-label">Merchant Tidak aktif</label>
                                         @endif
