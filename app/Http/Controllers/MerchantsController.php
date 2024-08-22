@@ -243,7 +243,7 @@ class MerchantsController extends Controller
                     if ($comp['comp_lbl'] === 'Nomor Handphone') {
                         $no_hp = $comp['comp_values']['comp_value'][0]['value'];
                     }
-                    if ($comp['comp_lbl'] === 'No Registrasi') {
+                    if ($comp['comp_lbl'] === 'Kode Registrasi') {
                         $no_registrasi = $comp['comp_values']['comp_value'][0]['value'];
                     }
                 }
@@ -346,7 +346,7 @@ class MerchantsController extends Controller
             $cifid = null;
             if (isset($responseArray['screen']['comps']['comp'])) {
                 foreach ($responseArray['screen']['comps']['comp'] as $comp) {
-                    if ($comp['comp_lbl'] === 'ID CIF') {
+                    if ($comp['comp_lbl'] === 'No CIF') {
                         $cifid = $comp['comp_values']['comp_value'][0]['value'];
                     }
                 }
@@ -425,7 +425,7 @@ class MerchantsController extends Controller
                     if ($comp['comp_lbl'] === 'No Rekening') {
                         $noRekening = $comp['comp_values']['comp_value'][0]['value'];
                     }
-                    else if ($comp['comp_lbl'] === 'ID CIF') {
+                    else if ($comp['comp_lbl'] === 'No CIF') {
                         $noCIF = $comp['comp_values']['comp_value'][0]['value'];
                     }
                 }
