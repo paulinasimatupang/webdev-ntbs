@@ -527,6 +527,8 @@ class MerchantsController extends Controller
                 $reqData['file_ktp'] = $filePaths['file_ktp'];
                 $reqData['file_kk'] = $filePaths['file_kk'];
                 $reqData['file_npwp'] = $filePaths['file_npwp'];
+                $reqData['mid'] = str_pad(mt_rand(0, 99999999), 8, '0', STR_PAD_LEFT);
+
                 $data   = $this->repository->create($reqData);
 
                 // Create to user_groups

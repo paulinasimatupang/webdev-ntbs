@@ -22,12 +22,6 @@
                     <form action="{{ route('merchant_store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="form-group row">
-                            <label class="col-sm-2 col-form-label">Merchant ID</label>
-                            <div class="col-sm-10">
-                                <input type="text" class="form-control" value="{{ old('mid') }}" name="mid" placeholder="Merchant ID" required>
-                            </div>
-                        </div>
-                        <div class="form-group row">
                             <label class="col-sm-2 col-form-label">Nama Lengkap</label>
                             <div class="col-sm-10">
                                 <input type="text" class="form-control" id="fullname" name="fullname" value="{{ old('fullname', session('fullname', null)) }}" placeholder="Nama Lengkap" required>
