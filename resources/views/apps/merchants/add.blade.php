@@ -76,7 +76,7 @@
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label">Kota</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" value="{{ old('city') }}" name="city" placeholder="City" required>
+                                <input type="text" class="form-control" value="{{old('city', session('city', null))}}" name="city" placeholder="City" required>
                             </div>
                         </div>
                         <div class="form-group row">

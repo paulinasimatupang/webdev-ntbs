@@ -132,7 +132,7 @@
                                     <div class="col-sm-10">
                                         @if(isset($merchant) && $merchant->file_ktp)
                                             <div class="mb-2">
-                                                <a href="{{ asset('storage/' . $merchant->file_ktp) }}" target="_blank">Lihat File KTP</a>
+                                                <a href="{{ asset('uploads/' . $merchant->file_ktp) }}" target="_blank">Lihat File KTP</a>
                                             </div>
                                         @endif
                                     </div>
@@ -142,7 +142,7 @@
                                     <div class="col-sm-10">
                                         @if(isset($merchant) && $merchant->file_kk)
                                             <div class="mb-2">
-                                                <a href="{{ asset('storage/' . $merchant->file_kk) }}" target="_blank">Lihat File Kartu Keluarga</a>
+                                                <a href="{{ asset('uploads/' . $merchant->file_kk) }}" target="_blank">Lihat File Kartu Keluarga</a>
                                             </div>
                                         @endif
                                     </div>
@@ -152,7 +152,7 @@
                                     <div class="col-sm-10">
                                         @if(isset($merchant) && $merchant->file_npwp)
                                             <div class="mb-2">
-                                                <a href="{{ asset('storage/' . $merchant->file_npwp) }}" target="_blank">Lihat File NPWP</a>
+                                                <a href="{{ asset('uploads/' . $merchant->file_npwp) }}" target="_blank">Lihat File NPWP</a>
                                             </div>
                                         @endif
                                     </div>

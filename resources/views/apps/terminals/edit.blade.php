@@ -43,7 +43,7 @@
                                     <input name="_token" type="hidden" value="{{ csrf_token() }}"/>
                                     <label class="col-sm-2 col-form-label">Terminal ID</label>
                                     <div class="col-sm-10">
-                                        <input type="text" class="form-control" value="{{ $terminal->tid }}" name="tid" placeholder="Terminal ID" required>
+                                        <input type="text" class="form-control" value="{{ $terminal->tid }}" name="tid" placeholder="Terminal ID" disabled>
                                     </div>
                                 </div>
                                 <div class="form-group row">
@@ -69,16 +69,6 @@
                                     <label class="col-sm-2 col-form-label">IMEI</label>
                                     <div class="col-sm-10">
                                         <input type="text" class="form-control" value="{{ $terminal->imei }}" name="imei" placeholder="IMEI" required>
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label class="col-sm-2 col-form-label">Update Billiton</label>
-                                    <div class="col-sm-10">
-                                        <input type="checkbox" class="btn btn-primary" id="is_update_billiton" name="is_update_billiton" value="true" @php if($checkTerminalBilliton == false) echo "disabled" @endphp>
-                                        <label  class="col-sm-2 col-form-label" for="is_update_billiton">Update Billiton</label><br>
-                                        {{-- <a href="{{route('terminal_update_billiton',[$terminal->id])}}">
-                                            <button type="button" class="btn btn-primary" @php if($checkTerminalBilliton == false) echo 'disabled' @endphp>Update</button>
-                                        </a> --}}
                                     </div>
                                 </div>
                                 <div class="form-group row">

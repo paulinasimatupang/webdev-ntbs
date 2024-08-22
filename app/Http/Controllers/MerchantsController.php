@@ -224,6 +224,7 @@ class MerchantsController extends Controller
             $alamat = null;
             $email = null;
             $no_hp = null;
+            $no_registrasi = null;
             if (isset($responseArray['screen']['comps']['comp'])) {
                 foreach ($responseArray['screen']['comps']['comp'] as $comp) {
                     if ($comp['comp_lbl'] === 'No CIF') {
@@ -241,6 +242,9 @@ class MerchantsController extends Controller
                     }
                     if ($comp['comp_lbl'] === 'Nomor Handphone') {
                         $no_hp = $comp['comp_values']['comp_value'][0]['value'];
+                    }
+                    if ($comp['comp_lbl'] === 'No Registrasi') {
+                        $no_registrasi = $comp['comp_values']['comp_value'][0]['value'];
                     }
                 }
             }
@@ -260,7 +264,8 @@ class MerchantsController extends Controller
                             ->with('fullname', $nama_rek)
                             ->with('address', $alamat)
                             ->with('email', $email)
-                            ->with('phone', $no_hp);
+                            ->with('phone', $no_hp)
+                            ->with('no_registrasi', $no_registrasi);
         }
     }
 
@@ -271,6 +276,7 @@ class MerchantsController extends Controller
 
     public function store_cif(Request $request){
         $status_penduduk = $request->input('status_penduduk');
+        $kewarganegaraan = $request->input('kewarganegaraan');
         $nama_lengkap = $request->input('nama_lengkap');
         $nama_alias = $request->input('nama_alias');
         $ibu_kandung = $request->input('ibu_kandung');
@@ -287,7 +293,6 @@ class MerchantsController extends Controller
         $kab_kota = $request->input('kab_kota');
         $provinsi = $request->input('provinsi');
         $kode_pos = $request->input('kode_pos');
-        $kewarganegaraan = $request->input('kewarganegaraan');
         $no_telp = $request->input('no_telp');
         $no_hp = $request->input('no_hp');
         $npwp = $request->input('npwp');
@@ -349,12 +354,17 @@ class MerchantsController extends Controller
         }
 
         if (isset($responseArray['screen']['title']) && $responseArray['screen']['title'] === 'Gagal') {
-            return Redirect::to('/merchant/create/cif')->with('error', "Create CIF Gagal");
+            return Redirect::to('/merchant/create/cif')->with('error', "Create CIF Gagal")
+            ->withInput();
         } else {
+            $inquiryRequest = new Request(['nik' => $no_identitas]);
+            $inquiryResponse = $this->store_inquiry_nik($inquiryRequest);
+
             return Redirect::to('/merchant/create/rekening')
                             ->with('nama_lengkap', $nama_lengkap)
                             ->with('branchid', $branchid)
-                            ->with('no_cif', $cifid);
+                            ->with('no_cif', $cifid)
+                            ->with('inquiry_response', json_encode($inquiryResponse));
         }
         
     }
@@ -423,7 +433,7 @@ class MerchantsController extends Controller
         }
 
         if (isset($responseArray['screen']['title']) && $responseArray['screen']['title'] === 'Gagal') {
-            return Redirect::to('/merchant/create/rekening')->with('error', "Rekening Gagal Terdaftar");
+            return Redirect::to('/merchant/create/rekening')->with('error', "Rekening Gagal Terdaftar")->withInput();
         } else {
             return Redirect::to('/merchant/create')
                             ->with('no', $noRekening)
