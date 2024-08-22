@@ -216,42 +216,57 @@ class MerchantsController extends Controller
 
         $match = false;
 
+        $responseArray = json_decode($output, true);
+
         if ($err) {
             Log::error('cURL Error: ' . $err);
-        }else {
+        } else {
             $cifid = null;
             $nama_rek = null;
             $alamat = null;
             $email = null;
             $no_hp = null;
             $no_registrasi = null;
+        
             if (isset($responseArray['screen']['comps']['comp'])) {
                 foreach ($responseArray['screen']['comps']['comp'] as $comp) {
-                    if ($comp['comp_lbl'] === 'No CIF') {
-                        $cifid = $comp['comp_values']['comp_value'][0]['value'];
-                        $match = Merchant::where('no_cif', $cifid)->exists();
-                    }
-                    if ($comp['comp_lbl'] === 'Nama Rekening') {
-                        $nama_rek = $comp['comp_values']['comp_value'][0]['value'];
-                    }
-                    if ($comp['comp_lbl'] === 'Alamat') {
-                        $alamat = $comp['comp_values']['comp_value'][0]['value'];
-                    }
-                    if ($comp['comp_lbl'] === 'Email') {
-                        $email = $comp['comp_values']['comp_value'][0]['value'];
-                    }
-                    if ($comp['comp_lbl'] === 'Nomor Handphone') {
-                        $no_hp = $comp['comp_values']['comp_value'][0]['value'];
-                    }
-                    if ($comp['comp_lbl'] === 'Kode Registrasi') {
-                        $no_registrasi = $comp['comp_values']['comp_value'][0]['value'];
+                    if (isset($comp['comp_values']['comp_value'][0]['value'])) {
+                        $value = $comp['comp_values']['comp_value'][0]['value'];
+        
+                        // Assign only if value is not null or 'null'
+                        if ($value !== 'null' && $value !== null) {
+                            switch ($comp['comp_lbl']) {
+                                case 'No CIF':
+                                    $cifid = $value;
+                                    $match = Merchant::where('no_cif', $cifid)->exists();
+                                    break;
+        
+                                case 'Nama Rekening':
+                                    $nama_rek = $value;
+                                    break;
+        
+                                case 'Alamat':
+                                    $alamat = $value;
+                                    break;
+        
+                                case 'Email':
+                                    $email = $value;
+                                    break;
+        
+                                case 'Nomor Handphone':
+                                    $no_hp = $value;
+                                    break;
+        
+                                case 'Kode Registrasi':
+                                    $no_registrasi = $value;
+                                    break;
+                            }
+                        }
                     }
                 }
             }
         }
-
-        $responseArray = json_decode($output, true);
-
+        
         if ($match){
             return Redirect::to('/merchant/create/inquiry')->with('error', "Merchant Sudah Terdaftar CIF Gagal");
         }
