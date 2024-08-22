@@ -217,17 +217,17 @@ class MerchantsController extends Controller
         $match = false;
 
         $responseArray = json_decode($output, true);
+        
+        $cifid = null;
+        $nama_rek = null;
+        $alamat = null;
+        $email = null;
+        $no_hp = null;
+        $no_registrasi = null;
 
         if ($err) {
             Log::error('cURL Error: ' . $err);
         } else {
-            $cifid = null;
-            $nama_rek = null;
-            $alamat = null;
-            $email = null;
-            $no_hp = null;
-            $no_registrasi = null;
-        
             if (isset($responseArray['screen']['comps']['comp'])) {
                 foreach ($responseArray['screen']['comps']['comp'] as $comp) {
                     if (isset($comp['comp_values']['comp_value'][0]['value'])) {
