@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use DB;
 use Redirect;
+use Validator;
 
 use App\Http\Requests;
 use Prettus\Validator\Contracts\ValidatorInterface;
@@ -223,6 +224,7 @@ class MerchantsController extends Controller
             $alamat = null;
             $email = null;
             $no_hp = null;
+            $no_registrasi = null;
             if (isset($responseArray['screen']['comps']['comp'])) {
                 foreach ($responseArray['screen']['comps']['comp'] as $comp) {
                     if ($comp['comp_lbl'] === 'No CIF') {
@@ -240,6 +242,9 @@ class MerchantsController extends Controller
                     }
                     if ($comp['comp_lbl'] === 'Nomor Handphone') {
                         $no_hp = $comp['comp_values']['comp_value'][0]['value'];
+                    }
+                    if ($comp['comp_lbl'] === 'Kode Registrasi') {
+                        $no_registrasi = $comp['comp_values']['comp_value'][0]['value'];
                     }
                 }
             }
@@ -259,7 +264,8 @@ class MerchantsController extends Controller
                             ->with('fullname', $nama_rek)
                             ->with('address', $alamat)
                             ->with('email', $email)
-                            ->with('phone', $no_hp);
+                            ->with('phone', $no_hp)
+                            ->with('no_registrasi', $no_registrasi);
         }
     }
 
@@ -270,6 +276,7 @@ class MerchantsController extends Controller
 
     public function store_cif(Request $request){
         $status_penduduk = $request->input('status_penduduk');
+        $kewarganegaraan = $request->input('kewarganegaraan');
         $nama_lengkap = $request->input('nama_lengkap');
         $nama_alias = $request->input('nama_alias');
         $ibu_kandung = $request->input('ibu_kandung');
@@ -286,7 +293,6 @@ class MerchantsController extends Controller
         $kab_kota = $request->input('kab_kota');
         $provinsi = $request->input('provinsi');
         $kode_pos = $request->input('kode_pos');
-        $kewarganegaraan = $request->input('kewarganegaraan');
         $no_telp = $request->input('no_telp');
         $no_hp = $request->input('no_hp');
         $npwp = $request->input('npwp');
@@ -340,7 +346,7 @@ class MerchantsController extends Controller
             $cifid = null;
             if (isset($responseArray['screen']['comps']['comp'])) {
                 foreach ($responseArray['screen']['comps']['comp'] as $comp) {
-                    if ($comp['comp_lbl'] === 'ID CIF') {
+                    if ($comp['comp_lbl'] === 'No CIF') {
                         $cifid = $comp['comp_values']['comp_value'][0]['value'];
                     }
                 }
@@ -348,12 +354,17 @@ class MerchantsController extends Controller
         }
 
         if (isset($responseArray['screen']['title']) && $responseArray['screen']['title'] === 'Gagal') {
-            return Redirect::to('/merchant/create/cif')->with('error', "Create CIF Gagal");
+            return Redirect::to('/merchant/create/cif')->with('error', "Create CIF Gagal")
+            ->withInput();
         } else {
+            $inquiryRequest = new Request(['nik' => $no_identitas]);
+            $inquiryResponse = $this->store_inquiry_nik($inquiryRequest);
+
             return Redirect::to('/merchant/create/rekening')
                             ->with('nama_lengkap', $nama_lengkap)
                             ->with('branchid', $branchid)
-                            ->with('no_cif', $cifid);
+                            ->with('no_cif', $cifid)
+                            ->with('inquiry_response', json_encode($inquiryResponse));
         }
         
     }
@@ -414,7 +425,7 @@ class MerchantsController extends Controller
                     if ($comp['comp_lbl'] === 'No Rekening') {
                         $noRekening = $comp['comp_values']['comp_value'][0]['value'];
                     }
-                    else if ($comp['comp_lbl'] === 'ID CIF') {
+                    else if ($comp['comp_lbl'] === 'No CIF') {
                         $noCIF = $comp['comp_values']['comp_value'][0]['value'];
                     }
                 }
@@ -422,7 +433,7 @@ class MerchantsController extends Controller
         }
 
         if (isset($responseArray['screen']['title']) && $responseArray['screen']['title'] === 'Gagal') {
-            return Redirect::to('/merchant/create/rekening')->with('error', "Rekening Gagal Terdaftar");
+            return Redirect::to('/merchant/create/rekening')->with('error', "Rekening Gagal Terdaftar")->withInput();
         } else {
             return Redirect::to('/merchant/create')
                             ->with('no', $noRekening)
@@ -516,6 +527,8 @@ class MerchantsController extends Controller
                 $reqData['file_ktp'] = $filePaths['file_ktp'];
                 $reqData['file_kk'] = $filePaths['file_kk'];
                 $reqData['file_npwp'] = $filePaths['file_npwp'];
+                $reqData['mid'] = str_pad(mt_rand(0, 99999999), 8, '0', STR_PAD_LEFT);
+
                 $data   = $this->repository->create($reqData);
 
                 // Create to user_groups
@@ -699,26 +712,29 @@ class MerchantsController extends Controller
             
             $merchant = Merchant::where('id', $id)->first();
             
-            if ($merchant) {
-                $merchant->status_agen = 1;
-                $merchant->active_at = now();
-                $merchant->save();
+            if (!$merchant) {
+                throw new \Exception("Merchant not found");
+            }
 
-                $user = User::where('id', $merchant->user_id)->first();
-                
-                if ($user) {
-                    $user->status = 1;
-                    $user->save();
-                }
+            if ($merchant->status_agen == 2 || $merchant->status_agen == 0) {
+                $merchant->status_agen = 1;
+                $merchant->resign_at = null; // Reset resignation date
+                $merchant->save();
+            } 
+
+            $user = User::where('id', $merchant->user_id)->first();
+            
+            if ($user) {
+                $user->status = 1;
+                $user->save();
             }
 
             DB::commit();
-            return Redirect::to('/dashboard/merchant/request')
-                            ->with('success', 'Activate Successfully');
+            return redirect()->route('merchant')->with('success', 'Merchant activated successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return Redirect::to('/dashboard/merchant/request')
-                            ->with('failed', 'Activate Failed');
+            Log::error('Agent activation failed', ['error' => $e->getMessage()]);
+            return redirect()->route('merchant')->with('failed', 'Activation failed: ' . $e->getMessage());
         }
     }
 
@@ -728,30 +744,36 @@ class MerchantsController extends Controller
 
         try {
             $this->validator->with($request->all())->passesOrFail(ValidatorInterface::RULE_UPDATE);
-            
+
             $merchant = Merchant::where('id', $id)->first();
             
-            if ($merchant) {
-                $merchant->status_agen = 2;
-                $merchant->resign_at = now();
-                $merchant->save(); 
-
-                $user = User::where('id', $merchant->user_id)->first();
-                
-                if ($user) {
-                    $user->status = 2;
-                    $user->save();
-                }
-            } else {
+            if (!$merchant) {
                 throw new \Exception("Merchant not found");
             }
+
+            if ($merchant->status_agen == 1) {
+                $merchant->status_agen = 2;
+                $merchant->resign_at = now();
+                $merchant->save();
+            }
+
+            $user = User::where('id', $merchant->user_id)->first();
+            
+            if ($user) {
+                $user->status = 2;
+                $user->save();
+            }
+
             DB::commit();
-            return redirect()->route('merchant')->with('success', 'Deactivate Successfully');
+            return redirect()->route('merchant')->with('success', 'Merchant deactivated successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->route('merchant')->with('failed', 'Deactivate Failed: ' . $e->getMessage());
+            Log::error('Agent deactivation failed', ['error' => $e->getMessage()]);
+            return redirect()->route('merchant')->with('failed', 'Deactivation failed: ' . $e->getMessage());
         }
     }
+
+
 
     /**
      * Remove the specified resource from storage.

@@ -9,6 +9,7 @@ class TerminalUserBilliton extends Model
     //
     protected $connection = 'pgsql_billiton';
     protected $primaryKey = 'terminal_id';
+    public $timestamps = false;
     //
     protected $fillable = [
         'terminal_id',

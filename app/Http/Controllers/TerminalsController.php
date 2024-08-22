@@ -124,6 +124,8 @@ class TerminalsController extends Controller
 
     public function create(Request $request){
         $merchant = Merchant::where('terminal_id',null)->orderBy('name')->get();
+        $merchant = $merchant->where('status_agen', 1);
+
 
         return view('apps.terminals.add')
                 ->with('merchant', $merchant);
@@ -381,74 +383,55 @@ class TerminalsController extends Controller
         DB::beginTransaction();
         try {
             $this->validator->with($request->all())->passesOrFail(ValidatorInterface::RULE_UPDATE);
-            
-            if($request->has('merchant_id')){
+
+            $reqData = $request->all();
+
+            if ($request->has('merchant_id')) {
                 $merchant = Merchant::where('mid', $request->merchant_id)->first();
-                if($merchant){
-                    $reqData['merchant_id']             = $merchant->mid;
-                    $reqData['merchant_name']           = $merchant->name;
-                    $reqData['merchant_address']        = $merchant->address;
+                if ($merchant) {
+                    $reqData['merchant_id'] = $merchant->mid;
+                    $reqData['merchant_name'] = $merchant->name;
+                    $reqData['merchant_address'] = $merchant->address;
                     $reqData['merchant_account_number'] = $merchant->no;
-                }else{
-                    $reqData['merchant_id']             = null;
-                    $reqData['merchant_name']           = null;
-                    $reqData['merchant_address']        = null;
+                } else {
+                    $reqData['merchant_id'] = null;
+                    $reqData['merchant_name'] = null;
+                    $reqData['merchant_address'] = null;
                     $reqData['merchant_account_number'] = null;
                 }
-                $data = $this->repository->update($reqData, $id);
-            } else {
-                $data = $this->repository->update($request->all(), $id);
             }
 
-            $terminalBilliton = TerminalBilliton::where('terminal_id', '=', $request->get('tid'))->first();
-            if($terminalBilliton) {
-                if($request->get('is_update_billiton') === 'true'){
-                    try {
-                        TerminalBilliton::where('terminal_id', $request->get('tid'))
-                                                    ->update([
-                                                        'terminal_sim_number' => $request->get('iccid'),
-                                                        'terminal_name' => $request->get('serial_number'),
-                                                        'terminal_imei' => $request->get('imei')
-                                                    ]);
+            $data = $this->repository->update($reqData, $id);
 
-                    } catch (Exception $e) {
-                        DB::rollBack();
-                        return Redirect::to('terminal/'.$id.'/edit')
-                                    ->with('error', $e)
-                                    ->withInput();
-                    } catch (\Illuminate\Database\QueryException $e) {
-                        DB::rollBack();
-                        return Redirect::to('terminal/'.$id.'/edit')
-                                    ->with('error', $e)
-                                    ->withInput();
-                    }
-                }
+            if (!$data) {
+                DB::rollBack();
+                return Redirect::to('terminal/'.$id.'/edit')->with('error', 'Failed to update terminal data.');
             }
-            
-            if($data){
-                if($request->has('merchant_id')){
-                    $merchant->terminal_id = $data->tid;
-                    $merchant->save();
-                }
-                
-                DB::commit();
-                return Redirect::to('terminal')
-                                    ->with('message', 'Terminal updated');
+
+            $terminalBilliton = TerminalBilliton::where('terminal_id', $request->get('tid'))->first();
+            if ($terminalBilliton) {
+                $terminalBilliton->update([
+                    'terminal_sim_number' => $request->get('iccid'),
+                    'terminal_name' => $request->get('serial_number'),
+                    'terminal_imei' => $request->get('imei'),
+                ]);
             } else {
                 DB::rollBack();
-                return Redirect::to('terminal/'.$id.'/edit')
-                            ->with('error', $data->error)
-                            ->withInput();
+                return Redirect::to('terminal/'.$id.'/edit')->with('error', 'TerminalBilliton not found for terminal_id: ' . $request->get('tid'));
             }
-        } catch (Exception $e) {
+
+            DB::commit();
+            return Redirect::to('terminal')->with('message', 'Terminal updated successfully.');
+
+        } catch (\Exception $e) {
             DB::rollBack();
             return Redirect::to('terminal/'.$id.'/edit')
-                        ->with('error', $e)
+                        ->with('error', $e->getMessage())
                         ->withInput();
         } catch (\Illuminate\Database\QueryException $e) {
             DB::rollBack();
             return Redirect::to('terminal/'.$id.'/edit')
-                        ->with('error', $e)
+                        ->with('error', $e->getMessage())
                         ->withInput();
         }
     }

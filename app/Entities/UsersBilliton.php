@@ -15,6 +15,7 @@ class UsersBilliton extends Model
     //
     protected $connection = 'pgsql_billiton';
     protected $primaryKey = 'user_uid';
+    public $timestamps = false;
     //
     protected $fillable = [
         'user_uid',

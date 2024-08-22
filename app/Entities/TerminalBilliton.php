@@ -14,8 +14,12 @@ class TerminalBilliton extends Model
         'terminal_id',
         'terminal_type',
         'terminal_imei',
+        'terminal_ip',
         'terminal_name',
-        'merchant_id'
+        'wk_ttl',
+        'last_login',
+        'merchant_id',
+        'terminal_sim_number'
     ];
     
     protected $table = 'public.terminal';
