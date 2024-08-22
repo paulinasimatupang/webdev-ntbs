@@ -15,19 +15,16 @@ use Prettus\Repository\Traits\TransformableTrait;
 class Merchant extends Model implements Transformable
 {
     use TransformableTrait;
-    // use SoftDeletes;
+    use SoftDeletes;
 
     public $incrementing = true;
 
     protected $fillable = [
         'id',
-        'merchant_id',
-        'type',
         'name',
         'no',
         'code',
         'address',
-        'city',
         'phone',
         'email',
         'balance',
@@ -35,6 +32,7 @@ class Merchant extends Model implements Transformable
         'status',
         'user_id',
         'terminal_id',
+        'city',
         'screen_id',
         'mid',
         'status_agen',
@@ -54,7 +52,7 @@ class Merchant extends Model implements Transformable
 
     public function terminal()
     {
-        return $this->hasOne(Terminal::class,'merchant_id','mid');
+        return $this->hasMany(Terminal::class,'mid','merchant_id');
     }
 
     public function user()
@@ -64,7 +62,7 @@ class Merchant extends Model implements Transformable
 
     public function transactions()
     {
-        return $this->hasMany(Transaction::class, 'account_number', 'no');
+        return $this->hasMany(Transaction::class,'no','account_number');
     }
 
 }
