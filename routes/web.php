@@ -12,6 +12,7 @@ use App\Http\Controllers\RankingLakuPandaiController;
 | contains the "web" middleware group. Now create something great!
 |
 */
+
 Route::get('/', function () {
     return view('sessions.signIn');
 });
@@ -46,7 +47,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/merchant/{id}/edit', 'MerchantsController@edit')->name('merchant_edit');
     Route::post('/merchant/{id}/update', 'MerchantsController@update')->name('merchant_update');
     Route::get('/merchant/create/inquiry', 'MerchantsController@inquiry_nik')->name('merchant_inquiry_nik');
-    Route::post('/merchant/store/inquiry', 'MerchantsController@store_inquiry_nik')->name('merchant_store_inquiry_nik');
+    Route::post('/merchant/store/inquiy', 'MerchantsController@store_inquiry_nik')->name('merchant_store_inquiry_nik');
     Route::get('/merchant/create/cif', 'MerchantsController@create_cif')->name('merchant_create_cif');
     Route::post('/merchant/store/cif', 'MerchantsController@store_cif')->name('merchant_store_cif');
     Route::get('/merchant/create/rekening', 'MerchantsController@create_rekening')->name('merchant_create_rekening');
@@ -105,7 +106,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/transactionBJB/saleExport', 'TransactionBJBsController@saleExport');
     Route::get('/transactionBJB/feeExport', 'TransactionBJBsController@feeExport');
     Route::get('/transactionBJB/reversal', 'TransactionBJBsController@reversal');
-    Route::get('/transactionBJB/reversal/{additional_data}','TransactionBJBsController@postReversal')->name('transactionBJB_postReversal');
+    Route::get('/transactionBJB/reversal/{additional_data}', 'TransactionBJBsController@postReversal')->name('transactionBJB_postReversal');
 
     Route::get('/biller', 'BillersController@index')->name('biller');
 
@@ -120,13 +121,13 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/terminal/{id}/updateBilliton', 'TerminalsController@updateBilliton')->name('terminal_update_billiton');
 
     // Routes for Master Data
-    Route::get('/masterdata', 'MasterDataController@index')->name('masterdata');
-    Route::get('/masterdata/create', 'MasterDataController@create')->name('masterdata_create');
-    Route::post('/masterdata/store', 'MasterDataController@store')->name('masterdata_store');
-    Route::get('/masterdata/{id}/edit', 'MasterDataController@edit')->name('masterdata_edit');
-    Route::post('/masterdata/{id}/update', 'MasterDataController@update')->name('masterdata_update');
-    Route::post('/masterdata/{id}/destroy', 'MasterDataController@destroy')->name('masterdata_destroy');
-    Route::get('/masterdata/chart', 'MasterDataController@showChart')->name('masterdata_chart');
+    Route::get('/hak-akses', 'HakAksesController@index')->name('hakakses');
+    Route::get('/hak-akses/create', 'HakAksesController@create')->name('hakakses_create');
+    Route::post('/hak-akses/store', 'HakAksesController@store')->name('hakakses_store');
+    Route::get('/hak-akses/{id}/edit', 'HakAksesController@edit')->name('hakakses_edit');
+    Route::post('/hak-akses/{id}/update', 'HakAksesController@update')->name('hakakses_update');
+    Route::post('/hak-akses/{id}/destroy', 'HakAksesController@destroy')->name('hakakses_destroy');
+    Route::get('/hak-akses/chart', 'HakAksesController@showChart')->name('hakakses_chart');
 
     // Routes for ServiceMeta
     Route::get('/servicemeta', 'ServiceMetaController@index')->name('servicemeta');
@@ -173,8 +174,20 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::get('/new_features', 'NewFeaturesController@index')->name('new_features');
 
-    
-    Route::get('/ranking_lakupandai', 'RankingLakuPandaiController@index')->name('ranking_lakupandai');
+    Route::get('/masterdata', 'MasterDataController@index')->name('masterdata');
+
+    Route::get('/fee', 'FeeController@index')->name('fee');
+    Route::get('/fee/create', 'FeeController@create')->name('fee_create');
+    Route::post('/fee/store', 'FeeController@store')->name('fee_store');
+    // Route::get('/fee/{id}/edit', 'FeeController@edit')->name('fee_edit');
+    // Route::post('/fee/{id}/update', 'FeeController@update')->name('fee_update');
+    // Route::post('/fee/{id}/destroy', 'FeeController@destroy')->name('fee_destroy');
+    Route::get('/fee/edit/{meta_id}/{service_id}/{seq}', 'FeeController@edit')->name('fee_edit');
+    Route::post('/fee/update/{meta_id}/{service_id}/{seq}', 'FeeController@update')->name('fee_update');    
+    Route::post('fee/destroy/{meta_id}/{service_id}/{seq}', 'FeeController@edit')->name('fee_destroy');
+
+
+    // Route::get('/ranking_lakupandai', 'RankingLakuPandaiController@index')->name('ranking_lakupandai');
 
     // Route::view('/', 'starter')->name('starter');
     Route::get('large-compact-sidebar/dashboard/dashboard1', function () {

@@ -35,4 +35,9 @@ class Service extends Model implements Transformable
         'system_markup'
     ];
 
+    public function serviceMeta()
+    {
+        return $this->hasMany(ServiceMeta::class, 'service_id', 'service_id');
+    }
+
 }

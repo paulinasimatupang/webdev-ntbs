@@ -55,6 +55,14 @@ display: none;
                 </a>
                 <div class="triangle"></div>
             </li>
+            <li class="nav-item {{ (request()->is('masterdata') || request()->is('masterdata/*')) ? 'active' : '' }}">
+                <a class="nav-item-hold" href="{{route('masterdata')}}">
+                 
+                    <img class="img_bintang_sidebar" src="{{asset('/assets/images/sidebar_icon/masterdata.png')}}" alt="">
+                    <span class="nav-text">Master Data</span>
+                </a>
+                <div class="triangle"></div>
+            </li>
             <li class="nav-item {{ (request()->is('message') || request()->is('message/*')) ? 'active' : '' }}" @php if(session()->get('user')->role_id == 2) echo 'id="b1"'; @endphp>
                 <a class="nav-item-hold" href="{{route('message_log')}}">
                  

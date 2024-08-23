@@ -8,7 +8,7 @@
 @section('main-content')
     <div class="container">
         <h1>Edit Master Data</h1>
-        <form action="{{ route('masterdata_update', $group->id) }}" method="POST">
+        <form action="{{ route('hakakses_update', $group->id) }}" method="POST">
             @csrf
             @method('POST')
             <div class="form-group">

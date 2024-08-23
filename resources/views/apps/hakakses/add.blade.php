@@ -24,7 +24,7 @@
         <div class="col-md-12">
             <div class="card mb-5">
                 <div class="card-body">
-                    <form action="{{ route('masterdata_store') }}" method="POST">
+                    <form action="{{ route('hakakses_store') }}" method="POST">
                         @csrf
                         <div class="form-group row">
                             <label for="name" class="col-sm-2 col-form-label">Name</label>
@@ -49,7 +49,7 @@
                         </div>
                         <div class="form-group row">
                             <div class="col-sm-12 text-right">
-                                <a href="{{ route('masterdata') }}">
+                                <a href="{{ route('hakakses') }}">
                                     <button type="button" class="btn btn-primary">Back</button>
                                 </a>
                                 <button type="submit" class="btn btn-primary">Save</button>
