@@ -186,6 +186,14 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/fee/update/{meta_id}/{service_id}/{seq}', 'FeeController@update')->name('fee_update');    
     Route::post('fee/destroy/{meta_id}/{service_id}/{seq}', 'FeeController@edit')->name('fee_destroy');
 
+    Route::get('/nasabah', 'DataCalonNasabahController@index')->name('nasabah');
+    Route::get('/nasabah/list', 'DataCalonNasabahController@list')->name('nasabah_list');
+    Route::get('/nasabah/request', 'DataCalonNasabahController@list_request')->name('nasabah_request');
+    Route::post('/nasabah/cif/{id}', 'DataCalonNasabahController@store_cif')->name('nasabah_cif');
+    Route::post('/nasabah/reject/{id}', 'DataCalonNasabahController@rejectNasabah')->name('nasabah_reject');
+    Route::post('/nasabah/approve/{id}', 'DataCalonNasabahController@approveNasabah')->name('nasabah_approve');
+    Route::get('/nasabah/detail/{id}', 'DataCalonNasabahController@detailRequest')->name('nasabah_detail');
+
 
     // Route::get('/ranking_lakupandai', 'RankingLakuPandaiController@index')->name('ranking_lakupandai');
 

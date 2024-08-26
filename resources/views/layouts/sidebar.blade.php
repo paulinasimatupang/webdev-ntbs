@@ -55,6 +55,14 @@ display: none;
                 </a>
                 <div class="triangle"></div>
             </li>
+            <li class="nav-item {{ (request()->is('nasabah') || request()->is('nasabah/*')) ? 'active' : '' }}">
+                <a class="nav-item-hold" href="{{route('nasabah')}}">
+                 
+                    <img class="img_bintang_sidebar" src="{{asset('/assets/images/sidebar_icon/nasabah.png')}}" alt="">
+                    <span class="nav-text">Nasabah</span>
+                </a>
+                <div class="triangle"></div>
+            </li>
             <li class="nav-item {{ (request()->is('masterdata') || request()->is('masterdata/*')) ? 'active' : '' }}">
                 <a class="nav-item-hold" href="{{route('masterdata')}}">
                  
