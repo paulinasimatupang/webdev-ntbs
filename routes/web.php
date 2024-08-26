@@ -71,6 +71,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/transaction/feeExport', 'TransactionsController@feeExport');
     Route::get('/transaction/reversal', 'TransactionsController@reversal');
     Route::get('/transaction/reversal/{additional_data}', 'TransactionsController@postReversal')->name('transaction_postReversal');
+    Route::get('/transaction/fee', 'TransactionsController@reportFee')->name('transaction_fee');
 
 
 

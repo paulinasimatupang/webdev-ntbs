@@ -25,6 +25,7 @@ use App\Entities\Merchant;
 use App\Entities\Service;
 use App\Entities\Transaction;
 use App\Entities\TransactionStatus;
+use App\Entities\TransactionFee;
 use App\Entities\transactionPaymentStatus;
 use App\Entities\Group;
 use App\Entities\UserGroup;
@@ -535,5 +536,14 @@ class TransactionsController extends Controller
     {
         $rankedTransactions = $this->transactionService->rankTransactionsByMerchantUser();
         return view('apps.transactions.rank', compact('rankedTransactions'));
+    }
+
+    public function reportFee()
+    {
+        $totalFees = TransactionFee::select('penerima', DB::raw('SUM(fee) as total_fee'))
+            ->groupBy('penerima')
+            ->get();
+
+        return view('apps.transactions.list-fee', compact('totalFees'));
     }
 }
