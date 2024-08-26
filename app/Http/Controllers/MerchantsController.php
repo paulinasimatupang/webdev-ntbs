@@ -218,7 +218,6 @@ class MerchantsController extends Controller
         $alamat = null;
         $email = null;
         $no_hp = null;
-        $no_registrasi = null;
 
         if ($err) {
             Log::error('cURL Error: ' . $err);
@@ -249,10 +248,6 @@ class MerchantsController extends Controller
                                 case 'Nomor Handphone':
                                     $no_hp = $value;
                                     break;
-        
-                                case 'Kode Registrasi':
-                                    $no_registrasi = $value;
-                                    break;
                             }
                         }
                     }
@@ -261,7 +256,7 @@ class MerchantsController extends Controller
         }
         
         if ($match){
-            return Redirect::to('/merchant/create/inquiry')->with('error', "Merchant Sudah Terdaftar CIF Gagal");
+            return Redirect::to('/merchant/create/inquiry')->with('error', "Merchant Sudah Terdaftar");
         }
         else if (isset($responseArray['screen']['title']) && $responseArray['screen']['title'] === 'Gagal') {
             return Redirect::to('/merchant/create/inquiry')
@@ -272,8 +267,7 @@ class MerchantsController extends Controller
                             ->with('fullname', $nama_rek)
                             ->with('address', $alamat)
                             ->with('email', $email)
-                            ->with('phone', $no_hp)
-                            ->with('no_registrasi', $no_registrasi);
+                            ->with('phone', $no_hp);
         }
     }
 
@@ -300,18 +294,14 @@ class MerchantsController extends Controller
                     ], 403);
                 }
 
-                if ($request->has('role_id')) {
-                    $role_id = $request->role_id;
+                $role = Role::where('name', 'Merchant')->first();
+                if ($role) {
+                    $role_id = $role->id;
                 } else {
-                    $role = Role::where('name', 'Merchant')->first();
-                    if ($role) {
-                        $role_id = $role->id;
-                    } else {
-                        return response()->json([
-                            'status' => false, 
-                            'error' => 'Role not found'
-                        ], 404);
-                    }
+                    return response()->json([
+                        'status' => false, 
+                        'error' => 'Role not found'
+                    ], 404);
                 }
                 
                 $user = User::create([
@@ -351,8 +341,6 @@ class MerchantsController extends Controller
                     }
                 }
 
-
-                // $this->validator->with($request->all())->passesOrFail(ValidatorInterface::RULE_CREATE);
                 $reqData = $request->except(['file_ktp', 'file_kk', 'file_npwp']); 
                 $reqData['user_id'] = $user->id;
                 $reqData['name']    = $user->fullname;
@@ -364,7 +352,6 @@ class MerchantsController extends Controller
 
                 $data   = $this->repository->create($reqData);
 
-                // Create to user_groups
                 $checkGroup = Group::where('name','Agent')->first();
                 if($checkGroup){
                     $checkUG = UserGroup::where('user_id',$user->id)

@@ -51,7 +51,7 @@
             </a>
         </div>
 
-        <div class="col-lg-4 col-md-4 col-sm-4" @php if(session()->get('user')->role_id == 2) echo 'id="b1"'; @endphp>
+        <div class="col-lg-4 col-md-4 col-sm-4">
             <a href="/nasabah/list" class="card-link">
                 <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-2">
                     <div class="card-body text-center">

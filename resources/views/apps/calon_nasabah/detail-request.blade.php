@@ -63,9 +63,28 @@
                     </div>
 
                     <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Jenis Kelamin</label>
+                        <div class="col-sm-10">
+                            <p class="form-control-static">
+                                @foreach($jenis_kelamin as $option)
+                                    @if($nasabah->jenis_kelamin == $option->seq)
+                                        {{ $option->opt_label }}
+                                    @endif
+                                @endforeach
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
                         <label class="col-sm-2 col-form-label">Agama</label>
                         <div class="col-sm-10">
-                            <p class="form-control-static">{{ $nasabah->agama }}</p>
+                            <p class="form-control-static">
+                                @foreach($agama as $option)
+                                    @if($nasabah->agama == $option->seq)
+                                        {{ $option->opt_label }}
+                                    @endif
+                                @endforeach
+                            </p>
                         </div>
                     </div>
 
@@ -107,14 +126,26 @@
                     <div class="form-group row">
                         <label class="col-sm-2 col-form-label">Kabupaten/Kota</label>
                         <div class="col-sm-10">
-                            <p class="form-control-static">{{ $nasabah->kab_kota }}</p>
+                            <p class="form-control-static">
+                                @foreach($kab_kota as $option)
+                                    @if($nasabah->kab_kota == $option->seq)
+                                        {{ $option->opt_label }}
+                                    @endif
+                                @endforeach
+                            </p>
                         </div>
                     </div>
 
                     <div class="form-group row">
                         <label class="col-sm-2 col-form-label">Provinsi</label>
                         <div class="col-sm-10">
-                            <p class="form-control-static">{{ $nasabah->provinsi }}</p>
+                            <p class="form-control-static">
+                                @foreach($provinsi as $option)
+                                    @if($nasabah->provinsi == $option->seq)
+                                        {{ $option->opt_label }}
+                                    @endif
+                                @endforeach
+                            </p>
                         </div>
                     </div>
 
@@ -142,14 +173,26 @@
                     <div class="form-group row">
                         <label class="col-sm-2 col-form-label">Status Penduduk</label>
                         <div class="col-sm-10">
-                            <p class="form-control-static">{{ $nasabah->status_penduduk }}</p>
+                            <p class="form-control-static">
+                                @foreach($status_penduduk as $option)
+                                    @if($nasabah->status_penduduk == $option->seq)
+                                        {{ $option->opt_label }}
+                                    @endif
+                                @endforeach
+                            </p>
                         </div>
                     </div>
 
                     <div class="form-group row">
                         <label class="col-sm-2 col-form-label">Kewarganegaraan</label>
                         <div class="col-sm-10">
-                            <p class="form-control-static">{{ $nasabah->kewarganegaraan }}</p>
+                            <p class="form-control-static">
+                                @foreach($kewarganegaraan as $option)
+                                    @if($nasabah->kewarganegaraan == $option->seq)
+                                        {{ $option->opt_label }}
+                                    @endif
+                                @endforeach
+                            </p>
                         </div>
                     </div>
 
@@ -163,7 +206,13 @@
                     <div class="form-group row">
                         <label class="col-sm-2 col-form-label">Jenis Identitas</label>
                         <div class="col-sm-10">
-                            <p class="form-control-static">{{ $nasabah->jenis_identitas }}</p>
+                            <p class="form-control-static">
+                                @foreach($jenis_identitas as $option)
+                                    @if($nasabah->jenis_identitas == $option->seq)
+                                        {{ $option->opt_label }}
+                                    @endif
+                                @endforeach
+                            </p>
                         </div>
                     </div>
 
@@ -184,7 +233,13 @@
                     <div class="form-group row">
                         <label class="col-sm-2 col-form-label">Pendidikan Terakhir</label>
                         <div class="col-sm-10">
-                            <p class="form-control-static">{{ $nasabah->pendidikan_terakhir }}</p>
+                            <p class="form-control-static">
+                                @foreach($pendidikan_terakhir as $option)
+                                    @if($nasabah->pendidikan_terakhir == $option->seq)
+                                        {{ $option->opt_label }}
+                                    @endif
+                                @endforeach
+                            </p>
                         </div>
                     </div>
 

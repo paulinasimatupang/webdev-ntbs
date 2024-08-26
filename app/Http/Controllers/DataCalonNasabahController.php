@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Log;
 use Ixudra\Curl\Facades\Curl;
 
 use App\Entities\DataCalonNasabah;
+use App\Entities\CompOption;
 
 class DataCalonNasabahController extends Controller
 {
@@ -416,8 +417,27 @@ class DataCalonNasabahController extends Controller
     public function detailRequest($id){
         $nasabah = DataCalonNasabah::find($id);
         if($nasabah){
+            $jenis_kelamin = CompOption::where('comp_id', 'CIF05')->get();
+            $agama = CompOption::where('comp_id', 'CIF06')->get();
+            $status_nikah = CompOption::where('comp_id', 'CIF07')->get();
+            $status_penduduk = CompOption::where('comp_id', 'CIF16')->get();
+            $kewarganegaraan = CompOption::where('comp_id', 'CIF17')->get();
+            $jenis_identitas = CompOption::where('comp_id', 'CIF21')->get();
+            $pendidikan_terakhir = CompOption::where('comp_id', 'CIF25')->get();
+            $kab_kota = CompOption::where('comp_id', 'CIF13')->get();
+            $provinsi = CompOption::where('comp_id', 'CIF14')->get();
+            
             return view('apps.calon_nasabah.detail-request')
-                ->with('nasabah', $nasabah);
+                ->with('nasabah', $nasabah)
+                ->with('jenis_kelamin', $jenis_kelamin)
+                ->with('agama', $agama)
+                ->with('status_nikah', $status_nikah)
+                ->with('status_penduduk', $status_penduduk)
+                ->with('kewarganegaraan', $kewarganegaraan)
+                ->with('jenis_identitas', $jenis_identitas)
+                ->with('pendidikan_terakhir', $pendidikan_terakhir)
+                ->with('kab_kota', $kab_kota)
+                ->with('provinsi', $provinsi);
         }else{
             return Redirect::to('nasabah_request')
                             ->with('error', 'Data not found');
