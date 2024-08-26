@@ -26,7 +26,7 @@
                             @endif
 
                             @if ($message = Session::get('failed'))
-                                <div class="alert alert-failed">
+                                <div class="alert alert-danger">
                                     <p>{{ $message }}</p>
                                 </div>
                             @endif
