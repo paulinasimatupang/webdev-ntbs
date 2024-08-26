@@ -51,21 +51,6 @@
             </a>
         </div>
 
-        <div class="col-lg-4 col-md-4 col-sm-4" @php if(session()->get('user')->role_id == 2) echo 'id="b1"'; @endphp>
-            <a href="/dashboard/merchant/request" class="card-link">
-                <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-2">
-                    <div class="card-body text-center">
-                        <div class="d-flex align-items-center">
-                            <img src="{{ asset('assets/images/new_features/merchant_request.png') }}" alt="Total Transaction" class="mr-3" style="width: 50px">
-                            <div class="text-left">
-                                <p class="text-muted mt-2 mb-0">Merchant Request</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </a>
-        </div>
-
         <!-- <div class="col-lg-4 col-md-4 col-sm-4">
             <a href="/component" class="card-link">
                 <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-2">

@@ -7,7 +7,7 @@
 @endsection
 @section('main-content')
             <div class="breadcrumb">
-                <h1>Request Merchant</h1>
+                <h1>Request Agen</h1>
                 <!-- <ul>
                     <li><a href="">Selada</a></li> -->
             </div>
@@ -17,7 +17,7 @@
                     <div class="card text-left">
                         <div class="card-body">
                             <div class="row">
-                                <h4 class=" col-sm-12 col-md-6 card-title mb-3">List Request Merchant </h4>
+                                <h4 class=" col-sm-12 col-md-6 card-title mb-3">List Request Agen </h4>
                             </div>
                             @if ($message = Session::get('success'))
                                 <div class="alert alert-success">
@@ -50,7 +50,7 @@
                                             <td>{{$item->mid}}</td>
                                             <td>{{$item->name}}</td>
                                             <td>
-                                                <a href="{{route('merchant_request_detail',[$item->id])}}">
+                                                <a href="{{route('agen_request_detail',[$item->id])}}">
                                                     <button class="btn btn-warning ripple btn-sm m-1 edit-btn" type="button">Detail</button>
                                                 </a>
                                             </td>

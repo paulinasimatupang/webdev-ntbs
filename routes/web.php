@@ -41,22 +41,22 @@ Route::group(['middleware' => 'auth'], function () {
     //     return view('apps.landing');
     // })->name('landing');
 
-    Route::get('/merchant', 'MerchantsController@index')->name('merchant');
-    Route::get('/merchant/create', 'MerchantsController@create')->name('merchant_create');
-    Route::post('/merchant/store', 'MerchantsController@store')->name('merchant_store');
-    Route::get('/merchant/{id}/edit', 'MerchantsController@edit')->name('merchant_edit');
-    Route::post('/merchant/{id}/update', 'MerchantsController@update')->name('merchant_update');
-    Route::get('/merchant/create/inquiry', 'MerchantsController@inquiry_nik')->name('merchant_inquiry_nik');
-    Route::post('/merchant/store/inquiy', 'MerchantsController@store_inquiry_nik')->name('merchant_store_inquiry_nik');
-    Route::get('/merchant/create/cif', 'MerchantsController@create_cif')->name('merchant_create_cif');
-    Route::post('/merchant/store/cif', 'MerchantsController@store_cif')->name('merchant_store_cif');
-    Route::get('/merchant/create/rekening', 'MerchantsController@create_rekening')->name('merchant_create_rekening');
-    Route::post('/merchant/store/rekening', 'MerchantsController@store_rekening')->name('merchant_store_rekening');
-    Route::post('/merchant/{id}/activate', 'MerchantsController@activateMerchant')->name('merchant_activate');
-    Route::post('/merchant/{id}/deactivate', 'MerchantsController@deactivateMerchant')->name('merchant_deactivate');
-
-    Route::get('/dashboard/merchant/request', 'MerchantsController@request_list')->name('merchant_request');
-    Route::get('/dashboard/merchant/request/{id}', 'MerchantsController@detail_request')->name('merchant_request_detail');
+    Route::get('/agen', 'MerchantsController@menu')->name('agen');
+    Route::get('/agen/list', 'MerchantsController@index')->name('agen_list');
+    Route::get('/agen/create', 'MerchantsController@create')->name('agen_create');
+    Route::post('/agen/store', 'MerchantsController@store')->name('agen_store');
+    Route::get('/agen/{id}/edit', 'MerchantsController@edit')->name('agen_edit');
+    Route::post('/agen/{id}/update', 'MerchantsController@update')->name('agen_update');
+    Route::get('/agen/create/inquiry', 'MerchantsController@inquiry_nik')->name('agen_inquiry_nik');
+    Route::post('/agen/store/inquiry', 'MerchantsController@store_inquiry_nik')->name('agen_store_inquiry_nik');
+    Route::get('/agen/create/cif', 'MerchantsController@create_cif')->name('agen_create_cif');
+    Route::post('/agen/store/cif', 'MerchantsController@store_cif')->name('agen_store_cif');
+    Route::get('/agen/create/rekening', 'MerchantsController@create_rekening')->name('agen_create_rekening');
+    Route::post('/agen/store/rekening', 'MerchantsController@store_rekening')->name('agen_store_rekening');
+    Route::post('/agen/{id}/activate', 'MerchantsController@activateagen')->name('agen_activate');
+    Route::post('/agen/{id}/deactivate', 'MerchantsController@deactivateagen')->name('agen_deactivate');
+    Route::get('/agen/request', 'MerchantsController@request_list')->name('agen_request');
+    Route::get('/agen/request/{id}', 'MerchantsController@detail_request')->name('agen_request_detail');
 
     Route::get('/message', 'MessageLogController@index')->name('message_log');
 

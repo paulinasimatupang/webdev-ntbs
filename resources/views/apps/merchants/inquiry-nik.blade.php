@@ -1,11 +1,7 @@
 @extends('layouts.master')
 @section('main-content')
     <div class="breadcrumb">
-                <h1>Add Merchant</h1>
-                <ul>
-                    <li><a href="">Selada</a></li>
-                   
-                </ul>
+                <h1>Inquiry CIF By NIK</h1>
             </div>
             <div class="separator-breadcrumb border-top"></div>
 
@@ -19,7 +15,7 @@
                 <div class="col-md-12">
                     <div class="card mb-5">
                         <div class="card-body">
-                            <form action="{{route('merchant_store_inquiry_nik')}}" method="POST">
+                            <form action="{{route('agen_store_inquiry_nik')}}" method="POST">
                                 <div class="form-group row">
                                     <input name="_token" type="hidden" value="{{ csrf_token() }}"/>
                                     <label class="col-sm-2 col-form-label">NIK</label>
@@ -29,7 +25,7 @@
                                 </div>
                                 <div class="form-group row">
                                     <div class="col-sm-12 text-right">
-                                        <a href="{{route('merchant')}}">
+                                        <a href="{{route('agen')}}">
                                             <button type="button" class="btn btn-primary">Back</button>
                                         </a>
                                         <button type="submit" class="btn btn-primary">Save</button>

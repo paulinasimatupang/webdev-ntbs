@@ -2,7 +2,7 @@
 
 @section('main-content')
     <div class="breadcrumb">
-        <h1>Add Merchant</h1>
+        <h1>Add Agen</h1>
         <ul>
             <li><a href="#">Selada</a></li>
         </ul>
@@ -19,7 +19,7 @@
         <div class="col-md-12">
             <div class="card mb-5">
                 <div class="card-body">
-                    <form action="{{ route('merchant_store') }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('agen_store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label">Nama Lengkap</label>
@@ -95,7 +95,7 @@
                         </div>
                         <div class="form-group row">
                             <div class="col-sm-12 text-right">
-                                <a href="{{ route('merchant') }}">
+                                <a href="{{ route('agen') }}">
                                     <button type="button" class="btn btn-primary">Back</button>
                                 </a>
                                 <button type="submit" class="btn btn-primary">Save</button>

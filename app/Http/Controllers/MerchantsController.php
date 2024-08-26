@@ -56,6 +56,16 @@ class MerchantsController extends Controller
         $this->validator  = $validator;
     }
 
+     /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function menu()
+    {
+        return view('apps.merchants.menu');
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -256,13 +266,13 @@ class MerchantsController extends Controller
         }
         
         if ($match){
-            return Redirect::to('/merchant/create/inquiry')->with('error', "Merchant Sudah Terdaftar");
+            return Redirect::to('/agen/create/inquiry')->with('error', "Merchant Sudah Terdaftar");
         }
         else if (isset($responseArray['screen']['title']) && $responseArray['screen']['title'] === 'Gagal') {
-            return Redirect::to('/merchant/create/inquiry')
+            return Redirect::to('/agen/create/inquiry')
                             ->with('error', "CIF Belum Terdaftar");
         } else {
-            return Redirect::to('/merchant/create')
+            return Redirect::to('/agen/create')
                             ->with('no_cif', $cifid)
                             ->with('fullname', $nama_rek)
                             ->with('address', $alamat)
@@ -365,16 +375,16 @@ class MerchantsController extends Controller
                     }
                 }
                 DB::commit();
-                return Redirect::to('merchant')
+                return Redirect::to('agen/list')
                                 ->with('message', 'Merchant created');
             } catch (Exception $e) {
                 DB::rollBack();
-                    return Redirect::to('merchant/create')
+                    return Redirect::to('agen/create')
                                 ->with('error', $e)
                                 ->withInput();
             } catch (\Illuminate\Database\QueryException $e) {
                 DB::rollBack();
-                    return Redirect::to('merchant/create')
+                    return Redirect::to('agen/create')
                                 ->with('error', $e)
                                 ->withInput();
             }
@@ -430,7 +440,7 @@ class MerchantsController extends Controller
                 ->with('merchant', $merchant)
                 ->with('user', $user);
         }else{
-            return Redirect::to('terminal')
+            return Redirect::to('agen_request')
                             ->with('error', 'Data not found');
         }
     }
@@ -502,22 +512,22 @@ class MerchantsController extends Controller
 
                 }
                 DB::commit();
-                return Redirect::to('merchant')
+                return Redirect::to('agen/list')
                                     ->with('message', 'Merchant updated');
             }else{
                 DB::rollBack();
-                return Redirect::to('merchant/'.$id.'/edit')
+                return Redirect::to('agen/'.$id.'/edit')
                             ->with('error', $data->error)
                             ->withInput();
             }
         } catch (Exception $e) {
             DB::rollBack();
-            return Redirect::to('merchant/'.$id.'/edit')
+            return Redirect::to('agen/'.$id.'/edit')
                         ->with('error', $e)
                         ->withInput();
         } catch (\Illuminate\Database\QueryException $e) {
             DB::rollBack();
-            return Redirect::to('merchant/'.$id.'/edit')
+            return Redirect::to('agen/'.$id.'/edit')
                         ->with('error', $e)
                         ->withInput();
         }
@@ -550,11 +560,11 @@ class MerchantsController extends Controller
             }
 
             DB::commit();
-            return redirect()->route('merchant')->with('success', 'Merchant activated successfully.');
+            return redirect()->route('agen/list')->with('success', 'Merchant activated successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Agent activation failed', ['error' => $e->getMessage()]);
-            return redirect()->route('merchant')->with('failed', 'Activation failed: ' . $e->getMessage());
+            return redirect()->route('agen/list')->with('failed', 'Activation failed: ' . $e->getMessage());
         }
     }
 
@@ -585,11 +595,11 @@ class MerchantsController extends Controller
             }
 
             DB::commit();
-            return redirect()->route('merchant')->with('success', 'Merchant deactivated successfully.');
+            return redirect()->route('agen/list')->with('success', 'Merchant deactivated successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Agent deactivation failed', ['error' => $e->getMessage()]);
-            return redirect()->route('merchant')->with('failed', 'Deactivation failed: ' . $e->getMessage());
+            return redirect()->route('agen/list')->with('failed', 'Deactivation failed: ' . $e->getMessage());
         }
     }
 
