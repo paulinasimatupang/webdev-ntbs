@@ -45,7 +45,7 @@
                                         <tr>
                                             <th scope="row">{{ $no }}</th>
                                             <td>{{$fee->penerima}}</td>
-                                            <td>{{ number_format($fee->total_fee, 2) }}</td>
+                                            <td>Rp{{ number_format($fee->total_fee, 2) }}</td>
                                         </tr>
                                         @php
                                             $no++;

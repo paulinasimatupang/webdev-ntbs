@@ -127,7 +127,8 @@ class TransactionsController extends Controller
         $data->orderBy($orderBy, $orderType);
 
         $totalAmount = $data->sum('amount');
-        $totalFee = $data->sum('fee');
+        $fee = TransactionFee::select('fee');
+        $totalFee = $fee->sum('fee');
 
         $feeSelada = DB::connection('pgsql_billiton')->table('persen_fee')->where('id', 1)->value('persentase') / 100;
         $feeNTBS = DB::connection('pgsql_billiton')->table('persen_fee')->where('id', 2)->value('persentase') / 100;
