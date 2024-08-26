@@ -124,16 +124,21 @@ class TransactionsController extends Controller
         $orderType = $request->get('order_type', 'desc');
         $orderBy = $request->get('order_by', 'transaction_time');
         $data->orderBy($orderBy, $orderType);
+
         $totalAmount = $data->sum('amount');
         $totalFee = $data->sum('fee');
-    
+
+        $feeSelada = DB::connection('pgsql_billiton')->table('persen_fee')->where('id', 1)->value('persentase') / 100;
+        $feeNTBS = DB::connection('pgsql_billiton')->table('persen_fee')->where('id', 2)->value('persentase') / 100;
+        $feeAgent = DB::connection('pgsql_billiton')->table('persen_fee')->where('id', 3)->value('persentase') / 100;
+
         $dataRevenue = [
             'total_trx' => $data->count(),
             'amount_trx' => $totalAmount,
             'total_fee' => $totalFee,
-            'total_fee_agent' => $totalFee * 0.6,
-            'total_fee_ntbs' => $totalFee * 0.2,
-            'total_fee_selada' => $totalFee * 0.2,
+            'total_fee_agent' => $totalFee * $feeAgent,
+            'total_fee_ntbs' => $totalFee * $feeNTBS,
+            'total_fee_selada' => $totalFee * $feeSelada,
         ];
     
         // Pagination

@@ -185,6 +185,14 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/fee/edit/{meta_id}/{service_id}/{seq}', 'FeeController@edit')->name('fee_edit');
     Route::post('/fee/update/{meta_id}/{service_id}/{seq}', 'FeeController@update')->name('fee_update');    
     Route::post('fee/destroy/{meta_id}/{service_id}/{seq}', 'FeeController@edit')->name('fee_destroy');
+    
+    Route::get('/persen_fee', 'PersenFeeController@index')->name('persen_fee');
+    Route::get('/persen_fee/create', 'PersenFeeController@create')->name('persen_fee_create');
+    Route::post('/persen_fee/store', 'PersenFeeController@store')->name('persen_fee_store');
+    Route::post('persen_fee/destroy/{id}', 'PersenFeeController@destroy')->name('persen_fee_destroy');
+    Route::get('/persen_fee/edit/{id}', 'PersenFeeController@edit')->name('persen_fee_edit');
+    Route::post('/persen_fee/update/{id}', 'PersenFeeController@update')->name('persen_fee_update');
+    //Route::post('/persen_fee/destroy/{meta_id}/{service_id}/{seq}', 'PersenFeeController@edit')->name('persen_fee_destroy');
 
     Route::get('/nasabah', 'DataCalonNasabahController@index')->name('nasabah');
     Route::get('/nasabah/list', 'DataCalonNasabahController@list')->name('nasabah_list');
