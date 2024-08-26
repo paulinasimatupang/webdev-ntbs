@@ -179,13 +179,10 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/fee', 'FeeController@index')->name('fee');
     Route::get('/fee/create', 'FeeController@create')->name('fee_create');
     Route::post('/fee/store', 'FeeController@store')->name('fee_store');
-    // Route::get('/fee/{id}/edit', 'FeeController@edit')->name('fee_edit');
-    // Route::post('/fee/{id}/update', 'FeeController@update')->name('fee_update');
-    // Route::post('/fee/{id}/destroy', 'FeeController@destroy')->name('fee_destroy');
-    Route::get('/fee/edit/{meta_id}/{service_id}/{seq}', 'FeeController@edit')->name('fee_edit');
+    Route::get('/edit/{meta_id}/{service_id}/{seq}', 'FeeController@edit')->name('fee_edit');
     Route::post('/fee/update/{meta_id}/{service_id}/{seq}', 'FeeController@update')->name('fee_update');    
     Route::post('fee/destroy/{meta_id}/{service_id}/{seq}', 'FeeController@edit')->name('fee_destroy');
-    
+
     Route::get('/persen_fee', 'PersenFeeController@index')->name('persen_fee');
     Route::get('/persen_fee/create', 'PersenFeeController@create')->name('persen_fee_create');
     Route::post('/persen_fee/store', 'PersenFeeController@store')->name('persen_fee_store');
