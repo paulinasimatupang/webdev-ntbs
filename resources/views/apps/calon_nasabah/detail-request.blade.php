@@ -132,6 +132,7 @@
                                         {{ $option->opt_label }}
                                     @endif
                                 @endforeach
+                                {{ $nasabah->kab_kota }}
                             </p>
                         </div>
                     </div>
@@ -220,6 +221,11 @@
                         <label class="col-sm-2 col-form-label">Golongan Darah</label>
                         <div class="col-sm-10">
                             <p class="form-control-static">{{ $nasabah->golongan_darah }}</p>
+                                @foreach($golongan_darah as $option)
+                                    @if($nasabah->golongan_darah == $option->seq)
+                                        {{ $option->opt_label }}
+                                    @endif
+                                @endforeach
                         </div>
                     </div>
 

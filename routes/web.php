@@ -49,6 +49,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/agen/{id}/update', 'MerchantsController@update')->name('agen_update');
     Route::get('/agen/create/inquiry', 'MerchantsController@inquiry_nik')->name('agen_inquiry_nik');
     Route::post('/agen/store/inquiry', 'MerchantsController@store_inquiry_nik')->name('agen_store_inquiry_nik');
+    Route::get('/agen/create/inquiry/rek', 'MerchantsController@inquiry_rek')->name('agen_inquiry_rek');
+    Route::post('/agen/store/inquiry/rek', 'MerchantsController@store_inquiry_rek')->name('agen_store_inquiry_rek');
     Route::get('/agen/create/cif', 'MerchantsController@create_cif')->name('agen_create_cif');
     Route::post('/agen/store/cif', 'MerchantsController@store_cif')->name('agen_store_cif');
     Route::get('/agen/create/rekening', 'MerchantsController@create_rekening')->name('agen_create_rekening');
@@ -212,6 +214,7 @@ Route::group(['middleware' => 'auth'], function () {
 
 
     // Route::get('/ranking_lakupandai', 'RankingLakuPandaiController@index')->name('ranking_lakupandai');
+    
 
     // Route::view('/', 'starter')->name('starter');
     Route::get('large-compact-sidebar/dashboard/dashboard1', function () {

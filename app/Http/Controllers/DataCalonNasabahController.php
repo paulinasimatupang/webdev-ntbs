@@ -426,6 +426,7 @@ class DataCalonNasabahController extends Controller
             $pendidikan_terakhir = CompOption::where('comp_id', 'CIF25')->get();
             $kab_kota = CompOption::where('comp_id', 'CIF13')->get();
             $provinsi = CompOption::where('comp_id', 'CIF14')->get();
+            $golongan_darah = CompOption::where('comp_id', 'CIF23')->get();
             
             return view('apps.calon_nasabah.detail-request')
                 ->with('nasabah', $nasabah)
@@ -437,7 +438,8 @@ class DataCalonNasabahController extends Controller
                 ->with('jenis_identitas', $jenis_identitas)
                 ->with('pendidikan_terakhir', $pendidikan_terakhir)
                 ->with('kab_kota', $kab_kota)
-                ->with('provinsi', $provinsi);
+                ->with('provinsi', $provinsi)
+                ->with('golongan_darah', $golongan_darah);
         }else{
             return Redirect::to('nasabah_request')
                             ->with('error', 'Data not found');

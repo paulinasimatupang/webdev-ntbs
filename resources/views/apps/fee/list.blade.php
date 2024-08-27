@@ -43,11 +43,8 @@
                         <thead>
                             <tr>
                                 <th scope="col">No</th>
-                                <th scope="col">Service ID</th>
-                                <th scope="col">Service Name</th>
-                                <th scope="col">Meta ID</th>
-                                <th scope="col">Meta Default</th>
-                                <th scope="col">Influx</th>
+                                <th scope="col">Fitur</th>
+                                <th scope="col">Nominal</th>
                                 <th scope="col">Action</th>
                             </tr>
                         </thead>
@@ -56,11 +53,8 @@
                             @foreach($groups as $group)
                             <tr>
                                 <th scope="row">{{ $no }}</th>
-                                <td>{{ $group->service_id }}</td>
                                 <td>{{ $group->service->service_name }}</td>
-                                <td>{{ $group->meta_id }}</td>
                                 <td>{{ $group->meta_default }}</td>
-                                <td>{{ $group->influx }}</td>
                                 <td>
                                     <a href="{{ route('fee_edit', ['meta_id' => $group->meta_id, 'service_id' => $group->service_id, 'seq' => $group->seq]) }}">
                                         <button class="btn btn-edit ripple btn-sm m-1 edit-btn" type="button">Edit</button>

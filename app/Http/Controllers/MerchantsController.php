@@ -6,6 +6,10 @@ use Illuminate\Http\Request;
 use DB;
 use Redirect;
 use Validator;
+use Illuminate\Support\Str;
+
+use App\Mail\sendPassword;
+use Illuminate\Support\Facades\Mail;
 
 use App\Http\Requests;
 use Prettus\Validator\Contracts\ValidatorInterface;
@@ -281,6 +285,107 @@ class MerchantsController extends Controller
         }
     }
 
+    public function inquiry_rek(Request $request){
+        return view('apps.merchants.inquiry-rek');
+    }
+
+    public function store_inquiry_rek(Request $request)
+    {
+        $rek = $request->input('rek');
+        $terminal = '353471045058692';
+        $dateTime = date("YmdHms");
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, "http://108.137.154.8:8080/ARRest/api/");
+        $data = json_encode([
+            'msg'=>([
+            'msg_id' =>  "$terminal$dateTime",
+            'msg_ui' => "$terminal",
+            'msg_si' => 'INF001',
+            'msg_dt' => 'admin|'. $rek
+            ])
+        ]);
+       
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: text/plain'
+        ]);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+
+        $output = curl_exec($ch);
+        $err = curl_error($ch);
+        $info = curl_getinfo($ch);
+        curl_close($ch);
+
+        Log::info('cURL Request URL: '  . $info['url']);
+        Log::info('cURL Request Data: ' . $data);
+        Log::info('cURL Response: ' . $output);
+
+        $match = false;
+
+        $responseArray = json_decode($output, true);
+        
+        $cifid = null;
+        $nama_rek = null;
+        $alamat = null;
+        $norek = null;
+        $no_hp = null;
+
+        if ($err) {
+            Log::error('cURL Error: ' . $err);
+        } else {
+            if (isset($responseArray['screen']['comps']['comp'])) {
+                foreach ($responseArray['screen']['comps']['comp'] as $comp) {
+                    if (isset($comp['comp_values']['comp_value'][0]['value'])) {
+                        $value = $comp['comp_values']['comp_value'][0]['value'];
+                        if ($value !== 'null' && $value !== null) {
+                            switch ($comp['comp_lbl']) {
+                                case 'No CIF':
+                                    $cifid = $value;
+                                    break;
+        
+                                case 'Nama Rekening':
+                                    $nama_rek = $value;
+                                    break;
+        
+                                case 'Alamat':
+                                    $alamat = $value;
+                                    break;
+        
+                                case 'Nomor Rekening':
+                                    $norek = $value;
+                                    $match = Merchant::where('no', $norek)->exists();
+                                    break;
+        
+                                case 'Nomor Handphone':
+                                    $no_hp = $value;
+                                    break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        if ($match){
+            return Redirect::to('/agen/create/inquiry/rek')->with('error', "Merchant dengan Nomor Rekening yang diinputkan Sudah Terdaftar")->withInput();
+        }
+        else if (isset($responseArray['screen']['title']) && $responseArray['screen']['title'] === 'Gagal') {
+            return Redirect::to('/agen/create/inquiry/rek')
+                            ->with('error', "No Rekening Belum Terdaftar")
+                            ->withInput();
+        } else {
+            return Redirect::to('/agen/create')
+                            ->with('no_cif', $cifid)
+                            ->with('fullname', $nama_rek)
+                            ->with('address', $alamat)
+                            ->with('no', $norek)
+                            ->with('phone', $no_hp);
+        }
+    }
+
     /**
      * Store a newly created resource in storage.
      *
@@ -313,14 +418,17 @@ class MerchantsController extends Controller
                         'error' => 'Role not found'
                     ], 404);
                 }
+
+                $password = 'agenntbs' . implode('', array_map(function() { return mt_rand(0, 9); }, range(1, 5)));
+                Log::info('PasswordGenerate: ' . $password);
                 
                 $user = User::create([
                                 'role_id'           => $role_id,
                                 'username'          => $request->username,
                                 'fullname'          => $request->fullname,
                                 'email'             => $request->email,
-                                'password'          => bcrypt($request->password),
-                                'status'            => 0
+                                'password'          => bcrypt($password),
+                                'status'            => 1
                             ]);
 
                 $uploadPath = public_path('uploads/');
@@ -354,11 +462,10 @@ class MerchantsController extends Controller
                 $reqData = $request->except(['file_ktp', 'file_kk', 'file_npwp']); 
                 $reqData['user_id'] = $user->id;
                 $reqData['name']    = $user->fullname;
-                $reqData['status_agen']    = 0;
+                $reqData['status_agen']    = 1;
                 $reqData['file_ktp'] = $filePaths['file_ktp'];
                 $reqData['file_kk'] = $filePaths['file_kk'];
                 $reqData['file_npwp'] = $filePaths['file_npwp'];
-                $reqData['mid'] = str_pad(mt_rand(0, 99999999), 8, '0', STR_PAD_LEFT);
 
                 $data   = $this->repository->create($reqData);
 
@@ -374,6 +481,19 @@ class MerchantsController extends Controller
                         ]);
                     }
                 }
+                $pesan = "<p><b>Halo</b></p>";
+                $pesan .= '<p>Berikut adalah detail akun Anda:</p>';
+                $pesan .= '<p>Username: ' . $user->username . '</p>';
+                $pesan .= '<p>Password: ' . $password . '</p>';
+
+                $detail_message = [
+                    'sender' => 'auliaziizah@gmail.com',
+                    'subject' => 'Akun Agen NTBS',
+                    'isi' => $pesan
+                ];
+
+                Mail::to($user->email)->send(new sendPassword($detail_message));
+
                 DB::commit();
                 return Redirect::to('agen/list')
                                 ->with('message', 'Merchant created');
