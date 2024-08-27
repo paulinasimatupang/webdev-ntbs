@@ -18,10 +18,12 @@ use App\Http\Requests\TransactionUpdateRequest;
 use App\Repositories\TransactionRepository;
 use App\Validators\TransactionValidator;
 use Ixudra\Curl\Facades\Curl;
+use App\Exports\TransactionExport;
 
 use App\Services\TransactionService;
 
 use App\Entities\Merchant;
+use App\Entities\PersenFee;
 use App\Entities\Service;
 use App\Entities\Transaction;
 use App\Entities\TransactionStatus;
@@ -33,7 +35,6 @@ use App\Entities\GroupSchemaShareholder;
 use App\Entities\TransactionBJB;
 use App\Entities\TransactionLog;
 use App\Entities\TransactionSaleBJB;
-use App\Exports\TransactionExport;
 use App\Exports\TransactionSaleExport;
 use App\Exports\TransactionFeeSaleExport;
 use App\Http\Controllers\CoresController as Core;
@@ -41,6 +42,8 @@ use App\Http\Requests\TransactionBJBUpdateRequest;
 use Exception;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Str;
+use Maatwebsite\Excel\Facades\Excel;
+use Barryvdh\DomPDF\Facade as Pdf;
 
 /**
  * Class TransactionsController.
@@ -124,16 +127,21 @@ class TransactionsController extends Controller
         $orderType = $request->get('order_type', 'desc');
         $orderBy = $request->get('order_by', 'transaction_time');
         $data->orderBy($orderBy, $orderType);
+
         $totalAmount = $data->sum('amount');
         $totalFee = $data->sum('fee');
-    
+
+        $feeSelada = DB::connection('pgsql_billiton')->table('persen_fee')->where('id', 1)->value('persentase') / 100;
+        $feeNTBS = DB::connection('pgsql_billiton')->table('persen_fee')->where('id', 2)->value('persentase') / 100;
+        $feeAgent = DB::connection('pgsql_billiton')->table('persen_fee')->where('id', 3)->value('persentase') / 100;
+
         $dataRevenue = [
             'total_trx' => $data->count(),
             'amount_trx' => $totalAmount,
             'total_fee' => $totalFee,
-            'total_fee_agent' => $totalFee * 0.6,
-            'total_fee_ntbs' => $totalFee * 0.2,
-            'total_fee_selada' => $totalFee * 0.2,
+            'total_fee_agent' => $totalFee * $feeAgent,
+            'total_fee_ntbs' => $totalFee * $feeNTBS,
+            'total_fee_selada' => $totalFee * $feeSelada,
         ];
     
         // Pagination
@@ -208,53 +216,37 @@ class TransactionsController extends Controller
         return (new TransactionSaleExport($request))->download('transaction_sale_export_' . $request->get('start_date') . '_' . $request->get('end_date') . '.xlsx', \Maatwebsite\Excel\Excel::XLSX);
     }
 
-
     public function exportCSV(Request $request)
     {
-
-        if (!$request->has('status') && $request->get('status') == '') {
-            $request->request->add([
-                'status'  => 'Success'
-            ]);
-        }
-        if (!$request->has('start_date') && $request->get('start_date') == '') {
-            $request->request->add([
-                'start_date'      => date("Y-m-d")
-            ]);
-        }
-        if (!$request->has('end_date') && $request->get('end_date') == '') {
-            $request->request->add([
-                'end_date'      => date("Y-m-d")
-            ]);
-        }
-        $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
-
-        return (new TransactionExport($request))->download('transaction_export_' . $request->get('start_date') . '_' . $request->get('end_date') . '.csv', \Maatwebsite\Excel\Excel::CSV, [
-            'Content-Type' => 'text/csv'
-        ]);
+        $query = Transaction::query(); 
+        $choice = 1; // Menampilkan semua data
+        return Excel::download(new TransactionsExport($query, $choice), 'transactions_all.xlsx');
     }
-
+    
+    public function exportCSVFeeOnly(Request $request)
+    {
+        $query = Transaction::query(); 
+        $choice = 2; // Menampilkan fee, nama, dan status
+        return Excel::download(new TransactionsExport($query, $choice), 'transactions_fee.xlsx');
+    }
+    
+    public function exportCSVPaymentOnly(Request $request)
+    {
+        $query = Transaction::query(); 
+        $choice = 3; // Menampilkan nama, amount, dan status
+        return Excel::download(new TransactionsExport($query, $choice), 'transactions_payment.xlsx');
+    }
+    
     public function exportPDF(Request $request)
     {
-
-        if (!$request->has('status') && $request->get('status') == '') {
-            $request->request->add([
-                'status'  => 'Success'
-            ]);
-        }
-        if (!$request->has('start_date') && $request->get('start_date') == '') {
-            $request->request->add([
-                'start_date'      => date("Y-m-d")
-            ]);
-        }
-        if (!$request->has('end_date') && $request->get('end_date') == '') {
-            $request->request->add([
-                'end_date'      => date("Y-m-d")
-            ]);
-        }
-        $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
-
-        return (new TransactionExport($request))->download('transaction_export_' . $request->get('start_date') . '_' . $request->get('end_date') . '.pdf', \Maatwebsite\Excel\Excel::DOMPDF);
+        ini_set('memory_limit', '512M');
+        set_time_limit(300);
+        $query = Transaction::query();
+        $viewType = 1; 
+        $transactionsExport = new TransactionsExport($query, $viewType);
+        $transactions = $transactionsExport->collection(); 
+        $pdf = Pdf::loadView('pdf.transactions', ['transactions' => $transactions]);
+        return $pdf->download('transactions.pdf');
     }
 
     public function feeExport(Request $request)

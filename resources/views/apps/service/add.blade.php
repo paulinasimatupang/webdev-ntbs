@@ -9,16 +9,22 @@
     </div>
     <div class="separator-breadcrumb border-top"></div>
 
-    @if(Session('error'))
-        @foreach (Session('error') as $key => $item)
+    
+    @if(Session::has('error'))
+        @php
+            $errors = Session::get('error');
+            $errors = is_array($errors) ? $errors : [$errors];  // Convert to array if it's a single message
+        @endphp
+        @foreach ($errors as $item)
             <div class="alert alert-danger" role="alert">
-                <strong class="text-capitalize">Error : </strong> {{ $item[0] }}
+                <strong class="text-capitalize">Error : </strong> {{ $item }}
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
         @endforeach
     @endif
+
 
     <div class="row">
         <div class="col-md-12">

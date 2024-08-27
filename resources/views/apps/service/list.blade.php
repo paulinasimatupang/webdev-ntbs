@@ -64,7 +64,7 @@
                                             <td>{{$item->screen_response}}</td>
                                             <td>{{$item->param1}}</td>
                                             <td>
-                                                <a href="{{route('screen_edit',[$item->service_id])}}">
+                                                <a href="{{route('service_edit',[$item->service_id])}}">
                                                     <button class="btn btn-warning ripple btn-sm m-1 edit-btn" type="button" @php if($username !== 'selada_produktif') echo 'disabled' @endphp>Edit</button>
                                                 </a>
                                                 <a href="#" onclick="deleteConfirm({{ $item->service_id }}); return false;" class="btn btn-danger ripple btn-sm m-1">Delete</a>

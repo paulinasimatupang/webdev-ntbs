@@ -19,16 +19,17 @@ class Service extends Model implements Transformable
     protected $table = 'service';
     protected $primaryKey = 'service_id';
     public $incrementing = false;
+    public $timestamps = false;
 
     protected $fillable = [
         'service_id',
         'service_name',
         'is_transaction',
-        'screen_respon',
+        'screen_response',
         'screen_start',
         'is_to_core',
         'service_class',
-        'param_1',
+        'param1',
         'param_2',
         'trx_tbl',
         'service_url',

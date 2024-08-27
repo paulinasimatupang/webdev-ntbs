@@ -54,13 +54,13 @@
     </div>
 
     <div class="col-lg-4 col-md-4 col-sm-4">
-        <a href="/component" class="card-link">
+        <a href="/persen_fee" class="card-link">
             <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-2">
                 <div class="card-body text-center">
                     <div class="d-flex align-items-center">
                         <img src="{{ asset('assets/images/new_features/component.png') }}" alt="Component" class="mr-3" style="width: 60px">
                         <div class="text-left">
-                            <p class="text-muted mt-2 mb-0">Component</p>
+                            <p class="text-muted mt-2 mb-0">Persen Fee</p>
                         </div>
                     </div>
                 </div>

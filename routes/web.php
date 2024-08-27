@@ -65,10 +65,10 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/transaction/{id}/edit', 'TransactionsController@edit')->name('transaction_edit');
     Route::post('/transaction/{id}/update', 'TransactionsController@update')->name('transaction_update');
     Route::get('/transaction/export', 'TransactionsController@export');
-    Route::get('/transaction/exportPDF', 'TransactionsController@exportPDF');
-    Route::get('/transaction/exportCSV', 'TransactionsController@exportCSV');
-    Route::get('/transaction/saleExport', 'TransactionsController@saleExport');
-    Route::get('/transaction/feeExport', 'TransactionsController@feeExport');
+    Route::get('/transaction.pdf', 'TransactionsController@exportPDF')->name('transactions.pdf');
+    Route::get('/transactions.csv', 'TransactionsController@exportCSV')->name('transactions.csv');
+    Route::get('/transaction/saleExport', 'TransactionsController@exportCSVPaymentOnly')->name('transactions.csvPaymentOnly');
+    Route::get('/transaction/feeExport', 'TransactionsController@exportCSVFeeOnly')->name('transactions.csvFeeOnly');
     Route::get('/transaction/reversal', 'TransactionsController@reversal');
     Route::get('/transaction/reversal/{additional_data}', 'TransactionsController@postReversal')->name('transaction_postReversal');
 
@@ -185,6 +185,16 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/fee/edit/{meta_id}/{service_id}/{seq}', 'FeeController@edit')->name('fee_edit');
     Route::post('/fee/update/{meta_id}/{service_id}/{seq}', 'FeeController@update')->name('fee_update');    
     Route::post('fee/destroy/{meta_id}/{service_id}/{seq}', 'FeeController@edit')->name('fee_destroy');
+
+
+
+    Route::get('/persen_fee', 'PersenFeeController@index')->name('persen_fee');
+    Route::get('/persen_fee/create', 'PersenFeeController@create')->name('persen_fee_create');
+    Route::post('/persen_fee/store', 'PersenFeeController@store')->name('persen_fee_store');
+    Route::post('persen_fee/destroy/{id}', 'PersenFeeController@destroy')->name('persen_fee_destroy');
+    Route::get('/persen_fee/edit/{id}', 'PersenFeeController@edit')->name('persen_fee_edit');
+    Route::post('/persen_fee/update/{id}', 'PersenFeeController@update')->name('persen_fee_update');
+    //Route::post('/persen_fee/destroy/{meta_id}/{service_id}/{seq}', 'PersenFeeController@edit')->name('persen_fee_destroy');
 
 
     // Route::get('/ranking_lakupandai', 'RankingLakuPandaiController@index')->name('ranking_lakupandai');
