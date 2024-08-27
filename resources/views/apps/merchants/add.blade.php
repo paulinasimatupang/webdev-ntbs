@@ -48,19 +48,19 @@
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label">Nomor Handphone</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" value="{{ old('phone', session('phone', null)) }}" name="phone" placeholder="Phone" required>
+                                <input type="text" class="form-control" value="{{ old('phone', session('phone', null)) }}" name="phone" placeholder="Nomor Handphone" required>
                             </div>
                         </div>
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label">Alamat</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" value="{{ old('address', session('address', null)) }}" name="address" placeholder="Address" required>
+                                <input type="text" class="form-control" value="{{ old('address', session('address', null)) }}" name="address" placeholder="Alamat" required>
                             </div>
                         </div>
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label">Kota</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" value="{{old('city', session('city', null))}}" name="city" placeholder="City" required>
+                                <input type="text" class="form-control" value="{{old('city', session('city', null))}}" name="city" placeholder="Kota" required>
                             </div>
                         </div>
                         <div class="form-group row">
