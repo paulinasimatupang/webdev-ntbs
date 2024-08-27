@@ -152,61 +152,20 @@
     </div>
 
     <div class="col-lg-4 col-md-4 col-sm-4">
-        <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-2">
-            <div class="card-body text-center">
-                <div class="d-flex align-items-center">
-                    <img src="{{ asset('assets/images/transaction/total_fee.png') }}" alt="Total Fee Agent" class="mr-3" style="width: 50px">
-                    <div class="text-left">
-                        <p class="text-muted mt-2 mb-0">Total Fee</p>
-                        <p class="text-primary text-24 line-height-1 mb-2">@currency($dataRevenue['total_fee'])</p>
+        <a href="/transaction/fee" class="card-link">
+            <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-2">
+                <div class="card-body text-center">
+                    <div class="d-flex align-items-center">
+                        <img src="{{ asset('assets/images/transaction/total_fee.png') }}" alt="Total Fee Agent" class="mr-3" style="width: 50px">
+                        <div class="text-left">
+                            <p class="text-muted mt-2 mb-0">Total Fee</p>
+                            <p class="text-primary text-24 line-height-1 mb-2">@currency($dataRevenue['total_fee'])</p>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </a>
     </div>
-
-    <div class="col-lg-4 col-md-4 col-sm-4">
-        <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-2">
-            <div class="card-body text-center">
-                <div class="d-flex align-items-center">
-                    <img src="{{ asset('assets/images/transaction/total_fee_agent.png') }}" alt="Total Fee Agent" class="mr-3" style="width: 50px">
-                    <div class="text-left">
-                        <p class="text-muted mt-2 mb-0">Total Fee Agent</p>
-                        <p class="text-primary text-24 line-height-1 mb-2">@currency($dataRevenue['total_fee_agent'])</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-lg-4 col-md-4 col-sm-4">
-        <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-2">
-            <div class="card-body text-center">
-                <div class="d-flex align-items-center">
-                    <img src="{{ asset('assets/images/transaction/total_fee_bjb2.png') }}" alt="Total Fee Agent" class="mr-3" style="width: 50px">
-                    <div class="text-left">
-                        <p class="text-muted mt-2 mb-0">Total Fee NTBS</p>
-                        <p class="text-primary text-24 line-height-1 mb-2">@currency($dataRevenue['total_fee_ntbs'])</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-lg-4 col-md-4 col-sm-4">
-        <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-2">
-            <div class="card-body text-center">
-                <div class="d-flex align-items-center">
-                    <img src="{{ asset('assets/images/transaction/total_fee_selada.png') }}" alt="Total Fee Agent" class="mr-3" style="width: 50px">
-                    <div class="text-left">
-                        <p class="text-muted mt-2 mb-0">Total Fee Selada</p>
-                        <p class="text-primary text-24 line-height-1 mb-2">@currency($dataRevenue['total_fee_selada'])</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
 
     <div class="col-md-12 mb-3">
         <div class="card text-left">

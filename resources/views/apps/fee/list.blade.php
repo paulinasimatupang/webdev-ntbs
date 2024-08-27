@@ -12,13 +12,13 @@
 </div>
 <div class="separator-breadcrumb border-top"></div>
 <div class="row mb-4">
-    <div class="col-lg-12 col-md-12 col-sm-12 d-flex justify-content-center mb-3">
+    <!-- <div class="col-lg-12 col-md-12 col-sm-12 d-flex justify-content-center mb-3">
         <div class="input-group">
             <a href="{{ route('fee_create') }}">
                 <button class="btn btn-warning ripple m-1 add-new-btn" type="button" @php if($username !=='selada_produktif' ) echo 'disabled' @endphp>Add New</button>
             </a>
         </div>
-    </div>
+    </div> -->
     <div class="col-md-12 mb-3">
         <div class="card text-left">
             <div class="card-body">
@@ -65,7 +65,7 @@
                                     <a href="{{ route('fee_edit', ['meta_id' => $group->meta_id, 'service_id' => $group->service_id, 'seq' => $group->seq]) }}">
                                         <button class="btn btn-edit ripple btn-sm m-1 edit-btn" type="button">Edit</button>
                                     </a>
-                                    <a href="#" onclick="deleteConfirm('{{ $group->meta_id }}', '{{ $group->service_id }}', '{{ $group->seq }}'); return false;" class="btn btn-danger ripple btn-sm m-1">Delete</a>
+                                    <!-- <a href="#" onclick="deleteConfirm('{{ $group->meta_id }}', '{{ $group->service_id }}', '{{ $group->seq }}'); return false;" class="btn btn-danger ripple btn-sm m-1">Delete</a> -->
                                 </td>
 
                             </tr>

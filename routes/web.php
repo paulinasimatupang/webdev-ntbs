@@ -41,22 +41,22 @@ Route::group(['middleware' => 'auth'], function () {
     //     return view('apps.landing');
     // })->name('landing');
 
-    Route::get('/merchant', 'MerchantsController@index')->name('merchant');
-    Route::get('/merchant/create', 'MerchantsController@create')->name('merchant_create');
-    Route::post('/merchant/store', 'MerchantsController@store')->name('merchant_store');
-    Route::get('/merchant/{id}/edit', 'MerchantsController@edit')->name('merchant_edit');
-    Route::post('/merchant/{id}/update', 'MerchantsController@update')->name('merchant_update');
-    Route::get('/merchant/create/inquiry', 'MerchantsController@inquiry_nik')->name('merchant_inquiry_nik');
-    Route::post('/merchant/store/inquiy', 'MerchantsController@store_inquiry_nik')->name('merchant_store_inquiry_nik');
-    Route::get('/merchant/create/cif', 'MerchantsController@create_cif')->name('merchant_create_cif');
-    Route::post('/merchant/store/cif', 'MerchantsController@store_cif')->name('merchant_store_cif');
-    Route::get('/merchant/create/rekening', 'MerchantsController@create_rekening')->name('merchant_create_rekening');
-    Route::post('/merchant/store/rekening', 'MerchantsController@store_rekening')->name('merchant_store_rekening');
-    Route::post('/merchant/{id}/activate', 'MerchantsController@activateMerchant')->name('merchant_activate');
-    Route::post('/merchant/{id}/deactivate', 'MerchantsController@deactivateMerchant')->name('merchant_deactivate');
-
-    Route::get('/dashboard/merchant/request', 'MerchantsController@request_list')->name('merchant_request');
-    Route::get('/dashboard/merchant/request/{id}', 'MerchantsController@detail_request')->name('merchant_request_detail');
+    Route::get('/agen', 'MerchantsController@menu')->name('agen');
+    Route::get('/agen/list', 'MerchantsController@index')->name('agen_list');
+    Route::get('/agen/create', 'MerchantsController@create')->name('agen_create');
+    Route::post('/agen/store', 'MerchantsController@store')->name('agen_store');
+    Route::get('/agen/{id}/edit', 'MerchantsController@edit')->name('agen_edit');
+    Route::post('/agen/{id}/update', 'MerchantsController@update')->name('agen_update');
+    Route::get('/agen/create/inquiry', 'MerchantsController@inquiry_nik')->name('agen_inquiry_nik');
+    Route::post('/agen/store/inquiry', 'MerchantsController@store_inquiry_nik')->name('agen_store_inquiry_nik');
+    Route::get('/agen/create/cif', 'MerchantsController@create_cif')->name('agen_create_cif');
+    Route::post('/agen/store/cif', 'MerchantsController@store_cif')->name('agen_store_cif');
+    Route::get('/agen/create/rekening', 'MerchantsController@create_rekening')->name('agen_create_rekening');
+    Route::post('/agen/store/rekening', 'MerchantsController@store_rekening')->name('agen_store_rekening');
+    Route::post('/agen/{id}/activate', 'MerchantsController@activateagen')->name('agen_activate');
+    Route::post('/agen/{id}/deactivate', 'MerchantsController@deactivateagen')->name('agen_deactivate');
+    Route::get('/agen/request', 'MerchantsController@request_list')->name('agen_request');
+    Route::get('/agen/request/{id}', 'MerchantsController@detail_request')->name('agen_request_detail');
 
     Route::get('/message', 'MessageLogController@index')->name('message_log');
 
@@ -71,6 +71,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/transaction/feeExport', 'TransactionsController@exportCSVFeeOnly')->name('transactions.csvFeeOnly');
     Route::get('/transaction/reversal', 'TransactionsController@reversal');
     Route::get('/transaction/reversal/{additional_data}', 'TransactionsController@postReversal')->name('transaction_postReversal');
+    Route::get('/transaction/fee', 'TransactionsController@reportFee')->name('transaction_fee');
 
 
 
@@ -179,12 +180,25 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/fee', 'FeeController@index')->name('fee');
     Route::get('/fee/create', 'FeeController@create')->name('fee_create');
     Route::post('/fee/store', 'FeeController@store')->name('fee_store');
-    // Route::get('/fee/{id}/edit', 'FeeController@edit')->name('fee_edit');
-    // Route::post('/fee/{id}/update', 'FeeController@update')->name('fee_update');
-    // Route::post('/fee/{id}/destroy', 'FeeController@destroy')->name('fee_destroy');
-    Route::get('/fee/edit/{meta_id}/{service_id}/{seq}', 'FeeController@edit')->name('fee_edit');
+    Route::get('/edit/{meta_id}/{service_id}/{seq}', 'FeeController@edit')->name('fee_edit');
     Route::post('/fee/update/{meta_id}/{service_id}/{seq}', 'FeeController@update')->name('fee_update');    
     Route::post('fee/destroy/{meta_id}/{service_id}/{seq}', 'FeeController@edit')->name('fee_destroy');
+
+    Route::get('/persen_fee', 'PersenFeeController@index')->name('persen_fee');
+    Route::get('/persen_fee/create', 'PersenFeeController@create')->name('persen_fee_create');
+    Route::post('/persen_fee/store', 'PersenFeeController@store')->name('persen_fee_store');
+    Route::post('persen_fee/destroy/{id}', 'PersenFeeController@destroy')->name('persen_fee_destroy');
+    Route::get('/persen_fee/edit/{id}', 'PersenFeeController@edit')->name('persen_fee_edit');
+    Route::post('/persen_fee/update/{id}', 'PersenFeeController@update')->name('persen_fee_update');
+    //Route::post('/persen_fee/destroy/{meta_id}/{service_id}/{seq}', 'PersenFeeController@edit')->name('persen_fee_destroy');
+
+    Route::get('/nasabah', 'DataCalonNasabahController@index')->name('nasabah');
+    Route::get('/nasabah/list', 'DataCalonNasabahController@list')->name('nasabah_list');
+    Route::get('/nasabah/request', 'DataCalonNasabahController@list_request')->name('nasabah_request');
+    Route::post('/nasabah/cif/{id}', 'DataCalonNasabahController@store_cif')->name('nasabah_cif');
+    Route::post('/nasabah/reject/{id}', 'DataCalonNasabahController@rejectNasabah')->name('nasabah_reject');
+    Route::post('/nasabah/approve/{id}', 'DataCalonNasabahController@approveNasabah')->name('nasabah_approve');
+    Route::get('/nasabah/detail/{id}', 'DataCalonNasabahController@detailRequest')->name('nasabah_detail');
 
 
 

@@ -7,24 +7,24 @@
 @endsection
 @section('main-content')
             <div class="breadcrumb">
-                <h1>Merchant</h1>
+                <h1>Agen</h1>
                 <!-- <ul>
                     <li><a href="">Selada</a></li> -->
             </div>
             <div class="separator-breadcrumb border-top"></div>
             <div class="row mb-4">
-                <div class="col-lg-12 col-md-12 col-sm-12 d-flex justify-content-center mb-3">
+                <!-- <div class="col-lg-12 col-md-12 col-sm-12 d-flex justify-content-center mb-3">
                     <div class="input-group">
-                        <a href="{{route('merchant_inquiry_nik')}}">
+                        <a href="{{route('agen_inquiry_nik')}}">
                             <button class="btn btn-warning ripple m-1 add-new-btn" type="button">Add New</button>
                         </a>
                     </div>
-                </div>
+                </div> -->
                 <div class="col-md-12 mb-3">
                     <div class="card text-left">
                         <div class="card-body">
                             <div class="row">
-                                <h4 class=" col-sm-12 col-md-6 card-title mb-3">List Merchant </h4>
+                                <h4 class=" col-sm-12 col-md-6 card-title mb-3">List Agen </h4>
                             </div>
                             @if ($message = Session::get('success'))
                                 <div class="alert alert-success">
@@ -33,7 +33,7 @@
                             @endif
 
                             @if ($message = Session::get('failed'))
-                                <div class="alert alert-failed">
+                                <div class="alert alert-danger">
                                     <p>{{ $message }}</p>
                                 </div>
                             @endif
@@ -74,7 +74,7 @@
                                             <td>{{$item->active_at}}</td>
                                             <td>{{$item->resign_at}}</td>
                                             <td>
-                                                <a href="{{route('merchant_edit',[$item->id])}}">
+                                                <a href="{{route('agen_edit',[$item->id])}}">
                                                     <button class="btn btn-warning ripple btn-sm m-1 edit-btn" type="button"  @php if(session()->get('user')->role_id == 2) echo 'id="b1"'; @endphp>Edit</button>
                                                 </a>
                                             </td>

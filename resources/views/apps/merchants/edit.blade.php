@@ -12,7 +12,7 @@
     <div class="col-md-12">
         <div class="card mb-5">
             <div class="card-body">
-                <form action="{{ route('merchant_update', [$merchant->id]) }}" method="POST">
+                <form action="{{ route('agen_update', [$merchant->id]) }}" method="POST">
                     @csrf
                     @method('POST')
 
@@ -185,7 +185,7 @@
                     <script>
                         document.getElementById('activateMerchantBtn').addEventListener('click', function() {
                             if (confirm('Are you sure you want to activate this merchant?')) {
-                                fetch("{{ route('merchant_activate', [$merchant->id]) }}", {
+                                fetch("{{ route('agen_activate', [$merchant->id]) }}", {
                                         method: 'POST',
                                         headers: {
                                             'Content-Type': 'application/json',
@@ -210,7 +210,7 @@
 
                         document.getElementById('deactivateMerchantBtn').addEventListener('click', function() {
                             if (confirm('Are you sure you want to deactivate this merchant?')) {
-                                fetch("{{ route('merchant_deactivate', [$merchant->id]) }}", {
+                                fetch("{{ route('agen_deactivate', [$merchant->id]) }}", {
                                         method: 'POST',
                                         headers: {
                                             'Content-Type': 'application/json',
@@ -236,7 +236,7 @@
 
                     <div class="form-group row">
                         <div class="col-sm-12 text-right">
-                            <a href="{{route('merchant')}}">
+                            <a href="{{route('agen_list')}}">
                                 <button type="button" class="btn btn-primary">Back</button>
                             </a>
                             <button type="submit" class="btn btn-primary">Save</button>

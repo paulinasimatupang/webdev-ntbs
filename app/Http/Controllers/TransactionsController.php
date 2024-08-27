@@ -27,6 +27,7 @@ use App\Entities\PersenFee;
 use App\Entities\Service;
 use App\Entities\Transaction;
 use App\Entities\TransactionStatus;
+use App\Entities\TransactionFee;
 use App\Entities\transactionPaymentStatus;
 use App\Entities\Group;
 use App\Entities\UserGroup;
@@ -129,7 +130,8 @@ class TransactionsController extends Controller
         $data->orderBy($orderBy, $orderType);
 
         $totalAmount = $data->sum('amount');
-        $totalFee = $data->sum('fee');
+        $fee = TransactionFee::select('fee');
+        $totalFee = $fee->sum('fee');
 
         $feeSelada = DB::connection('pgsql_billiton')->table('persen_fee')->where('id', 1)->value('persentase') / 100;
         $feeNTBS = DB::connection('pgsql_billiton')->table('persen_fee')->where('id', 2)->value('persentase') / 100;
@@ -139,6 +141,9 @@ class TransactionsController extends Controller
             'total_trx' => $data->count(),
             'amount_trx' => $totalAmount,
             'total_fee' => $totalFee,
+            'total_fee_agent' => $totalFee * $feeAgent,
+            'total_fee_ntbs' => $totalFee * $feeNTBS,
+            'total_fee_selada' => $totalFee * $feeSelada,
             'total_fee_agent' => $totalFee * $feeAgent,
             'total_fee_ntbs' => $totalFee * $feeNTBS,
             'total_fee_selada' => $totalFee * $feeSelada,
@@ -522,5 +527,14 @@ class TransactionsController extends Controller
     {
         $rankedTransactions = $this->transactionService->rankTransactionsByMerchantUser();
         return view('apps.transactions.rank', compact('rankedTransactions'));
+    }
+
+    public function reportFee()
+    {
+        $totalFees = TransactionFee::select('penerima', DB::raw('SUM(fee) as total_fee'))
+            ->groupBy('penerima')
+            ->get();
+
+        return view('apps.transactions.list-fee', compact('totalFees'));
     }
 }

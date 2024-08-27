@@ -20,7 +20,7 @@
     <div class="col-md-12">
         <div class="card mb-5">
             <div class="card-body">
-                <form action="{{ route('merchant_activate', [$merchant->id]) }}" method="POST">
+                <form action="{{ route('agen_activate', [$merchant->id]) }}" method="POST">
                     @csrf
                     @method('POST')
 
@@ -182,7 +182,7 @@
                     </div>
                     <div class="form-group row">
                         <div class="col-sm-12 text-right">
-                            <a href="{{ route('merchant') }}">
+                            <a href="{{ route('agen_request') }}">
                                 <button type="button" class="btn btn-primary">Back</button>
                             </a>
                             <button type="submit" class="btn btn-primary">Activate</button>

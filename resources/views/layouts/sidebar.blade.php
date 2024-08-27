@@ -47,11 +47,19 @@ display: none;
                 </a>
                 <div class="triangle"></div>
             </li>
-            <li class="nav-item {{ (request()->is('merchant') || request()->is('merchant/*')) ? 'active' : '' }}">
-                <a class="nav-item-hold" href="{{route('merchant')}}">
+            <li class="nav-item {{ (request()->is('agen') || request()->is('agen/*')) ? 'active' : '' }}">
+                <a class="nav-item-hold" href="{{route('agen')}}">
                  
                     <img class="img_bintang_sidebar" src="{{asset('/assets/images/sidebar_icon/agent.png')}}" alt="">
-                    <span class="nav-text">Merchant</span>
+                    <span class="nav-text">Agen</span>
+                </a>
+                <div class="triangle"></div>
+            </li>
+            <li class="nav-item {{ (request()->is('nasabah') || request()->is('nasabah/*')) ? 'active' : '' }}">
+                <a class="nav-item-hold" href="{{route('nasabah')}}">
+                 
+                    <img class="img_bintang_sidebar" src="{{asset('/assets/images/sidebar_icon/nasabah.png')}}" alt="">
+                    <span class="nav-text">Nasabah</span>
                 </a>
                 <div class="triangle"></div>
             </li>

@@ -37,6 +37,5 @@ class ServiceMeta extends Model implements Transformable
     public function metaType()
     {
         return $this->belongsTo(MetaType::class, 'meta_type_id', 'meta_type_id');
-    }
-    
+    }   
 }

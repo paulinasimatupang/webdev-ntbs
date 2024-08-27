@@ -41,6 +41,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(\App\Repositories\TerminalRepository::class, \App\Repositories\TerminalRepositoryEloquent::class);
         $this->app->bind(\App\Repositories\TransactionBJBRepository::class, \App\Repositories\TransactionBJBRepositoryEloquent::class);
         $this->app->bind(\App\Repositories\TransactionSaleBJBRepository::class, \App\Repositories\TransactionSaleBJBRepositoryEloquent::class);
+        $this->app->bind(\App\Repositories\DataCalonNasabahRepository::class, \App\Repositories\DataCalonNasabahRepositoryEloquent::class);
         //:end-bindings:
     }
 
