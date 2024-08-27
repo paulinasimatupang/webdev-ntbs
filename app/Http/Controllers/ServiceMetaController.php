@@ -36,12 +36,12 @@ class ServiceMetaController extends Controller
         DB::beginTransaction();
         try {
             $validatedData = $request->validate([
-                'meta_id' => 'required|integer',
-                'service_id' => 'required|string',
-                'seq' => 'required|integer',
-                'meta_type_id' => 'required|string',
-                'meta_default' => 'nullable|string',
-                'influx' => 'nullable|string',
+                'meta_id' => 'required',
+                'service_id' => 'required',
+                'seq' => 'required',
+                'meta_type_id' => 'required',
+                'meta_default' => 'nullable',
+                'influx' => 'required',
             ]);
 
 
