@@ -53,7 +53,7 @@
                             @foreach($groups as $group)
                             <tr>
                                 <th scope="row">{{ $no }}</th>
-                                <td>{{ $group->service->service_name }}</td>
+                                <td>{{ str_replace(['Review', 'OTP'], '', $group->service->service_name) }}</td>
                                 <td>{{ $group->meta_default }}</td>
                                 <td>
                                     <a href="{{ route('fee_edit', ['meta_id' => $group->meta_id, 'service_id' => $group->service_id, 'seq' => $group->seq]) }}">

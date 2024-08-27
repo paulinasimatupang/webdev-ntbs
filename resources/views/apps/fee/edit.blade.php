@@ -15,7 +15,7 @@
 
                     <div class="form-group">
                         <label for="service_id">Fitur</label>
-                        <input type="text" class="form-control" id="service_id" name="service_id" value="{{ $group->service->service_name }}" readonly>
+                        <input type="text" class="form-control" id="service_id" name="service_id" value="{{ str_replace(['Review', 'OTP'], '', $group->service->service_name) }}" readonly>
                     </div>
 
                     <div class="form-group">
