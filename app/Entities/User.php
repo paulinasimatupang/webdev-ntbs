@@ -25,7 +25,14 @@ class User extends Authenticatable implements JWTSubject
      * @var array
      */
     protected $fillable = [
-        'id', 'role_id', 'username', 'email', 'fullname', 'password', 'status', 'is_user_mireta'
+        'id', 
+        'role_id', //di db yg aku bikin pakenya roles 
+        'username', 
+        'email', 
+        'fullname', 
+        'password', 
+        'status', 
+        'is_user_mireta'
     ];
 
     protected $casts = [

@@ -183,7 +183,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/fee/create', 'FeeController@create')->name('fee_create');
     Route::post('/fee/store', 'FeeController@store')->name('fee_store');
     Route::get('/edit/{meta_id}/{service_id}/{seq}', 'FeeController@edit')->name('fee_edit');
-    Route::post('/fee/update/{meta_id}/{service_id}/{seq}', 'FeeController@update')->name('fee_update');    
+    Route::post('/fee/update/{meta_id}/{service_id}/{seq}', 'FeeController@update')->name('fee_update');
     Route::post('fee/destroy/{meta_id}/{service_id}/{seq}', 'FeeController@edit')->name('fee_destroy');
 
     Route::get('/persen_fee', 'PersenFeeController@index')->name('persen_fee');
@@ -202,8 +202,6 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/nasabah/approve/{id}', 'DataCalonNasabahController@approveNasabah')->name('nasabah_approve');
     Route::get('/nasabah/detail/{id}', 'DataCalonNasabahController@detailRequest')->name('nasabah_detail');
 
-
-
     Route::get('/persen_fee', 'PersenFeeController@index')->name('persen_fee');
     Route::get('/persen_fee/create', 'PersenFeeController@create')->name('persen_fee_create');
     Route::post('/persen_fee/store', 'PersenFeeController@store')->name('persen_fee_store');
@@ -212,8 +210,30 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/persen_fee/update/{id}', 'PersenFeeController@update')->name('persen_fee_update');
     //Route::post('/persen_fee/destroy/{meta_id}/{service_id}/{seq}', 'PersenFeeController@edit')->name('persen_fee_destroy');
 
-
     // Route::get('/ranking_lakupandai', 'RankingLakuPandaiController@index')->name('ranking_lakupandai');
+
+    Route::get('/permissions', 'PermissionController@index')->name('permissions.index');
+    Route::get('/permissions/create', 'PermissionController@create')->name('permissions.create');
+    Route::post('/permissions', 'PermissionController@store')->name('permissions.store');
+    Route::get('/permissions/{permission}/edit', 'PermissionController@edit')->name('permissions.edit');
+    Route::post('/permissions/{permission}', 'PermissionController@update')->name('permissions.update');
+    Route::post('/permissions/{permission}/delete', 'PermissionController@destroy')->name('permissions.destroy');
+
+    Route::get('/roles', 'RoleController@index')->name('roles.index');
+    Route::get('/roles/create', 'RoleController@create')->name('roles.create');
+    Route::post('/roles', 'RoleController@store')->name('roles.store');
+    Route::get('/roles/{role}/edit', 'RoleController@edit')->name('roles.edit');
+    Route::post('/roles/{role}', 'RoleController@update')->name('roles.update');
+    Route::post('/roles/{roleId}/delete', 'RoleController@destroy')->name('roles.destroy');
+    Route::get('/roles/{roleId}/give-permissions', 'RoleController@addPermissionToRole')->name('roles.addPermissionToRole');
+    Route::post('/roles/{roleId}/give-permissions', 'RoleController@givePermissionToRole')->name('roles.addPermissionToRole');
+
+    Route::get('/users', 'UserController@index')->name('users.index');
+    Route::get('/users/create', 'UserController@create')->name('users.create');
+    Route::post('/users', 'UserController@store')->name('users.store');
+    Route::get('/users/{user}/edit', 'UserController@edit')->name('users.edit');
+    Route::post('/users/{user}', 'UserController@update')->name('users.update');
+    Route::post('/users/{user}/delete', 'UserController@destroy')->name('users.destroy');
     
 
     // Route::view('/', 'starter')->name('starter');
