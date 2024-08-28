@@ -2,9 +2,9 @@
 @section('main-content')
 <div class="breadcrumb">
     <h1>Edit Merchant</h1>
-    <ul>
+    <!-- <ul>
         <li><a href="">Selada</a></li>
-    </ul>
+    </ul> -->
 </div>
 <div class="separator-breadcrumb border-top"></div>
 

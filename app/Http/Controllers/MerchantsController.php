@@ -466,6 +466,7 @@ class MerchantsController extends Controller
                 $reqData['file_ktp'] = $filePaths['file_ktp'];
                 $reqData['file_kk'] = $filePaths['file_kk'];
                 $reqData['file_npwp'] = $filePaths['file_npwp'];
+                $reqData['active_at'] =now();
 
                 $data   = $this->repository->create($reqData);
 

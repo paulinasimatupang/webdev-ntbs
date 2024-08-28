@@ -54,7 +54,7 @@
                                             <td>{{$item->nama_lengkap}}</td>
                                             <td>{{$item->alamat}}</td>
                                             <td>{{$item->no_hp}}</td>
-                                            <td>{{$item->request_time}}</td>
+                                            <td>{{ \Carbon\Carbon::parse($item->request_time)->format('Y-m-d H:i:s') }}</td>
                                             <td>
                                                 <form action="{{ route('nasabah_detail', [$item->id]) }}" style="display: inline;">
                                                     <button class="btn btn-primary ripple btn-sm m-1 primary-btn" type="submit">Detail</button>

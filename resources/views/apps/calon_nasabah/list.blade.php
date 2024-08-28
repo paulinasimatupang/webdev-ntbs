@@ -7,7 +7,7 @@
 @endsection
 @section('main-content')
             <div class="breadcrumb">
-                <h1>Nasabah</h1>
+                <h1>List Nasabah</h1>
                 <!-- <ul>
                     <li><a href="">Selada</a></li> -->
             </div>
@@ -56,8 +56,8 @@
                                             <td>{{$item->nama_lengkap}}</td>
                                             <td>{{$item->alamat}}</td>
                                             <td>{{$item->no_hp}}</td>
-                                            <td>{{$item->request_time}}</td>
-                                            <td>{{$item->reply_time}}</td>
+                                            <td>{{ \Carbon\Carbon::parse($item->request_time)->format('Y-m-d H:i:s') }}</td>
+                                            <td>{{ \Carbon\Carbon::parse($item->reply_time)->format('Y-m-d H:i:s') }}</td>
                                             <td>{{$item->status_text}}</td>
                                             <td>
                                                 <a href="{{route('nasabah_detail',[$item->id])}}">
