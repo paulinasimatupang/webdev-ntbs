@@ -219,12 +219,12 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/permissions/{permission}', 'PermissionController@update')->name('permissions.update');
     Route::post('/permissions/{permission}/delete', 'PermissionController@destroy')->name('permissions.destroy');
 
-    Route::get('/roles', 'RoleController@index')->name('roles.index');
-    Route::get('/roles/create', 'RoleController@create')->name('roles.create');
+    Route::get('/roles', 'RoleController@index')->name('roles.list');
+    Route::get('/roles/create', 'RoleController@create')->name('roles.add');
     Route::post('/roles', 'RoleController@store')->name('roles.store');
     Route::get('/roles/{role}/edit', 'RoleController@edit')->name('roles.edit');
     Route::post('/roles/{role}', 'RoleController@update')->name('roles.update');
-    Route::post('/roles/{roleId}/delete', 'RoleController@destroy')->name('roles.destroy');
+    Route::post('/roles/{roleId}/destroy', 'RoleController@destroy')->name('roles.destroy');
     Route::get('/roles/{roleId}/give-permissions', 'RoleController@addPermissionToRole')->name('roles.addPermissionToRole');
     Route::post('/roles/{roleId}/give-permissions', 'RoleController@givePermissionToRole')->name('roles.addPermissionToRole');
 

@@ -50,7 +50,7 @@
                                             <a href="{{ url('roles/'.$role->id.'/edit') }}">
                                                 <button class="btn btn-success btn-sm m-1 edit-btn" type="button">Edit Role</button>
                                             </a>
-                                            <a href="{{ url('roles/'.$role->id.'/delete') }}" class="btn btn-danger btn-sm m-1 delete-btn" type="button">Delete</a>
+                                            <a href="{{ url('roles/'.$role->id.'/destroy') }}" class="btn btn-danger btn-sm m-1 delete-btn" type="button">Delete</a>
                                         </td>
                                     </tr>
                                 @endforeach

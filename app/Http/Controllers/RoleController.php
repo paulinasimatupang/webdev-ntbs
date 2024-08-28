@@ -20,12 +20,12 @@ class RoleController extends Controller
     public function index()
     {
         $roles = Role::get();
-        return view('apps.role.index', ['roles' => $roles]);
+        return view('apps.role.list', ['roles' => $roles]);
     }
 
     public function create()
     {
-        return view('apps.role.create');
+        return view('apps.role.add');
     }
 
     public function store(Request $request)
