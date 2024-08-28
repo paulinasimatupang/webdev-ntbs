@@ -488,7 +488,7 @@ class MerchantsController extends Controller
                 $pesan .= '<p>Password: ' . $password . '</p>';
 
                 $detail_message = [
-                    'sender' => 'auliaziizah@gmail.com',
+                    'sender' => 'administrator@selada.id',
                     'subject' => 'Akun Agen NTBS',
                     'isi' => $pesan
                 ];
