@@ -48,7 +48,7 @@ display: none;
                 <div class="triangle"></div>
             </li>
             <li class="nav-item {{ (request()->is('agen') || request()->is('agen/*')) ? 'active' : '' }}">
-                <a class="nav-item-hold" href="{{route('agen')}}">
+                <a class="nav-item-hold" href="{{route('agen_list')}}">
                  
                     <img class="img_bintang_sidebar" src="{{asset('/assets/images/sidebar_icon/agent.png')}}" alt="">
                     <span class="nav-text">Agen</span>

@@ -127,11 +127,22 @@
                         <label class="col-sm-2 col-form-label">Kabupaten/Kota</label>
                         <div class="col-sm-10">
                             <p class="form-control-static">
+                                @php
+                                    $labelFound = false;
+                                @endphp
+                                
                                 @foreach($kab_kota as $option)
                                     @if($nasabah->kab_kota == $option->seq)
                                         {{ $option->opt_label }}
+                                        @php
+                                            $labelFound = true;
+                                        @endphp
                                     @endif
                                 @endforeach
+
+                                @if(!$labelFound)
+                                    {{ $nasabah->kab_kota }}
+                                @endif
                             </p>
                         </div>
                     </div>
@@ -219,7 +230,13 @@
                     <div class="form-group row">
                         <label class="col-sm-2 col-form-label">Golongan Darah</label>
                         <div class="col-sm-10">
-                            <p class="form-control-static">{{ $nasabah->golongan_darah }}</p>
+                            <p class="form-control-static">
+                                @foreach($golongan_darah as $option)
+                                    @if($nasabah->golongan_darah == $option->seq)
+                                        {{ $option->opt_label }}
+                                    @endif
+                                @endforeach
+                            </p>
                         </div>
                     </div>
 

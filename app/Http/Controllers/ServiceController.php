@@ -3,8 +3,14 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use DB;
+use Redirect;
+use Prettus\Validator\Contracts\ValidatorInterface;
+use Prettus\Validator\Exceptions\ValidatorException;
 use App\Http\Controllers\Controller;
-use App\Entities\Service; 
+use App\Entities\Service;
+use App\Entities\ServiceMeta;
+
 
 class ServiceController extends Controller
 {
@@ -60,20 +66,21 @@ class ServiceController extends Controller
             $validatedData = $request->validate([
                 'service_id' => 'required|string|max:7',
                 'service_name' => 'required|string|max:50',
-                'screen_response' => 'nullable|string|max:7',
-                'param1' => 'nullable|string|max:32',
+                'screen_response' => 'nullable|string|max:7', // Ubah dari screen_response ke screen_respon
+                'param1' => 'nullable|string|max:32', // Ubah dari param1 ke param_1 jika kolomnya sesuai
             ]);
             $service = new Service();
             $service->service_id = $validatedData['service_id'];
             $service->service_name = $validatedData['service_name'];
-            $service->screen_response = $validatedData['screen_response'];
-            $service->param1 = $validatedData['param1'];
+            $service->screen_response = $validatedData['screen_response']; // Ubah dari screen_response ke screen_respon
+            $service->param1 = $validatedData['param1']; // Ubah dari param1 ke param_1 jika kolomnya sesuai
             $service->save();
             return Redirect::to('service')->with('success', 'Data berhasil disimpan.');
         } catch (\Exception $e) {
             return Redirect::to('service/create')->with('error', 'Terjadi kesalahan saat menyimpan data: ' . $e->getMessage())->withInput();
         }
     }
+
 
     public function edit($id)
     {

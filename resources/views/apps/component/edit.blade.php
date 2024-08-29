@@ -24,8 +24,6 @@
                 <div class="card-body">
                     <form action="{{ route('component_update', [$component->comp_id]) }}" method="POST">
                         @csrf
-                        @method('POST')
-
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label">Component ID</label>
                             <div class="col-sm-10">

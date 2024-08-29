@@ -3,9 +3,9 @@
 @section('main-content')
     <div class="breadcrumb">
         <h1>Add Agen</h1>
-        <ul>
+        <!-- <ul>
             <li><a href="#">Selada</a></li>
-        </ul>
+        </ul> -->
     </div>
     <div class="separator-breadcrumb border-top"></div>
 
@@ -22,6 +22,12 @@
                     <form action="{{ route('agen_store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="form-group row">
+                            <label class="col-sm-2 col-form-label">Kode Agen</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="mid" name="mid" value="{{ old('mid', session('mid', null)) }}" placeholder="Kode Agen" required>
+                            </div>
+                        </div>
+                        <div class="form-group row">
                             <label class="col-sm-2 col-form-label">Nama Lengkap</label>
                             <div class="col-sm-10">
                                 <input type="text" class="form-control" id="fullname" name="fullname" value="{{ old('fullname', session('fullname', null)) }}" placeholder="Nama Lengkap" required>
@@ -31,12 +37,6 @@
                             <label class="col-sm-2 col-form-label">Username</label>
                             <div class="col-sm-10">
                                 <input type="text" class="form-control" value="{{ old('username') }}" name="username" placeholder="Username" required>
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <label class="col-sm-2 col-form-label">Password</label>
-                            <div class="col-sm-10">
-                                <input type="text" class="form-control" value="{{ old('password') }}" name="password" placeholder="Password" required>
                             </div>
                         </div>
                         <div class="form-group row">

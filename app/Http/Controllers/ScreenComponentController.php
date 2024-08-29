@@ -102,18 +102,26 @@ class ScreenComponentController extends Controller
                 'comp_id' => 'required|string|max:10',
                 'sequence' => 'required|integer',
             ]);
+            $screenComponent = ScreenComponent::where('screen_id', $validatedData['screen_id'])
+                ->where('comp_id', $validatedData['comp_id'])
+                ->first();
 
-            $screenComponent = ScreenComponent::findOrFail($id);
-            $screenComponent->screen_id = $validatedData['screen_id'];
-            $screenComponent->comp_id = $validatedData['comp_id'];
-            $screenComponent->sequence = $validatedData['sequence'];
-            $screenComponent->save();
-
-            return redirect()->route('screen_component')->with('success', 'Data berhasil diperbarui.');
+            if ($screenComponent) {
+                $screenComponent->sequence = $validatedData['sequence'];
+                $screenComponent->save();
+                
+                return redirect()->route('screen_component')->with('success', 'Data berhasil diperbarui.');
+            } else {
+                return redirect()->route('screen_component_edit', $id)
+                    ->with('error', 'Data tidak ditemukan.')
+                    ->withInput();
+            }
         } catch (\Exception $e) {
-            return redirect()->route('screen_component_edit', $id)->with('error', 'Terjadi kesalahan saat memperbarui data: ' . $e->getMessage())->withInput();
+            return redirect()->route('screen_component_edit', $id)
+                ->with('error', 'Terjadi kesalahan saat memperbarui data: ' . $e->getMessage())
+                ->withInput();
         }
-    }
+    }    
 
     public function destroy($id)
     {

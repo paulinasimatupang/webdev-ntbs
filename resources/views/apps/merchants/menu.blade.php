@@ -36,7 +36,7 @@
     <div class="separator-breadcrumb border-top"></div>
     <div class="row mb-4">
         <div class="col-lg-4 col-md-4 col-sm-4">
-            <a href="/agen/create/inquiry" class="card-link">
+            <a href="/agen/create/inquiry/rek" class="card-link">
                 <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-2">
                     <div class="card-body text-center">
                         <div class="d-flex align-items-center">

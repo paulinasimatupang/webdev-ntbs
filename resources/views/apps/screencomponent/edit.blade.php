@@ -24,7 +24,6 @@
                 <div class="card-body">
                     <form action="{{ route('screen_component_update', [$screenComponent->screen_id]) }}" method="POST">
                         @csrf
-                        @method('POST')
 
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label">Screen ID</label>

@@ -99,7 +99,8 @@
                                 <div class="row">
                                     <div class="col-lg-12 text-center">
                                         <button type="submit" class="btn  btn-success m-1">Save</button>
-                                        <a href='https://report.selada.id/transaction' type="button" class="btn btn-outline-secondary m-1">Clear</a>
+                                        <a href="{{ route('transaction') }}" type="button" class="btn btn-outline-secondary m-1">Clear</a>
+                                        
 
 
 
@@ -187,24 +188,16 @@
                             </a>
                             '
                             @endphp
-                            <a id="export-fee-to-excel"
-                                style="" href='#'
-                                type="button" class="btn btn-outline-secondary">
+                            <a id="export-fee-to-excel" href="{{ route('transactions.csvFeeOnly') }}" class="btn btn-outline-secondary">
                                 Export Fee Agen to Excel
                             </a>
-                            <a id="export-to-csv"
-                                style="" href='#'
-                                type="button" class="btn btn-outline-secondary">
-                                Export to CSV
-                            </a>
-                            <a id="export-to-excel"
-                                style="" href='#'
-                                type="button" class="btn btn-outline-secondary">
+                            <a id="export-fee-to-excel" class="btn btn-outline-secondary" href="{{ route('transactions.csv') }}">
                                 Export to Excel
                             </a>
-                            <a id="sale-export-to-excel"
-                                style="" href='#'
-                                type="button" class="btn btn-outline-secondary">
+                            <a id="export-fee-to-pdf" class="btn btn-outline-secondary" href="{{ route('transactions.pdf') }}">
+                                Export to PDF
+                            </a>
+                            <a id="export-payment-to-excel" href="{{ route('transactions.csvPaymentOnly') }}" class="btn btn-outline-secondary">
                                 Export to Excel (Payment Only)
                             </a>
                             <a id="export-to-pdf"

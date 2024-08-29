@@ -31,7 +31,7 @@ class Component extends Model implements Transformable
         'disabled',
         'min_length',
         'max_length',
-        'comp_lbl_en'
+        'comp_lbl_en',
     ];
 
     public function componentType()

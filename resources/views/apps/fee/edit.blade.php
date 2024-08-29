@@ -14,27 +14,12 @@
                     @method('POST')
 
                     <div class="form-group">
-                        <label for="service_id">Service ID</label>
-                        <input type="text" class="form-control" id="service_id" name="service_id" value="{{ $group->service_id }}" readonly>
+                        <label for="service_id">Fitur</label>
+                        <input type="text" class="form-control" id="service_id" name="service_id" value="{{ str_replace(['Review', 'OTP'], '', $group->service->service_name) }}" readonly>
                     </div>
 
                     <div class="form-group">
-                        <label for="meta_id">Meta ID</label>
-                        <input type="text" class="form-control" id="meta_id" name="meta_id" value="{{ $group->meta_id }}" readonly>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="influx">Influx</label>
-                        <input type="text" class="form-control" id="influx" name="influx" value="{{ old('influx', $group->influx) }}" readonly>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="seq">Sequence</label>
-                        <input type="text" class="form-control" id="seq" name="seq" value="{{ $group->seq }}" readonly>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="meta_default">Meta Default</label>
+                        <label for="meta_default">Nominal</label>
                         <input type="text" class="form-control" id="meta_default" name="meta_default" value="{{ old('meta_default', $group->meta_default) }}">
                     </div>
 

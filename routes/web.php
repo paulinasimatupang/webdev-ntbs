@@ -49,6 +49,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/agen/{id}/update', 'MerchantsController@update')->name('agen_update');
     Route::get('/agen/create/inquiry', 'MerchantsController@inquiry_nik')->name('agen_inquiry_nik');
     Route::post('/agen/store/inquiry', 'MerchantsController@store_inquiry_nik')->name('agen_store_inquiry_nik');
+    Route::get('/agen/create/inquiry/rek', 'MerchantsController@inquiry_rek')->name('agen_inquiry_rek');
+    Route::post('/agen/store/inquiry/rek', 'MerchantsController@store_inquiry_rek')->name('agen_store_inquiry_rek');
     Route::get('/agen/create/cif', 'MerchantsController@create_cif')->name('agen_create_cif');
     Route::post('/agen/store/cif', 'MerchantsController@store_cif')->name('agen_store_cif');
     Route::get('/agen/create/rekening', 'MerchantsController@create_rekening')->name('agen_create_rekening');
@@ -65,10 +67,10 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/transaction/{id}/edit', 'TransactionsController@edit')->name('transaction_edit');
     Route::post('/transaction/{id}/update', 'TransactionsController@update')->name('transaction_update');
     Route::get('/transaction/export', 'TransactionsController@export');
-    Route::get('/transaction/exportPDF', 'TransactionsController@exportPDF');
-    Route::get('/transaction/exportCSV', 'TransactionsController@exportCSV');
-    Route::get('/transaction/saleExport', 'TransactionsController@saleExport');
-    Route::get('/transaction/feeExport', 'TransactionsController@feeExport');
+    Route::get('/transaction.pdf', 'TransactionsController@exportPDF')->name('transactions.pdf');
+    Route::get('/transactions.csv', 'TransactionsController@exportCSV')->name('transactions.csv');
+    Route::get('/transaction/saleExport', 'TransactionsController@exportCSVPaymentOnly')->name('transactions.csvPaymentOnly');
+    Route::get('/transaction/feeExport', 'TransactionsController@exportCSVFeeOnly')->name('transactions.csvFeeOnly');
     Route::get('/transaction/reversal', 'TransactionsController@reversal');
     Route::get('/transaction/reversal/{additional_data}', 'TransactionsController@postReversal')->name('transaction_postReversal');
     Route::get('/transaction/fee', 'TransactionsController@reportFee')->name('transaction_fee');
@@ -181,7 +183,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/fee/create', 'FeeController@create')->name('fee_create');
     Route::post('/fee/store', 'FeeController@store')->name('fee_store');
     Route::get('/edit/{meta_id}/{service_id}/{seq}', 'FeeController@edit')->name('fee_edit');
-    Route::post('/fee/update/{meta_id}/{service_id}/{seq}', 'FeeController@update')->name('fee_update');    
+    Route::post('/fee/update/{meta_id}/{service_id}/{seq}', 'FeeController@update')->name('fee_update');
     Route::post('fee/destroy/{meta_id}/{service_id}/{seq}', 'FeeController@edit')->name('fee_destroy');
 
     Route::get('/persen_fee', 'PersenFeeController@index')->name('persen_fee');
@@ -200,8 +202,39 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/nasabah/approve/{id}', 'DataCalonNasabahController@approveNasabah')->name('nasabah_approve');
     Route::get('/nasabah/detail/{id}', 'DataCalonNasabahController@detailRequest')->name('nasabah_detail');
 
+    Route::get('/persen_fee', 'PersenFeeController@index')->name('persen_fee');
+    Route::get('/persen_fee/create', 'PersenFeeController@create')->name('persen_fee_create');
+    Route::post('/persen_fee/store', 'PersenFeeController@store')->name('persen_fee_store');
+    Route::post('persen_fee/destroy/{id}', 'PersenFeeController@destroy')->name('persen_fee_destroy');
+    Route::get('/persen_fee/edit/{id}', 'PersenFeeController@edit')->name('persen_fee_edit');
+    Route::post('/persen_fee/update/{id}', 'PersenFeeController@update')->name('persen_fee_update');
+    //Route::post('/persen_fee/destroy/{meta_id}/{service_id}/{seq}', 'PersenFeeController@edit')->name('persen_fee_destroy');
 
     // Route::get('/ranking_lakupandai', 'RankingLakuPandaiController@index')->name('ranking_lakupandai');
+
+    Route::get('/permissions', 'PermissionController@index')->name('permissions.index');
+    Route::get('/permissions/create', 'PermissionController@create')->name('permissions.create');
+    Route::post('/permissions', 'PermissionController@store')->name('permissions.store');
+    Route::get('/permissions/{permission}/edit', 'PermissionController@edit')->name('permissions.edit');
+    Route::post('/permissions/{permission}', 'PermissionController@update')->name('permissions.update');
+    Route::post('/permissions/{permission}/delete', 'PermissionController@destroy')->name('permissions.destroy');
+
+    Route::get('/roles', 'RoleController@index')->name('roles.list');
+    Route::get('/roles/create', 'RoleController@create')->name('roles.add');
+    Route::post('/roles', 'RoleController@store')->name('roles.store');
+    Route::get('/roles/{role}/edit', 'RoleController@edit')->name('roles.edit');
+    Route::post('/roles/{role}', 'RoleController@update')->name('roles.update');
+    Route::post('/roles/{roleId}/destroy', 'RoleController@destroy')->name('roles.destroy');
+    Route::get('/roles/{roleId}/give-permissions', 'RoleController@addPermissionToRole')->name('roles.addPermissionToRole');
+    Route::post('/roles/{roleId}/give-permissions', 'RoleController@givePermissionToRole')->name('roles.addPermissionToRole');
+
+    Route::get('/users', 'UserController@index')->name('users.index');
+    Route::get('/users/create', 'UserController@create')->name('users.create');
+    Route::post('/users', 'UserController@store')->name('users.store');
+    Route::get('/users/{user}/edit', 'UserController@edit')->name('users.edit');
+    Route::post('/users/{user}', 'UserController@update')->name('users.update');
+    Route::post('/users/{user}/delete', 'UserController@destroy')->name('users.destroy');
+    
 
     // Route::view('/', 'starter')->name('starter');
     Route::get('large-compact-sidebar/dashboard/dashboard1', function () {
