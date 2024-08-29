@@ -184,6 +184,7 @@ return [
         App\Providers\RouteServiceProvider::class,
         // App\Providers\RepositoriesServiceProvider::class,
         Maatwebsite\Excel\ExcelServiceProvider::class,
+        Spatie\Permission\PermissionServiceProvider::class,
 
     ],
 
@@ -239,7 +240,7 @@ return [
         'View' => Illuminate\Support\Facades\View::class,
         'Curl' => Ixudra\Curl\Facades\Curl::class,
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
-
+        'Permission' => Spatie\Permission\Facades\Permission::class,
     ],
 
 ];

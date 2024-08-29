@@ -2,43 +2,43 @@
 
 namespace App\Entities;
 
+use Auth;
+use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Notifications\Notifiable;
+// use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Webpatser\Uuid\Uuid;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Tymon\JWTAuth\Contracts\JWTSubject;
-use Webpatser\Uuid\Uuid;
 use DateTimeZone;
 use DateTime;
 
-use Auth;
-
-class User extends Authenticatable implements JWTSubject
+class User extends Authenticatable 
 {
-    use Notifiable;
-    // use SoftDeletes;
+    use Notifiable, HasRoles, SoftDeletes;
+
+    // HasApiTokens,
 
     public $incrementing = false;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
     protected $fillable = [
-        'id', 'role_id', 'username', 'email', 'fullname', 'password', 'status', 'is_user_mireta'
+        'id', 
+        'roles', 
+        'name', 
+        'email', 
+        // 'fullname', 
+        'password', 
+        // 'status'
     ];
 
     protected $casts = [
         'id' => 'string'
     ];
 
-    /**
-     * The attributes that should be hidden for arrays.
-     *
-     * @var array
-     */
     protected $hidden = [
         'password',
+        'remember_token',
     ];
 
     public function user_group()

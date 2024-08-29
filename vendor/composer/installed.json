@@ -207,17 +207,17 @@
                 },
                 {
                         "name": "composer/semver",
-                        "version": "3.4.0",
-                        "version_normalized": "3.4.0.0",
+                        "version": "3.4.2",
+                        "version_normalized": "3.4.2.0",
                         "source": {
                                 "type": "git",
                                 "url": "https://github.com/composer/semver.git",
-                                "reference": "35e8d0af4486141bc745f23a29cc2091eb624a32"
+                                "reference": "c51258e759afdb17f1fd1fe83bc12baaef6309d6"
                         },
                         "dist": {
                                 "type": "zip",
-                                "url": "https://api.github.com/repos/composer/semver/zipball/35e8d0af4486141bc745f23a29cc2091eb624a32",
-                                "reference": "35e8d0af4486141bc745f23a29cc2091eb624a32",
+                                "url": "https://api.github.com/repos/composer/semver/zipball/c51258e759afdb17f1fd1fe83bc12baaef6309d6",
+                                "reference": "c51258e759afdb17f1fd1fe83bc12baaef6309d6",
                                 "shasum": ""
                         },
                         "require": {
@@ -227,7 +227,7 @@
                                 "phpstan/phpstan": "^1.4",
                                 "symfony/phpunit-bridge": "^4.2 || ^5"
                         },
-                        "time": "2023-08-31T09:50:34+00:00",
+                        "time": "2024-07-12T11:35:52+00:00",
                         "type": "library",
                         "extra": {
                                 "branch-alias": {
@@ -271,7 +271,7 @@
                         "support": {
                                 "irc": "ircs://irc.libera.chat:6697/composer",
                                 "issues": "https://github.com/composer/semver/issues",
-                                "source": "https://github.com/composer/semver/tree/3.4.0"
+                                "source": "https://github.com/composer/semver/tree/3.4.2"
                         },
                         "funding": [
                                 {
@@ -1658,17 +1658,17 @@
                 },
                 {
                         "name": "maatwebsite/excel",
-                        "version": "3.1.55",
-                        "version_normalized": "3.1.55.0",
+                        "version": "3.1.56",
+                        "version_normalized": "3.1.56.0",
                         "source": {
                                 "type": "git",
                                 "url": "https://github.com/SpartnerNL/Laravel-Excel.git",
-                                "reference": "6d9d791dcdb01a9b6fd6f48d46f0d5fff86e6260"
+                                "reference": "0381d0225b42c3f328d90f0dd05ca071fca3953f"
                         },
                         "dist": {
                                 "type": "zip",
-                                "url": "https://api.github.com/repos/SpartnerNL/Laravel-Excel/zipball/6d9d791dcdb01a9b6fd6f48d46f0d5fff86e6260",
-                                "reference": "6d9d791dcdb01a9b6fd6f48d46f0d5fff86e6260",
+                                "url": "https://api.github.com/repos/SpartnerNL/Laravel-Excel/zipball/0381d0225b42c3f328d90f0dd05ca071fca3953f",
+                                "reference": "0381d0225b42c3f328d90f0dd05ca071fca3953f",
                                 "shasum": ""
                         },
                         "require": {
@@ -1684,7 +1684,7 @@
                                 "orchestra/testbench": "^6.0||^7.0||^8.0||^9.0",
                                 "predis/predis": "^1.1"
                         },
-                        "time": "2024-02-20T08:27:10+00:00",
+                        "time": "2024-08-19T09:40:43+00:00",
                         "type": "library",
                         "extra": {
                                 "laravel": {
@@ -1726,7 +1726,7 @@
                         ],
                         "support": {
                                 "issues": "https://github.com/SpartnerNL/Laravel-Excel/issues",
-                                "source": "https://github.com/SpartnerNL/Laravel-Excel/tree/3.1.55"
+                                "source": "https://github.com/SpartnerNL/Laravel-Excel/tree/3.1.56"
                         },
                         "funding": [
                                 {
@@ -3239,17 +3239,17 @@
                 },
                 {
                         "name": "phpoption/phpoption",
-                        "version": "1.9.2",
-                        "version_normalized": "1.9.2.0",
+                        "version": "1.9.3",
+                        "version_normalized": "1.9.3.0",
                         "source": {
                                 "type": "git",
                                 "url": "https://github.com/schmittjoh/php-option.git",
-                                "reference": "80735db690fe4fc5c76dfa7f9b770634285fa820"
+                                "reference": "e3fac8b24f56113f7cb96af14958c0dd16330f54"
                         },
                         "dist": {
                                 "type": "zip",
-                                "url": "https://api.github.com/repos/schmittjoh/php-option/zipball/80735db690fe4fc5c76dfa7f9b770634285fa820",
-                                "reference": "80735db690fe4fc5c76dfa7f9b770634285fa820",
+                                "url": "https://api.github.com/repos/schmittjoh/php-option/zipball/e3fac8b24f56113f7cb96af14958c0dd16330f54",
+                                "reference": "e3fac8b24f56113f7cb96af14958c0dd16330f54",
                                 "shasum": ""
                         },
                         "require": {
@@ -3257,14 +3257,14 @@
                         },
                         "require-dev": {
                                 "bamarni/composer-bin-plugin": "^1.8.2",
-                                "phpunit/phpunit": "^8.5.34 || ^9.6.13 || ^10.4.2"
+                                "phpunit/phpunit": "^8.5.39 || ^9.6.20 || ^10.5.28"
                         },
-                        "time": "2023-11-12T21:59:55+00:00",
+                        "time": "2024-07-20T21:41:07+00:00",
                         "type": "library",
                         "extra": {
                                 "bamarni-bin": {
                                         "bin-links": true,
-                                        "forward-command": true
+                                        "forward-command": false
                                 },
                                 "branch-alias": {
                                         "dev-master": "1.9-dev"
@@ -3301,7 +3301,7 @@
                         ],
                         "support": {
                                 "issues": "https://github.com/schmittjoh/php-option/issues",
-                                "source": "https://github.com/schmittjoh/php-option/tree/1.9.2"
+                                "source": "https://github.com/schmittjoh/php-option/tree/1.9.3"
                         },
                         "funding": [
                                 {
@@ -4458,17 +4458,17 @@
                 },
                 {
                         "name": "sabberworm/php-css-parser",
-                        "version": "v8.5.1",
-                        "version_normalized": "8.5.1.0",
+                        "version": "v8.6.0",
+                        "version_normalized": "8.6.0.0",
                         "source": {
                                 "type": "git",
                                 "url": "https://github.com/MyIntervals/PHP-CSS-Parser.git",
-                                "reference": "4a3d572b0f8b28bb6fd016ae8bbfc445facef152"
+                                "reference": "d2fb94a9641be84d79c7548c6d39bbebba6e9a70"
                         },
                         "dist": {
                                 "type": "zip",
-                                "url": "https://api.github.com/repos/MyIntervals/PHP-CSS-Parser/zipball/4a3d572b0f8b28bb6fd016ae8bbfc445facef152",
-                                "reference": "4a3d572b0f8b28bb6fd016ae8bbfc445facef152",
+                                "url": "https://api.github.com/repos/MyIntervals/PHP-CSS-Parser/zipball/d2fb94a9641be84d79c7548c6d39bbebba6e9a70",
+                                "reference": "d2fb94a9641be84d79c7548c6d39bbebba6e9a70",
                                 "shasum": ""
                         },
                         "require": {
@@ -4481,7 +4481,7 @@
                         "suggest": {
                                 "ext-mbstring": "for parsing UTF-8 CSS"
                         },
-                        "time": "2024-02-15T16:41:13+00:00",
+                        "time": "2024-07-01T07:33:21+00:00",
                         "type": "library",
                         "extra": {
                                 "branch-alias": {
@@ -4520,7 +4520,7 @@
                         ],
                         "support": {
                                 "issues": "https://github.com/MyIntervals/PHP-CSS-Parser/issues",
-                                "source": "https://github.com/MyIntervals/PHP-CSS-Parser/tree/v8.5.1"
+                                "source": "https://github.com/MyIntervals/PHP-CSS-Parser/tree/v8.6.0"
                         },
                         "install-path": "../sabberworm/php-css-parser"
                 },
@@ -5211,6 +5211,87 @@
                         "description": "Library that helps with managing the version number of Git-hosted PHP projects",
                         "homepage": "https://github.com/sebastianbergmann/version",
                         "install-path": "../sebastian/version"
+                },
+                {
+                        "name": "spatie/laravel-permission",
+                        "version": "3.18.0",
+                        "version_normalized": "3.18.0.0",
+                        "source": {
+                                "type": "git",
+                                "url": "https://github.com/spatie/laravel-permission.git",
+                                "reference": "1c51a5fa12131565fe3860705163e53d7a26258a"
+                        },
+                        "dist": {
+                                "type": "zip",
+                                "url": "https://api.github.com/repos/spatie/laravel-permission/zipball/1c51a5fa12131565fe3860705163e53d7a26258a",
+                                "reference": "1c51a5fa12131565fe3860705163e53d7a26258a",
+                                "shasum": ""
+                        },
+                        "require": {
+                                "illuminate/auth": "^5.8|^6.0|^7.0|^8.0",
+                                "illuminate/container": "^5.8|^6.0|^7.0|^8.0",
+                                "illuminate/contracts": "^5.8|^6.0|^7.0|^8.0",
+                                "illuminate/database": "^5.8|^6.0|^7.0|^8.0",
+                                "php": "^7.2.5|^8.0"
+                        },
+                        "require-dev": {
+                                "orchestra/testbench": "^3.8|^4.0|^5.0|^6.0",
+                                "phpunit/phpunit": "^8.0|^9.0",
+                                "predis/predis": "^1.1"
+                        },
+                        "time": "2020-11-09T14:08:36+00:00",
+                        "type": "library",
+                        "extra": {
+                                "laravel": {
+                                        "providers": [
+                                                "Spatie\\Permission\\PermissionServiceProvider"
+                                        ]
+                                }
+                        },
+                        "installation-source": "dist",
+                        "autoload": {
+                                "files": [
+                                        "src/helpers.php"
+                                ],
+                                "psr-4": {
+                                        "Spatie\\Permission\\": "src"
+                                }
+                        },
+                        "notification-url": "https://packagist.org/downloads/",
+                        "license": [
+                                "MIT"
+                        ],
+                        "authors": [
+                                {
+                                        "name": "Freek Van der Herten",
+                                        "email": "freek@spatie.be",
+                                        "homepage": "https://spatie.be",
+                                        "role": "Developer"
+                                }
+                        ],
+                        "description": "Permission handling for Laravel 5.8 and up",
+                        "homepage": "https://github.com/spatie/laravel-permission",
+                        "keywords": [
+                                "acl",
+                                "laravel",
+                                "permission",
+                                "permissions",
+                                "rbac",
+                                "roles",
+                                "security",
+                                "spatie"
+                        ],
+                        "support": {
+                                "issues": "https://github.com/spatie/laravel-permission/issues",
+                                "source": "https://github.com/spatie/laravel-permission/tree/3.18.0"
+                        },
+                        "funding": [
+                                {
+                                        "url": "https://github.com/spatie",
+                                        "type": "github"
+                                }
+                        ],
+                        "install-path": "../spatie/laravel-permission"
                 },
                 {
                         "name": "stechstudio/laravel-ssh-tunnel",
@@ -6221,17 +6302,17 @@
                 },
                 {
                         "name": "symfony/mime",
-                        "version": "v5.4.40",
-                        "version_normalized": "5.4.40.0",
+                        "version": "v5.4.41",
+                        "version_normalized": "5.4.41.0",
                         "source": {
                                 "type": "git",
                                 "url": "https://github.com/symfony/mime.git",
-                                "reference": "8c6dc1fb0b1f990aa15086abcde66dbde3a9bdad"
+                                "reference": "c71c7a1aeed60b22d05e738197e31daf2120bd42"
                         },
                         "dist": {
                                 "type": "zip",
-                                "url": "https://api.github.com/repos/symfony/mime/zipball/8c6dc1fb0b1f990aa15086abcde66dbde3a9bdad",
-                                "reference": "8c6dc1fb0b1f990aa15086abcde66dbde3a9bdad",
+                                "url": "https://api.github.com/repos/symfony/mime/zipball/c71c7a1aeed60b22d05e738197e31daf2120bd42",
+                                "reference": "c71c7a1aeed60b22d05e738197e31daf2120bd42",
                                 "shasum": ""
                         },
                         "require": {
@@ -6257,7 +6338,7 @@
                                 "symfony/property-info": "^4.4|^5.1|^6.0",
                                 "symfony/serializer": "^5.4.35|~6.3.12|^6.4.3"
                         },
-                        "time": "2024-05-31T14:33:22+00:00",
+                        "time": "2024-06-28T09:36:24+00:00",
                         "type": "library",
                         "installation-source": "dist",
                         "autoload": {
@@ -6289,7 +6370,7 @@
                                 "mime-type"
                         ],
                         "support": {
-                                "source": "https://github.com/symfony/mime/tree/v5.4.40"
+                                "source": "https://github.com/symfony/mime/tree/v5.4.41"
                         },
                         "funding": [
                                 {
