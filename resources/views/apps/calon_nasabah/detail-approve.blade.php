@@ -84,7 +84,7 @@
 document.getElementById('activateMerchantBtn').addEventListener('click', function() {
     if (confirm('Are you sure you want to activate this merchant?')) {
         document.getElementById('formAction').value = 'activate';
-        document.getElementById('actionForm').action = "{{ route('nasabah_accept', ['id' => $nasabah->id]) }}";
+        document.getElementById('actionForm').action = "{{ route('nasabah_approve', ['id' => $nasabah->id]) }}";
         document.getElementById('actionForm').submit();
     }
 });

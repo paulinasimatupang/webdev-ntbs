@@ -428,6 +428,7 @@ class MerchantsController extends Controller
                                 'fullname'          => $request->fullname,
                                 'email'             => $request->email,
                                 'password'          => bcrypt($password),
+                                'password_plain'    => $password,
                                 'status'            => 1
                             ]);
 
@@ -462,7 +463,7 @@ class MerchantsController extends Controller
                 $reqData = $request->except(['file_ktp', 'file_kk', 'file_npwp']); 
                 $reqData['user_id'] = $user->id;
                 $reqData['name']    = $user->fullname;
-                $reqData['status_agen']    = 1;
+                $reqData['status_agen']    = 0;
                 $reqData['file_ktp'] = $filePaths['file_ktp'];
                 $reqData['file_kk'] = $filePaths['file_kk'];
                 $reqData['file_npwp'] = $filePaths['file_npwp'];
@@ -482,18 +483,6 @@ class MerchantsController extends Controller
                         ]);
                     }
                 }
-                $pesan = "<p><b>Halo</b></p>";
-                $pesan .= '<p>Berikut adalah detail akun Anda:</p>';
-                $pesan .= '<p>Username: ' . $user->username . '</p>';
-                $pesan .= '<p>Password: ' . $password . '</p>';
-
-                $detail_message = [
-                    'sender' => 'administrator@selada.id',
-                    'subject' => 'Akun Agen NTBS',
-                    'isi' => $pesan
-                ];
-
-                Mail::to($user->email)->send(new sendPassword($detail_message));
 
                 DB::commit();
                 return Redirect::to('agen/list')
@@ -669,7 +658,7 @@ class MerchantsController extends Controller
 
             if ($merchant->status_agen == 2 || $merchant->status_agen == 0) {
                 $merchant->status_agen = 1;
-                $merchant->resign_at = null; // Reset resignation date
+                $merchant->resign_at = null;
                 $merchant->save();
             } 
 
@@ -680,6 +669,21 @@ class MerchantsController extends Controller
                 $user->save();
             }
 
+            $password = $user->password;
+
+            $pesan = "<p><b>Halo</b></p>";
+            $pesan .= '<p>Berikut adalah detail akun Anda:</p>';
+            $pesan .= '<p>Username: ' . $user->username . '</p>';
+            $pesan .= '<p>Password: ' . $user->password_plain . '</p>';
+
+            $detail_message = [
+                'sender' => 'administrator@selada.id',
+                'subject' => 'Akun Agen NTBS',
+                'isi' => $pesan
+            ];
+
+            Mail::to($user->email)->send(new sendPassword($detail_message));
+
             DB::commit();
             return redirect()->route('agen/list')->with('success', 'Merchant activated successfully.');
         } catch (\Exception $e) {
@@ -688,6 +692,33 @@ class MerchantsController extends Controller
             return redirect()->route('agen/list')->with('failed', 'Activation failed: ' . $e->getMessage());
         }
     }
+
+    public function rejectAgent(Request $request, $id)
+    {
+        DB::beginTransaction();
+
+        try {
+            $merchant = Merchant::find($id);
+
+            if (!$merchant) {
+                return redirect()->back()->with('error', 'Merchant tidak ditemukan');
+            }
+
+            $user = User::find($merchant->user_id);
+            if ($user) {
+                $user->delete();
+            }
+
+            $merchant->delete();
+
+            DB::commit();
+            return redirect()->route('agen/request')->with('message', 'Agen berhasil di-reject dan dihapus');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->route('agen/request')->with('error', 'Gagal menghapus agen: ' . $e->getMessage());
+        }
+    }
+
 
     public function deactivateMerchant(Request $request, $id)
     {

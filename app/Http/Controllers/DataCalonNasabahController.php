@@ -64,7 +64,7 @@ class DataCalonNasabahController extends Controller
         $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
 
         $data = DataCalonNasabah::select('*');
-        $data = $data->whereIn('status', [1, 2]);
+        $data = $data->whereIn('status', [2, 3, 4]);
 
         if($request->has('search')){
             $data = $data->whereRaw('lower(name) like (?)', ["%{$request->search}%"]);
@@ -148,6 +148,46 @@ class DataCalonNasabahController extends Controller
         $user = session()->get('user');
 
         return view('apps.calon_nasabah.list-request')
+            ->with('data', $data)
+            ->with('username', $user->username);
+    }
+
+    public function list_approve(Request $request)
+    {
+        $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
+
+        $data = DataCalonNasabah::select('*');
+        $data = $data->where('status', 1);
+
+        if($request->has('search')){
+            $data = $data->whereRaw('lower(name) like (?)', ["%{$request->search}%"]);
+        }
+
+        $total = $data->count();
+
+        if($request->has('order_type')){
+            if($request->get('order_type') == 'asc'){
+                if($request->has('order_by')){
+                    $data->orderBy($request->get('order_by'));
+                } else {
+                    $data->orderBy('request_time');
+                }
+            } else {
+                if($request->has('order_by')){
+                    $data->orderBy($request->get('order_by'), 'desc');
+                } else {
+                    $data->orderBy('request_time', 'desc');
+                }
+            }
+        } else {
+            $data->orderBy('request_time', 'desc');
+        }
+
+        $data = $data->get();
+
+        $user = session()->get('user');
+
+        return view('apps.calon_nasabah.list-approve')
             ->with('data', $data)
             ->with('username', $user->username);
     }
@@ -356,37 +396,37 @@ class DataCalonNasabahController extends Controller
             $nasabah = DataCalonNasabah::find($id);
 
             if (!$nasabah) {
-                return Redirect::to('/nasabah/request')
+                return Redirect::to('/nasabah/approve')
                             ->with('error', "Data nasabah tidak ditemukan");
             }
 
             $this->registration_code($id);
         
             if (!$this->registration_code($id)) {
-                return Redirect::to('/nasabah/request')
+                return Redirect::to('/nasabah/approve')
                             ->with('error', "Gagal menghasilkan nomor registrasi.");
             }
 
             if (!$this->store_cif($id)) {
-                return Redirect::to('/nasabah/request')
+                return Redirect::to('/nasabah/approve')
                             ->with('error', "Gagal membuat CIF.");
             }
 
             if (!$this->store_rekening($id)) {
-                return Redirect::to('/nasabah/request')
+                return Redirect::to('/nasabah/approve')
                             ->with('error', "Gagal membuat rekening.");
             }
 
-            $nasabah->status = 1;
+            $nasabah->status = 2;
             $nasabah->reply_time = now();
             $nasabah->save();
 
             DB::commit();
-            return Redirect::to('/nasabah/request')->with('success', 'Nasabah berhasil disetujui, CIF dan rekening berhasil dibuat.');
+            return Redirect::to('/nasabah/approve')->with('success', 'Nasabah berhasil disetujui, CIF dan rekening berhasil dibuat.');
         } catch (Exception $e) {
             DB::rollBack();
             Log::error('Error in approveNasabah: ' . $e->getMessage());
-            return Redirect::to('/nasabah/request')
+            return Redirect::to('/nasabah/approve')
                 ->with('error', $e->getMessage())
                 ->withInput();
         }
@@ -414,6 +454,27 @@ class DataCalonNasabahController extends Controller
         }
     }
 
+    public function acceptNasabah($id){
+        DB::beginTransaction();
+        try {
+            $nasabah = DataCalonNasabah::where('id', $id)->first();
+            if (!$nasabah) {
+                throw new \Exception("nasabah not found");
+            }
+
+            $nasabah->status = 1;
+            $nasabah->save();
+
+            DB::commit();
+            return redirect()->route('nasabah_request')->with('success', 'Permintaan Berhasil Diterima.');
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::error('Error : ' . $e->getMessage());
+            return Redirect::to('nasabah_request')
+                ->with('error', $e->getMessage());
+        }
+    }
+
     public function detailRequest($id){
         $nasabah = DataCalonNasabah::find($id);
         if($nasabah){
@@ -429,6 +490,37 @@ class DataCalonNasabahController extends Controller
             $golongan_darah = CompOption::where('comp_id', 'CIF23')->get();
             
             return view('apps.calon_nasabah.detail-request')
+                ->with('nasabah', $nasabah)
+                ->with('jenis_kelamin', $jenis_kelamin)
+                ->with('agama', $agama)
+                ->with('status_nikah', $status_nikah)
+                ->with('status_penduduk', $status_penduduk)
+                ->with('kewarganegaraan', $kewarganegaraan)
+                ->with('jenis_identitas', $jenis_identitas)
+                ->with('pendidikan_terakhir', $pendidikan_terakhir)
+                ->with('kab_kota', $kab_kota)
+                ->with('provinsi', $provinsi)
+                ->with('golongan_darah', $golongan_darah);
+        }else{
+            return Redirect::to('nasabah_request')
+                            ->with('error', 'Data not found');
+        }
+    }
+    public function detailApprove($id){
+        $nasabah = DataCalonNasabah::find($id);
+        if($nasabah){
+            $jenis_kelamin = CompOption::where('comp_id', 'CIF05')->get();
+            $agama = CompOption::where('comp_id', 'CIF06')->get();
+            $status_nikah = CompOption::where('comp_id', 'CIF07')->get();
+            $status_penduduk = CompOption::where('comp_id', 'CIF16')->get();
+            $kewarganegaraan = CompOption::where('comp_id', 'CIF17')->get();
+            $jenis_identitas = CompOption::where('comp_id', 'CIF21')->get();
+            $pendidikan_terakhir = CompOption::where('comp_id', 'CIF25')->get();
+            $kab_kota = CompOption::where('comp_id', 'CIF13')->get();
+            $provinsi = CompOption::where('comp_id', 'CIF14')->get();
+            $golongan_darah = CompOption::where('comp_id', 'CIF23')->get();
+            
+            return view('apps.calon_nasabah.detail-approve')
                 ->with('nasabah', $nasabah)
                 ->with('jenis_kelamin', $jenis_kelamin)
                 ->with('agama', $agama)
