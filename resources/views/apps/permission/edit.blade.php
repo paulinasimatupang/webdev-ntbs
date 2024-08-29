@@ -32,23 +32,20 @@
                 <form action="{{ route('permissions.update', $permission->id) }}" method="POST">
                     @csrf
                     @method('PUT')
-
                     <div class="form-group row">
                         <label class="col-sm-2 col-form-label">Permission Name</label>
                         <div class="col-sm-10">
                             <input type="text" name="name" value="{{ $permission->name }}" class="form-control" placeholder="Permission Name" required>
                         </div>
                     </div>
-
                     <div class="form-group row">
                         <div class="col-sm-12 text-right">
-                            <a href="{{ url('permissions') }}">
-                                <button type="button" class="btn btn-danger">Back</button>
-                            </a>
+                            <a href="{{ route('permissions.index') }}" class="btn btn-secondary">Back</a>
                             <button type="submit" class="btn btn-primary">Update</button>
                         </div>
                     </div>
                 </form>
+
             </div>
         </div>
     </div>

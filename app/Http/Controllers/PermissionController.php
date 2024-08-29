@@ -32,12 +32,10 @@ class PermissionController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'id' => ['nullable', 'integer', 'unique:permissions,id'],
             'name' => ['required', 'string', 'unique:permissions,name']
         ]);
 
         Permission::create([
-            'id' => $request->id, // Allow manual setting of the ID
             'name' => $request->name,
             'guard_name' => 'web' // Add guard_name if needed
         ]);
@@ -47,7 +45,7 @@ class PermissionController extends Controller
 
     public function edit(Permission $permission)
     {
-        // return $permission;
+        return $permission;
         return view('apps.permission.edit', [
             'permission' => $permission
         ]);
@@ -69,12 +67,10 @@ class PermissionController extends Controller
 
         return redirect()->route('permissions.index')->with('status', 'Permission Updated Successfully');
     }
-
     public function destroy($permissionId)
     {
         $permission = Permission::findOrFail($permissionId);
         $permission->delete();
-
         return redirect()->route('permissions.index')->with('status', 'Permission Deleted Successfully');
     }
 }

@@ -221,9 +221,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/permissions/create', 'PermissionController@create')->name('permissions.create');
     Route::post('/permissions', 'PermissionController@store')->name('permissions.store');
     Route::get('/permissions/{permission}/edit', 'PermissionController@edit')->name('permissions.edit');
-    Route::post('/permissions/{permission}', 'PermissionController@update')->name('permissions.update');
-    Route::post('/permissions/{permission}/destroy', 'PermissionController@destroy')->name('permissions.destroy');
-
+    Route::put('/permissions/{permission}', 'PermissionController@update')->name('permissions.update');    
+    Route::post('/permissions/{permission}/destroy', 'PermissionController@destroy')->name('permissions.destroy');    
 
     Route::get('/roles', 'RoleController@index')->name('roles.list');
     Route::get('/roles/create', 'RoleController@create')->name('roles.add');
@@ -234,7 +233,6 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/roles/{role}/give-permissions', 'RoleController@addPermissionToRole')->name('roles.addPermissionToRole');
     Route::put('/roles/{role}/give-permissions', 'RoleController@givePermissionToRole')->name('roles.givePermissionToRole');
 
-    
     Route::get('/users', 'UserController@index')->name('users.index');
     Route::get('/users/create', 'UserController@create')->name('users.create');
     Route::post('/users', 'UserController@store')->name('users.store');
