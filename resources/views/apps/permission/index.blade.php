@@ -14,7 +14,7 @@
 <div class="row mb-4">
     <div class="col-lg-12 col-md-12 col-sm-12 d-flex justify-content-center mb-3">
         <div class="input-group">
-            <a href="{{ url('permissions/create') }}">
+            <a href="{{ route('permissions.create') }}">
                 <button class="btn btn-warning ripple m-1 add-new-btn" type="button">Add Permission</button>
             </a>
         </div>
@@ -47,10 +47,14 @@
                                 <td>{{ $permission->id }}</td>
                                 <td>{{ $permission->name }}</td>
                                 <td>
-                                    <a href="{{ url('permissions/'.$permission->id.'/edit') }}">
-                                        <button class="btn btn-success btn-sm m-1 edit-btn" type="button">Edit Permission</button>
+                                    <a href="{{ route('permissions.edit', $permission->id) }}">
+                                        <button class="btn btn-primary" type="button">Edit Permission</button>
                                     </a>
-                                    <a href="{{ url('permissions/'.$permission->id.'/delete') }}" class="btn btn-danger btn-sm m-1 delete-btn" type="button">Delete</a>
+                                    <form action="{{ route('permissions.destroy', $permission->id) }}" method="POST" style="display:inline;">
+                                        @csrf
+                                        @method('POST')
+                                        <button type="submit" class="btn btn-danger">Delete</button>
+                                    </form>
                                 </td>
                             </tr>
                             @endforeach

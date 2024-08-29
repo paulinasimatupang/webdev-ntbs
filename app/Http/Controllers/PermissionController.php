@@ -18,10 +18,10 @@ class PermissionController extends Controller
 
     public function index()
     {
-        $permissions = Permission::get();
+        $permissions = Permission::all();
         return view('apps.permission.index', [
-            'permissions' => $permissions]);
-        
+            'permissions' => $permissions
+        ]);
     }
 
     public function create()
@@ -32,15 +32,14 @@ class PermissionController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => [
-                'required',
-                'string',
-                'unique:permissions,name'
-            ]
+            'id' => ['nullable', 'integer', 'unique:permissions,id'],
+            'name' => ['required', 'string', 'unique:permissions,name']
         ]);
 
         Permission::create([
-            'name' => $request->name
+            'id' => $request->id, // Allow manual setting of the ID
+            'name' => $request->name,
+            'guard_name' => 'web' // Add guard_name if needed
         ]);
 
         return redirect()->route('permissions.index')->with('status', 'Permission Created Successfully');
@@ -60,7 +59,7 @@ class PermissionController extends Controller
             'name' => [
                 'required',
                 'string',
-                'unique:permissions,name,'.$permission->id
+                'unique:permissions,name,' . $permission->id
             ]
         ]);
 
@@ -68,13 +67,14 @@ class PermissionController extends Controller
             'name' => $request->name
         ]);
 
-        return redirect('permissions')->with('status','Permission Updated Successfully');
+        return redirect()->route('permissions.index')->with('status', 'Permission Updated Successfully');
     }
 
     public function destroy($permissionId)
     {
-        $permission = Permission::find($permissionId);
+        $permission = Permission::findOrFail($permissionId);
         $permission->delete();
-        return redirect('permissions')->with('status','Permission Deleted Successfully');
+
+        return redirect()->route('permissions.index')->with('status', 'Permission Deleted Successfully');
     }
 }

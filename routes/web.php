@@ -217,24 +217,26 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/permissions', 'PermissionController@store')->name('permissions.store');
     Route::get('/permissions/{permission}/edit', 'PermissionController@edit')->name('permissions.edit');
     Route::post('/permissions/{permission}', 'PermissionController@update')->name('permissions.update');
-    Route::post('/permissions/{permission}/delete', 'PermissionController@destroy')->name('permissions.destroy');
+    Route::post('/permissions/{permission}/destroy', 'PermissionController@destroy')->name('permissions.destroy');
+
 
     Route::get('/roles', 'RoleController@index')->name('roles.list');
     Route::get('/roles/create', 'RoleController@create')->name('roles.add');
     Route::post('/roles', 'RoleController@store')->name('roles.store');
     Route::get('/roles/{role}/edit', 'RoleController@edit')->name('roles.edit');
-    Route::post('/roles/{role}', 'RoleController@update')->name('roles.update');
-    Route::post('/roles/{roleId}/destroy', 'RoleController@destroy')->name('roles.destroy');
-    Route::get('/roles/{roleId}/give-permissions', 'RoleController@addPermissionToRole')->name('roles.addPermissionToRole');
-    Route::post('/roles/{roleId}/give-permissions', 'RoleController@givePermissionToRole')->name('roles.addPermissionToRole');
+    Route::put('/roles/{role}', 'RoleController@update')->name('roles.update');
+    Route::post('/roles/{role}/destroy', 'RoleController@destroy')->name('roles.destroy'); 
+    Route::get('/roles/{role}/give-permissions', 'RoleController@addPermissionToRole')->name('roles.addPermissionToRole');
+    Route::put('/roles/{role}/give-permissions', 'RoleController@givePermissionToRole')->name('roles.givePermissionToRole');
 
+    
     Route::get('/users', 'UserController@index')->name('users.index');
     Route::get('/users/create', 'UserController@create')->name('users.create');
     Route::post('/users', 'UserController@store')->name('users.store');
     Route::get('/users/{user}/edit', 'UserController@edit')->name('users.edit');
     Route::post('/users/{user}', 'UserController@update')->name('users.update');
     Route::post('/users/{user}/delete', 'UserController@destroy')->name('users.destroy');
-    
+
 
     // Route::view('/', 'starter')->name('starter');
     Route::get('large-compact-sidebar/dashboard/dashboard1', function () {
