@@ -18,6 +18,7 @@ class ScreenComponent extends Model implements Transformable
     protected $table = 'screen_component';
     protected $primaryKey = 'screen_id';
     public $incrementing = false;
+    public $timestamps = false;
 
     protected $fillable = [
         'screen_id',

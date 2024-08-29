@@ -18,6 +18,7 @@ class Component extends Model implements Transformable
     protected $table = 'component';
     protected $primaryKey = 'comp_id';
     public $incrementing = false;
+    public $timestamps = false;
 
     protected $fillable = [
         'comp_id',
