@@ -7,7 +7,7 @@
 @endsection
 @section('main-content')
             <div class="breadcrumb">
-                <h1>Request Nasabah</h1>
+                <h1>Approve Nasabah</h1>
                 <!-- <ul>
                     <li><a href="">Selada</a></li> -->
             </div>
@@ -17,7 +17,7 @@
                     <div class="card text-left">
                         <div class="card-body">
                             <div class="row">
-                                <h4 class=" col-sm-12 col-md-6 card-title mb-3">List Request Nasabah</h4>
+                                <h4 class=" col-sm-12 col-md-6 card-title mb-3">List Approve Nasabah</h4>
                             </div>
                             @if ($message = Session::get('success'))
                                 <div class="alert alert-success">
@@ -56,7 +56,7 @@
                                             <td>{{$item->no_hp}}</td>
                                             <td>{{ \Carbon\Carbon::parse($item->request_time)->format('Y-m-d H:i:s') }}</td>
                                             <td>
-                                                <form action="{{ route('nasabah_detail', [$item->id]) }}" style="display: inline;">
+                                                <form action="{{ route('nasabah_detail_approve', [$item->id]) }}" style="display: inline;">
                                                     @csrf
                                                     <button class="btn btn-primary ripple btn-sm m-1 primary-btn" type="submit">Detail</button>
                                                 </form>

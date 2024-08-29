@@ -55,10 +55,11 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/agen/store/cif', 'MerchantsController@store_cif')->name('agen_store_cif');
     Route::get('/agen/create/rekening', 'MerchantsController@create_rekening')->name('agen_create_rekening');
     Route::post('/agen/store/rekening', 'MerchantsController@store_rekening')->name('agen_store_rekening');
-    Route::post('/agen/{id}/activate', 'MerchantsController@activateagen')->name('agen_activate');
-    Route::post('/agen/{id}/deactivate', 'MerchantsController@deactivateagen')->name('agen_deactivate');
+    Route::post('/agen/{id}/activate', 'MerchantsController@activateMerchant')->name('agen_activate');
+    Route::post('/agen/{id}/deactivate', 'MerchantsController@deactivateMerchant')->name('agen_deactivate');
     Route::get('/agen/request', 'MerchantsController@request_list')->name('agen_request');
     Route::get('/agen/request/{id}', 'MerchantsController@detail_request')->name('agen_request_detail');
+    Route::post('/agen/{id}/reject', 'MerchantsController@rejectAgent')->name('agen_reject');
 
     Route::get('/message', 'MessageLogController@index')->name('message_log');
 
@@ -201,6 +202,10 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/nasabah/reject/{id}', 'DataCalonNasabahController@rejectNasabah')->name('nasabah_reject');
     Route::post('/nasabah/approve/{id}', 'DataCalonNasabahController@approveNasabah')->name('nasabah_approve');
     Route::get('/nasabah/detail/{id}', 'DataCalonNasabahController@detailRequest')->name('nasabah_detail');
+
+    Route::get('/nasabah/approve', 'DataCalonNasabahController@list_approve')->name('list_approve');
+    Route::post('/nasabah/accept/{id}', 'DataCalonNasabahController@acceptNasabah')->name('nasabah_accept');
+    Route::get('/nasabah/{id}/detail', 'DataCalonNasabahController@detailApprove')->name('nasabah_detail_approve');
 
     Route::get('/persen_fee', 'PersenFeeController@index')->name('persen_fee');
     Route::get('/persen_fee/create', 'PersenFeeController@create')->name('persen_fee_create');

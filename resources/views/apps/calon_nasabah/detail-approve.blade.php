@@ -273,11 +273,11 @@
                             <input type="hidden" name="nasabah_id" value="{{ $nasabah->id }}">
                             <input type="hidden" name="action" id="formAction">
 
-                            <button type="button" id="activateMerchantBtn" class="btn btn-success">
+                            <button type="button" id="approve" class="btn btn-success">
                                 Approve
                             </button>
 
-                            <button type="button" id="rejectMerchantBtn" class="btn btn-danger ml-2">
+                            <button type="button" id="reject" class="btn btn-danger ml-2">
                                 Reject
                             </button>
                         </form>
@@ -290,15 +290,15 @@
 
 @section('page-js')
 <script>
-document.getElementById('activateMerchantBtn').addEventListener('click', function() {
+document.getElementById('approve').addEventListener('click', function() {
     if (confirm('Are you sure you want to activate this merchant?')) {
         document.getElementById('formAction').value = 'activate';
-        document.getElementById('actionForm').action = "{{ route('nasabah_accept', ['id' => $nasabah->id]) }}";
+        document.getElementById('actionForm').action = "{{ route('nasabah_approve', ['id' => $nasabah->id]) }}";
         document.getElementById('actionForm').submit();
     }
 });
 
-document.getElementById('rejectMerchantBtn').addEventListener('click', function() {
+document.getElementById('reject').addEventListener('click', function() {
     if (confirm('Are you sure you want to reject this merchant?')) {
         document.getElementById('formAction').value = 'reject';
         document.getElementById('actionForm').action = "{{ route('nasabah_reject', ['id' => $nasabah->id]) }}";
