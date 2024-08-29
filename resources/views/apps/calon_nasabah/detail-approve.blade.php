@@ -1,5 +1,4 @@
 @extends('layouts.master')
-
 @section('main-content')
 <div class="breadcrumb">
     <h1>Detail Calon Nasabah</h1>
@@ -21,58 +20,268 @@
     <div class="col-md-12">
         <div class="card mb-5">
             <div class="card-body">
-                @foreach([
-                    'NIK' => $nasabah->no_identitas,
-                    'Nama Lengkap' => $nasabah->nama_lengkap,
-                    'Nama Alias' => $nasabah->nama_alias,
-                    'Ibu Kandung' => $nasabah->ibu_kandung,
-                    'Tempat Lahir' => $nasabah->tempat_lahir,
-                    'Tanggal Lahir' => $nasabah->tgl_lahir,
-                    'Jenis Kelamin' => $jenis_kelamin->where('seq', $nasabah->jenis_kelamin)->first()->opt_label ?? '',
-                    'Agama' => $agama->where('seq', $nasabah->agama)->first()->opt_label ?? '',
-                    'Alamat' => $nasabah->alamat,
-                    'RT' => $nasabah->rt,
-                    'RW' => $nasabah->rw,
-                    'Kecamatan' => $nasabah->kecamatan,
-                    'Kelurahan' => $nasabah->kelurahan,
-                    'Kabupaten/Kota' => $kab_kota->where('seq', $nasabah->kab_kota)->first()->opt_label ?? $nasabah->kab_kota,
-                    'Provinsi' => $provinsi->where('seq', $nasabah->provinsi)->first()->opt_label ?? '',
-                    'Kode POS' => $nasabah->kode_pos,
-                    'Nomor Telepon' => $nasabah->no_telp,
-                    'Nomor HP' => $nasabah->no_hp,
-                    'Status Penduduk' => $status_penduduk->where('seq', $nasabah->status_penduduk)->first()->opt_label ?? '',
-                    'Kewarganegaraan' => $kewarganegaraan->where('seq', $nasabah->kewarganegaraan)->first()->opt_label ?? '',
-                    'Nomor NPWP' => $nasabah->npwp,
-                    'Jenis Identitas' => $jenis_identitas->where('seq', $nasabah->jenis_identitas)->first()->opt_label ?? '',
-                    'Golongan Darah' => $golongan_darah->where('seq', $nasabah->golongan_darah)->first()->opt_label ?? '',
-                    'Expired Identitas' => $nasabah->expired_identitas,
-                    'Pendidikan Terakhir' => $pendidikan_terakhir->where('seq', $nasabah->pendidikan_terakhir)->first()->opt_label ?? '',
-                    'Email' => $nasabah->email
-                ] as $label => $value)
                     <div class="form-group row">
-                        <label class="col-sm-2 col-form-label">{{ $label }}</label>
+                        <label class="col-sm-2 col-form-label">NIK</label>
                         <div class="col-sm-10">
-                            <p class="form-control-static">{{ $value }}</p>
+                            <p class="form-control-static">{{ $nasabah->no_identitas }}</p>
                         </div>
                     </div>
-                @endforeach
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Nama Lengkap</label>
+                        <div class="col-sm-10">
+                            <p class="form-control-static">{{ $nasabah->nama_lengkap }}</p>
+                        </div>
+                    </div>
 
-                <div class="col-sm-12 d-flex justify-content-end">
-                    <a href="{{ route('nasabah_request') }}" class="btn btn-primary mr-2">Back</a>
-                    <form id="actionForm" method="POST" class="d-inline">
-                        @csrf
-                        <input type="hidden" name="nasabah_id" value="{{ $nasabah->id }}">
-                        <input type="hidden" name="action" id="formAction">
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Nama Alias</label>
+                        <div class="col-sm-10">
+                            <p class="form-control-static">{{ $nasabah->nama_alias }}</p>
+                        </div>
+                    </div>
 
-                        <button type="button" id="activateMerchantBtn" class="btn btn-success">
-                            Approve
-                        </button>
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Ibu Kandung</label>
+                        <div class="col-sm-10">
+                            <p class="form-control-static">{{ $nasabah->ibu_kandung }}</p>
+                        </div>
+                    </div>
 
-                        <button type="button" id="rejectMerchantBtn" class="btn btn-danger ml-2">
-                            Reject
-                        </button>
-                    </form>
-                </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Tempat Lahir</label>
+                        <div class="col-sm-10">
+                            <p class="form-control-static">{{ $nasabah->tempat_lahir }}</p>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Tanggal Lahir</label>
+                        <div class="col-sm-10">
+                            <p class="form-control-static">{{ $nasabah->tgl_lahir }}</p>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Jenis Kelamin</label>
+                        <div class="col-sm-10">
+                            <p class="form-control-static">
+                                @foreach($jenis_kelamin as $option)
+                                    @if($nasabah->jenis_kelamin == $option->seq)
+                                        {{ $option->opt_label }}
+                                    @endif
+                                @endforeach
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Agama</label>
+                        <div class="col-sm-10">
+                            <p class="form-control-static">
+                                @foreach($agama as $option)
+                                    @if($nasabah->agama == $option->seq)
+                                        {{ $option->opt_label }}
+                                    @endif
+                                @endforeach
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Alamat</label>
+                        <div class="col-sm-10">
+                            <p class="form-control-static">{{ $nasabah->alamat }}</p>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">RT</label>
+                        <div class="col-sm-10">
+                            <p class="form-control-static">{{ $nasabah->rt }}</p>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">RW</label>
+                        <div class="col-sm-10">
+                            <p class="form-control-static">{{ $nasabah->rw }}</p>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Kecamatan</label>
+                        <div class="col-sm-10">
+                            <p class="form-control-static">{{ $nasabah->kecamatan }}</p>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Kelurahan</label>
+                        <div class="col-sm-10">
+                            <p class="form-control-static">{{ $nasabah->kelurahan }}</p>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Kabupaten/Kota</label>
+                        <div class="col-sm-10">
+                            <p class="form-control-static">
+                                @php
+                                    $labelFound = false;
+                                @endphp
+                                
+                                @foreach($kab_kota as $option)
+                                    @if($nasabah->kab_kota == $option->seq)
+                                        {{ $option->opt_label }}
+                                        @php
+                                            $labelFound = true;
+                                        @endphp
+                                    @endif
+                                @endforeach
+
+                                @if(!$labelFound)
+                                    {{ $nasabah->kab_kota }}
+                                @endif
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Provinsi</label>
+                        <div class="col-sm-10">
+                            <p class="form-control-static">
+                                @foreach($provinsi as $option)
+                                    @if($nasabah->provinsi == $option->seq)
+                                        {{ $option->opt_label }}
+                                    @endif
+                                @endforeach
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Kode POS</label>
+                        <div class="col-sm-10">
+                            <p class="form-control-static">{{ $nasabah->kode_pos }}</p>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Nomor Telepon</label>
+                        <div class="col-sm-10">
+                            <p class="form-control-static">{{ $nasabah->no_telp }}</p>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Nomor HP</label>
+                        <div class="col-sm-10">
+                            <p class="form-control-static">{{ $nasabah->no_hp }}</p>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Status Penduduk</label>
+                        <div class="col-sm-10">
+                            <p class="form-control-static">
+                                @foreach($status_penduduk as $option)
+                                    @if($nasabah->status_penduduk == $option->seq)
+                                        {{ $option->opt_label }}
+                                    @endif
+                                @endforeach
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Kewarganegaraan</label>
+                        <div class="col-sm-10">
+                            <p class="form-control-static">
+                                @foreach($kewarganegaraan as $option)
+                                    @if($nasabah->kewarganegaraan == $option->seq)
+                                        {{ $option->opt_label }}
+                                    @endif
+                                @endforeach
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Nomor NPWP</label>
+                        <div class="col-sm-10">
+                            <p class="form-control-static">{{ $nasabah->npwp }}</p>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Jenis Identitas</label>
+                        <div class="col-sm-10">
+                            <p class="form-control-static">
+                                @foreach($jenis_identitas as $option)
+                                    @if($nasabah->jenis_identitas == $option->seq)
+                                        {{ $option->opt_label }}
+                                    @endif
+                                @endforeach
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Golongan Darah</label>
+                        <div class="col-sm-10">
+                            <p class="form-control-static">
+                                @foreach($golongan_darah as $option)
+                                    @if($nasabah->golongan_darah == $option->seq)
+                                        {{ $option->opt_label }}
+                                    @endif
+                                @endforeach
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Expired Identitas</label>
+                        <div class="col-sm-10">
+                            <p class="form-control-static">{{ $nasabah->expired_identitas }}</p>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Pendidikan Terakhir</label>
+                        <div class="col-sm-10">
+                            <p class="form-control-static">
+                                @foreach($pendidikan_terakhir as $option)
+                                    @if($nasabah->pendidikan_terakhir == $option->seq)
+                                        {{ $option->opt_label }}
+                                    @endif
+                                @endforeach
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Email</label>
+                        <div class="col-sm-10">
+                            <p class="form-control-static">{{ $nasabah->email }}</p>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-12 d-flex justify-content-end">
+                        <a href="{{ route('nasabah_request') }}" class="btn btn-primary mr-2">Back</a>
+                        <form id="actionForm" method="POST" class="d-inline">
+                            @csrf
+                            <input type="hidden" name="nasabah_id" value="{{ $nasabah->id }}">
+                            <input type="hidden" name="action" id="formAction">
+
+                            <button type="button" id="approve" class="btn btn-success">
+                                Approve
+                            </button>
+
+                            <button type="button" id="reject" class="btn btn-danger ml-2">
+                                Reject
+                            </button>
+                        </form>
+                    </div>
             </div>
         </div>
     </div>
@@ -81,7 +290,7 @@
 
 @section('page-js')
 <script>
-document.getElementById('activateMerchantBtn').addEventListener('click', function() {
+document.getElementById('approve').addEventListener('click', function() {
     if (confirm('Are you sure you want to activate this merchant?')) {
         document.getElementById('formAction').value = 'activate';
         document.getElementById('actionForm').action = "{{ route('nasabah_approve', ['id' => $nasabah->id]) }}";
@@ -89,7 +298,7 @@ document.getElementById('activateMerchantBtn').addEventListener('click', functio
     }
 });
 
-document.getElementById('rejectMerchantBtn').addEventListener('click', function() {
+document.getElementById('reject').addEventListener('click', function() {
     if (confirm('Are you sure you want to reject this merchant?')) {
         document.getElementById('formAction').value = 'reject';
         document.getElementById('actionForm').action = "{{ route('nasabah_reject', ['id' => $nasabah->id]) }}";

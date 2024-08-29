@@ -115,8 +115,19 @@
                 <div class="form-group row">
                     <div class="col-sm-12 text-right">
                         <a href="{{ route('agen_request') }}" class="btn btn-primary">Back</a>
-                        <button type="button" id="activateMerchantBtn" class="btn btn-success">Activate</button>
-                        <button type="button" id="rejectMerchantBtn" class="btn btn-danger">Reject</button>
+                        <form id="actionForm" method="POST" class="d-inline">
+                        @csrf
+                        <input type="hidden" name="nasabah_id" value="{{ $nasabah->id }}">
+                        <input type="hidden" name="action" id="formAction">
+
+                        <button type="button" id="approve" class="btn btn-success">
+                            Approve
+                        </button>
+
+                        <button type="button" id="reject" class="btn btn-danger ml-2">
+                            Reject
+                        </button>
+                    </form>
                     </div>
                 </div>
             </div>
@@ -127,59 +138,25 @@
 @endsection
 
 @section('page-js')
+<script>
+document.getElementById('approve').addEventListener('click', function() {
+    if (confirm('Are you sure you want to activate this merchant?')) {
+        document.getElementById('formAction').value = 'activate';
+        document.getElementById('actionForm').action = "{{ route('agen_activate', ['id' => $merchant->id]) }}";
+        document.getElementById('actionForm').submit();
+    }
+});
+
+document.getElementById('reject').addEventListener('click', function() {
+    if (confirm('Are you sure you want to reject this merchant?')) {
+        document.getElementById('formAction').value = 'reject';
+        document.getElementById('actionForm').action = "{{ route('agen_reject', ['id' => $merchant->id]) }}";
+        document.getElementById('actionForm').submit();
+    }
+});
+</script>
 @endsection
 
 @section('bottom-js')
 <script src="{{ asset('assets/js/form.validation.script.js') }}"></script>
-<script>
-    document.getElementById('activateMerchantBtn').addEventListener('click', function() {
-    if (confirm('Apakah Anda yakin akan mengaktivasi agen ini?')) {
-        fetch("{{ route('agen_activate', [$merchant->id]) }}", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': "{{ csrf_token() }}"
-            },
-            body: JSON.stringify({ action: 'activate' })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('Agen berhasil di aktivasi.');
-                location.reload(); 
-            } else {
-                alert('Gagal mengaktivasi agen.');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
-    }
-});
-
-document.getElementById('rejectMerchantBtn').addEventListener('click', function() {
-    if (confirm('Apakah anda yakin akan menolak agen ini?')) {
-        fetch("{{ route('agen_reject', [$merchant->id]) }}", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': "{{ csrf_token() }}"
-            },
-            body: JSON.stringify({ action: 'reject' })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('Agen berhasil di reject');
-                location.reload();
-            } else {
-                alert('Gagal menolak agen.');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
-    }
-});
-</script>
 @endsection
