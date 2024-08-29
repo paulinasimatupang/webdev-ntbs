@@ -41,6 +41,8 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    protected $keyType = 'string'; // Tipe UUID
+
     public function user_group()
     {
         return $this->hasMany(UserGroup::class,'user_id','id');

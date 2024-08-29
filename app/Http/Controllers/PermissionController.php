@@ -45,7 +45,7 @@ class PermissionController extends Controller
 
     public function edit(Permission $permission)
     {
-        return $permission;
+        // return $permission;
         return view('apps.permission.edit', [
             'permission' => $permission
         ]);

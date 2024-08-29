@@ -29,11 +29,6 @@
 	    <div class="col-lg-12 col-md-12 col-sm-12">
                 <div class="card bg-dark text-white o-hidden mb-4">
 			<img class="card-img" src="assets/images/ntbs.jpg" alt="Card image">
-                        <!--<div class="card-img-overlay">
-                        	<h5 class="card-title text-white">Selada | bjb BiSA Dashboard</h5>
-                                <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-                                <p class="card-text">Last updated 3 mins ago</p>
-                        </div>-->
                	</div>
             </div>
             <!-- ICON BG -->
@@ -43,7 +38,6 @@
                     <div class="card-body text-center">
                         <img src="{{asset('/assets/images/sidebar_icon/dashboard.png')}}" alt="" class="mr-3" style="width: 50px">
                         <div class="content">
-                            <p class="text-muted mt-2 mb-0">Jump to</p>
                             <p class="lead text-primary text-24 mb-2">Dashboard</p>
                         </div>
                     </div>
@@ -57,8 +51,7 @@
                     <div class="card-body text-center">
                     <img src="{{asset('/assets/images/sidebar_icon/transaction.png')}}" alt="" class="mr-3" style="width: 50px">
                         <div class="content">
-                            <p class="text-muted mt-2 mb-0">Jump to</p>
-                            <p class="lead text-primary text-24 mb-2" style="text-align: left;">Trx Laku Pandai</p>
+                            <p class="lead text-primary text-24 mb-2" style="text-align: left;">Transaksi Laku Pandai</p>
                         </div>
                     </div>
                 </div>
@@ -85,7 +78,6 @@
                     <div class="card-body text-center">
                     <img src="{{asset('/assets/images/sidebar_icon/agent.png')}}" alt="" class="mr-3" style="width: 50px">
                         <div class="content">
-                            <p class="text-muted mt-2 mb-0">Jump to</p>
                             <p class="lead text-primary text-24 mb-2">Merchants</p>
                         </div>
                     </div>
