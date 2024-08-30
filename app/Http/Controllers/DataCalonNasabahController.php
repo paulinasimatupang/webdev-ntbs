@@ -537,4 +537,12 @@ class DataCalonNasabahController extends Controller
                             ->with('error', 'Data not found');
         }
     }
+
+    public function showImageFromServer($imageName)
+    {
+        $baseUrl = "http://108.137.154.8:8081/ARRest/images";
+        $imageUrl = $baseUrl . $imageName;
+
+        return view('calon_nasabah.list', ['imageUrl' => $imageUrl]);
+    }
 }
