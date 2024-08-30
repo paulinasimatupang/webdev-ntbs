@@ -61,6 +61,11 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/agen/request/{id}', 'MerchantsController@detail_request')->name('agen_request_detail');
     Route::post('/agen/{id}/reject', 'MerchantsController@rejectAgent')->name('agen_reject');
 
+    Route::get('/merchants.pdf', 'MerchantsController@exportPDF')->name('merchants.pdf');
+    Route::get('/merchants.csv', 'MerchantsController@exportCSV')->name('merchants.csv');
+    Route::get('/merchants.excel', 'MerchantsController@exportExcel')->name('merchants.excel');
+    Route::get('/merchants.txt', 'MerchantsController@exportTxt')->name('merchants.txt');
+    
     Route::get('/message', 'MessageLogController@index')->name('message_log');
 
     Route::get('/transaction', 'TransactionsController@index')->name('transaction');
@@ -202,6 +207,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/nasabah/reject/{id}', 'DataCalonNasabahController@rejectNasabah')->name('nasabah_reject');
     Route::post('/nasabah/approve/{id}', 'DataCalonNasabahController@approveNasabah')->name('nasabah_approve');
     Route::get('/nasabah/detail/{id}', 'DataCalonNasabahController@detailRequest')->name('nasabah_detail');
+
+    Route::post('/end-sms/{id}', 'SmsTwilioController@sendSms')->name('send_sms');
 
     Route::get('/nasabah/approve', 'DataCalonNasabahController@list_approve')->name('list_approve');
     Route::post('/nasabah/accept/{id}', 'DataCalonNasabahController@acceptNasabah')->name('nasabah_accept');

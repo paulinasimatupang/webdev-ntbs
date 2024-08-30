@@ -21,6 +21,7 @@ use App\Validators\MerchantValidator;
 use Ixudra\Curl\Facades\Curl;
 use Illuminate\Support\Facades\Log;
 
+use App\Exports\MerchantExport;
 
 use App\Entities\Merchant;
 use App\Entities\Role;
@@ -29,7 +30,8 @@ use App\Entities\Terminal;
 use App\Entities\Group;
 use App\Entities\TerminalBilliton;
 use App\Entities\UserGroup;
-
+use Maatwebsite\Excel\Facades\Excel;
+use Barryvdh\DomPDF\Facade as Pdf;
 
 /**
  * Class MerchantsController.
@@ -901,4 +903,42 @@ class MerchantsController extends Controller
             return response()->json($response, 404);
         }
     }
+
+    public function exportPDF(Request $request)
+    {
+        ini_set('memory_limit', '512M');
+        set_time_limit(300);
+        $merchants = Merchant::all();
+        $pdf = Pdf::loadView('pdf.merchants', ['merchants' => $merchants]);
+        return $pdf->download('merchants.pdf');
+    }
+
+    public function exportCSV()
+    {
+        return Excel::download(new MerchantsExport(Merchant::query(), 1), 'merchants.csv');
+    }
+
+    public function exportExcel()
+    {
+        return Excel::download(new MerchantsExport(Merchant::query(), 1), 'merchants.xlsx');
+    }
+    
+    public function exportTxt()
+    {
+        $merchants = Merchant::all();
+        $txtData = '';
+
+        foreach ($merchants as $merchant) {
+            $txtData .= "ID: {$merchant->mid}, Name: {$merchant->name}, Email: {$merchant->email}\n";
+        }
+
+        $fileName = "merchants.txt";
+        $headers = [
+            'Content-type' => 'text/plain',
+            'Content-Disposition' => "attachment; filename=\"$fileName\"",
+        ];
+
+        return response($txtData, 200, $headers);
+    }
+
 }
