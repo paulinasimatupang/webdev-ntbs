@@ -545,4 +545,60 @@ class DataCalonNasabahController extends Controller
 
         return view('calon_nasabah.list', ['imageUrl' => $imageUrl]);
     }
+
+    public function listJson(Request $request)
+    {
+        // Memeriksa pengguna yang terautentikasi
+        $user = auth()->user();
+
+        if (!$user) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
+
+        $data = DataCalonNasabah::select('*');
+        $data = $data->whereIn('status', [2, 3, 4]);
+
+        if ($request->has('search')) {
+            $data = $data->whereRaw('lower(name) like (?)', ["%{$request->search}%"]);
+        }
+
+        $total = $data->count();
+
+        if ($request->has('order_type')) {
+            if ($request->get('order_type') == 'asc') {
+                if ($request->has('order_by')) {
+                    $data->orderBy($request->get('order_by'));
+                } else {
+                    $data->orderBy('request_time');
+                }
+            } else {
+                if ($request->has('order_by')) {
+                    $data->orderBy($request->get('order_by'), 'desc');
+                } else {
+                    $data->orderBy('request_time', 'desc');
+                }
+            }
+        } else {
+            $data->orderBy('request_time', 'desc');
+        }
+
+        $data = $data->get();
+
+        foreach ($data as $nasabah) {
+            if ($nasabah->status == 1) {
+                $nasabah->status_text = 'Accepted';
+            } else {
+                $nasabah->status_text = 'Rejected';
+            }
+        }
+
+        return response()->json([
+            'status' => true,
+            'data' => $data,
+            'username' => $user->username,
+        ]);
+    }
+
 }

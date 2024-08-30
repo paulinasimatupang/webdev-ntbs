@@ -18,6 +18,8 @@ use App\Http\Requests;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Prettus\Validator\Contracts\ValidatorInterface;
 use Prettus\Validator\Exceptions\ValidatorException;
+use Illuminate\Support\Facades\Log;
+
 
 use App\Entities\User;
 use App\Entities\Role;
@@ -110,7 +112,7 @@ class AuthController extends Controller
         
         try {
             // attempt to verify the credentials and create a token for the user
-            if (! $token = Auth::attempt($credentials)) {
+            if (! $token = JWTAuth::attempt($credentials)) {
                 return Redirect::to('login')
                             ->with('error', 'We cant find an account with this credentials.')
                             ->withInput();
@@ -125,6 +127,8 @@ class AuthController extends Controller
         // all good so return the token
         $user = User::where('username', $credentials['username'])->with('user_group.group')->first();
         
+        Log::info('Token generated for user: ' . $token);
+
         if($user){
             $role = Role::where('name','Admin')->first();
             $roleMerchant = Role::where('name','Merchant')->first();
