@@ -41,7 +41,7 @@ class DataCalonNasabahController extends Controller
     public function __construct(DataCalonNasabahRepository $repository, DataCalonNasabahValidator $validator)
     {
         $this->repository = $repository;
-        $this->validator  = $validator;
+        $this->validator = $validator;
     }
 
     /**
@@ -66,21 +66,21 @@ class DataCalonNasabahController extends Controller
         $data = DataCalonNasabah::select('*');
         $data = $data->whereIn('status', [2, 3, 4]);
 
-        if($request->has('search')){
+        if ($request->has('search')) {
             $data = $data->whereRaw('lower(name) like (?)', ["%{$request->search}%"]);
         }
 
         $total = $data->count();
 
-        if($request->has('order_type')){
-            if($request->get('order_type') == 'asc'){
-                if($request->has('order_by')){
+        if ($request->has('order_type')) {
+            if ($request->get('order_type') == 'asc') {
+                if ($request->has('order_by')) {
                     $data->orderBy($request->get('order_by'));
                 } else {
                     $data->orderBy('request_time');
                 }
             } else {
-                if($request->has('order_by')){
+                if ($request->has('order_by')) {
                     $data->orderBy($request->get('order_by'), 'desc');
                 } else {
                     $data->orderBy('request_time', 'desc');
@@ -92,8 +92,8 @@ class DataCalonNasabahController extends Controller
 
         $data = $data->get();
 
-        foreach($data as $nasabah) {
-            if ($nasabah->status == 1){
+        foreach ($data as $nasabah) {
+            if ($nasabah->status == 1) {
                 $nasabah->status_text = 'Accepted';
             } else {
                 $nasabah->status_text = 'Rejected';
@@ -119,21 +119,21 @@ class DataCalonNasabahController extends Controller
         $data = DataCalonNasabah::select('*');
         $data = $data->where('status', 0);
 
-        if($request->has('search')){
+        if ($request->has('search')) {
             $data = $data->whereRaw('lower(name) like (?)', ["%{$request->search}%"]);
         }
 
         $total = $data->count();
 
-        if($request->has('order_type')){
-            if($request->get('order_type') == 'asc'){
-                if($request->has('order_by')){
+        if ($request->has('order_type')) {
+            if ($request->get('order_type') == 'asc') {
+                if ($request->has('order_by')) {
                     $data->orderBy($request->get('order_by'));
                 } else {
                     $data->orderBy('request_time');
                 }
             } else {
-                if($request->has('order_by')){
+                if ($request->has('order_by')) {
                     $data->orderBy($request->get('order_by'), 'desc');
                 } else {
                     $data->orderBy('request_time', 'desc');
@@ -159,21 +159,21 @@ class DataCalonNasabahController extends Controller
         $data = DataCalonNasabah::select('*');
         $data = $data->where('status', 1);
 
-        if($request->has('search')){
+        if ($request->has('search')) {
             $data = $data->whereRaw('lower(name) like (?)', ["%{$request->search}%"]);
         }
 
         $total = $data->count();
 
-        if($request->has('order_type')){
-            if($request->get('order_type') == 'asc'){
-                if($request->has('order_by')){
+        if ($request->has('order_type')) {
+            if ($request->get('order_type') == 'asc') {
+                if ($request->has('order_by')) {
                     $data->orderBy($request->get('order_by'));
                 } else {
                     $data->orderBy('request_time');
                 }
             } else {
-                if($request->has('order_by')){
+                if ($request->has('order_by')) {
                     $data->orderBy($request->get('order_by'), 'desc');
                 } else {
                     $data->orderBy('request_time', 'desc');
@@ -191,13 +191,13 @@ class DataCalonNasabahController extends Controller
             ->with('data', $data)
             ->with('username', $user->username);
     }
-    
-    public function store_cif($id) 
+
+    public function store_cif($id)
     {
         DB::beginTransaction();
         try {
             $nasabah = DataCalonNasabah::find($id);
-            if($nasabah){
+            if ($nasabah) {
                 $nama_lengkap = $nasabah->nama_lengkap;
                 $nama_alias = $nasabah->nama_alias;
                 $ibu_kandung = $nasabah->ibu_kandung;
@@ -226,10 +226,10 @@ class DataCalonNasabahController extends Controller
                 $pendidikan_terakhir = $nasabah->pendidikan_terakhir;
                 $email = $nasabah->email;
                 $branchid = $nasabah->branchid;
-    
+
                 $terminal = '353471045058692';
                 $dateTime = date("YmdHis");
-        
+
                 $ch = curl_init();
                 curl_setopt($ch, CURLOPT_URL, "http://108.137.154.8:8080/ARRest/api/");
                 $data = json_encode([
@@ -238,12 +238,12 @@ class DataCalonNasabahController extends Controller
                         'msg_ui' => "$terminal",
                         'msg_si' => 'CC0004',
                         'msg_dt' => 'lakupandai|' . $no_identitas . '|' . $nama_lengkap . '|' . $nama_alias . '|' . $ibu_kandung . '|' . $tempat_lahir . '|' . $tgl_lahir . '|' . $jenis_kelamin . '|' .
-                            $agama . '|' . $status_nikah . '|' . $alamat . '|' . $rt . '|' . $rw . '|' . $kecamatan . '|' . $kelurahan . '|' . $kab_kota . '|' . $provinsi . '|' . $kode_pos . 
-                            '|' . $status_penduduk . '|' . $kewarganegaraan . '|' . $no_telp . '|' . $no_hp . '|' . $npwp . '|' . $jenis_identitas . '|' . $golongan_darah . '|' . $expired_identitas . 
+                            $agama . '|' . $status_nikah . '|' . $alamat . '|' . $rt . '|' . $rw . '|' . $kecamatan . '|' . $kelurahan . '|' . $kab_kota . '|' . $provinsi . '|' . $kode_pos .
+                            '|' . $status_penduduk . '|' . $kewarganegaraan . '|' . $no_telp . '|' . $no_hp . '|' . $npwp . '|' . $jenis_identitas . '|' . $golongan_darah . '|' . $expired_identitas .
                             '|' . $pendidikan_terakhir . '|' . $email . '|' . $branchid
                     ]
                 ]);
-        
+
                 curl_setopt($ch, CURLOPT_HTTPHEADER, [
                     'Content-Type: text/plain'
                 ]);
@@ -251,21 +251,21 @@ class DataCalonNasabahController extends Controller
                 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
                 curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        
+
                 $output = curl_exec($ch);
                 $err = curl_error($ch);
                 $info = curl_getinfo($ch);
                 curl_close($ch);
-        
-                Log::info('cURL Request URL: '  . $info['url']);
+
+                Log::info('cURL Request URL: ' . $info['url']);
                 Log::info('cURL Request Data: ' . $data);
                 Log::info('cURL Response: ' . $output);
-        
+
                 $responseArray = json_decode($output, true);
 
                 if ($err) {
                     Log::error('cURL Error: ' . $err);
-                }else {
+                } else {
                     $cifid = null;
                     if (isset($responseArray['screen']['comps']['comp'])) {
                         foreach ($responseArray['screen']['comps']['comp'] as $comp) {
@@ -277,7 +277,7 @@ class DataCalonNasabahController extends Controller
                     }
                     $nasabah->save();
                 }
-        
+
                 if (isset($responseArray['screen']['title']) && $responseArray['screen']['title'] === 'Gagal') {
                     return false;
                 } else {
@@ -302,7 +302,7 @@ class DataCalonNasabahController extends Controller
                     $no_registrasi = str_pad(mt_rand(0, 99999999), 8, '0', STR_PAD_LEFT);
                     $exists = DataCalonNasabah::where('no_registrasi', $no_registrasi)->exists();
                 } while ($exists);
-    
+
                 $nasabah->no_registrasi = $no_registrasi;
                 $nasabah->save();
             }
@@ -314,33 +314,33 @@ class DataCalonNasabahController extends Controller
             return false;
         }
     }
-    
-    public function store_rekening($id) 
+
+    public function store_rekening($id)
     {
         DB::beginTransaction();
         try {
             $nasabah = DataCalonNasabah::find($id);
-            if($nasabah){
+            if ($nasabah) {
                 $nama_lengkap = $nasabah->nama_lengkap;
                 $no_cif = $nasabah->no_cif;
                 $kode_produk = 36;
                 $no_registrasi = $nasabah->no_registrasi;
                 $branchid = $nasabah->branchid;
-    
+
                 $terminal = '353471045058692';
                 $dateTime = date("YmdHis");
-        
+
                 $ch = curl_init();
                 curl_setopt($ch, CURLOPT_URL, "http://108.137.154.8:8080/ARRest/api/");
                 $data = json_encode([
-                    'msg'=>[
-                        'msg_id' =>  "$terminal$dateTime",
+                    'msg' => [
+                        'msg_id' => "$terminal$dateTime",
                         'msg_ui' => "$terminal",
                         'msg_si' => 'CRS004',
                         'msg_dt' => 'lakupandai|' . $nama_lengkap . '|' . $no_cif . '|' . $kode_produk . '|' . $no_registrasi . '|' . $branchid
                     ]
                 ]);
-        
+
                 curl_setopt($ch, CURLOPT_HTTPHEADER, [
                     'Content-Type: text/plain'
                 ]);
@@ -348,21 +348,21 @@ class DataCalonNasabahController extends Controller
                 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
                 curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        
+
                 $output = curl_exec($ch);
                 $err = curl_error($ch);
                 $info = curl_getinfo($ch);
                 curl_close($ch);
-        
-                Log::info('cURL Request URL: '  . $info['url']);
+
+                Log::info('cURL Request URL: ' . $info['url']);
                 Log::info('cURL Request Data: ' . $data);
                 Log::info('cURL Response: ' . $output);
-        
+
                 $responseArray = json_decode($output, true);
 
                 if ($err) {
                     Log::error('cURL Error: ' . $err);
-                }else{
+                } else {
                     $noRekening = null;
                     if (isset($responseArray['screen']['comps']['comp'])) {
                         foreach ($responseArray['screen']['comps']['comp'] as $comp) {
@@ -374,7 +374,7 @@ class DataCalonNasabahController extends Controller
                     }
                     $nasabah->save();
                 }
-        
+
                 if (isset($responseArray['screen']['title']) && $responseArray['screen']['title'] === 'Gagal') {
                     return false;
                 } else {
@@ -397,24 +397,24 @@ class DataCalonNasabahController extends Controller
 
             if (!$nasabah) {
                 return Redirect::to('/nasabah/approve')
-                            ->with('error', "Data nasabah tidak ditemukan");
+                    ->with('error', "Data nasabah tidak ditemukan");
             }
 
             $this->registration_code($id);
-        
+
             if (!$this->registration_code($id)) {
                 return Redirect::to('/nasabah/approve')
-                            ->with('error', "Gagal menghasilkan nomor registrasi.");
+                    ->with('error', "Gagal menghasilkan nomor registrasi.");
             }
 
             if (!$this->store_cif($id)) {
                 return Redirect::to('/nasabah/approve')
-                            ->with('error', "Gagal membuat CIF.");
+                    ->with('error', "Gagal membuat CIF.");
             }
 
             if (!$this->store_rekening($id)) {
                 return Redirect::to('/nasabah/approve')
-                            ->with('error', "Gagal membuat rekening.");
+                    ->with('error', "Gagal membuat rekening.");
             }
 
             $nasabah->status = 2;
@@ -432,7 +432,8 @@ class DataCalonNasabahController extends Controller
         }
     }
 
-    public function rejectNasabah($id){
+    public function rejectNasabah($id)
+    {
         DB::beginTransaction();
         try {
             $nasabah = DataCalonNasabah::where('id', $id)->first();
@@ -454,7 +455,8 @@ class DataCalonNasabahController extends Controller
         }
     }
 
-    public function acceptNasabah($id){
+    public function acceptNasabah($id)
+    {
         DB::beginTransaction();
         try {
             $nasabah = DataCalonNasabah::where('id', $id)->first();
@@ -475,9 +477,10 @@ class DataCalonNasabahController extends Controller
         }
     }
 
-    public function detailRequest($id){
+    public function detailRequest($id)
+    {
         $nasabah = DataCalonNasabah::find($id);
-        if($nasabah){
+        if ($nasabah) {
             $jenis_kelamin = CompOption::where('comp_id', 'CIF05')->get();
             $agama = CompOption::where('comp_id', 'CIF06')->get();
             $status_nikah = CompOption::where('comp_id', 'CIF07')->get();
@@ -488,7 +491,7 @@ class DataCalonNasabahController extends Controller
             $kab_kota = CompOption::where('comp_id', 'CIF13')->get();
             $provinsi = CompOption::where('comp_id', 'CIF14')->get();
             $golongan_darah = CompOption::where('comp_id', 'CIF23')->get();
-            
+
             return view('apps.calon_nasabah.detail-request')
                 ->with('nasabah', $nasabah)
                 ->with('jenis_kelamin', $jenis_kelamin)
@@ -501,14 +504,15 @@ class DataCalonNasabahController extends Controller
                 ->with('kab_kota', $kab_kota)
                 ->with('provinsi', $provinsi)
                 ->with('golongan_darah', $golongan_darah);
-        }else{
+        } else {
             return Redirect::to('nasabah_request')
-                            ->with('error', 'Data not found');
+                ->with('error', 'Data not found');
         }
     }
-    public function detailApprove($id){
+    public function detailApprove($id)
+    {
         $nasabah = DataCalonNasabah::find($id);
-        if($nasabah){
+        if ($nasabah) {
             $jenis_kelamin = CompOption::where('comp_id', 'CIF05')->get();
             $agama = CompOption::where('comp_id', 'CIF06')->get();
             $status_nikah = CompOption::where('comp_id', 'CIF07')->get();
@@ -519,7 +523,7 @@ class DataCalonNasabahController extends Controller
             $kab_kota = CompOption::where('comp_id', 'CIF13')->get();
             $provinsi = CompOption::where('comp_id', 'CIF14')->get();
             $golongan_darah = CompOption::where('comp_id', 'CIF23')->get();
-            
+
             return view('apps.calon_nasabah.detail-approve')
                 ->with('nasabah', $nasabah)
                 ->with('jenis_kelamin', $jenis_kelamin)
@@ -532,9 +536,9 @@ class DataCalonNasabahController extends Controller
                 ->with('kab_kota', $kab_kota)
                 ->with('provinsi', $provinsi)
                 ->with('golongan_darah', $golongan_darah);
-        }else{
+        } else {
             return Redirect::to('nasabah_request')
-                            ->with('error', 'Data not found');
+                ->with('error', 'Data not found');
         }
     }
 
@@ -555,10 +559,17 @@ class DataCalonNasabahController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
+        // Ambil branchid dari body request
+        $branchid = $request->input('branchid');
+
         $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
 
-        $data = DataCalonNasabah::select('*');
-        $data = $data->whereIn('status', [2, 3, 4]);
+        // Filter data berdasarkan branchid jika tersedia
+        $data = DataCalonNasabah::select('*')
+            ->when($branchid, function ($query, $branchid) {
+                return $query->where('branchid', $branchid);
+            })
+            ->whereIn('status', [2, 3, 4]);
 
         if ($request->has('search')) {
             $data = $data->whereRaw('lower(name) like (?)', ["%{$request->search}%"]);
@@ -600,5 +611,6 @@ class DataCalonNasabahController extends Controller
             'username' => $user->username,
         ]);
     }
+
 
 }

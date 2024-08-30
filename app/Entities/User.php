@@ -6,7 +6,7 @@ use Auth;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Notifications\Notifiable;
-// use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Webpatser\Uuid\Uuid;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -17,6 +17,8 @@ use DateTime;
 class User extends Authenticatable implements JWTSubject
 {
     use Notifiable, HasRoles, SoftDeletes;
+
+    // HasFactory;
 
     // HasApiTokens,
 
