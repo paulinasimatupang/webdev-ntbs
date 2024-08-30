@@ -19,7 +19,7 @@ Route::get('/', function (Request $request) {
 });
 
 Route::post('auth/register', 'AuthController@register');
-Route::post('auth/login', 'AuthController@login');
+Route::post('auth/login', 'AuthController@doLogin');
 
 Route::get('banks', 'BanksController@index');
 Route::post('banks', 'BanksController@store');
@@ -177,3 +177,7 @@ Route::delete('users/{id}', 'UsersController@destroy');
 // Route::get('master-data/{id}', [MasterDataController::class, 'show']); // Untuk menampilkan detail data berdasarkan ID
 // Route::post('master-data/{id}', [MasterDataController::class, 'update']); // Untuk memperbarui data berdasarkan ID
 // Route::delete('master-data/{id}', [MasterDataController::class, 'destroy']); // Untuk menghapus data berdasarkan ID
+
+// Route::get('nasabah/list', 'DataCalonNasabahController@listJson');
+
+Route::middleware('auth:api')->get('nasabah/list', 'DataCalonNasabahController@listJson');
