@@ -31,7 +31,7 @@ class User extends Authenticatable
         'password', 
         'status'
     ];
-
+    protected $table = 'users';
     protected $casts = [
         'id' => 'string'
     ];

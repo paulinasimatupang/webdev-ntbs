@@ -19,70 +19,83 @@ class UserController extends Controller
 
     public function index()
     {
-        $users = User::get();
+        $users = User::all();
         return view('apps.user.index', ['users' => $users]);
     }
 
     public function create()
     {
-        $roles = Role::pluck('name','name')->all();
-        return view('apps.user.create', ['roles' => $roles]);
+        return view('apps.user.create');
     }
 
     public function store(Request $request)
     {
+        // Validasi input yang diterima
         $request->validate([
-            'name' => 'required|string|max:255',
+            'fullname' => 'required|string|max:255',
+            'username' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email',
             'password' => 'required|string|min:8|max:20',
-            'roles' => 'required'
+            'role_id' => 'required|exists:roles,id', // Validasi role_id
         ]);
-
+    
+        // Membuat user baru dengan data yang diberikan
         $user = User::create([
-                        'name' => $request->name,
-                        'email' => $request->email,
-                        'password' => Hash::make($request->password),
-                    ]);
-
-        $user->syncRoles($request->roles);
-
-        return redirect('/users')->with('status','User created successfully with roles');
-    }
-
-    public function edit(User $user)
-    {
-        $roles = Role::pluck('name','name')->all();
-        $userRoles = $user->roles->pluck('name','name')->all();
-        return view('role-permission.user.edit', [
-            'user' => $user,
-            'roles' => $roles,
-            'userRoles' => $userRoles
-        ]);
-    }
-
-    public function update(Request $request, User $user)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'password' => 'nullable|string|min:8|max:20',
-            'roles' => 'required'
-        ]);
-
-        $data = [
-            'name' => $request->name,
+            'fullname' => $request->fullname,
+            'username' => $request->username,
             'email' => $request->email,
-        ];
+            'password' => Hash::make($request->password),
+            'role_id' => $request->role_id, // Menyimpan role_id
+        ]);
+    
+        // Mengatur role pada user jika Anda menggunakan Spatie Laravel Permission
+        // $user->syncRoles($request->roles); // Hapus komentar jika menggunakan multiple roles
+    
+        // Redirect ke halaman users.index dengan pesan sukses
+        return redirect()->route('users.index')->with('success', 'User berhasil dibuat.');
+    }
 
-        if(!empty($request->password)){
-            $data += [
-                'password' => Hash::make($request->password),
-            ];
+    public function edit(User $id)
+    {
+        // $roles = Role::pluck('name', 'name')->all();
+        // $userRoles = $user->roles->pluck('name', 'name')->all();
+        // return view('role-permission.user.edit', [
+        //     'user' => $user,
+        //     'roles' => $roles,
+        //     'userRoles' => $userRoles
+        // ]);
+        $user = User::findOrFail($id);
+        return view('users.edit', compact('user'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        // Validasi input yang diterima
+        $request->validate([
+            'fullname' => 'required|string|max:255',
+            'username' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $id,
+            'password' => 'nullable|string|min:8|confirmed',
+            'role_id' => 'required|exists:roles,id',
+        ]);
+
+        // Temukan user berdasarkan ID
+        $user = User::findOrFail($id);
+        $user->fullname = $request->fullname; // Memperbaiki kesalahan penamaan variabel
+        $user->username = $request->username; // Menambahkan update username
+        $user->email = $request->email;
+        $user->role_id = $request->role_id; // Menambahkan atau memperbarui role_id
+
+        // Cek jika password diisi, jika ya, maka hash dan simpan
+        if ($request->filled('password')) {
+            $user->password = Hash::make($request->password);
         }
 
-        $user->update($data);
-        $user->syncRoles($request->roles);
+        // Simpan perubahan pada user
+        $user->save();
 
-        return redirect('/users')->with('status','User Updated Successfully with roles');
+        // Redirect ke halaman users.index dengan pesan sukses
+        return redirect()->route('users.index')->with('success', 'User berhasil diperbarui.');
     }
 
     public function destroy($userId)
@@ -90,6 +103,6 @@ class UserController extends Controller
         $user = User::findOrFail($userId);
         $user->delete();
 
-        return redirect('/users')->with('status','User Delete Successfully');
+        return redirect()->route('users.index')->with('success', 'User berhasil dihapus.');
     }
 }
