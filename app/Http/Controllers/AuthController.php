@@ -37,54 +37,55 @@ class AuthController extends Controller
         DB::beginTransaction();
         try {
             $check = User::where('username', $request->username)
-                            ->orWhere('email',$request->email)
-                            ->first();
-            if($check){
+                ->orWhere('email', $request->email)
+                ->first();
+            if ($check) {
                 return response()->json([
-                    'status'=> false, 
-                    'error'=> 'Username already used'
+                    'status' => false,
+                    'error' => 'Username already used'
                 ], 403);
             }
-            
+
             $user = User::create([
-                            'role_id'   => $request->role_id,
-                            'username'  => $request->username,
-                            'fullname'  => $request->fullname,
-                            'email'     => $request->email,
-                            'password'  => bcrypt($request->password),
-                        ]);
-                        
+                'role_id' => $request->role_id,
+                'username' => $request->username,
+                'fullname' => $request->fullname,
+                'email' => $request->email,
+                'password' => bcrypt($request->password),
+            ]);
+
             DB::commit();
             return response()->json([
-                'status'    => true, 
-                'message'   => 'Thanks for signing up.',
-                'data'      => $user
+                'status' => true,
+                'message' => 'Thanks for signing up.',
+                'data' => $user
             ], 200);
         } catch (Exception $e) {
             // For rollback data if one data is error
             DB::rollBack();
 
             return response()->json([
-                'status'=> false, 
-                'error'=> 'Something wrong!'
+                'status' => false,
+                'error' => 'Something wrong!'
             ], 500);
         } catch (\Illuminate\Database\QueryException $ex) {
             // For rollback data if one data is error
             DB::rollBack();
 
             return response()->json([
-                'status'=> false, 
-                'error'=> 'Something wrong!'
+                'status' => false,
+                'error' => 'Something wrong!'
             ], 500);
         }
     }
 
-    public function login(Request $request){
+    public function login(Request $request)
+    {
         $user = $request->session()->get('user');
         // return response()->json($user,200);
-        if($user){
+        if ($user) {
             return Redirect::to('landing');
-        }else{
+        } else {
             return view('sessions.signIn');
         }
     }
@@ -95,68 +96,108 @@ class AuthController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
+    // public function doLogin(Request $request)
+    // {
+    //     $credentials = $request->only('username', 'password');
+
+    //     $rules = [
+    //         'username' => 'required',
+    //         'password' => 'required',
+    //     ];
+    //     $validator = Validator::make($credentials, $rules);
+    //     if($validator->fails()) {
+    //         return Redirect::to('login')
+    //                         ->with('error', $validator->messages())
+    //                         ->withInput();
+    //     }
+
+    //     try {
+    //         // attempt to verify the credentials and create a token for the user
+    //         if (! $token = JWTAuth::attempt($credentials)) {
+    //             return Redirect::to('login')
+    //                         ->with('error', 'We cant find an account with this credentials.')
+    //                         ->withInput();
+    //         }
+    //     } catch (JWTException $e) {
+    //         // something went wrong whilst attempting to encode the token
+    //         return Redirect::to('login')
+    //                         ->with('error', 'Failed to login, please try again.')
+    //                         ->withInput();
+    //     }
+
+    //     // all good so return the token
+    //     $user = User::where('username', $credentials['username'])->with('user_group.group')->first();
+
+    //     Log::info('Token generated for user: ' . $token);
+
+    //     if($user){
+    //         $role = Role::where('name','Admin')->first();
+    //         $roleMerchant = Role::where('name','Merchant')->first();
+    //         if($role){
+    //             if($role->id == $user->role_id || $roleMerchant->id == $user->role_id) {
+    //                 //skip
+    //             } else {
+    //                 return Redirect::to('login')
+    //                                 ->with('error', 'Failed to login, please check your account.')
+    //                                 ->withInput();
+    //             }
+    //             // if($role->id != $user->role_id){
+    //             //     return Redirect::to('login')
+    //             //                     ->with('error', 'Failed to login, please check your account.')
+    //             //                     ->withInput();
+    //             // }
+    //         }
+
+    	// 	$request->session()->put('user', $user);
+
+        //     return Redirect::to('landing');
+        // }else{
+        //     return Redirect::to('login')
+        //                     ->withInput();
+        // }
+    // }
+
     public function doLogin(Request $request)
     {
         $credentials = $request->only('username', 'password');
-        
+
         $rules = [
             'username' => 'required',
             'password' => 'required',
         ];
         $validator = Validator::make($credentials, $rules);
-        if($validator->fails()) {
-            return Redirect::to('login')
-                            ->with('error', $validator->messages())
-                            ->withInput();
+        if ($validator->fails()) {
+            return response()->json(['status' => false, 'error' => $validator->messages()], 401);
         }
-        
+
         try {
+
             // attempt to verify the credentials and create a token for the user
-            if (! $token = JWTAuth::attempt($credentials)) {
-                return Redirect::to('login')
-                            ->with('error', 'We cant find an account with this credentials.')
-                            ->withInput();
+            if (!$token = JWTAuth::attempt($credentials)) {
+                return response()->json(['status' => false, 'error' => 'We cant find an account with this credentials. Please make sure you entered the right information. Or Try Again'], 404);
             }
         } catch (JWTException $e) {
             // something went wrong whilst attempting to encode the token
-            return Redirect::to('login')
-                            ->with('error', 'Failed to login, please try again.')
-                            ->withInput();
+            return response()->json(['status' => false, 'error' => 'Failed to login, please try again.'], 500);
         }
-        
+
         // all good so return the token
-        $user = User::where('username', $credentials['username'])->with('user_group.group')->first();
-        
-        Log::info('Token generated for user: ' . $token);
+        $user = User::where('username', $credentials['username'])->with('user_group.group', 'merchant.terminal')->first();
 
-        if($user){
-            $role = Role::where('name','Admin')->first();
-            $roleMerchant = Role::where('name','Merchant')->first();
-            if($role){
-                if($role->id == $user->role_id || $roleMerchant->id == $user->role_id) {
-                    //skip
-                } else {
-                    return Redirect::to('login')
-                                    ->with('error', 'Failed to login, please check your account.')
-                                    ->withInput();
-                }
-                // if($role->id != $user->role_id){
-                //     return Redirect::to('login')
-                //                     ->with('error', 'Failed to login, please check your account.')
-                //                     ->withInput();
-                // }
-            }
-
-			$request->session()->put('user', $user);
-
-            return Redirect::to('landing');
-        }else{
-            return Redirect::to('login')
-                            ->withInput();
+        if ($user) {
+            $result = array();
+            $result['status'] = true;
+            $result['message'] = 'Success';
+            $result['token'] = $token;
+            $result['data'] = $user;
+            // all good so return the token
+            return response()->json($result, 200);
         }
     }
 
-    public function logout(Request $request){
+
+    public function logout(Request $request)
+    {
         Auth::logout();
         $request->session()->forget('user');
         return Redirect::to('login');
