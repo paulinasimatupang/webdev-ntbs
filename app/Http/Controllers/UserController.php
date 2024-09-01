@@ -53,22 +53,21 @@ class UserController extends Controller
         return redirect()->route('users.index')->with('success', 'User berhasil dibuat.');
     }
     
-
     public function edit($id)
     {
         $user = User::findOrFail($id);
         $roles = Role::all(); // Pastikan data roles juga dikirim
         return view('apps.user.edit', compact('user', 'roles'));
     }
+    
     public function update(Request $request, $id)
     {
         $request->validate([
             'fullname' => 'required|string|max:255',
             'username' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $id,
-            'password' => 'nullable|string|min:8|confirmed',
-            'role_id' => 'required|array',
-            'role_id.*' => 'exists:roles,id',
+            'password' => 'nullable|string|min:8',
+            'role_id' => 'required|exists:roles,id', // Pastikan validasi role_id yang benar
         ]);
     
         $user = User::findOrFail($id);
@@ -79,13 +78,15 @@ class UserController extends Controller
         if ($request->filled('password')) {
             $user->password = Hash::make($request->password);
         }
+    
         $user->save();
     
-        // Mengatur role pada user menggunakan Spatie Laravel Permission
-        $user->syncRoles($request->role_id); // Menyimpan multiple roles
+        // Update user role with syncRoles
+        $user->syncRoles([$request->role_id]);
     
         return redirect()->route('users.index')->with('success', 'User berhasil diperbarui.');
-    } 
+    }
+    
 
     public function destroy($userId)
     {

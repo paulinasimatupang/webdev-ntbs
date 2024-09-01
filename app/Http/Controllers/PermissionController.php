@@ -32,16 +32,17 @@ class PermissionController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => ['required', 'string', 'unique:permissions,name']
+            'name' => 'required|string|unique:permissions,name',
         ]);
-
+    
         Permission::create([
             'name' => $request->name,
-            'guard_name' => 'web' // Add guard_name if needed
+            'guard_name' => 'web',
         ]);
-
-        return redirect()->route('permissions.index')->with('status', 'Permission Created Successfully');
+    
+        return redirect()->route('permissions.index')->with('status', 'Permission created successfully.');
     }
+    
 
     public function edit(Permission $permission)
     {
