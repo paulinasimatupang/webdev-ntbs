@@ -208,7 +208,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/nasabah/approve/{id}', 'DataCalonNasabahController@approveNasabah')->name('nasabah_approve');
     Route::get('/nasabah/detail/{id}', 'DataCalonNasabahController@detailRequest')->name('nasabah_detail');
 
-    Route::post('/end-sms/{id}', 'SmsTwilioController@sendSms')->name('send_sms');
+    Route::post('/end-sms/{id}', 'DataCalonNasabahController@send_sms')->name('send_sms');
 
     Route::get('/nasabah/approve', 'DataCalonNasabahController@list_approve')->name('list_approve');
     Route::post('/nasabah/accept/{id}', 'DataCalonNasabahController@acceptNasabah')->name('nasabah_accept');
