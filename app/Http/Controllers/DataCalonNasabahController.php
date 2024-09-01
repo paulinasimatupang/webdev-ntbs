@@ -425,7 +425,7 @@ class DataCalonNasabahController extends Controller
             $this->sendApprovalSms($nasabah);
 
             return Redirect::to('/nasabah/approve')->with('success', 'Nasabah berhasil disetujui, CIF dan rekening berhasil dibuat.');
-            
+
         } catch (Exception $e) {
             DB::rollBack();
             Log::error('Error in approveNasabah: ' . $e->getMessage());
@@ -553,7 +553,7 @@ class DataCalonNasabahController extends Controller
         return view('calon_nasabah.list', ['imageUrl' => $imageUrl]);
     }
 
-    public function listJson(Request $request)
+    public function listJson(Request $request, $branchid)
     {
         // Memeriksa pengguna yang terautentikasi
         $user = auth()->user();
@@ -562,16 +562,11 @@ class DataCalonNasabahController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        // Ambil branchid dari body request
-        $branchid = $request->input('branchid');
-
         $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
 
         // Filter data berdasarkan branchid jika tersedia
         $data = DataCalonNasabah::select('*')
-            ->when($branchid, function ($query, $branchid) {
-                return $query->where('branchid', $branchid);
-            })
+            ->where('branchid', $branchid)
             ->whereIn('status', [2, 3, 4]);
 
         if ($request->has('search')) {
@@ -614,7 +609,8 @@ class DataCalonNasabahController extends Controller
             'username' => $user->username,
         ]);
     }
-    
+
+
     public function send_sms($id)
     {
         DB::beginTransaction();

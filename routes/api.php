@@ -184,8 +184,7 @@ Route::delete('users/{id}', 'UsersController@destroy');
 // Route::delete('master-data/{id}', [MasterDataController::class, 'destroy']); // Untuk menghapus data berdasarkan ID
 
 // Route::get('nasabah/list', 'DataCalonNasabahController@listJson');
-
-Route::middleware('auth:api')->get('nasabah/list', 'DataCalonNasabahController@listJson');
+Route::middleware('auth:api')->get('nasabah/list/{branchid}', 'DataCalonNasabahController@listJson');
 Route::middleware('auth:api')->get('history/detail', 'MessageLogController@historyDetail');
 Route::middleware('auth:api')->get('history', 'MessageLogController@historyList');
 Route::middleware('auth:api')->post('auth/changePassword', 'AuthController@changePassword');
