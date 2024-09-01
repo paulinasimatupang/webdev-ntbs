@@ -56,7 +56,12 @@
                                     <a href="{{ route('users.edit', $user->id) }}">
                                         <button class="btn btn-warning ripple btn-sm m-1 edit-btn" type="button">Edit</button>
                                     </a>
-                                    <button class="btn btn-danger ripple btn-sm m-1 delete-btn" type="button" onclick="deleteConfirm({{ $user->id }})">Delete</button>
+                                    <form action="{{ route('users.destroy', $user) }}" method="POST" style="display:inline;">
+                                        @csrf
+                                        @method('POST')
+                                        <button type="submit" class="btn btn-danger">Delete</button>
+                                    </form>
+
                                 </td>
                             </tr>
                             @endforeach

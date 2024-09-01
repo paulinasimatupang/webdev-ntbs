@@ -244,8 +244,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/users/create', 'UserController@create')->name('users.create');
     Route::post('/users', 'UserController@store')->name('users.store');
     Route::get('/users/{user}/edit', 'UserController@edit')->name('users.edit');
-    Route::post('/users/{user}', 'UserController@update')->name('users.update');
-    Route::post('/users/{user}/delete', 'UserController@destroy')->name('users.destroy');
+    Route::put('/users/{user}', 'UserController@update')->name('users.update');
+    Route::post('/users/{user}/destroy', 'UserController@destroy')->name('users.destroy');
 
 
     // Route::view('/', 'starter')->name('starter');

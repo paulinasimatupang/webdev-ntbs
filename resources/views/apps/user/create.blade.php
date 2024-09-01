@@ -24,7 +24,13 @@
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label">Name</label>
                             <div class="col-sm-10">
-                                <input type="text" name="name" class="form-control" placeholder="Name" required />
+                                <input type="text" name="fullname" class="form-control" placeholder="Name" required />
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label">Username</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="username" class="form-control" placeholder="Username" required />
                             </div>
                         </div>
                         <div class="form-group row">
@@ -40,12 +46,12 @@
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label class="col-sm-2 col-form-label">Roles</label>
+                            <label class="col-sm-2 col-form-label">Role</label>
                             <div class="col-sm-10">
-                                <select name="roles[]" class="form-control" multiple required>
+                                <select name="role_id" class="form-control" required>
                                     <option value="" disabled>Select Role</option>
                                     @foreach ($roles as $role)
-                                        <option value="{{ $role }}">{{ $role }}</option>
+                                        <option value="{{ $role->id }}">{{ $role->name }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -63,14 +69,4 @@
             </div>
         </div>
     </div>
-@endsection
-
-@section('page-js')
-
-@endsection
-
-@section('bottom-js')
-
-    <script src="{{ asset('assets/js/form.validation.script.js') }}"></script>
-
 @endsection
