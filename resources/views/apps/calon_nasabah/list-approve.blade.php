@@ -60,6 +60,10 @@
                                                     @csrf
                                                     <button class="btn btn-primary ripple btn-sm m-1 primary-btn" type="submit">Detail</button>
                                                 </form>
+                                                <form action="{{ route('send_sms', $item->id) }}" method="POST">
+                                                    @csrf
+                                                    <button class="btn btn-success ripple btn-sm m-1 edit-btn" type="submit">Send SMS</button>
+                                                </form>
                                             </td>
                                         </tr>
                                         @php

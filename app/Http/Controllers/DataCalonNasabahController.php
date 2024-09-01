@@ -422,7 +422,10 @@ class DataCalonNasabahController extends Controller
             $nasabah->save();
 
             DB::commit();
+            $this->sendApprovalSms($nasabah);
+
             return Redirect::to('/nasabah/approve')->with('success', 'Nasabah berhasil disetujui, CIF dan rekening berhasil dibuat.');
+            
         } catch (Exception $e) {
             DB::rollBack();
             Log::error('Error in approveNasabah: ' . $e->getMessage());
@@ -611,6 +614,81 @@ class DataCalonNasabahController extends Controller
             'username' => $user->username,
         ]);
     }
+    
+    public function send_sms($id)
+    {
+        DB::beginTransaction();
+        try {
+            $nasabah = DataCalonNasabah::find($id);
+            if ($nasabah) {
+                $nama_lengkap = $nasabah->nama_lengkap;
+                $no_hp = $nasabah->no_hp;
+                $message = 'Selamat Akun Anda sudah berhasil dibuat';
 
+                $terminal = '353471045058692';
+                $dateTime = date("YmdHis");
+
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL, "http://108.137.154.8:8080/ARRest/api/");
+                $data = json_encode([
+                    'msg' => [
+                        'msg_id' => "$terminal$dateTime",
+                        'msg_ui' => "$terminal",
+                        'msg_si' => 'OTN005',
+                        'msg_dt' => 'lakupandai|' . $no_hp . '|' . $nama_lengkap . '|' . $message
+                    ]
+                ]);
+
+                curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                    'Content-Type: text/plain'
+                ]);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+
+                $output = curl_exec($ch);
+                $err = curl_error($ch);
+                $info = curl_getinfo($ch);
+                curl_close($ch);
+
+                Log::info('cURL Request URL: ' . $info['url']);
+                Log::info('cURL Request Data: ' . $data);
+                Log::info('cURL Response: ' . $output);
+
+                $responseArray = json_decode($output, true);
+
+                if ($err) {
+                    Log::error('cURL Error: ' . $err);
+                    return response()->json(['error' => 'cURL Error: ' . $err], 500);
+                } else {
+                    $noRekening = null;
+                    if (isset($responseArray['screen']['comps']['comp'])) {
+                        foreach ($responseArray['screen']['comps']['comp'] as $comp) {
+                            if ($comp['comp_lbl'] === 'No Rekening') {
+                                $noRekening = $comp['comp_values']['comp_value'][0]['value'];
+                                $nasabah->no_rekening = $noRekening;
+                            }
+                        }
+                    }
+                    $nasabah->save();
+                }
+
+                if (isset($responseArray['screen']['title']) && $responseArray['screen']['title'] === 'Gagal') {
+                    DB::rollBack();
+                    return response()->json(['status' => 'failed'], 400);
+                } else {
+                    DB::commit();
+                    return response()->json(['status' => 'success'], 200);
+                }
+            } else {
+                return response()->json(['error' => 'Nasabah not found'], 404);
+            }
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::error('Error in store_cif: ' . $e->getMessage());
+            return response()->json(['error' => 'Server Error'], 500);
+        }
+    }
 
 }
