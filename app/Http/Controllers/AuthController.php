@@ -103,57 +103,57 @@ class AuthController extends Controller
             'username' => 'required',
             'password' => 'required',
         ];
-
         $validator = Validator::make($credentials, $rules);
-        if ($validator->fails()) {
+        if($validator->fails()) {
             return Redirect::to('login')
                             ->with('error', $validator->messages())
                             ->withInput();
         }
 
         try {
-            if (! $token = JWTAuth::attempt($credentials)) {
+            // attempt to verify the credentials and create a token for the user
+            if (! $token = Auth::attempt($credentials)) {
                 return Redirect::to('login')
-                                ->with('error', 'We can’t find an account with these credentials.')
-                                ->withInput();
+                            ->with('error', 'We cant find an account with this credentials.')
+                            ->withInput();
             }
         } catch (JWTException $e) {
+            // something went wrong whilst attempting to encode the token
             return Redirect::to('login')
                             ->with('error', 'Failed to login, please try again.')
                             ->withInput();
         }
 
-        $user = User::where('username', $credentials['username'])
-                    ->with('user_group.group')
-                    ->first();
+        // all good so return the token
+        $user = User::where('username', $credentials['username'])->with('user_group.group')->first();
 
-        if ($user) {
-            $role = Role::where('name', 'Admin')->first();
-            $roleMerchant = Role::where('name', 'Merchant')->first();
-
-            if ($role && ($role->id == $user->role_id || ($roleMerchant && $roleMerchant->id == $user->role_id))) {
-                if ($request->expectsJson()) {
-                    return response()->json([
-                        'status' => true,
-                        'message' => 'Login successful',
-                        'token' => $token,
-                        'data' => $user,
-                    ], 200);
+        if($user){
+            $role = Role::where('name','Admin')->first();
+            $roleMerchant = Role::where('name','Merchant')->first();
+            if($role){
+                if($role->id == $user->role_id || $roleMerchant->id == $user->role_id) {
+                    //skip
                 } else {
-                    $request->session()->put('user', $user);
-                    return Redirect::to('landing');
+                    return Redirect::to('login')
+                                    ->with('error', 'Failed to login, please check your account.')
+                                    ->withInput();
                 }
-            } else {
-                return Redirect::to('login')
-                                ->with('error', 'Failed to login, please check your account.')
-                                ->withInput();
+                // if($role->id != $user->role_id){
+                //     return Redirect::to('login')
+                //                     ->with('error', 'Failed to login, please check your account.')
+                //                     ->withInput();
+                // }
             }
-        } else {
+
+                        $request->session()->put('user', $user);
+
+            return Redirect::to('landing');
+        }else{
             return Redirect::to('login')
-                            ->with('error', 'User not found.')
                             ->withInput();
         }
     }
+
     // public function doLogin(Request $request)
     // {
     //     $credentials = $request->only('username', 'password');
