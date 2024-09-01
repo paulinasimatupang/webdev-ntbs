@@ -1,7 +1,9 @@
     <div class="main-header">
-            <div class="logo_bintang_header">
-                <img src="{{asset('assets/images/icon_bintang/ntbs-transparan.png')}}" alt="">
-            </div>
+        <div class="logo_bintang_header">
+            <a href="{{ url('landing') }}">
+                <img src="{{asset('assets/images/icon_bintang/ntbs-transparan.png')}}" alt="Logo">
+            </a>
+        </div>
 
             <div class="menu-toggle">
                 <div></div>

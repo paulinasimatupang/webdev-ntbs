@@ -117,7 +117,7 @@
                         <a href="{{ route('agen_request') }}" class="btn btn-primary">Back</a>
                         <form id="actionForm" method="POST" class="d-inline">
                         @csrf
-                        <input type="hidden" name="nasabah_id" value="{{ $nasabah->id }}">
+                        <input type="hidden" name="agen_id" value="{{ $merchant->id }}">
                         <input type="hidden" name="action" id="formAction">
 
                         <button type="button" id="approve" class="btn btn-success">

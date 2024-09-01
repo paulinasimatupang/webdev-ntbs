@@ -27,7 +27,7 @@ display: none;
                 <a class="nav-item-hold" href="{{route('transaction')}}">
                  
                     <img class="img_bintang_sidebar" src="{{asset('/assets/images/sidebar_icon/transaction.png')}}"alt="">
-                    <span class="nav-text">Transaction Laku Pandai</span>
+                    <span class="nav-text">Transaksi</span>
                 </a>
                 <div class="triangle"></div>
             </li>

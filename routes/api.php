@@ -20,6 +20,11 @@ Route::get('/', function (Request $request) {
 
 Route::post('auth/register', 'AuthController@register');
 Route::post('auth/login', 'AuthController@doLogin');
+Route::group(['middleware' => 'auth'], function () {
+    Route::get('/landing', function () {
+        return view('apps.landing');
+    })->name('landing');
+});
 
 Route::get('banks', 'BanksController@index');
 Route::post('banks', 'BanksController@store');
@@ -181,3 +186,6 @@ Route::delete('users/{id}', 'UsersController@destroy');
 // Route::get('nasabah/list', 'DataCalonNasabahController@listJson');
 
 Route::middleware('auth:api')->get('nasabah/list', 'DataCalonNasabahController@listJson');
+Route::middleware('auth:api')->get('history/detail', 'MessageLogController@historyDetail');
+Route::middleware('auth:api')->get('history', 'MessageLogController@historyList');
+Route::middleware('auth:api')->post('auth/changePassword', 'AuthController@changePassword');
