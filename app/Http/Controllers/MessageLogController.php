@@ -122,7 +122,7 @@ class MessageLogController extends Controller
             $logs = MessageLog::where('terminal_id', $request->terminal_id)
             ->whereIn('service_id', $serviceIds)
             ->whereNotNull('response_message')
-            ->select('request_message', 'response_message')
+            ->select('request_message')
             ->get();
 
             if ($logs->isEmpty()) {

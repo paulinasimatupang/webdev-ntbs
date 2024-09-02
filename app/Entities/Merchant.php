@@ -52,7 +52,7 @@ class Merchant extends Model implements Transformable
 
     public function terminal()
     {
-        return $this->hasMany(Terminal::class,'mid','merchant_id');
+        return $this->hasMany(Terminal::class,'merchant_id','mid');
     }
 
     public function user()
