@@ -48,21 +48,15 @@
                                                 <button class="btn btn-primary" type="button">Add/Edit Role</button>
                                             </a>
 
-                                            <!-- @can('update role') -->
-                                            @role('super-admin')
                                             <a href="{{ route('roles.edit', $role) }}">
                                                 <button class="btn btn-success" type="button">Edit Role</button>
                                             </a>
-                                            @endrole
 
-                                            @can('delete role')
                                             <form action="{{ route('roles.destroy', $role) }}" method="POST" style="display:inline;">
                                                 @csrf
                                                 @method('POST')
                                                 <button type="submit" class="btn btn-danger">Delete</button>
                                             </form>
-                                            @endcan
-                                            
                                         </td>
                                     </tr>
                             @endforeach
