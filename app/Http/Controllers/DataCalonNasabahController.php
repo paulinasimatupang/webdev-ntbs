@@ -425,7 +425,7 @@ class DataCalonNasabahController extends Controller
             $this->sendApprovalSms($nasabah);
 
             return Redirect::to('/nasabah/approve')->with('success', 'Nasabah berhasil disetujui, CIF dan rekening berhasil dibuat.');
-            
+
         } catch (Exception $e) {
             DB::rollBack();
             Log::error('Error in approveNasabah: ' . $e->getMessage());
@@ -553,7 +553,7 @@ class DataCalonNasabahController extends Controller
         return view('calon_nasabah.list', ['imageUrl' => $imageUrl]);
     }
 
-    public function listJson(Request $request)
+    public function listJson(Request $request, $branchid)
     {
         // Memeriksa pengguna yang terautentikasi
         $user = auth()->user();
@@ -562,51 +562,14 @@ class DataCalonNasabahController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        // Ambil branchid dari body request
-        $branchid = $request->input('branchid');
-
         $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
 
-        // Filter data berdasarkan branchid jika tersedia
+        // Filter data hanya berdasarkan branchid
         $data = DataCalonNasabah::select('*')
-            ->when($branchid, function ($query, $branchid) {
-                return $query->where('branchid', $branchid);
-            })
-            ->whereIn('status', [2, 3, 4]);
-
-        if ($request->has('search')) {
-            $data = $data->whereRaw('lower(name) like (?)', ["%{$request->search}%"]);
-        }
-
-        $total = $data->count();
-
-        if ($request->has('order_type')) {
-            if ($request->get('order_type') == 'asc') {
-                if ($request->has('order_by')) {
-                    $data->orderBy($request->get('order_by'));
-                } else {
-                    $data->orderBy('request_time');
-                }
-            } else {
-                if ($request->has('order_by')) {
-                    $data->orderBy($request->get('order_by'), 'desc');
-                } else {
-                    $data->orderBy('request_time', 'desc');
-                }
-            }
-        } else {
-            $data->orderBy('request_time', 'desc');
-        }
+            ->where('branchid', $branchid)
+            ->orderBy('request_time', 'asc'); // Order by request_time in ascending order
 
         $data = $data->get();
-
-        foreach ($data as $nasabah) {
-            if ($nasabah->status == 1) {
-                $nasabah->status_text = 'Accepted';
-            } else {
-                $nasabah->status_text = 'Rejected';
-            }
-        }
 
         return response()->json([
             'status' => true,
@@ -614,7 +577,9 @@ class DataCalonNasabahController extends Controller
             'username' => $user->username,
         ]);
     }
-    
+
+
+
     public function send_sms($id)
     {
         DB::beginTransaction();
