@@ -207,9 +207,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/nasabah/reject/{id}', 'DataCalonNasabahController@rejectNasabah')->name('nasabah_reject');
     Route::post('/nasabah/approve/{id}', 'DataCalonNasabahController@approveNasabah')->name('nasabah_approve');
     Route::get('/nasabah/detail/{id}', 'DataCalonNasabahController@detailRequest')->name('nasabah_detail');
-
     Route::post('/end-sms/{id}', 'DataCalonNasabahController@send_sms')->name('send_sms');
-
     Route::get('/nasabah/approve', 'DataCalonNasabahController@list_approve')->name('list_approve');
     Route::post('/nasabah/accept/{id}', 'DataCalonNasabahController@acceptNasabah')->name('nasabah_accept');
     Route::get('/nasabah/{id}/detail', 'DataCalonNasabahController@detailApprove')->name('nasabah_detail_approve');
@@ -236,7 +234,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/roles', 'RoleController@store')->name('roles.store');
     Route::get('/roles/{role}/edit', 'RoleController@edit')->name('roles.edit');
     Route::put('/roles/{role}', 'RoleController@update')->name('roles.update');
-    Route::post('/roles/{role}/destroy', 'RoleController@destroy')->name('roles.destroy'); 
+    Route::post('/roles/{role}/destroy', 'RoleController@destroy')->name('roles.destroy');
     Route::get('/roles/{role}/give-permissions', 'RoleController@addPermissionToRole')->name('roles.addPermissionToRole');
     Route::put('/roles/{role}/give-permissions', 'RoleController@givePermissionToRole')->name('roles.givePermissionToRole');
 

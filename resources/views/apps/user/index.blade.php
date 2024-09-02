@@ -53,14 +53,18 @@
                                 <td>{{ $user->email }}</td>
                                 <td>{{ $user->role_id }}</td>
                                 <td>
+                                    @can('update user')
                                     <a href="{{ route('users.edit', $user->id) }}">
                                         <button class="btn btn-warning ripple btn-sm m-1 edit-btn" type="button">Edit</button>
                                     </a>
+                                    @endcan
+                                    @can('delete user')
                                     <form action="{{ route('users.destroy', $user) }}" method="POST" style="display:inline;">
                                         @csrf
                                         @method('POST')
                                         <button type="submit" class="btn btn-danger">Delete</button>
                                     </form>
+                                    @endcan
 
                                 </td>
                             </tr>

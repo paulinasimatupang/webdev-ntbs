@@ -23,6 +23,8 @@ class User extends Authenticatable implements JWTSubject
     // HasApiTokens,
 
     public $incrementing = false;
+    
+    public $timestamps = false;
 
     protected $fillable = [
         'id', 
