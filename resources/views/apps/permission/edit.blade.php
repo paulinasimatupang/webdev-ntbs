@@ -35,7 +35,7 @@
                     <div class="form-group row">
                         <label class="col-sm-2 col-form-label">Permission Name</label>
                         <div class="col-sm-10">
-                            <input type="text" name="name" value="{{ $permission->name }}" class="form-control" placeholder="Permission Name" required>
+                            <input type="text" name="name" value="{{ old('name', $permission->name) }}" class="form-control" placeholder="Permission Name" required>
                         </div>
                     </div>
                     <div class="form-group row">
@@ -45,7 +45,6 @@
                         </div>
                     </div>
                 </form>
-
             </div>
         </div>
     </div>

@@ -112,7 +112,7 @@ class AuthController extends Controller
         }
 
         try {
-            if (! $token = JWTAuth::attempt($credentials)) {
+            if (! $token = Auth::attempt($credentials)) {
                 return Redirect::to('login')
                                 ->with('error', 'We can’t find an account with these credentials.')
                                 ->withInput();
@@ -132,17 +132,17 @@ class AuthController extends Controller
             $roleMerchant = Role::where('name', 'Merchant')->first();
 
             if ($role && ($role->id == $user->role_id || ($roleMerchant && $roleMerchant->id == $user->role_id))) {
-                if ($request->expectsJson()) {
-                    return response()->json([
-                        'status' => true,
-                        'message' => 'Login successful',
-                        'token' => $token,
-                        'data' => $user,
-                    ], 200);
-                } else {
+                // if ($request->expectsJson()) {
+                //     return response()->json([
+                //         'status' => true,
+                //         'message' => 'Login successful',
+                //         'token' => $token,
+                //         'data' => $user,
+                //     ], 200);
+                // } else {
                     $request->session()->put('user', $user);
                     return Redirect::to('landing');
-                }
+                // }
             } else {
                 return Redirect::to('login')
                                 ->with('error', 'Failed to login, please check your account.')

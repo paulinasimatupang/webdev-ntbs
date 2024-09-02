@@ -580,6 +580,7 @@ class ComposerStaticInit47851431b94adcfdca7422015eb93114
         'App\\Entities\\Provider' => __DIR__ . '/../..' . '/app/Entities/Provider.php',
         'App\\Entities\\ReportFee' => __DIR__ . '/../..' . '/app/Entities/ReportFee.php',
         'App\\Entities\\ReportMiniBanking' => __DIR__ . '/../..' . '/app/Entities/ReportMiniBanking.php',
+        'App\\Entities\\ResponseLog' => __DIR__ . '/../..' . '/app/Entities/ResponseLog.php',
         'App\\Entities\\Revenue' => __DIR__ . '/../..' . '/app/Entities/Revenue.php',
         'App\\Entities\\Role' => __DIR__ . '/../..' . '/app/Entities/Role.php',
         'App\\Entities\\RolePrivilege' => __DIR__ . '/../..' . '/app/Entities/RolePrivilege.php',

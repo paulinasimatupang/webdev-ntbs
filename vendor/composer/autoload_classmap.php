@@ -31,6 +31,7 @@ return array(
     'App\\Entities\\Provider' => $baseDir . '/app/Entities/Provider.php',
     'App\\Entities\\ReportFee' => $baseDir . '/app/Entities/ReportFee.php',
     'App\\Entities\\ReportMiniBanking' => $baseDir . '/app/Entities/ReportMiniBanking.php',
+    'App\\Entities\\ResponseLog' => $baseDir . '/app/Entities/ResponseLog.php',
     'App\\Entities\\Revenue' => $baseDir . '/app/Entities/Revenue.php',
     'App\\Entities\\Role' => $baseDir . '/app/Entities/Role.php',
     'App\\Entities\\RolePrivilege' => $baseDir . '/app/Entities/RolePrivilege.php',
