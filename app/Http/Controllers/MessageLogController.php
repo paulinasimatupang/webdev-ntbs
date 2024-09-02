@@ -49,59 +49,6 @@ class MessageLogController extends Controller
         return view('apps.messagelog.list')->with('data', $data);
     }
 
-    public function historyDetail(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'terminal_id' => 'required|integer',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'status' => false,
-                'error' => 'Invalid input data.',
-                'details' => $validator->errors(),
-            ], 422); 
-        }
-
-        $serviceIds = ['T00002', 'OTT001', 'OT0001'];
-
-        try {
-            $logs = MessageLog::where('terminal_id', $request->terminal_id)
-            ->whereIn('service_id', $serviceIds)
-            ->select('request_message')
-            ->get();
-
-            if ($logs->isEmpty()) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'No logs found for the given terminal ID.',
-                ], 404);
-            }
-
-            $msgIds = $logs->map(function ($log) {
-                $data = json_decode($log->request_message, true);
-                return $data['msg']['msg_id'] ?? null; // Return msg_id or null
-            })->filter(); // Remove null values
-    
-            // Get all ResponseLogs based on msg_id
-            $responseLogs = ResponseLog::whereIn('message_id', $msgIds)
-            ->select('value')
-            ->get();
-    
-            return response()->json([
-                'status' => true,
-                'data' => $responseLogs,
-            ], 200);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => false,
-                'error' => 'Failed to retrieve message logs.',
-                'exception' => $e->getMessage(),
-            ], 500);
-        }
-    }
-
     public function historyList(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -135,6 +82,51 @@ class MessageLogController extends Controller
             return response()->json([
                 'status' => true,
                 'data' => $logs,
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'error' => 'Failed to retrieve message logs.',
+                'exception' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function historyDetail($terminal_id, $message_id)
+    {
+        $validator = Validator::make([
+            'terminal_id' => $terminal_id,
+            'message_id' => $message_id,
+        ], [
+            'terminal_id' => 'required|integer',
+            'message_id' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'error' => 'Invalid input data.',
+                'details' => $validator->errors(),
+            ], 422); 
+        }
+
+        try {
+            $log = MessageLog::where('terminal_id', $terminal_id)
+                ->where('message_id', $message_id)
+                ->select('response_message')
+                ->first();
+
+            if (!$log) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'No log found for the given terminal ID and message ID.',
+                ], 404);
+            }
+
+            return response()->json([
+                'status' => true,
+                'data' => $log->response_message,
             ], 200);
 
         } catch (\Exception $e) {

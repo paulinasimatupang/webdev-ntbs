@@ -124,29 +124,20 @@ class AuthController extends Controller
         }
 
         $user = User::where('username', $credentials['username'])
-                    ->with('user_group.group')
+                    ->with('user_group.group', 'merchant.terminal')
                     ->first();
 
         if ($user) {
-            $role = Role::where('name', 'Admin')->first();
-            $roleMerchant = Role::where('name', 'Merchant')->first();
-
-            if ($role && ($role->id == $user->role_id || ($roleMerchant && $roleMerchant->id == $user->role_id))) {
-                // if ($request->expectsJson()) {
-                //     return response()->json([
-                //         'status' => true,
-                //         'message' => 'Login successful',
-                //         'token' => $token,
-                //         'data' => $user,
-                //     ], 200);
-                // } else {
-                    $request->session()->put('user', $user);
-                    return Redirect::to('landing');
-                // }
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Login successful',
+                    'token' => $token,
+                    'data' => $user,
+                ], 200);
             } else {
-                return Redirect::to('login')
-                                ->with('error', 'Failed to login, please check your account.')
-                                ->withInput();
+                $request->session()->put('user', $user);
+                return Redirect::to('landing');
             }
         } else {
             return Redirect::to('login')
