@@ -48,6 +48,10 @@ class User extends Authenticatable implements JWTSubject
 
     protected $keyType = 'string'; // Tipe UUID
 
+    public function hasRole($role)
+    {
+        return in_array($role, $this->roles);
+    }
     public function user_group()
     {
         return $this->hasMany(UserGroup::class,'user_id','id');

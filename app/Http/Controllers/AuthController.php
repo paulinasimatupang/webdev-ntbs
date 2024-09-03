@@ -112,7 +112,7 @@ class AuthController extends Controller
         }
 
         try {
-            if (! $token = JWTAuth::attempt($credentials)) {
+            if (! $token = Auth::attempt($credentials)) {
                 return Redirect::to('login')
                                 ->with('error', 'We can’t find an account with these credentials.')
                                 ->withInput();

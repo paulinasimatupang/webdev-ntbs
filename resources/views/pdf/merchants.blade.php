@@ -31,7 +31,7 @@
             font-weight: bold;
         }
         h1 {
-            font-size: 12px; /* Reduced font size for heading */
+            font-size: 10px; /* Reduced font size for heading */
             text-align: center;
             margin-bottom: 10px;
         }
