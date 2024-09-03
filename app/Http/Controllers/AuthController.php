@@ -106,45 +106,77 @@ class AuthController extends Controller
 
         $validator = Validator::make($credentials, $rules);
         if ($validator->fails()) {
-            return Redirect::to('login')
-                            ->with('error', $validator->messages())
-                            ->withInput();
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => $validator->messages()->first(),
+                ], 400);
+            } else {
+                return Redirect::to('login')
+                    ->with('error', $validator->messages())
+                    ->withInput();
+            }
+        }
+
+        $user = User::where('username', $credentials['username'])->first();
+        if (!$user) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Username not found.',
+                ], 404);
+            } else {
+                return Redirect::to('login')
+                    ->with('error', 'Username not found.')
+                    ->withInput();
+            }
         }
 
         try {
-            if (! $token = Auth::attempt($credentials)) {
-                return Redirect::to('login')
-                                ->with('error', 'We can’t find an account with these credentials.')
-                                ->withInput();
+            if (!Auth::attempt($credentials)) {
+                if ($request->expectsJson()) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Incorrect password.',
+                    ], 401);
+                } else {
+                    return Redirect::to('login')
+                        ->with('error', 'Incorrect password.')
+                        ->withInput();
+                }
             }
+
+            $token = Auth::attempt($credentials);
         } catch (JWTException $e) {
-            return Redirect::to('login')
-                            ->with('error', 'Failed to login, please try again.')
-                            ->withInput();
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Failed to login, please try again.',
+                ], 500);
+            } else {
+                return Redirect::to('login')
+                    ->with('error', 'Failed to login, please try again.')
+                    ->withInput();
+            }
         }
 
         $user = User::where('username', $credentials['username'])
                     ->with('user_group.group', 'merchant.terminal')
                     ->first();
 
-        if ($user) {
-            if ($request->expectsJson()) {
-                return response()->json([
-                    'status' => true,
-                    'message' => 'Login successful',
-                    'token' => $token,
-                    'data' => $user,
-                ], 200);
-            } else {
-                $request->session()->put('user', $user);
-                return Redirect::to('landing');
-            }
+        if ($request->expectsJson()) {
+            return response()->json([
+                'status' => true,
+                'message' => 'Login successful',
+                'token' => $token,
+                'data' => $user,
+            ], 200);
         } else {
-            return Redirect::to('login')
-                            ->with('error', 'User not found.')
-                            ->withInput();
+            $request->session()->put('user', $user);
+            return Redirect::to('landing');
         }
     }
+
     // public function doLogin(Request $request)
     // {
     //     $credentials = $request->only('username', 'password');

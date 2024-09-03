@@ -863,43 +863,45 @@ class MerchantsController extends Controller
         }
     }
 
-    /**
-     * Get number from storage.
-     *
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function lastestNumber(Request $request)
+    public function blockAgen(Request $request)
     {
         DB::beginTransaction();
-        try {
-            $merchant = Merchant::select('no')->orderBy('no','DESC')->first();
 
-            $response = [
-                'status'  => true,
-                'message' => 'Success',
-                'data'    => $merchant
-            ];
+        try {
+            $this->validator->with($request->all())->passesOrFail(ValidatorInterface::RULE_UPDATE);
+
+            $merchant = Merchant::where('id', $request->id)->first();
+            
+            if (!$merchant) {
+                throw new \Exception("Agen tidak ditermukan");
+            }
+
+            if ($merchant->status_agen == 1) {
+                $merchant->status_agen = 3;
+                $merchant->save();
+            }
+
+            $user = User::where('id', $merchant->user_id)->first();
+            
+            if ($user) {
+                $user->status = 3;
+                $user->save();
+            }
 
             DB::commit();
-            return response()->json($response, 200);
-        } catch (Exception $e) {
-            // For rollback data if one data is error
-            DB::rollBack();
-
+            // Returning a JSON response instead of redirecting
             return response()->json([
-                'status'    => false, 
-                'error'     => 'Something wrong!',
-                'exception' => $e
-            ], 500);
-        } catch (\Illuminate\Database\QueryException $e) {
-            // For rollback data if one data is error
-            DB::rollBack();
+                'status' => true,
+                'message' => 'Agen Terblokir.'
+            ], 200);
 
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Blokir Agen Gagal', ['error' => $e->getMessage()]);
+            // Returning a JSON response on failure
             return response()->json([
-                'status'    => false, 
-                'error'     => 'Something wrong!',
-                'exception' => $e
+                'status' => false,
+                'message' => 'Blokir Gagal: ' . $e->getMessage()
             ], 500);
         }
     }

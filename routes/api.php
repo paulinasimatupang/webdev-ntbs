@@ -189,3 +189,4 @@ Route::middleware('auth:api')->get('history/detail/{terminal_id}/{message_id}', 
 Route::middleware('auth:api')->get('history', 'MessageLogController@historyList');
 Route::middleware('auth:api')->post('auth/changePassword', 'AuthController@changePassword');
 Route::middleware('auth:api')->post('auth/changePin', 'AuthController@changePin');
+Route::middleware('auth:api')->post('agen/block', 'MerchantsController@blockAgen');

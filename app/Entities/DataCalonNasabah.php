@@ -44,7 +44,11 @@ class DataCalonNasabah extends Model
         'no_rekening',
         'status',
         'request_time',
-        'reply_time'
+        'reply_time',
+        'kode_agen',
+        'foto_ktp',
+        'foto_ttd',
+        'foto_diri',
     ];
 
     protected $table = 'public.data_calon_nasabah';
