@@ -15,7 +15,7 @@ use App\Http\Controllers\RankingLakuPandaiController;
 
 Route::get('/', function () {
     return view('sessions.signIn');
-}); 
+});
 
 Route::get('/login', 'AuthController@login')->name('login');
 Route::post('/login', 'AuthController@doLogin');
@@ -182,7 +182,7 @@ Route::group(['middleware' => ['checkMultipleRoles:super-admin,operator-pusat']]
     Route::post('/terminal/{id}/{merchant_id}/delete', 'TerminalsController@deleteMerchantData')->name('terminal_delete');
     Route::get('/terminal/{id}/activateBilliton', 'TerminalsController@activateBilliton')->name('terminal_activate_billiton');
     Route::get('/terminal/{id}/updateBilliton', 'TerminalsController@updateBilliton')->name('terminal_update_billiton');
-});   
+});
 
 Route::group(['middleware' => ['checkMultipleRoles:super-admin,agen']], function () {
     Route::get('/transaction', 'TransactionsController@index')->name('transaction');
@@ -259,6 +259,8 @@ Route::group(['middleware' => ['checkMultipleRoles:super-admin,customer-service-
     Route::get('/nasabah', 'DataCalonNasabahController@index')->name('nasabah');
     Route::get('/nasabah/list', 'DataCalonNasabahController@list')->name('nasabah_list');
     Route::get('/nasabah/request', 'DataCalonNasabahController@list_request')->name('nasabah_request');
+    // Rute untuk menampilkan gambar dari database
+    Route::get('/image/{imageName}', 'DataCalonNasabahController@getImage')->name('get_image');
     Route::post('/nasabah/reject/{id}', 'DataCalonNasabahController@rejectNasabah')->name('nasabah_reject');
 });
 
@@ -280,8 +282,8 @@ Route::group(['middleware' => ['checkMultipleRoles:super-admin']], function () {
     Route::get('/permissions/create', 'PermissionController@create')->name('permissions.create');
     Route::post('/permissions', 'PermissionController@store')->name('permissions.store');
     Route::get('/permissions/{permission}/edit', 'PermissionController@edit')->name('permissions.edit');
-    Route::put('/permissions/{permission}', 'PermissionController@update')->name('permissions.update');    
-    Route::post('/permissions/{permission}/destroy', 'PermissionController@destroy')->name('permissions.destroy');    
+    Route::put('/permissions/{permission}', 'PermissionController@update')->name('permissions.update');
+    Route::post('/permissions/{permission}/destroy', 'PermissionController@destroy')->name('permissions.destroy');
     //roles
     Route::get('/roles', 'RoleController@index')->name('roles.list');
     Route::get('/roles/create', 'RoleController@create')->name('roles.add');

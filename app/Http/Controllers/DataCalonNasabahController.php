@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -6,6 +7,8 @@ use DB;
 use Redirect;
 use Validator;
 
+use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Storage;
 use App\Http\Requests;
 use Prettus\Validator\Contracts\ValidatorInterface;
 use Prettus\Validator\Exceptions\ValidatorException;
@@ -425,7 +428,6 @@ class DataCalonNasabahController extends Controller
             $this->sendApprovalSms($nasabah);
 
             return Redirect::to('/nasabah/approve')->with('success', 'Nasabah berhasil disetujui, CIF dan rekening berhasil dibuat.');
-
         } catch (Exception $e) {
             DB::rollBack();
             Log::error('Error in approveNasabah: ' . $e->getMessage());
@@ -545,13 +547,72 @@ class DataCalonNasabahController extends Controller
         }
     }
 
-    public function showImageFromServer($imageName)
-    {
-        $baseUrl = "http://108.137.154.8:8081/ARRest/images";
-        $imageUrl = $baseUrl . $imageName;
+    // public function showImageFromServer($imageName)
+    // {
+    //     $baseUrl = "http://108.137.154.8:8081/ARRest/images";
+    //     $imageUrl = $baseUrl . $imageName;
 
-        return view('calon_nasabah.list', ['imageUrl' => $imageUrl]);
+    //     return view('calon_nasabah.list', ['imageUrl' => $imageUrl]);
+    // }
+
+
+    public function getImage($imageName)
+    {
+        $nasabah = DataCalonNasabah::where('foto_diri', $imageName)
+                                   ->orWhere('foto_ktp', $imageName)
+                                   ->orWhere('foto_ttd', $imageName)
+                                   ->first();
+    
+        if ($nasabah) {
+            $fileColumn = null;
+    
+            if ($nasabah->foto_diri === $imageName) {
+                $fileColumn = 'foto_diri';
+            } elseif ($nasabah->foto_ktp === $imageName) {
+                $fileColumn = 'foto_ktp';
+            } elseif ($nasabah->foto_ttd === $imageName) {
+                $fileColumn = 'foto_ttd';
+            }
+    
+            if ($fileColumn) {
+                // Pastikan Anda menggunakan path yang benar untuk file gambar
+                $filePath = storage_path('app/public/' . $nasabah->$fileColumn);
+                if (file_exists($filePath)) {
+                    $fileContent = file_get_contents($filePath);
+    
+                    // Tentukan MIME type berdasarkan ekstensi gambar
+                    $extension = pathinfo($filePath, PATHINFO_EXTENSION);
+                    $mimeType = $this->determineMimeType($extension);
+    
+                    // Pastikan konten gambar dikirim dengan benar
+                    return Response::make($fileContent, 200, [
+                        'Content-Type' => $mimeType,
+                        'Content-Disposition' => 'inline; filename="' . $imageName . '"'
+                    ]);
+                }
+            }
+        }
+    
+        abort(404, 'Image not found');
     }
+    
+    // Fungsi untuk menentukan MIME type berdasarkan ekstensi
+    private function determineMimeType($extension)
+    {
+        $mimeTypes = [
+            'jpeg' => 'image/jpeg',
+            'jpg' => 'image/jpg',
+            'png' => 'image/png',
+            'gif' => 'image/gif',
+            'bmp' => 'image/bmp',
+            'webp' => 'image/webp',
+            // Tambahkan MIME types lainnya sesuai kebutuhan
+        ];
+    
+        return $mimeTypes[$extension] ?? 'application/octet-stream';
+    }
+
+
 
     public function listJson(Request $request, $branchid)
     {
@@ -655,5 +716,4 @@ class DataCalonNasabahController extends Controller
             return response()->json(['error' => 'Server Error'], 500);
         }
     }
-
 }
