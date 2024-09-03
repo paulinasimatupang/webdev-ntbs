@@ -891,7 +891,7 @@ class MerchantsController extends Controller
             DB::commit();
             // Returning a JSON response instead of redirecting
             return response()->json([
-                'status' => 'success',
+                'status' => true,
                 'message' => 'Agen Terblokir.'
             ], 200);
 
@@ -900,7 +900,7 @@ class MerchantsController extends Controller
             Log::error('Blokir Agen Gagal', ['error' => $e->getMessage()]);
             // Returning a JSON response on failure
             return response()->json([
-                'status' => 'failed',
+                'status' => false,
                 'message' => 'Blokir Gagal: ' . $e->getMessage()
             ], 500);
         }
