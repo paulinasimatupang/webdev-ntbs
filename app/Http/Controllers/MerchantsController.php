@@ -411,7 +411,7 @@ class MerchantsController extends Controller
                     ], 403);
                 }
 
-                $role = Role::where('name', 'Merchant')->first();
+                $role = Role::where('name', 'Agen')->first();
                 if ($role) {
                     $role_id = $role->id;
                 } else {
@@ -421,17 +421,44 @@ class MerchantsController extends Controller
                     ], 404);
                 }
 
-                $password = 'agenntbs' . implode('', array_map(function() { return mt_rand(0, 9); }, range(1, 5)));
+                $password = implode('', array_merge(
+                    array_map(function() { return chr(mt_rand(65, 90)); }, range(1, 3)),
+                    array_map(function() { return chr(mt_rand(97, 122)); }, range(1, 3)), 
+                    array_map(function() { return mt_rand(0, 9); }, range(1, 2))
+                ));
+
+                $password = str_shuffle($password);
+                
                 Log::info('PasswordGenerate: ' . $password);
+
+                $prefix = 'NTBUS'; 
+                $lastUser = User::where('username', 'LIKE', $prefix . '%')
+                                ->orderBy('created_at', 'desc')
+                                ->first();
+                
+                $newUsername = $prefix . '000001'; 
+                
+                if ($lastUser) {
+                    $lastUsername = $lastUser->username;
+                    $number = substr($lastUsername, strlen($prefix));
+                    $newNumber = (int)$number + 1;
+                    $newNumberPadded = str_pad($newNumber, 6, '0', STR_PAD_LEFT);
+                    $newUsername = $prefix . $newNumberPadded;
+                }
+
+                while (User::where('username', $newUsername)->exists()) {
+                    $newNumber = (int)substr($newUsername, strlen($prefix)) + 1;
+                    $newUsername = $prefix . str_pad($newNumber, 6, '0', STR_PAD_LEFT);
+                }
                 
                 $user = User::create([
                                 'role_id'           => $role_id,
-                                'username'          => $request->username,
+                                'username'          => $newUsername,
                                 'fullname'          => $request->fullname,
                                 'email'             => $request->email,
                                 'password'          => bcrypt($password),
                                 'password_plain'    => $password,
-                                'status'            => 1
+                                'status'            => 0
                             ]);
 
                 $uploadPath = public_path('uploads/');
@@ -462,18 +489,42 @@ class MerchantsController extends Controller
                     }
                 }
 
-                $reqData = $request->except(['file_ktp', 'file_kk', 'file_npwp']); 
+                $branchid = $request->branchid;
+
+                $prefix = 'NTB'; 
+                $lastMID = Merchant::where('mid', 'LIKE', $prefix . '%')
+                                ->orderBy('created_at', 'desc')
+                                ->first();
+                
+                $newMid = $prefix . $branchid . '000001';
+                
+                if ($lastMID) {
+                    $lastMid = $lastMID->username;
+                    $number = substr($lastMid, strlen($prefix));
+                    $newNumber = (int)$number + 1;
+                    $newNumberPadded = str_pad($newNumber, 6, '0', STR_PAD_LEFT);;
+                    $newMid = $prefix . $branchid . $newNumberPadded;
+                }
+
+                while (Merchant::where('mid', $newMid)->exists()) {
+                    $newNumber = (int)substr($newMid, strlen($prefix)) + 1;
+                    $newMid = $prefix . str_pad($newNumber, 6, '0', STR_PAD_LEFT);
+                }
+
+                $reqData = $request->except(['file_ktp', 'file_kk', 'file_npwp', 'branchid']); 
                 $reqData['user_id'] = $user->id;
                 $reqData['name']    = $user->fullname;
                 $reqData['status_agen']    = 0;
                 $reqData['file_ktp'] = $filePaths['file_ktp'];
                 $reqData['file_kk'] = $filePaths['file_kk'];
                 $reqData['file_npwp'] = $filePaths['file_npwp'];
+                $reqData['mid'] = $newMid;
+                $reqData['pin'] = implode('', array_map(function() { return mt_rand(0, 9); }, range(1, 6)));
                 $reqData['active_at'] =now();
 
                 $data   = $this->repository->create($reqData);
 
-                $checkGroup = Group::where('name','Agent')->first();
+                $checkGroup = Group::where('name','Agen')->first();
                 if($checkGroup){
                     $checkUG = UserGroup::where('user_id',$user->id)
                                         ->where('group_id',$checkGroup->id)
@@ -487,17 +538,17 @@ class MerchantsController extends Controller
                 }
 
                 DB::commit();
-                return Redirect::to('agen/list')
+                return Redirect::to('agen')
                                 ->with('message', 'Merchant created');
             } catch (Exception $e) {
                 DB::rollBack();
                     return Redirect::to('agen/create')
-                                ->with('error', $e)
+                                ->with('error', $e->getMessage())
                                 ->withInput();
             } catch (\Illuminate\Database\QueryException $e) {
                 DB::rollBack();
                     return Redirect::to('agen/create')
-                                ->with('error', $e)
+                                ->with('error', $e->getMessage())
                                 ->withInput();
             }
     }
@@ -666,32 +717,41 @@ class MerchantsController extends Controller
 
             $user = User::where('id', $merchant->user_id)->first();
             
-            if ($user) {
-                $user->status = 1;
-                $user->save();
+            if (!$user) {
+                throw new \Exception("User not found");
             }
 
-            $password = $user->password;
+            $user->status = 1;
+            $user->save();
 
-            $pesan = "<p><b>Halo</b></p>";
-            $pesan .= '<p>Berikut adalah detail akun Anda:</p>';
-            $pesan .= '<p>Username: ' . $user->username . '</p>';
-            $pesan .= '<p>Password: ' . $user->password_plain . '</p>';
+            $pesan = '<p>Halo ' . htmlspecialchars($user->fullname) . ',</p>';
+            $pesan .= '<p>Pendaftaran Anda telah kami setujui, Anda telah terdaftar sebagai Agen LAKUPANDAI.</p>';
+            $pesan .= '<p>Berikut informasi Anda yang telah terdaftar sebagai Agen LAKUPANDAI:</p>';
+            $pesan .= '<p>ID Agen: ' . htmlspecialchars($merchant->mid) . '</p>';
+            $pesan .= '<p>Username: ' . htmlspecialchars($user->username) . '</p>';
+            $pesan .= '<p>Pin Transaksi: ' . htmlspecialchars($merchant->pin) . '</p>';
+            $pesan .= '<p>Gunakan Username dan Pin Transaksi di atas untuk mengakses halaman Bank.</p>';
+            $pesan .= '<p>Salam Hangat,</p>';
+            $pesan .= '<p><b>NTBS LAKUPANDAI</b></p>';
 
             $detail_message = [
                 'sender' => 'administrator@selada.id',
-                'subject' => 'Akun Agen NTBS',
+                'subject' => '[NTBS LAKUPANDAI] Pendaftaran Agen LAKUPANDAI Berhasil',
                 'isi' => $pesan
             ];
 
             Mail::to($user->email)->send(new sendPassword($detail_message));
 
             DB::commit();
-            return redirect()->route('agen/list')->with('success', 'Merchant activated successfully.');
+            return redirect()->route('agen_list')->with('success', 'Merchant activated successfully.');
+        } catch (\Illuminate\Database\QueryException $e) {
+            DB::rollBack();
+            Log::error('Database error during agent activation', ['error' => $e->getMessage()]);
+            return redirect()->route('agen_request')->with('failed', 'Activation failed: ' . $e->getMessage());
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Agent activation failed', ['error' => $e->getMessage()]);
-            return redirect()->route('agen/list')->with('failed', 'Activation failed: ' . $e->getMessage());
+            return redirect()->route('agen_request')->with('failed', 'Activation failed: ' . $e->getMessage());
         }
     }
 

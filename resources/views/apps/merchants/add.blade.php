@@ -22,21 +22,15 @@
                     <form action="{{ route('agen_store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="form-group row">
-                            <label class="col-sm-2 col-form-label">Kode Agen</label>
+                            <label class="col-sm-2 col-form-label">Kode Cabang</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" id="mid" name="mid" value="{{ old('mid', session('mid', null)) }}" placeholder="Kode Agen" required>
+                                <input type="text" class="form-control" id="branchid" name="branchid" value="{{ old('branchid', session('branchid', null)) }}" placeholder="Kode Cabang" required>
                             </div>
                         </div>
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label">Nama Lengkap</label>
                             <div class="col-sm-10">
                                 <input type="text" class="form-control" id="fullname" name="fullname" value="{{ old('fullname', session('fullname', null)) }}" placeholder="Nama Lengkap" required>
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <label class="col-sm-2 col-form-label">Username</label>
-                            <div class="col-sm-10">
-                                <input type="text" class="form-control" value="{{ old('username') }}" name="username" placeholder="Username" required>
                             </div>
                         </div>
                         <div class="form-group row">

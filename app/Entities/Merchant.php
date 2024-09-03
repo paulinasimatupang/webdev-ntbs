@@ -44,7 +44,8 @@ class Merchant extends Model implements Transformable
         'no_registrasi',
         'file_ktp',
         'file_kk',
-        'file_npwp'
+        'file_npwp',
+        'pin'
     ];
 
     protected $table = 'merchants';

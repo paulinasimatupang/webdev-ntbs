@@ -20,7 +20,7 @@ use Prettus\Validator\Contracts\ValidatorInterface;
 use Prettus\Validator\Exceptions\ValidatorException;
 use Illuminate\Support\Facades\Log;
 
-
+use App\Entities\Merchant;
 use App\Entities\User;
 use App\Entities\Role;
 
@@ -112,7 +112,7 @@ class AuthController extends Controller
         }
 
         try {
-            if (! $token = Auth::attempt($credentials)) {
+            if (! $token = JWTAuth::attempt($credentials)) {
                 return Redirect::to('login')
                                 ->with('error', 'We can’t find an account with these credentials.')
                                 ->withInput();
@@ -186,6 +186,181 @@ class AuthController extends Controller
 
     //     return response()->json(['status' => false, 'error' => 'User not found.'], 404);
     // }
+
+    public function changePassword(Request $request)
+    {
+        DB::beginTransaction();
+        try {
+            $user = User::where('id', $request->id)->first();
+            if ($user) {
+                if (Hash::check($request->old_password, $user->password)) {
+                    $user->password = bcrypt($request->new_password);
+                    $user->password_plain = $request->new_password;
+                    $user->save();
+
+                    DB::commit();
+
+                    $response = [
+                        'status'  => true,
+                        'message' => 'Password berhasil diubah.',
+                    ];
+                    return response()->json($response, 200);            
+                } else {
+                    DB::rollBack();
+
+                    $response = [
+                        'status' => false,
+                        'error'  => 'Password lama salah. Mohon isi dengan password yang benar untuk mengubah password baru.',
+                    ];
+
+                    return response()->json($response, 400);
+                }
+            } else {
+                DB::rollBack();
+
+                $response = [
+                    'status' => false,
+                    'error'  => 'User tidak ditemukan.',
+                ];
+
+                return response()->json($response, 404);
+            }
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            DB::rollBack();
+            $response = [
+                'status'  => false,
+                'error'   => 'Data tidak ditemukan.',
+                'details' => $e->getMessage()
+            ];
+            return response()->json($response, 404);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            DB::rollBack();
+            $response = [
+                'status'  => false,
+                'error'   => 'Validasi gagal.',
+                'details' => $e->errors()
+            ];
+            return response()->json($response, 422);
+        } catch (\Illuminate\Database\QueryException $e) {
+            DB::rollBack();
+            $response = [
+                'status'  => false,
+                'error'   => 'Kesalahan query database.',
+                'details' => $e->getMessage()
+            ];
+            return response()->json($response, 500);
+        } catch (\PDOException $e) {
+            DB::rollBack();
+            $response = [
+                'status'  => false,
+                'error'   => 'Kesalahan koneksi database.',
+                'details' => $e->getMessage()
+            ];
+            return response()->json($response, 500);
+        } catch (Exception $e) {
+            DB::rollBack();
+            $response = [
+                'status'    => false,
+                'error'     => 'Terjadi kesalahan yang tidak terduga.',
+                'exception' => $e->getMessage()
+            ];
+            return response()->json($response, 500);
+        }
+    }
+
+    public function changePin(Request $request)
+    {
+        DB::beginTransaction();
+        try {
+            $validator = Validator::make($request->all(), [
+                'id' => 'required|integer',
+                'old_pin' => 'required|string|min:4|max:6',
+                'new_pin' => 'required|string|min:4|max:6',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'error' => 'Data input tidak valid.',
+                    'details' => $validator->errors(),
+                ], 422);
+            }
+
+            $merchant = Merchant::where('id', $request->id)->first();
+            if ($merchant) {
+                if ($request->old_pin == $merchant->pin) {
+                    $merchant->pin = $request->new_pin;
+                    $merchant->save();
+
+                    DB::commit();
+
+                    $response = [
+                        'status'  => true,
+                        'message' => 'PIN berhasil diubah.',
+                    ];
+                    return response()->json($response, 200);
+                } else {
+                    DB::rollBack();
+
+                    $response = [
+                        'status' => false,
+                        'error'  => 'PIN lama salah. Mohon isi dengan PIN yang benar untuk mengubah PIN baru.',
+                    ];
+
+                    return response()->json($response, 400);
+                }
+            } else {
+                DB::rollBack();
+
+                $response = [
+                    'status' => false,
+                    'error'  => 'Merchant tidak ditemukan.',
+                ];
+
+                return response()->json($response, 404);
+            }
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            DB::rollBack();
+            $response = [
+                'status'  => false,
+                'error'   => 'Data tidak ditemukan.',
+                'details' => $e->getMessage()
+            ];
+            return response()->json($response, 404);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            DB::rollBack();
+            $response = [
+                'status'  => false,
+                'error'   => 'Validasi gagal.',
+                'details' => $e->errors()
+            ];
+            return response()->json($response, 422);
+        } catch (\Illuminate\Database\QueryException $e) {
+            DB::rollBack();
+            $response = [
+                'status'  => false,
+                'error'   => 'Kesalahan query database.',
+                'details' => $e->getMessage()
+            ];
+            return response()->json($response, 500);
+        } catch (\PDOException $e) {
+            DB::rollBack();
+            $response = [
+                'status'  => false,
+                'error'   => 'Kesalahan koneksi database.',
+                'details' => $e->getMessage()
+            ];
+            return response()->json($response, 500);
+        } catch (Exception $e) {
+            DB::rollBack();
+            $response = [
+                'status'    => false,
+                'error'     => 'Terjadi kesalahan yang tidak terduga.',
+                'exception' => $e->getMessage()
+            ];
+            return response()->json($response, 500);
+        }
+    }
 
     public function logout(Request $request)
     {
