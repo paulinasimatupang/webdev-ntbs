@@ -52,6 +52,7 @@ class User extends Authenticatable implements JWTSubject
     {
         return in_array($role, $this->roles);
     }
+
     public function user_group()
     {
         return $this->hasMany(UserGroup::class,'user_id','id');
@@ -60,6 +61,10 @@ class User extends Authenticatable implements JWTSubject
     public function merchant()
     {
         return $this->hasOne(Merchant::class,'user_id','id');
+    }
+    public function roles()
+    {
+        return $this->belongsTo(Role::class,'role_id');
     }
 
     /**

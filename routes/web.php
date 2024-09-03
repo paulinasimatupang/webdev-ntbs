@@ -266,7 +266,7 @@ Route::group(['middleware' => ['checkMultipleRoles:super-admin']], function () {
     //message log
     Route::get('/message', 'MessageLogController@index')->name('message_log');
     //biller
-    // Route::get('/biller', 'BillersController@index')->name('biller');
+    Route::get('/biller', 'BillersController@index')->name('biller');
     Route::get('/billers', 'BillersController@index')->name('billers');
     Route::get('/billers/create', 'BillersController@create')->name('billers_create');
     Route::post('/billers/store', 'BillersController@store')->name('billers_store');

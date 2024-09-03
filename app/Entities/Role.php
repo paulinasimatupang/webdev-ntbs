@@ -26,4 +26,9 @@ class Role extends Model implements Transformable
 
     protected $table = 'roles';
 
+    public function user()
+    {
+        return $this->hasMany(User::class,'role_id');
+    }
+
 }

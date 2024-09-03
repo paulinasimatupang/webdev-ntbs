@@ -9,13 +9,13 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('permission:view user', ['only' => ['index']]);
-        $this->middleware('permission:create user', ['only' => ['create', 'store']]);
-        $this->middleware('permission:update user', ['only' => ['update', 'edit']]);
-        $this->middleware('permission:delete user', ['only' => ['destroy']]);
-    }
+    // public function __construct()
+    // {
+    //     $this->middleware('permission:view user', ['only' => ['index']]);
+    //     $this->middleware('permission:create user', ['only' => ['create', 'store']]);
+    //     $this->middleware('permission:update user', ['only' => ['update', 'edit']]);
+    //     $this->middleware('permission:delete user', ['only' => ['destroy']]);
+    // }
 
     public function index()
     {
@@ -25,6 +25,7 @@ class UserController extends Controller
 
     public function create()
     {
+        // dd()
         $roles = Role::all();
         return view('apps.user.create', compact('roles'));
     }
@@ -32,6 +33,7 @@ class UserController extends Controller
     public function store(Request $request)
     {
         // Validasi input yang diterima
+
         $request->validate([
             'fullname' => 'required|string|max:255',
             'username' => 'required|string|max:255',
@@ -46,7 +48,7 @@ class UserController extends Controller
             'username' => $request->username,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            // 'role_id' => $request->role_id, // Menyimpan role_id
+            'role_id' => $request->role_id, // Menyimpan role_id
         ]);
 
         // Sinkronisasi role dengan menggunakan syncRoles

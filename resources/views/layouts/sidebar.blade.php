@@ -16,13 +16,6 @@ display: none;
                 </a>
                 <div class="triangle"></div>
             </li>
-            <!-- <li class="nav-item {{ (request()->is('new_features') || request()->is('new_features/*')) ? 'active' : '' }}">
-                <a class="nav-item-hold" href="{{route('new_features')}}">
-                <img class="img_bintang_sidebar" src="{{asset('/assets/images/sidebar_icon/new_features.png')}}" alt="">
-                    <span class="nav-text">New Features</span>
-                </a>
-                <div class="triangle"></div>
-            </li> -->
             <li class="nav-item {{ (request()->is('transaction') || request()->is('transaction/*')) ? 'active' : '' }}">
                 <a class="nav-item-hold" href="{{route('transaction')}}">
                  
@@ -31,14 +24,6 @@ display: none;
                 </a>
                 <div class="triangle"></div>
             </li>
-            <!-- <li class="nav-item {{ (request()->is('transactionBJB') || request()->is('transactionBJB/*')) ? 'active' : '' }}">
-                <a class="nav-item-hold" href="{{route('transactionBJB')}}">
-                 
-                    <img class="img_bintang_sidebar" src="{{asset('/assets/images/sidebar_icon/transactionbjb.png')}}"alt="">
-                    <span class="nav-text">Transaction BJB (PPOB)</span>
-                </a>
-                <div class="triangle"></div>
-            </li> -->
 	    <li class="nav-item {{ (request()->is('terminal') || request()->is('terminal/*')) ? 'active' : '' }}" @php if(session()->get('user')->role_id == 2) echo 'id="b1"'; @endphp>
                 <a class="nav-item-hold" href="{{route('terminal')}}" >
                  
