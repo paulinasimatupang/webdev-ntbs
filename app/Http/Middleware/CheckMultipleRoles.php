@@ -22,9 +22,9 @@ class CheckMultipleRoles
     
         $user = Auth::user();
         
-        // Ganti dengan logika pemeriksaan role yang sesuai
-        $userRoles = $user->roles; // Misalnya, jika role disimpan dalam atribut `roles`
-    
+        // Ubah `roles` menjadi array yang dapat digunakan oleh `in_array()`
+        $userRoles = $user->roles->pluck('name')->toArray(); // Asumsi role disimpan sebagai `name`
+        
         foreach ($roles as $role) {
             if (in_array($role, $userRoles)) {
                 return $next($request);
@@ -33,4 +33,5 @@ class CheckMultipleRoles
     
         abort(403, 'Anda tidak memiliki hak akses untuk halaman ini.');
     }
+    
 }
