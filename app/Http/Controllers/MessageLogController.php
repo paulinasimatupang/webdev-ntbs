@@ -114,6 +114,7 @@ class MessageLogController extends Controller
                 'no_rek' => $noRek,
                 'nama_rek' => $namaRek,
                 'nominal' => $nominal,
+                'status' => $log->message_status,
                 'request_message' => $log->request_message,
                 'response_message' => $log->response_message,
                 'reply_time' => $log->reply_time,
