@@ -291,7 +291,7 @@
 @section('page-js')
 <script>
 document.getElementById('approve').addEventListener('click', function() {
-    if (confirm('Are you sure you want to activate this merchant?')) {
+    if (confirm('Apakah Anda yakin akan menerima nasabah ini?')) {
         document.getElementById('formAction').value = 'activate';
         document.getElementById('actionForm').action = "{{ route('nasabah_approve', ['id' => $nasabah->id]) }}";
         document.getElementById('actionForm').submit();
@@ -299,7 +299,7 @@ document.getElementById('approve').addEventListener('click', function() {
 });
 
 document.getElementById('reject').addEventListener('click', function() {
-    if (confirm('Are you sure you want to reject this merchant?')) {
+    if (confirm('Apakah Anda yakin akan menolak nasabah ini?')) {
         document.getElementById('formAction').value = 'reject';
         document.getElementById('actionForm').action = "{{ route('nasabah_reject', ['id' => $nasabah->id]) }}";
         document.getElementById('actionForm').submit();

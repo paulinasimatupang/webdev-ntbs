@@ -136,7 +136,7 @@
 @section('page-js')
 <script>
 document.getElementById('approve').addEventListener('click', function() {
-    if (confirm('Are you sure you want to activate this merchant?')) {
+    if (confirm('Apakah Anda yakin akan mengaktivasi agen ini?')) {
         document.getElementById('formAction').value = 'activate';
         document.getElementById('actionForm').action = "{{ route('agen_activate', ['id' => $merchant->id]) }}";
         document.getElementById('actionForm').submit();

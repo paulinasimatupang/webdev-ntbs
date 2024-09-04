@@ -184,7 +184,7 @@
 
                     <script>
                         document.getElementById('activateMerchantBtn').addEventListener('click', function() {
-                            if (confirm('Are you sure you want to activate this merchant?')) {
+                            if (confirm('Apakah Anda yakin akan mengaktivasi agen ini?')) {
                                 fetch("{{ route('agen_activate', [$merchant->id]) }}", {
                                         method: 'POST',
                                         headers: {
@@ -209,7 +209,7 @@
                         });
 
                         document.getElementById('deactivateMerchantBtn').addEventListener('click', function() {
-                            if (confirm('Are you sure you want to deactivate this merchant?')) {
+                            if (confirm('Apakah Anda yakin akan menonaftifkan agen ini?')) {
                                 fetch("{{ route('agen_deactivate', [$merchant->id]) }}", {
                                         method: 'POST',
                                         headers: {
