@@ -298,6 +298,14 @@ Route::group(['middleware' => ['checkMultipleRoles:super-admin']], function () {
     Route::put('/roles/{role}/give-permissions', 'RoleController@givePermissionToRole')->name('roles.givePermissionToRole');
 });
 
+Route::group(['middleware' => ['checkMultipleRoles:super-admin, call-center']], function () {
+    Route::get('/agen', 'MerchantsController@menu')->name('agen');
+    Route::post('/agen/{id}/activate', 'MerchantsController@activateMerchant')->name('agen_activate');
+    Route::get('/agen/blocked', 'MerchantsController@list_block')->name('agen_blocked');
+    Route::get('/agen/blocked/{id}', 'MerchantsController@detail_blocked')->name('agen_blocked_detail');
+
+});
+
     // Routes for Master Data
     // Route::get('/hak-akses', 'HakAksesController@index')->name('hakakses');
     // Route::get('/hak-akses/create', 'HakAksesController@create')->name('hakakses_create');
