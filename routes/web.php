@@ -218,17 +218,27 @@ Route::group(['middleware' => ['checkMultipleRoles:super-admin,supervisor-pusat'
 
 Route::group(['middleware' => ['checkMultipleRoles:super-admin,supervisor-cabang']], function () {
     //nasabah approve
+    Route::get('/nasabah', 'DataCalonNasabahController@index')->name('nasabah');
+    Route::get('/nasabah/list', 'DataCalonNasabahController@list')->name('nasabah_list');
     Route::post('/nasabah/cif/{id}', 'DataCalonNasabahController@store_cif')->name('nasabah_cif');
+    Route::post('/nasabah/reject/{id}', 'DataCalonNasabahController@rejectNasabah')->name('nasabah_reject');
     Route::post('/nasabah/approve/{id}', 'DataCalonNasabahController@approveNasabah')->name('nasabah_approve');
-    Route::get('/nasabah/detail/{id}', 'DataCalonNasabahController@detailRequest')->name('nasabah_detail');
     Route::post('/end-sms/{id}', 'DataCalonNasabahController@send_sms')->name('send_sms');
     Route::get('/nasabah/approve', 'DataCalonNasabahController@list_approve')->name('list_approve');
-    Route::post('/nasabah/accept/{id}', 'DataCalonNasabahController@acceptNasabah')->name('nasabah_accept');
-    Route::get('/nasabah/{id}/detail', 'DataCalonNasabahController@detailApprove')->name('nasabah_detail_approve');
+    Route::get('/nasabah/approve/detail/{id}', 'DataCalonNasabahController@detailApprove')->name('nasabah_detail_approve');
+    Route::get('/nasabah/detail/{id}', 'DataCalonNasabahController@detail')->name('nasabah_detail');
+
     //agen
+    Route::get('/agen', 'MerchantsController@menu')->name('agen');
+    Route::post('/agen/{id}/activate', 'MerchantsController@activateMerchant')->name('agen_activate');
+    Route::post('/agen/{id}/deactivate', 'MerchantsController@deactivateMerchant')->name('agen_deactivate');
+    Route::get('/agen/request', 'MerchantsController@request_list')->name('agen_request');
+    Route::get('/agen/request/{id}', 'MerchantsController@detail_request')->name('agen_request_detail');
+    Route::post('/agen/{id}/reject', 'MerchantsController@rejectAgent')->name('agen_reject');
     Route::get('/agen/{id}/edit', 'MerchantsController@edit')->name('agen_edit');
     Route::post('/agen/{id}/update', 'MerchantsController@update')->name('agen_update');
-    Route::post('/agen/{id}/destroy', 'MerchantsController@destroy')->name('agen_destroy'); //baru ditambahin soalnya di root belum ada
+    Route::post('/agen/{id}/destroy', 'MerchantsController@destroy')->name('agen_destroy'); 
+    //baru ditambahin soalnya di root belum ada
     //root ngirim sms
 });
 
@@ -242,24 +252,17 @@ Route::group(['middleware' => ['checkMultipleRoles:super-admin,customer-service-
     Route::post('/agen/store/inquiry', 'MerchantsController@store_inquiry_nik')->name('agen_store_inquiry_nik');
     Route::get('/agen/create/inquiry/rek', 'MerchantsController@inquiry_rek')->name('agen_inquiry_rek');
     Route::post('/agen/store/inquiry/rek', 'MerchantsController@store_inquiry_rek')->name('agen_store_inquiry_rek');
-    Route::get('/agen/create/cif', 'MerchantsController@create_cif')->name('agen_create_cif');
-    Route::post('/agen/store/cif', 'MerchantsController@store_cif')->name('agen_store_cif');
-    Route::get('/agen/create/rekening', 'MerchantsController@create_rekening')->name('agen_create_rekening');
-    Route::post('/agen/store/rekening', 'MerchantsController@store_rekening')->name('agen_store_rekening');
-    Route::post('/agen/{id}/activate', 'MerchantsController@activateMerchant')->name('agen_activate');
-    Route::post('/agen/{id}/deactivate', 'MerchantsController@deactivateMerchant')->name('agen_deactivate');
-    Route::get('/agen/request', 'MerchantsController@request_list')->name('agen_request');
-    Route::get('/agen/request/{id}', 'MerchantsController@detail_request')->name('agen_request_detail');
-    Route::post('/agen/{id}/reject', 'MerchantsController@rejectAgent')->name('agen_reject');
     Route::get('/merchants.pdf', 'MerchantsController@exportPDF')->name('merchants.pdf');
     Route::get('/merchants.csv', 'MerchantsController@exportCSV')->name('merchants.csv');
     Route::get('/merchants.excel', 'MerchantsController@exportExcel')->name('merchants.excel');
     Route::get('/merchants.txt', 'MerchantsController@exportTxt')->name('merchants.txt');
     //nasabah
     Route::get('/nasabah', 'DataCalonNasabahController@index')->name('nasabah');
-    Route::get('/nasabah/list', 'DataCalonNasabahController@list')->name('nasabah_list');
     Route::get('/nasabah/request', 'DataCalonNasabahController@list_request')->name('nasabah_request');
-    // Rute untuk menampilkan gambar dari database
+    Route::get('/nasabah/request/detail/{id}', 'DataCalonNasabahController@detailRequest')->name('nasabah_detail_request');
+    Route::post('/nasabah/accept/{id}', 'DataCalonNasabahController@acceptNasabah')->name('nasabah_accept');
+    Route::post('/nasabah/reject/{id}', 'DataCalonNasabahController@rejectNasabah')->name('nasabah_reject');
+        // Rute untuk menampilkan gambar dari database
     Route::get('/image/{imageName}', 'DataCalonNasabahController@getImage')->name('get_image');
     Route::post('/nasabah/reject/{id}', 'DataCalonNasabahController@rejectNasabah')->name('nasabah_reject');
 });
@@ -294,7 +297,6 @@ Route::group(['middleware' => ['checkMultipleRoles:super-admin']], function () {
     Route::get('/roles/{role}/give-permissions', 'RoleController@addPermissionToRole')->name('roles.addPermissionToRole');
     Route::put('/roles/{role}/give-permissions', 'RoleController@givePermissionToRole')->name('roles.givePermissionToRole');
 });
-
 
     // Routes for Master Data
     // Route::get('/hak-akses', 'HakAksesController@index')->name('hakakses');

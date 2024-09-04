@@ -16,9 +16,9 @@
 @section('main-content')
         <div class="breadcrumb">
             <h1>Selamat Datang!</h1>
-            <ul>
+            <!-- <ul>
                 <li><a href="">Selamat Beraktifitas</a></li>
-            </ul>
+            </ul> -->
         </div>
 
         <div class="separator-breadcrumb border-top"></div>
@@ -51,26 +51,25 @@
                     <div class="card-body text-center">
                     <img src="{{asset('/assets/images/sidebar_icon/transaction.png')}}" alt="" class="mr-3" style="width: 50px">
                         <div class="content">
-                            <p class="lead text-primary text-24 mb-2" style="text-align: left;">Transaksi Laku Pandai</p>
+                            <p class="lead text-primary text-24 mb-2" style="text-align: left;">Transaksi</p>
                         </div>
                     </div>
                 </div>
 		</a>
             </div>
 
-            <!-- <div class="col-lg-3 col-md-6 col-sm-6"> -->
-		<!-- <a href="transactionBJB">
+            <div class="col-lg-3 col-md-6 col-sm-6">
+		<a href="nasabah">
                 <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-4">
                     <div class="card-body text-center">
-                    <img src="{{asset('/assets/images/sidebar_icon/transactionbjb.png')}}" alt="" class="mr-3" style="width: 50px">
+                    <img src="{{asset('/assets/images/sidebar_icon/nasabah.png')}}" alt="" class="mr-3" style="width: 50px">
                         <div class="content">
-                            <p class="text-muted mt-2 mb-0">Jump to</p>
-                            <p class="lead text-primary text-24 mb-2">Trx BJB</p>
+                            <p class="lead text-primary text-24 mb-2">Nasabah</p>
                         </div>
                     </div>
                 </div>
-		</a> -->
-            <!-- </div> -->
+		</a>
+            </div>
 
             <div class="col-lg-3 col-md-6 col-sm-6">
                 <a href="merchant">
@@ -78,7 +77,7 @@
                     <div class="card-body text-center">
                     <img src="{{asset('/assets/images/sidebar_icon/agent.png')}}" alt="" class="mr-3" style="width: 50px">
                         <div class="content">
-                            <p class="lead text-primary text-24 mb-2">Merchants</p>
+                            <p class="lead text-primary text-24 mb-2">Agen</p>
                         </div>
                     </div>
                 </div>

@@ -56,7 +56,7 @@
                                             <td>{{$item->no_hp}}</td>
                                             <td>{{ \Carbon\Carbon::parse($item->request_time)->format('Y-m-d H:i:s') }}</td>
                                             <td>
-                                                <form action="{{ route('nasabah_detail', [$item->id]) }}" style="display: inline;">
+                                                <form action="{{ route('nasabah_detail_request', [$item->id]) }}" style="display: inline;">
                                                     @csrf
                                                     <button class="btn btn-primary ripple btn-sm m-1 primary-btn" type="submit">Detail</button>
                                                 </form>

@@ -67,7 +67,7 @@ class DataCalonNasabahController extends Controller
         $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
 
         $data = DataCalonNasabah::select('*');
-        $data = $data->whereIn('status', [2, 3, 4]);
+        $data = $data->whereIn('status', [2, 3]);
 
         if ($request->has('search')) {
             $data = $data->whereRaw('lower(name) like (?)', ["%{$request->search}%"]);
@@ -96,7 +96,7 @@ class DataCalonNasabahController extends Controller
         $data = $data->get();
 
         foreach ($data as $nasabah) {
-            if ($nasabah->status == 1) {
+            if ($nasabah->status == 2) {
                 $nasabah->status_text = 'Accepted';
             } else {
                 $nasabah->status_text = 'Rejected';
@@ -451,11 +451,11 @@ class DataCalonNasabahController extends Controller
             $nasabah->save();
 
             DB::commit();
-            return redirect()->route('nasabah_request')->with('success', 'Permintaan Berhasil Ditolak.');
+            return redirect()->route('nasabah')->with('success', 'Permintaan Berhasil Ditolak.');
         } catch (Exception $e) {
             DB::rollBack();
             Log::error('Error : ' . $e->getMessage());
-            return Redirect::to('nasabah_request')
+            return Redirect::to('nasabah')
                 ->with('error', $e->getMessage());
         }
     }
@@ -473,11 +473,11 @@ class DataCalonNasabahController extends Controller
             $nasabah->save();
 
             DB::commit();
-            return redirect()->route('nasabah_request')->with('success', 'Permintaan Berhasil Diterima.');
+            return redirect()->route('nasabah')->with('success', 'Permintaan Berhasil Diterima.');
         } catch (Exception $e) {
             DB::rollBack();
             Log::error('Error : ' . $e->getMessage());
-            return Redirect::to('nasabah_request')
+            return Redirect::to('nasabah')
                 ->with('error', $e->getMessage());
         }
     }
@@ -542,7 +542,40 @@ class DataCalonNasabahController extends Controller
                 ->with('provinsi', $provinsi)
                 ->with('golongan_darah', $golongan_darah);
         } else {
-            return Redirect::to('nasabah_request')
+            return Redirect::to('nasabah_approve')
+                ->with('error', 'Data not found');
+        }
+    }
+
+    public function detail($id)
+    {
+        $nasabah = DataCalonNasabah::find($id);
+        if ($nasabah) {
+            $jenis_kelamin = CompOption::where('comp_id', 'CIF05')->get();
+            $agama = CompOption::where('comp_id', 'CIF06')->get();
+            $status_nikah = CompOption::where('comp_id', 'CIF07')->get();
+            $status_penduduk = CompOption::where('comp_id', 'CIF16')->get();
+            $kewarganegaraan = CompOption::where('comp_id', 'CIF17')->get();
+            $jenis_identitas = CompOption::where('comp_id', 'CIF21')->get();
+            $pendidikan_terakhir = CompOption::where('comp_id', 'CIF25')->get();
+            $kab_kota = CompOption::where('comp_id', 'CIF13')->get();
+            $provinsi = CompOption::where('comp_id', 'CIF14')->get();
+            $golongan_darah = CompOption::where('comp_id', 'CIF23')->get();
+
+            return view('apps.calon_nasabah.detail')
+                ->with('nasabah', $nasabah)
+                ->with('jenis_kelamin', $jenis_kelamin)
+                ->with('agama', $agama)
+                ->with('status_nikah', $status_nikah)
+                ->with('status_penduduk', $status_penduduk)
+                ->with('kewarganegaraan', $kewarganegaraan)
+                ->with('jenis_identitas', $jenis_identitas)
+                ->with('pendidikan_terakhir', $pendidikan_terakhir)
+                ->with('kab_kota', $kab_kota)
+                ->with('provinsi', $provinsi)
+                ->with('golongan_darah', $golongan_darah);
+        } else {
+            return Redirect::to('nasabah_list')
                 ->with('error', 'Data not found');
         }
     }
@@ -650,8 +683,11 @@ class DataCalonNasabahController extends Controller
             $nasabah = DataCalonNasabah::find($id);
             if ($nasabah) {
                 $nama_lengkap = $nasabah->nama_lengkap;
+                $no_rek = $nasabah->no_rekening;
                 $no_hp = $nasabah->no_hp;
-                $message = 'Selamat Akun Anda sudah berhasil dibuat';
+                $reply_time = $nasabah->reply_time;
+
+                $message = "Pembuatan Rekening BSA Berhasil an: {$nama_lengkap}, NoRek : {$no_rekening}, No HP: {$no_hp}, Date : {$reply_time}";
 
                 $terminal = '353471045058692';
                 $dateTime = date("YmdHis");

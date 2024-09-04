@@ -77,6 +77,7 @@ class MerchantsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    
     public function index(Request $request)
     {
         $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
@@ -121,8 +122,8 @@ class MerchantsController extends Controller
         foreach($data as $merchant) {
             if ($merchant->status_agen == 1){
                 $merchant->status_text = 'Active';
-            } else {
-                $merchant->status_text = 'Resign';
+            } else if ($merchant->status_agen == 2){ 
+                $merchant->status_text = 'Deactive';
             }
 
             if($merchant->active_at == null || $merchant->active_at == ''){
@@ -138,6 +139,54 @@ class MerchantsController extends Controller
         // echo $user->username; die;
 
         return view('apps.merchants.list')
+                ->with('data', $data)
+                ->with('username', $user->username);
+    }
+
+    public function list_block(Request $request)
+    {
+        $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
+
+        $data = Merchant::select('*');
+        $data = $data->where('status_agen', 3);
+
+        if($request->has('search')){
+            $data = $data->whereRaw('lower(name) like (?)',["%{$request->search}%"]);
+        }
+
+        $total = $data->count();
+    
+        if($request->has('limit')){
+            $data->take($request->get('limit'));
+            
+            if($request->has('offset')){
+            	$data->skip($request->get('offset'));
+            }
+        }
+
+        if($request->has('order_type')){
+            if($request->get('order_type') == 'asc'){
+                if($request->has('order_by')){
+                    $data->orderBy($request->get('order_by'));
+                }else{
+                    $data->orderBy('created_at');
+                }
+            }else{
+                if($request->has('order_by')){
+                    $data->orderBy($request->get('order_by'), 'desc');
+                }else{
+                    $data->orderBy('created_at', 'desc');
+                }
+            }
+        }else{
+            $data->orderBy('created_at', 'desc');
+        }
+
+        $data = $data->get();
+
+        $user = session()->get('user');
+
+        return view('apps.merchants.list-block')
                 ->with('data', $data)
                 ->with('username', $user->username);
     }
@@ -183,110 +232,6 @@ class MerchantsController extends Controller
             ->with('username', $user->username);
     }
     
-    public function create(Request $request){
-        return view('apps.merchants.add');
-    }
-
-    public function inquiry_nik(Request $request){
-        return view('apps.merchants.inquiry-nik');
-    }
-
-    public function store_inquiry_nik(Request $request)
-    {
-        $nik = $request->input('nik');
-        $terminal = '353471045058692';
-        $dateTime = date("YmdHms");
-
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, "http://108.137.154.8:8080/ARRest/api/");
-        $data = json_encode([
-            'msg'=>([
-            'msg_id' =>  "$terminal$dateTime",
-            'msg_ui' => "$terminal",
-            'msg_si' => 'INF002',
-            'msg_dt' => 'admin|'. $nik
-            ])
-        ]);
-       
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'Content-Type: text/plain'
-        ]);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-
-        $output = curl_exec($ch);
-        $err = curl_error($ch);
-        $info = curl_getinfo($ch);
-        curl_close($ch);
-
-        Log::info('cURL Request URL: '  . $info['url']);
-        Log::info('cURL Request Data: ' . $data);
-        Log::info('cURL Response: ' . $output);
-
-        $match = false;
-
-        $responseArray = json_decode($output, true);
-        
-        $cifid = null;
-        $nama_rek = null;
-        $alamat = null;
-        $email = null;
-        $no_hp = null;
-
-        if ($err) {
-            Log::error('cURL Error: ' . $err);
-        } else {
-            if (isset($responseArray['screen']['comps']['comp'])) {
-                foreach ($responseArray['screen']['comps']['comp'] as $comp) {
-                    if (isset($comp['comp_values']['comp_value'][0]['value'])) {
-                        $value = $comp['comp_values']['comp_value'][0]['value'];
-                        if ($value !== 'null' && $value !== null) {
-                            switch ($comp['comp_lbl']) {
-                                case 'No CIF':
-                                    $cifid = $value;
-                                    $match = Merchant::where('no_cif', $cifid)->exists();
-                                    break;
-        
-                                case 'Nama Rekening':
-                                    $nama_rek = $value;
-                                    break;
-        
-                                case 'Alamat':
-                                    $alamat = $value;
-                                    break;
-        
-                                case 'Email':
-                                    $email = $value;
-                                    break;
-        
-                                case 'Nomor Handphone':
-                                    $no_hp = $value;
-                                    break;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        
-        if ($match){
-            return Redirect::to('/agen/create/inquiry')->with('error', "Merchant Sudah Terdaftar");
-        }
-        else if (isset($responseArray['screen']['title']) && $responseArray['screen']['title'] === 'Gagal') {
-            return Redirect::to('/agen/create/inquiry')
-                            ->with('error', "CIF Belum Terdaftar");
-        } else {
-            return Redirect::to('/agen/create')
-                            ->with('no_cif', $cifid)
-                            ->with('fullname', $nama_rek)
-                            ->with('address', $alamat)
-                            ->with('email', $email)
-                            ->with('phone', $no_hp);
-        }
-    }
-
     public function inquiry_rek(Request $request){
         return view('apps.merchants.inquiry-rek');
     }
@@ -372,10 +317,10 @@ class MerchantsController extends Controller
         }
         
         if ($match){
-            return Redirect::to('/agen/create/inquiry/rek')->with('error', "Merchant dengan Nomor Rekening yang diinputkan Sudah Terdaftar")->withInput();
+            return Redirect::to('/agen/create/inquiry')->with('error', "Merchant dengan Nomor Rekening yang diinputkan Sudah Terdaftar")->withInput();
         }
         else if (isset($responseArray['screen']['title']) && $responseArray['screen']['title'] === 'Gagal') {
-            return Redirect::to('/agen/create/inquiry/rek')
+            return Redirect::to('/agen/create/inquiry')
                             ->with('error', "No Rekening Belum Terdaftar")
                             ->withInput();
         } else {
@@ -386,6 +331,10 @@ class MerchantsController extends Controller
                             ->with('no', $norek)
                             ->with('phone', $no_hp);
         }
+    }
+
+    public function create(Request $request){
+        return view('apps.merchants.add');
     }
 
     /**
@@ -489,9 +438,9 @@ class MerchantsController extends Controller
                     }
                 }
 
-                $branchid = $request->branchid;
+                $branchid = '001';
 
-                $prefix = 'NTB'; 
+                $prefix = 'NTB';
                 $lastMID = Merchant::where('mid', 'LIKE', $prefix . '%')
                                 ->orderBy('created_at', 'desc')
                                 ->first();
@@ -608,6 +557,20 @@ class MerchantsController extends Controller
         }
     }
 
+    public function detail_blocked($id)
+    {
+        $merchant = Merchant::find($id);
+        if($merchant){
+            $user = User::find($merchant->user_id);
+            return view('apps.merchants.detail-blocked')
+                ->with('merchant', $merchant)
+                ->with('user', $user);
+        }else{
+            return Redirect::to('agen_blocked')
+                            ->with('error', 'Data not found');
+        }
+    }
+
     /**
      * Update the specified resource in storage.
      *
@@ -709,49 +672,64 @@ class MerchantsController extends Controller
                 throw new \Exception("Merchant not found");
             }
 
-            if ($merchant->status_agen == 2 || $merchant->status_agen == 0) {
+            if ($merchant->status_agen == 0) {
+                $merchant->status_agen = 1;
+                $merchant->save();
+
+                $user = User::where('id', $merchant->user_id)->first();
+                
+                if (!$user) {
+                    throw new \Exception("User not found");
+                }
+
+                $user->status = 1;
+                $user->save();
+
+
+                $pesan = '<p>Halo ' . htmlspecialchars($user->fullname) . ',</p>';
+                $pesan .= '<p>Pendaftaran Anda telah kami setujui, Anda telah terdaftar sebagai Agen LAKUPANDAI.</p>';
+                $pesan .= '<p>Berikut informasi Anda yang telah terdaftar sebagai Agen LAKUPANDAI:</p>';
+                $pesan .= '<p>ID Agen: ' . htmlspecialchars($merchant->mid) . '</p>';
+                $pesan .= '<p>Username: ' . htmlspecialchars($user->username) . '</p>';
+                $pesan .= '<p>Pin Transaksi: ' . htmlspecialchars($merchant->pin) . '</p>';
+                $pesan .= '<p>Gunakan Username dan Pin Transaksi di atas untuk mengakses halaman Bank.</p>';
+                $pesan .= '<p>Salam Hangat,</p>';
+                $pesan .= '<p><b>NTBS LAKUPANDAI</b></p>';
+
+                $detail_message = [
+                    'sender' => 'administrator@selada.id',
+                    'subject' => '[NTBS LAKUPANDAI] Pendaftaran Agen LAKUPANDAI Berhasil',
+                    'isi' => $pesan
+                ];
+
+                Mail::to($user->email)->send(new sendPassword($detail_message));
+            }
+
+            else if ($merchant->status_agen == 2 || $merchant->status_agen == 3) {
                 $merchant->status_agen = 1;
                 $merchant->resign_at = null;
                 $merchant->save();
-            } 
 
-            $user = User::where('id', $merchant->user_id)->first();
-            
-            if (!$user) {
-                throw new \Exception("User not found");
+                $user = User::where('id', $merchant->user_id)->first();
+                
+                if (!$user) {
+                    throw new \Exception("User not found");
+                }
+
+                $user->status = 1;
+                $user->save();
             }
 
-            $user->status = 1;
-            $user->save();
-
-            $pesan = '<p>Halo ' . htmlspecialchars($user->fullname) . ',</p>';
-            $pesan .= '<p>Pendaftaran Anda telah kami setujui, Anda telah terdaftar sebagai Agen LAKUPANDAI.</p>';
-            $pesan .= '<p>Berikut informasi Anda yang telah terdaftar sebagai Agen LAKUPANDAI:</p>';
-            $pesan .= '<p>ID Agen: ' . htmlspecialchars($merchant->mid) . '</p>';
-            $pesan .= '<p>Username: ' . htmlspecialchars($user->username) . '</p>';
-            $pesan .= '<p>Pin Transaksi: ' . htmlspecialchars($merchant->pin) . '</p>';
-            $pesan .= '<p>Gunakan Username dan Pin Transaksi di atas untuk mengakses halaman Bank.</p>';
-            $pesan .= '<p>Salam Hangat,</p>';
-            $pesan .= '<p><b>NTBS LAKUPANDAI</b></p>';
-
-            $detail_message = [
-                'sender' => 'administrator@selada.id',
-                'subject' => '[NTBS LAKUPANDAI] Pendaftaran Agen LAKUPANDAI Berhasil',
-                'isi' => $pesan
-            ];
-
-            Mail::to($user->email)->send(new sendPassword($detail_message));
-
             DB::commit();
-            return redirect()->route('agen_list')->with('success', 'Merchant activated successfully.');
+            return redirect()->route('agen')->with('success', 'Merchant activated successfully.');
         } catch (\Illuminate\Database\QueryException $e) {
             DB::rollBack();
             Log::error('Database error during agent activation', ['error' => $e->getMessage()]);
-            return redirect()->route('agen_request')->with('failed', 'Activation failed: ' . $e->getMessage());
+            return redirect()->route('agen')->with('failed', 'Activation failed: ' . $e->getMessage());
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Agent activation failed', ['error' => $e->getMessage()]);
-            return redirect()->route('agen_request')->with('failed', 'Activation failed: ' . $e->getMessage());
+            return redirect()->route('agen')->with('failed', 'Activation failed: ' . $e->getMessage());
         }
     }
 

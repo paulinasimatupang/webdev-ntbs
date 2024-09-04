@@ -13,13 +13,13 @@
             </div>
             <div class="separator-breadcrumb border-top"></div>
             <div class="row mb-4">
-                <div class="col-lg-12 col-md-12 col-sm-12 d-flex justify-content-center mb-3">
+                <!-- <div class="col-lg-12 col-md-12 col-sm-12 d-flex justify-content-center mb-3">
                     <div class="input-group">
                         <a href="{{route('agen_inquiry_rek')}}">
                             <button class="btn btn-warning ripple m-1 add-new-btn" type="button">Add New</button>
                         </a>
                     </div>
-                </div>
+                </div> -->
                 <div class="col-md-12 mb-3">
                     <div class="card text-left">
                         <div class="card-body">

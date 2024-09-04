@@ -34,9 +34,20 @@
         <h1>Agen</h1>
     </div>
     <div class="separator-breadcrumb border-top"></div>
+    @if ($message = Session::get('success'))
+                                <div class="alert alert-success">
+                                    <p>{{ $message }}</p>
+                                </div>
+                            @endif
+
+                            @if ($message = Session::get('failed'))
+                                <div class="alert alert-danger">
+                                    <p>{{ $message }}</p>
+                                </div>
+                            @endif
     <div class="row mb-4">
         <div class="col-lg-4 col-md-4 col-sm-4">
-            <a href="/agen/create/inquiry/rek" class="card-link">
+            <a href="/agen/create/inquiry" class="card-link">
                 <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-2">
                     <div class="card-body text-center">
                         <div class="d-flex align-items-center">
@@ -79,5 +90,50 @@
                 </div>
             </a>
         </div>
+    </div><div class="row mb-4">
+        <div class="col-lg-4 col-md-4 col-sm-4">
+            <a href="/agen/blocked" class="card-link">
+                <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-2">
+                    <div class="card-body text-center">
+                        <div class="d-flex align-items-center">
+                            <img src="{{ asset('assets/images/new_features/request.png') }}" alt="Total Transaction" class="mr-3" style="width: 50px">
+                            <div class="text-left">
+                                <p class="text-muted mt-2 mb-0">List Block Agen</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- <div class="col-lg-4 col-md-4 col-sm-4">
+            <a href="/agen/request" class="card-link">
+                <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-2">
+                    <div class="card-body text-center">
+                        <div class="d-flex align-items-center">
+                            <img src="{{ asset('assets/images/new_features/request.png') }}" alt="Total Transaction" class="mr-3" style="width: 50px">
+                            <div class="text-left">
+                                <p class="text-muted mt-2 mb-0">Request Agen</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div> -->
+
+        <!-- <div class="col-lg-4 col-md-4 col-sm-4">
+            <a href="/agen/list" class="card-link">
+                <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-2">
+                    <div class="card-body text-center">
+                        <div class="d-flex align-items-center">
+                            <img src="{{ asset('assets/images/new_features/list.png') }}" alt="Total Transaction" class="mr-3" style="width: 50px">
+                            <div class="text-left">
+                                <p class="text-muted mt-2 mb-0">List Agen</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div> -->
     </div>
 @endsection

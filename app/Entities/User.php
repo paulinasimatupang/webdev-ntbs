@@ -16,7 +16,7 @@ use DateTime;
 
 class User extends Authenticatable implements JWTSubject
 {
-    use Notifiable, HasRoles, SoftDeletes;
+    use Notifiable, HasRoles;
 
     // HasFactory;
 

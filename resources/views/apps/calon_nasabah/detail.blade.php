@@ -265,14 +265,28 @@
                             <p class="form-control-static">{{ $nasabah->email }}</p>
                         </div>
                     </div>
+                    
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">No CIF</label>
+                        <div class="col-sm-10">
+                            <p class="form-control-static">{{ $nasabah->no_cif }}</p>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">No Rekening</label>
+                        <div class="col-sm-10">
+                            <p class="form-control-static">{{ $nasabah->no_rekening }}</p>
+                        </div>
+                    </div>
 
                     <div class="form-group row">
                         <label class="col-sm-2 col-form-label">Foto Diri</label>
                         <div class="col-sm-10">
-                            @if(isset($nasabah) && $nasabah->foto_diri)
-                            <div class="mb-2">
-                                <a href="{{ route('get_image', ['imageName' => $nasabah->foto_diri]) }}" target="_blank">Lihat Foto Diri</a>
-                            </div>
+                            @if ($nasabah->foto_diri)
+                                <img src="{{ $baseUrl . $nasabah->foto_diri }}" alt="Foto Tanda Tangan" class="img-thumbnail" style="max-width: 200px;">
+                            @else
+                            <p class="form-control-static">Belum diunggah</p>
                             @endif
                         </div>
                     </div>
@@ -280,10 +294,10 @@
                     <div class="form-group row">
                         <label class="col-sm-2 col-form-label">Foto KTP</label>
                         <div class="col-sm-10">
-                            @if(isset($nasabah) && $nasabah->foto_ktp)
-                            <div class="mb-2">
-                                <a href="{{ route('get_image', ['imageName' => $nasabah->foto_ktp]) }}" target="_blank">Lihat KTP</a>
-                            </div>
+                            @if ($nasabah->foto_ktp)
+                            <img src="{{ $baseUrl . $nasabah->foto_ktp }}" alt="Foto Tanda Tangan" class="img-thumbnail" style="max-width: 200px;">
+                            @else
+                            <p class="form-control-static">Belum diunggah</p>
                             @endif
                         </div>
                     </div>
@@ -291,29 +305,16 @@
                     <div class="form-group row">
                         <label class="col-sm-2 col-form-label">Foto Tanda Tangan</label>
                         <div class="col-sm-10">
-                            @if(isset($nasabah) && $nasabah->foto_ttd)
-                            <div class="mb-2">
-                                <a href="{{ route('get_image', ['imageName' => $nasabah->foto_ttd]) }}" target="_blank">Lihat Tanda Tangan</a>
-                            </div>
+                            @if ($nasabah->foto_tanda_tangan)
+                            <img src="{{ $baseUrl . $nasabah->foto_tanda_tangan }}" alt="Foto Tanda Tangan" class="img-thumbnail" style="max-width: 200px;">
+                            @else
+                            <p class="form-control-static">Belum diunggah</p>
                             @endif
                         </div>
                     </div>
 
                     <div class="col-sm-12 d-flex justify-content-end">
-                        <a href="{{ route('nasabah_request') }}" class="btn btn-primary mr-2">Back</a>
-                        <form id="actionForm" method="POST" class="d-inline">
-                            @csrf
-                            <input type="hidden" name="nasabah_id" value="{{ $nasabah->id }}">
-                            <input type="hidden" name="action" id="formAction">
-
-                            <button type="button" id="approve" class="btn btn-success">
-                                Approve
-                            </button>
-
-                            <button type="button" id="reject" class="btn btn-danger ml-2">
-                                Reject
-                            </button>
-                        </form>
+                        <a href="{{ route('nasabah_list') }}" class="btn btn-primary mr-2">Back</a>
                     </div>
             </div>
         </div>
@@ -321,25 +322,7 @@
 </div>
 @endsection
 
-@section('page-js')
-<script>
-document.getElementById('approve').addEventListener('click', function() {
-    if (confirm('Are you sure you want to appprove this agent?')) {
-        document.getElementById('formAction').value = 'activate';
-        document.getElementById('actionForm').action = "{{ route('nasabah_accept', ['id' => $nasabah->id]) }}";
-        document.getElementById('actionForm').submit();
-    }
-});
 
-document.getElementById('reject').addEventListener('click', function() {
-    if (confirm('Are you sure you want to reject this agent?')) {
-        document.getElementById('formAction').value = 'reject';
-        document.getElementById('actionForm').action = "{{ route('nasabah_reject', ['id' => $nasabah->id]) }}";
-        document.getElementById('actionForm').submit();
-    }
-});
-</script>
-@endsection
 
 @section('bottom-js')
 <script src="{{ asset('assets/js/form.validation.script.js') }}"></script>
