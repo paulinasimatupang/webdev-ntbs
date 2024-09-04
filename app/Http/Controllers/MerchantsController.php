@@ -370,29 +370,9 @@ class MerchantsController extends Controller
                     ], 404);
                 }
 
-                $prefix = 'NTBUS'; 
-                $lastUser = User::where('username', 'LIKE', $prefix . '%')
-                                ->orderBy('created_at', 'desc')
-                                ->first();
-                
-                $newUsername = $prefix . '000001'; 
-                
-                if ($lastUser) {
-                    $lastUsername = $lastUser->username;
-                    $number = substr($lastUsername, strlen($prefix));
-                    $newNumber = (int)$number + 1;
-                    $newNumberPadded = str_pad($newNumber, 6, '0', STR_PAD_LEFT);
-                    $newUsername = $prefix . $newNumberPadded;
-                }
-
-                while (User::where('username', $newUsername)->exists()) {
-                    $newNumber = (int)substr($newUsername, strlen($prefix)) + 1;
-                    $newUsername = $prefix . str_pad($newNumber, 6, '0', STR_PAD_LEFT);
-                }
                 
                 $user = User::create([
                                 'role_id'           => $role_id,
-                                'username'          => $newUsername,
                                 'fullname'          => $request->fullname,
                                 'email'             => $request->email,
                                 'status'            => 0
@@ -426,37 +406,14 @@ class MerchantsController extends Controller
                     }
                 }
 
-                $branchid = '001';
 
-                $prefix = 'NTB';
-                $lastMID = Merchant::where('mid', 'LIKE', $prefix . '%')
-                                ->orderBy('created_at', 'desc')
-                                ->first();
-                
-                $newMid = $prefix . $branchid . '000001';
-                
-                if ($lastMID) {
-                    $lastMid = $lastMID->username;
-                    $number = substr($lastMid, strlen($prefix));
-                    $newNumber = (int)$number + 1;
-                    $newNumberPadded = str_pad($newNumber, 6, '0', STR_PAD_LEFT);;
-                    $newMid = $prefix . $branchid . $newNumberPadded;
-                }
-
-                while (Merchant::where('mid', $newMid)->exists()) {
-                    $newNumber = (int)substr($newMid, strlen($prefix)) + 1;
-                    $newMid = $prefix . str_pad($newNumber, 6, '0', STR_PAD_LEFT);
-                }
-
-                $reqData = $request->except(['file_ktp', 'file_kk', 'file_npwp', 'branchid']); 
+                $reqData = $request->except(['file_ktp', 'file_kk', 'file_npwp']); 
                 $reqData['user_id'] = $user->id;
                 $reqData['name']    = $user->fullname;
                 $reqData['status_agen']    = 0;
                 $reqData['file_ktp'] = $filePaths['file_ktp'];
                 $reqData['file_kk'] = $filePaths['file_kk'];
                 $reqData['file_npwp'] = $filePaths['file_npwp'];
-                $reqData['mid'] = $newMid;
-                $reqData['pin'] = implode('', array_map(function() { return mt_rand(0, 9); }, range(1, 6)));
                 $reqData['active_at'] =now();
 
                 $data   = $this->repository->create($reqData);
@@ -661,6 +618,32 @@ class MerchantsController extends Controller
             }
 
             if ($merchant->status_agen == 0) {
+                $branchid = '001';
+
+                $prefix = 'NTB';
+                $lastMID = Merchant::where('mid', 'LIKE', $prefix . $branchid .'%')
+                                ->orderBy('created_at', 'desc')
+                                ->first();
+                
+                $newMid = $prefix . $branchid . '000001';
+                
+                if ($lastMID) {
+                    $lastMid = $lastMID->mid;
+                    $number = substr($lastMid, strlen($prefix . $branchid));
+                    $newNumber = (int)$number + 1;
+                    $newNumberPadded = str_pad($newNumber, 6, '0', STR_PAD_LEFT);;
+                    $newMid = $prefix . $branchid . $newNumberPadded;
+                }
+
+                while (Merchant::where('mid', $newMid)->exists()) {
+                    $newNumber = (int)substr($newMid, strlen($prefix . $branchid)) + 1;
+                    $newMid = $prefix . str_pad($newNumber, 6, '0', STR_PAD_LEFT);
+                }
+
+                $generatePin =  implode('', array_map(function() { return mt_rand(0, 9); }, range(1, 6)));
+
+                $merchant->mid = $newMid;
+                $merchant->pin = $generatePin;
                 $merchant->status_agen = 1;
                 $merchant->save();
 
@@ -680,8 +663,30 @@ class MerchantsController extends Controller
                 $passwordBcrypt = bcrypt($password);
                 
                 Log::info('PasswordGenerate: ' . $password);
+
+                $prefix = 'NTBUS'; 
+                $lastUser = User::where('username', 'LIKE', $prefix . '%')
+                                ->orderBy('created_at', 'desc')
+                                ->first();
+                
+                $newUsername = $prefix . '000001'; 
+                
+                if ($lastUser) {
+                    $lastUsername = $lastUser->username;
+                    $number = substr($lastUsername, strlen($prefix));
+                    $newNumber = (int)$number + 1;
+                    $newNumberPadded = str_pad($newNumber, 6, '0', STR_PAD_LEFT);
+                    $newUsername = $prefix . $newNumberPadded;
+                }
+
+                while (User::where('username', $newUsername)->exists()) {
+                    $newNumber = (int)substr($newUsername, strlen($prefix)) + 1;
+                    $newUsername = $prefix . str_pad($newNumber, 6, '0', STR_PAD_LEFT);
+                }
+
                 $user->password = $passwordBcrypt;
                 $user->status = 1;
+                $user->username = $newUsername;
                 $user->save();
 
 
