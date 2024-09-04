@@ -10,7 +10,7 @@ use App\Entities\TerminalBilliton;
 use App\Entities\ServiceBilliton;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
-
+use Illuminate\Support\Facades\Log;
 class MessageLogController extends Controller
 {
     public function index(Request $request)
@@ -50,100 +50,9 @@ class MessageLogController extends Controller
     }
 
     public function historyList(Request $request)
-{
-    $validator = Validator::make($request->all(), [
-        'terminal_id' => 'required|integer',
-    ]);
-
-    if ($validator->fails()) {
-        return response()->json([
-            'status' => false,
-            'error' => 'Invalid input data.',
-            'details' => $validator->errors(),
-        ], 422);
-    }
-
-    $serviceIds = ['T00002', 'OTT001', 'OT0001'];
-
-    try {
-        $logs = MessageLog::where('terminal_id', $request->terminal_id)
-            ->whereIn('service_id', $serviceIds)
-            ->whereNotNull('response_message')
-            ->orderBy('reply_time', 'desc')
-            ->get();
-
-        if ($logs->isEmpty()) {
-            return response()->json([
-                'status' => false,
-                'message' => 'No logs found for the given terminal ID.',
-            ], 404);
-        }
-
-        $processedLogs = $logs->map(function ($log) {
-            // Decode request_message JSON
-            $requestMessage = json_decode($log->request_message, true);
-            
-            if (!isset($requestMessage['msg']['msg_dt'])) {
-                return null;
-            }
-            
-            $msgDtArray = explode('|', $requestMessage['msg']['msg_dt']);
-            
-            // Determine indices to extract based on service_id
-            switch ($log->service_id) {
-                case 'T00002':
-                case 'OTT001':
-                    $indices = [1, 2, 5];
-                    break;
-                case 'OT0001':
-                    $indices = [1, 3, 4];
-                    break;
-                default:
-                    $indices = [];
-            }
-            
-            $noRek = isset($msgDtArray[$indices[0]]) ? $msgDtArray[$indices[0]] : null;
-            $namaRek = isset($msgDtArray[$indices[1]]) ? $msgDtArray[$indices[1]] : null;
-            $nominal = isset($msgDtArray[$indices[2]]) ? $msgDtArray[$indices[2]] : null;
-
-            // Reformat the log with extracted values
-            return [
-                'id' => $log->id,
-                'terminal_id' => $log->terminal_id,
-                'service_id' => $log->service_id,
-                'no_rek' => $noRek,
-                'nama_rek' => $namaRek,
-                'nominal' => $nominal,
-                'status' => $log->message_status,
-                'request_message' => $log->request_message,
-                'response_message' => $log->response_message,
-                'reply_time' => $log->reply_time,
-            ];
-        })->filter();
-
-        return response()->json([
-            'status' => true,
-            'data' => $processedLogs,
-        ], 200);
-
-    } catch (\Exception $e) {
-        return response()->json([
-            'status' => false,
-            'error' => 'Failed to retrieve message logs.',
-            'exception' => $e->getMessage(),
-        ], 500);
-    }
-}
-
-
-    public function historyDetail($terminal_id, $message_id)
     {
-        $validator = Validator::make([
-            'terminal_id' => $terminal_id,
-            'message_id' => $message_id,
-        ], [
+        $validator = Validator::make($request->all(), [
             'terminal_id' => 'required|integer',
-            'message_id' => 'required|string',
         ]);
 
         if ($validator->fails()) {
@@ -151,16 +60,95 @@ class MessageLogController extends Controller
                 'status' => false,
                 'error' => 'Invalid input data.',
                 'details' => $validator->errors(),
-            ], 422); 
+            ], 422);
         }
 
-        try {
-            $log = MessageLog::where('terminal_id', $terminal_id)
-                ->where('message_id', $message_id)
-                ->select('response_message')
-                ->first();
+        $serviceIds = ['T00002', 'OTT001', 'OT0001'];
 
-            if (!$log) {
+        try {
+            $logs = MessageLog::where('terminal_id', $request->terminal_id)
+                ->whereIn('service_id', $serviceIds)
+                ->whereNotNull('response_message')
+                ->orderBy('reply_time', 'desc')
+                ->get();
+
+            if ($logs->isEmpty()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'No logs found for the given terminal ID.',
+                ], 404);
+            }
+
+            $processedLogs = $logs->map(function ($log) {
+                // Decode request_message JSON
+                $requestMessage = json_decode($log->request_message, true);
+                
+                if (!isset($requestMessage['msg']['msg_dt'])) {
+                    return null;
+                }
+                
+                $msgDtArray = explode('|', $requestMessage['msg']['msg_dt']);
+                
+                // Determine indices to extract based on service_id
+                switch ($log->service_id) {
+                    case 'T00002':
+                    case 'OTT001':
+                        $indices = [1, 2, 5];
+                        break;
+                    case 'OT0001':
+                        $indices = [1, 3, 4];
+                        break;
+                    default:
+                        $indices = [];
+                }
+                
+                $noRek = isset($msgDtArray[$indices[0]]) ? $msgDtArray[$indices[0]] : null;
+                $namaRek = isset($msgDtArray[$indices[1]]) ? $msgDtArray[$indices[1]] : null;
+                $nominal = isset($msgDtArray[$indices[2]]) ? $msgDtArray[$indices[2]] : null;
+
+                // Reformat the log with extracted values
+                return [
+                    'id' => $log->id,
+                    'terminal_id' => $log->terminal_id,
+                    'service_id' => $log->service_id,
+                    'no_rek' => $noRek,
+                    'nama_rek' => $namaRek,
+                    'nominal' => $nominal,
+                    'status' => $log->message_status,
+                    'request_message' => $log->request_message,
+                    'response_message' => $log->response_message,
+                    'reply_time' => $log->reply_time,
+                ];
+            })->filter();
+
+            return response()->json([
+                'status' => true,
+                'data' => $processedLogs,
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'error' => 'Failed to retrieve message logs.',
+                'exception' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function historyDetail(Request $request)
+    {
+        try {
+            $this->validate($request, [
+                'terminal_id' => 'required|string',
+                'message_id' => 'required|string',
+            ]);
+
+            $responseMessage =MessageLog::where('terminal_id', $request->terminal_id)
+            ->where('message_id', $request->message_id)
+            ->whereNotNull('response_message')
+            ->get();
+
+            if (is_null($responseMessage)) {
                 return response()->json([
                     'status' => false,
                     'message' => 'No log found for the given terminal ID and message ID.',
@@ -169,14 +157,18 @@ class MessageLogController extends Controller
 
             return response()->json([
                 'status' => true,
-                'data' => $log->response_message,
+                'data' => $responseMessage,
             ], 200);
 
         } catch (\Exception $e) {
+            Log::error('Error retrieving message logs: '.$e->getMessage(), [
+                'terminal_id' => $request->terminal_id,
+                'message_id' => $request->message_id,
+            ]);
+
             return response()->json([
                 'status' => false,
-                'error' => 'Failed to retrieve message logs.',
-                'exception' => $e->getMessage(),
+                'error' => 'An error occurred while retrieving message logs.',
             ], 500);
         }
     }

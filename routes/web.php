@@ -186,6 +186,7 @@ Route::group(['middleware' => ['checkMultipleRoles:super-admin,operator-pusat']]
 
 Route::group(['middleware' => ['checkMultipleRoles:super-admin,agen']], function () {
     Route::get('/transaction', 'TransactionsController@index')->name('transaction');
+    Route::get('/transaction_log/edit/{stan}', 'TransactionLogController@edit')->name('transactionlog_edit');
     Route::get('/transaction/updateStatus/{code}', 'TransactionsController@updateStatus')->name('transaction_updateStatus');
     Route::get('/transaction/{id}/edit', 'TransactionsController@edit')->name('transaction_edit');
     Route::post('/transaction/{id}/update', 'TransactionsController@update')->name('transaction_update');
