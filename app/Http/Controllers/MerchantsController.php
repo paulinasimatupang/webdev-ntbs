@@ -691,6 +691,7 @@ class MerchantsController extends Controller
                 $pesan .= '<p>Berikut informasi Anda yang telah terdaftar sebagai Agen LAKUPANDAI:</p>';
                 $pesan .= '<p>ID Agen: ' . htmlspecialchars($merchant->mid) . '</p>';
                 $pesan .= '<p>Username: ' . htmlspecialchars($user->username) . '</p>';
+                $pesan .= '<p>Password: ' . htmlspecialchars($user->password_plain) . '</p>';
                 $pesan .= '<p>Pin Transaksi: ' . htmlspecialchars($merchant->pin) . '</p>';
                 $pesan .= '<p>Gunakan Username dan Pin Transaksi di atas untuk mengakses halaman Bank.</p>';
                 $pesan .= '<p>Salam Hangat,</p>';

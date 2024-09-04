@@ -423,10 +423,10 @@ class DataCalonNasabahController extends Controller
             $nasabah->status = 2;
             $nasabah->reply_time = now();
             $nasabah->save();
-
+            
             DB::commit();
-            $this->sendApprovalSms($nasabah);
-
+            
+            $this->send_sms($id);
             return Redirect::to('/nasabah/approve')->with('success', 'Nasabah berhasil disetujui, CIF dan rekening berhasil dibuat.');
         } catch (Exception $e) {
             DB::rollBack();
@@ -542,7 +542,7 @@ class DataCalonNasabahController extends Controller
                 ->with('provinsi', $provinsi)
                 ->with('golongan_darah', $golongan_darah);
         } else {
-            return Redirect::to('nasabah_approve')
+            return Redirect::to('list_approve')
                 ->with('error', 'Data not found');
         }
     }
@@ -687,7 +687,7 @@ class DataCalonNasabahController extends Controller
                 $no_hp = $nasabah->no_hp;
                 $reply_time = $nasabah->reply_time;
 
-                $message = "Pembuatan Rekening BSA Berhasil an: {$nama_lengkap}, NoRek : {$no_rekening}, No HP: {$no_hp}, Date : {$reply_time}";
+                $message = "Pembuatan Rekening BSA Berhasil an: {$nama_lengkap}, NoRek : {$no_rek}, No HP: {$no_hp}, Date : {$reply_time}";
 
                 $terminal = '353471045058692';
                 $dateTime = date("YmdHis");

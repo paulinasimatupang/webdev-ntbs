@@ -266,41 +266,8 @@
                         </div>
                     </div>
 
-                    <div class="form-group row">
-                        <label class="col-sm-2 col-form-label">Foto Diri</label>
-                        <div class="col-sm-10">
-                            @if ($nasabah->foto_diri)
-                                <img src="{{ $baseUrl . $nasabah->foto_diri }}" alt="Foto Tanda Tangan" class="img-thumbnail" style="max-width: 200px;">
-                            @else
-                            <p class="form-control-static">Belum diunggah</p>
-                            @endif
-                        </div>
-                    </div>
-
-                    <div class="form-group row">
-                        <label class="col-sm-2 col-form-label">Foto KTP</label>
-                        <div class="col-sm-10">
-                            @if ($nasabah->foto_ktp)
-                            <img src="{{'/opt/tomcat/images/' . $filename; . $nasabah->foto_ktp }}" alt="Foto Tanda Tangan" class="img-thumbnail" style="max-width: 200px;">
-                            @else
-                            <p class="form-control-static">Belum diunggah</p>
-                            @endif
-                        </div>
-                    </div>
-
-                    <div class="form-group row">
-                        <label class="col-sm-2 col-form-label">Foto Tanda Tangan</label>
-                        <div class="col-sm-10">
-                            @if ($nasabah->foto_tanda_tangan)
-                            <img src="{{ $baseUrl . $nasabah->foto_tanda_tangan }}" alt="Foto Tanda Tangan" class="img-thumbnail" style="max-width: 200px;">
-                            @else
-                            <p class="form-control-static">Belum diunggah</p>
-                            @endif
-                        </div>
-                    </div>
-
                     <div class="col-sm-12 d-flex justify-content-end">
-                        <a href="{{ route('nasabah_approve') }}" class="btn btn-primary mr-2">Back</a>
+                        <a href="{{ route('list_approve') }}" class="btn btn-primary mr-2">Back</a>
                         <form id="actionForm" method="POST" class="d-inline">
                             @csrf
                             <input type="hidden" name="nasabah_id" value="{{ $nasabah->id }}">

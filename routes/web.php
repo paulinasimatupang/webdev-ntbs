@@ -248,10 +248,8 @@ Route::group(['middleware' => ['checkMultipleRoles:super-admin,customer-service-
     Route::get('/agen/list', 'MerchantsController@index')->name('agen_list');
     Route::get('/agen/create', 'MerchantsController@create')->name('agen_create');
     Route::post('/agen/store', 'MerchantsController@store')->name('agen_store');
-    Route::get('/agen/create/inquiry', 'MerchantsController@inquiry_nik')->name('agen_inquiry_nik');
-    Route::post('/agen/store/inquiry', 'MerchantsController@store_inquiry_nik')->name('agen_store_inquiry_nik');
-    Route::get('/agen/create/inquiry/rek', 'MerchantsController@inquiry_rek')->name('agen_inquiry_rek');
-    Route::post('/agen/store/inquiry/rek', 'MerchantsController@store_inquiry_rek')->name('agen_store_inquiry_rek');
+    Route::get('/agen/create/inquiry', 'MerchantsController@inquiry_rek')->name('agen_inquiry_rek');
+    Route::post('/agen/store/inquiry', 'MerchantsController@store_inquiry_rek')->name('agen_store_inquiry_rek');
     Route::get('/merchants.pdf', 'MerchantsController@exportPDF')->name('merchants.pdf');
     Route::get('/merchants.csv', 'MerchantsController@exportCSV')->name('merchants.csv');
     Route::get('/merchants.excel', 'MerchantsController@exportExcel')->name('merchants.excel');
