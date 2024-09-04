@@ -271,7 +271,7 @@
                         <div class="col-sm-10">
                             @if(isset($nasabah) && $nasabah->foto_diri)
                             <div class="mb-2">
-                                <a href="{{ route('get_image', ['imageName' => $nasabah->foto_diri]) }}" target="_blank">Lihat Foto Diri</a>
+                                <a href="{{ url('http://108.137.154.8:8080/document/image/' . $nasabah->foto_diri) }}" target="_blank">Lihat Foto Diri</a>
                             </div>
                             @endif
                         </div>
@@ -282,7 +282,7 @@
                         <div class="col-sm-10">
                             @if(isset($nasabah) && $nasabah->foto_ktp)
                             <div class="mb-2">
-                                <a href="{{ route('get_image', ['imageName' => $nasabah->foto_ktp]) }}" target="_blank">Lihat KTP</a>
+                                <a href="{{ url('http://108.137.154.8:8080/document/image/' . $nasabah->foto_ktp) }}" target="_blank">Lihat KTP</a>
                             </div>
                             @endif
                         </div>
@@ -293,7 +293,7 @@
                         <div class="col-sm-10">
                             @if(isset($nasabah) && $nasabah->foto_ttd)
                             <div class="mb-2">
-                                <a href="{{ route('get_image', ['imageName' => $nasabah->foto_ttd]) }}" target="_blank">Lihat Tanda Tangan</a>
+                                <a href="{{ url('http://108.137.154.8:8080/document/image/' . $nasabah->foto_ttd) }}" target="_blank">Lihat Tanda Tangan</a>
                             </div>
                             @endif
                         </div>

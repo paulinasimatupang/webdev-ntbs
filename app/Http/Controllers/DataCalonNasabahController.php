@@ -588,48 +588,48 @@ class DataCalonNasabahController extends Controller
     //     return view('calon_nasabah.list', ['imageUrl' => $imageUrl]);
     // }
 
-    public function getImage($imageName)
-    {
-        $nasabah = DataCalonNasabah::where('foto_diri', $imageName)
-            ->orWhere('foto_ktp', $imageName)
-            ->orWhere('foto_ttd', $imageName)
-            ->first();
+    // public function getImage($imageName)
+    // {
+    //     $nasabah = DataCalonNasabah::where('foto_diri', $imageName)
+    //         ->orWhere('foto_ktp', $imageName)
+    //         ->orWhere('foto_ttd', $imageName)
+    //         ->first();
 
-        if ($nasabah) {
-            $fileColumn = null;
+    //     if ($nasabah) {
+    //         $fileColumn = null;
 
-            if ($nasabah->foto_diri === $imageName) {
-                $fileColumn = 'foto_diri';
-            } elseif ($nasabah->foto_ktp === $imageName) {
-                $fileColumn = 'foto_ktp';
-            } elseif ($nasabah->foto_ttd === $imageName) {
-                $fileColumn = 'foto_ttd';
-            }
+    //         if ($nasabah->foto_diri === $imageName) {
+    //             $fileColumn = 'foto_diri';
+    //         } elseif ($nasabah->foto_ktp === $imageName) {
+    //             $fileColumn = 'foto_ktp';
+    //         } elseif ($nasabah->foto_ttd === $imageName) {
+    //             $fileColumn = 'foto_ttd';
+    //         }
 
-            if ($fileColumn) {
-                // Ambil path atau URL gambar dari kolom database
-                $filePath = $nasabah->$fileColumn;
+    //         if ($fileColumn) {
+    //             // Ambil path atau URL gambar dari kolom database
+    //             $filePath = $nasabah->$fileColumn;
 
-                // Jika path ke file gambar
-                if (file_exists($filePath)) {
-                    $fileContent = file_get_contents($filePath);
+    //             // Jika path ke file gambar
+    //             if (file_exists($filePath)) {
+    //                 $fileContent = file_get_contents($filePath);
 
-                    // Tentukan MIME type berdasarkan ekstensi gambar
-                    $extension = pathinfo($filePath, PATHINFO_EXTENSION);
-                    $mimeType = $this->determineMimeType($extension);
+    //                 // Tentukan MIME type berdasarkan ekstensi gambar
+    //                 $extension = pathinfo($filePath, PATHINFO_EXTENSION);
+    //                 $mimeType = $this->determineMimeType($extension);
 
-                    return Response::make($fileContent, 200, [
-                        'Content-Type' => $mimeType,
-                        'Content-Disposition' => 'inline; filename="' . $imageName . '"'
-                    ]);
-                } else {
-                    abort(404, 'Image not found');
-                }
-            }
-        }
+    //                 return Response::make($fileContent, 200, [
+    //                     'Content-Type' => $mimeType,
+    //                     'Content-Disposition' => 'inline; filename="' . $imageName . '"'
+    //                 ]);
+    //             } else {
+    //                 abort(404, 'Image not found');
+    //             }
+    //         }
+    //     }
 
-        abort(404, 'Image not found');
-    }
+    //     abort(404, 'Image not found');
+    // }
 
     // Fungsi untuk menentukan MIME type berdasarkan ekstensi
     private function determineMimeType($extension)
