@@ -283,10 +283,10 @@
                     <div class="form-group row">
                         <label class="col-sm-2 col-form-label">Foto Diri</label>
                         <div class="col-sm-10">
-                            @if ($nasabah->foto_diri)
-                                <img src="{{ $baseUrl . $nasabah->foto_diri }}" alt="Foto Tanda Tangan" class="img-thumbnail" style="max-width: 200px;">
-                            @else
-                            <p class="form-control-static">Belum diunggah</p>
+                            @if(isset($nasabah) && $nasabah->foto_diri)
+                            <div class="mb-2">
+                                <a href="{{ url('http://108.137.154.8:8080/document/image/' . $nasabah->foto_diri) }}" target="_blank">Lihat Foto Diri</a>
+                            </div>
                             @endif
                         </div>
                     </div>
@@ -294,10 +294,10 @@
                     <div class="form-group row">
                         <label class="col-sm-2 col-form-label">Foto KTP</label>
                         <div class="col-sm-10">
-                            @if ($nasabah->foto_ktp)
-                            <img src="{{ $baseUrl . $nasabah->foto_ktp }}" alt="Foto Tanda Tangan" class="img-thumbnail" style="max-width: 200px;">
-                            @else
-                            <p class="form-control-static">Belum diunggah</p>
+                            @if(isset($nasabah) && $nasabah->foto_ktp)
+                            <div class="mb-2">
+                                <a href="{{ url('http://108.137.154.8:8080/document/image/' . $nasabah->foto_ktp) }}" target="_blank">Lihat KTP</a>
+                            </div>
                             @endif
                         </div>
                     </div>
@@ -305,10 +305,10 @@
                     <div class="form-group row">
                         <label class="col-sm-2 col-form-label">Foto Tanda Tangan</label>
                         <div class="col-sm-10">
-                            @if ($nasabah->foto_tanda_tangan)
-                            <img src="{{ $baseUrl . $nasabah->foto_tanda_tangan }}" alt="Foto Tanda Tangan" class="img-thumbnail" style="max-width: 200px;">
-                            @else
-                            <p class="form-control-static">Belum diunggah</p>
+                            @if(isset($nasabah) && $nasabah->foto_ttd)
+                            <div class="mb-2">
+                                <a href="{{ url('http://108.137.154.8:8080/document/image/' . $nasabah->foto_ttd) }}" target="_blank">Lihat Tanda Tangan</a>
+                            </div>
                             @endif
                         </div>
                     </div>

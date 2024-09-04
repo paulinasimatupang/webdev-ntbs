@@ -370,16 +370,6 @@ class MerchantsController extends Controller
                     ], 404);
                 }
 
-                $password = implode('', array_merge(
-                    array_map(function() { return chr(mt_rand(65, 90)); }, range(1, 3)),
-                    array_map(function() { return chr(mt_rand(97, 122)); }, range(1, 3)), 
-                    array_map(function() { return mt_rand(0, 9); }, range(1, 2))
-                ));
-
-                $password = str_shuffle($password);
-                
-                Log::info('PasswordGenerate: ' . $password);
-
                 $prefix = 'NTBUS'; 
                 $lastUser = User::where('username', 'LIKE', $prefix . '%')
                                 ->orderBy('created_at', 'desc')
@@ -405,8 +395,6 @@ class MerchantsController extends Controller
                                 'username'          => $newUsername,
                                 'fullname'          => $request->fullname,
                                 'email'             => $request->email,
-                                'password'          => bcrypt($password),
-                                'password_plain'    => $password,
                                 'status'            => 0
                             ]);
 
@@ -682,6 +670,17 @@ class MerchantsController extends Controller
                     throw new \Exception("User not found");
                 }
 
+                $password = implode('', array_merge(
+                    array_map(function() { return chr(mt_rand(65, 90)); }, range(1, 3)),
+                    array_map(function() { return chr(mt_rand(97, 122)); }, range(1, 3)), 
+                    array_map(function() { return mt_rand(0, 9); }, range(1, 2))
+                ));
+
+                $password = str_shuffle($password);
+                $passwordBcrypt = bcrypt($password);
+                
+                Log::info('PasswordGenerate: ' . $password);
+                $user->password = $passwordBcrypt;
                 $user->status = 1;
                 $user->save();
 
@@ -691,7 +690,7 @@ class MerchantsController extends Controller
                 $pesan .= '<p>Berikut informasi Anda yang telah terdaftar sebagai Agen LAKUPANDAI:</p>';
                 $pesan .= '<p>ID Agen: ' . htmlspecialchars($merchant->mid) . '</p>';
                 $pesan .= '<p>Username: ' . htmlspecialchars($user->username) . '</p>';
-                $pesan .= '<p>Password: ' . htmlspecialchars($user->password_plain) . '</p>';
+                $pesan .= '<p>Password: ' . htmlspecialchars($password) . '</p>';
                 $pesan .= '<p>Pin Transaksi: ' . htmlspecialchars($merchant->pin) . '</p>';
                 $pesan .= '<p>Gunakan Username dan Pin Transaksi di atas untuk mengakses halaman Bank.</p>';
                 $pesan .= '<p>Salam Hangat,</p>';

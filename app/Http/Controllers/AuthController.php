@@ -227,7 +227,6 @@ class AuthController extends Controller
             if ($user) {
                 if (Hash::check($request->old_password, $user->password)) {
                     $user->password = bcrypt($request->new_password);
-                    $user->password_plain = $request->new_password;
                     $user->save();
 
                     DB::commit();

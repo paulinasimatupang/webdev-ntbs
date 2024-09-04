@@ -266,6 +266,39 @@
                         </div>
                     </div>
 
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Foto Diri</label>
+                        <div class="col-sm-10">
+                            @if(isset($nasabah) && $nasabah->foto_diri)
+                            <div class="mb-2">
+                                <a href="{{ url('http://108.137.154.8:8080/document/image/' . $nasabah->foto_diri) }}" target="_blank">Lihat Foto Diri</a>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Foto KTP</label>
+                        <div class="col-sm-10">
+                            @if(isset($nasabah) && $nasabah->foto_ktp)
+                            <div class="mb-2">
+                                <a href="{{ url('http://108.137.154.8:8080/document/image/' . $nasabah->foto_ktp) }}" target="_blank">Lihat KTP</a>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Foto Tanda Tangan</label>
+                        <div class="col-sm-10">
+                            @if(isset($nasabah) && $nasabah->foto_ttd)
+                            <div class="mb-2">
+                                <a href="{{ url('http://108.137.154.8:8080/document/image/' . $nasabah->foto_ttd) }}" target="_blank">Lihat Tanda Tangan</a>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+
                     <div class="col-sm-12 d-flex justify-content-end">
                         <a href="{{ route('list_approve') }}" class="btn btn-primary mr-2">Back</a>
                         <form id="actionForm" method="POST" class="d-inline">
