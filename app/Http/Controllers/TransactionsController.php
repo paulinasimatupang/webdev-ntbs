@@ -133,20 +133,10 @@ class TransactionsController extends Controller
         $fee = TransactionFee::select('fee');
         $totalFee = $fee->sum('fee');
 
-        $feeSelada = DB::connection('pgsql_billiton')->table('persen_fee')->where('id', 1)->value('persentase') / 100;
-        $feeNTBS = DB::connection('pgsql_billiton')->table('persen_fee')->where('id', 2)->value('persentase') / 100;
-        $feeAgent = DB::connection('pgsql_billiton')->table('persen_fee')->where('id', 3)->value('persentase') / 100;
-
         $dataRevenue = [
             'total_trx' => $data->count(),
             'amount_trx' => $totalAmount,
             'total_fee' => $totalFee,
-            'total_fee_agent' => $totalFee * $feeAgent,
-            'total_fee_ntbs' => $totalFee * $feeNTBS,
-            'total_fee_selada' => $totalFee * $feeSelada,
-            'total_fee_agent' => $totalFee * $feeAgent,
-            'total_fee_ntbs' => $totalFee * $feeNTBS,
-            'total_fee_selada' => $totalFee * $feeSelada,
         ];
     
         // Pagination

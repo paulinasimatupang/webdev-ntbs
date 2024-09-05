@@ -580,9 +580,8 @@ class DataCalonNasabahController extends Controller
         }
     }
 
-    public function listJson(Request $request, $branchid)
+    public function listJson(Request $request, $kode_agen)
     {
-        // Memeriksa pengguna yang terautentikasi
         $user = auth()->user();
 
         if (!$user) {
@@ -591,10 +590,9 @@ class DataCalonNasabahController extends Controller
 
         $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
 
-        // Filter data hanya berdasarkan branchid
         $data = DataCalonNasabah::select('*')
-            ->where('branchid', $branchid)
-            ->orderBy('request_time', 'asc'); // Order by request_time in ascending order
+            ->where('kode_agen', $kode_agen)
+            ->orderBy('request_time', 'asc');
 
         $data = $data->get();
 
@@ -604,8 +602,6 @@ class DataCalonNasabahController extends Controller
             'username' => $user->username,
         ]);
     }
-
-
 
     public function send_sms($id)
     {
