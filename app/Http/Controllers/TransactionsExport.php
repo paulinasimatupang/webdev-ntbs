@@ -28,6 +28,10 @@ class TransactionsExport implements FromCollection, WithHeadings
                         $item->amount,
                         $item->fee,
                         $item->transaction_time,
+                        $item->rekening_penerima,
+                        $item->rekening_pengirim,
+                        $item->transaction_type,
+                        !empty($item->merchant) ? $item->merchant->mid : '',
                         $this->getStatusText($item->transaction_status_id),
                     ];
                 case 2:
@@ -52,7 +56,7 @@ class TransactionsExport implements FromCollection, WithHeadings
     {
         switch ($this->viewType) {
             case 1:
-                return ['No', 'Name', 'Transaction Code', 'Amount', 'Fee', 'Date', 'Status'];
+                return ['No', 'Name', 'Transaction Code', 'Amount', 'Fee', 'Date', 'Nomor Rekening Penerima', 'Nomor Rekening Penerim', 'Tipe Produk', 'Kode Agen', 'Status',];
             case 2:
                 return ['Name', 'Fee', 'Status'];
             case 3:

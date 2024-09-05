@@ -62,6 +62,7 @@
                                             <th scope="col">Name</th>
                                             <th scope="col">Email</th>
                                             <th scope="col">Address</th>
+                                            <th scope="col">City</th>
                                             <th scope="col">Phone</th>
                                             <th scope="col">TID</th>
                                             <th scope="col">Status Agen</th>
@@ -83,6 +84,7 @@
                                             <td>{{$item->name}}</td>
                                             <td>{{$item->email}}</td>
                                             <td>{{$item->address}}</td>
+                                            <td>{{$item->city}}</td>
                                             <td>{{$item->phone}}</td>
                                             <td>{{$item->terminal_id}}</td>
                                             <td>{{$item->status_text}}</td>

@@ -32,6 +32,10 @@ class Transaction extends Model implements Transformable
         'trace_no',
         'batch_no',
         'appr_code',
+        'kode_agen',
+        'rekening_penerima',
+        'rekening_pengirim',
+        'transaction_type',
     ];
 
     protected $primaryKey = 'transaction_id';
@@ -61,6 +65,8 @@ class Transaction extends Model implements Transformable
 
     public function merchant()
     {
-        return $this->belongsTo(Merchant::class, 'account_number', 'no');
+        return $this->belongsTo(Merchant::class, 'kode_agen', 'mid');
     }
+
+    
 }

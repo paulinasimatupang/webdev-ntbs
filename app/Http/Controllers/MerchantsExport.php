@@ -27,6 +27,7 @@ class MerchantsExport implements FromCollection, WithHeadings
                 $item->name,
                 $item->email,
                 $item->address,
+                $item->city,
                 $item->phone,
                 $item->terminal_id,
                 $item->status_agen,
@@ -40,7 +41,7 @@ class MerchantsExport implements FromCollection, WithHeadings
     {
         switch ($this->viewType) {
             case 1:
-                return ['No', 'Id', 'Account No', 'Name', 'Email', 'Address', 'Phone', 'TID', 'Status Agen', 'Activate Date', 'Resign Date'];
+                return ['No', 'Id', 'Account No', 'Name', 'Email', 'Address', 'City', 'Phone', 'TID', 'Status Agen', 'Activate Date', 'Resign Date'];
             default:
                 return [];
         }

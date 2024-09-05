@@ -92,6 +92,8 @@ class TransactionsController extends Controller
         $data = Transaction::select('*')
             ->with(['event','transactionStatus', 'user','service', 'merchant']);
 
+        $query = Transaction::with('merchant');
+
         if ($request->has('search') && $request->get('search') != '') {
             $data->where('transaction_code', '=', $request->get('search'));
         } 
@@ -235,7 +237,7 @@ class TransactionsController extends Controller
     public function exportPDF(Request $request)
     {
         ini_set('memory_limit', '512M');
-        set_time_limit(300);
+        set_time_limit(1000);
         $query = Transaction::query();
         $viewType = 1; 
         $transactionsExport = new TransactionsExport($query, $viewType);
@@ -244,6 +246,62 @@ class TransactionsController extends Controller
         return $pdf->download('transactions.pdf');
     }
 
+    public function excel()
+    {
+        return Excel::download(new TransactionsExport(Transaction::query(), 1), 'Transaction.csv');
+    }
+
+    public function exportTxt()
+    {
+        // Ambil semua transaksi dari database
+        $transactions = Transaction::all();
+        $txtData = '';
+    
+        // Loop untuk setiap transaksi
+        foreach ($transactions as $transaction) {
+            // Gunakan null coalescing operator (??) untuk menghindari error jika data tidak ada
+            $txtData .= "No: " . ($transaction->No ?? 'N/A') . ", ";
+            $txtData .= "Name: " . ($transaction->merchant->name ?? 'N/A') . ", ";
+            $txtData .= "Transaksi Code: " . ($transaction->transaction_code ?? 'N/A') . ", ";
+            $txtData .= "Amount: " . ($transaction->amount ?? 'N/A') . ", ";
+            $txtData .= "Fee: " . ($transaction->fee ?? 'N/A') . ", ";
+            $txtData .= "Waktu Transaksi: " . ($transaction->transaction_time);
+            $txtData .= "Nomor Rekening Penerima: " . ($transaction->rekening_penerima ?? 'N/A') . ", ";
+            $txtData .= "Nomor Rekening Pengirim: " . ($transaction->rekening_pengirim ?? 'N/A') . ", ";
+            $txtData .= "Tipe Transaksi: " . ($transaction->transaction_type ?? 'N/A') . ", ";
+            $txtData .= "Kode Agen: " . ($transaction->merchant->mid ?? 'N/A') . ", ";
+            $statusId = $transaction->transaction_status_id ?? null;
+            switch ($statusId) {
+                case 0:
+                    $statusText = 'Success';
+                    break;
+                case 1:
+                    $statusText = 'Failed';
+                    break;
+                case 2:
+                    $statusText = 'Pending';
+                    break;
+                default:
+                    $statusText = 'Unknown';
+            }
+    
+            // Append the status text to the file content
+            $txtData .= "Status: " . $statusText . "\n";
+        }
+    
+        // Nama file untuk unduhan
+        $fileName = "Transaction.txt";
+        
+        // Headers untuk unduhan file TXT
+        $headers = [
+            'Content-Type' => 'text/plain',
+            'Content-Disposition' => "attachment; filename=\"$fileName\"",
+        ];
+    
+        // Mengembalikan response dengan data dan headers
+        return response($txtData, 200, $headers);
+    }
+    
     public function feeExport(Request $request)
     {
 

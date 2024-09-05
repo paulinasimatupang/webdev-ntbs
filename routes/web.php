@@ -192,6 +192,8 @@ Route::group(['middleware' => ['checkMultipleRoles:super-admin,agen']], function
     Route::post('/transaction/{id}/update', 'TransactionsController@update')->name('transaction_update');
     Route::get('/transaction/export', 'TransactionsController@export');
     Route::get('/transaction.pdf', 'TransactionsController@exportPDF')->name('transactions.pdf');
+    Route::get('/transactions.excel', 'TransactionsController@excel')->name('transactions.excel');
+    Route::get('/transactions.text', 'TransactionsController@exportTxt')->name('transactions.txt');
     Route::get('/transactions.csv', 'TransactionsController@exportCSV')->name('transactions.csv');
     Route::get('/transaction/saleExport', 'TransactionsController@exportCSVPaymentOnly')->name('transactions.csvPaymentOnly');
     Route::get('/transaction/feeExport', 'TransactionsController@exportCSVFeeOnly')->name('transactions.csvFeeOnly');
