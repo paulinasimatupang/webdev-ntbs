@@ -38,6 +38,7 @@
 <div class="separator-breadcrumb border-top"></div>
 
 <div class="row mb-4">
+    @if ($permissionsByFeature['fee'] ?? false)
     <div class="col-lg-4 col-md-4 col-sm-4">
         <a href="/fee" class="card-link">
             <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-2">
@@ -52,7 +53,9 @@
             </div>
         </a>
     </div>
+    @endif
 
+    @if ($permissionsByFeature['persen_fee'] ?? false)
     <div class="col-lg-4 col-md-4 col-sm-4">
         <a href="/persen_fee" class="card-link">
             <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-2">
@@ -67,7 +70,9 @@
             </div>
         </a>
     </div>
+    @endif
 
+    @if ($permissionsByFeature['role'] ?? false)
     <div class="col-lg-4 col-md-4 col-sm-4">
         <a href="/roles" class="card-link">
             <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-2">
@@ -82,7 +87,9 @@
             </div>
         </a>
     </div>
+    @endif
 
+    @if ($permissionsByFeature['permission'] ?? false)
     <div class="col-lg-4 col-md-4 col-sm-4">
         <a href="/permissions" class="card-link">
             <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-2">
@@ -97,7 +104,9 @@
             </div>
         </a>
     </div>
+    @endif
 
+    @if ($permissionsByFeature['user'] ?? false)
     <div class="col-lg-4 col-md-4 col-sm-4">
         <a href="/users" class="card-link">
             <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-2">
@@ -112,6 +121,7 @@
             </div>
         </a>
     </div>
+    @endif
     
     <!-- <div class="col-lg-4 col-md-4 col-sm-4">
         <a href="/hak-akses" class="card-link">

@@ -23,16 +23,16 @@ class User extends Authenticatable implements JWTSubject
     // HasApiTokens,
 
     public $incrementing = false;
-    
+
     public $timestamps = false;
 
     protected $fillable = [
-        'id', 
-        'role_id', 
-        'fullname', 
-        'username', 
-        'email', 
-        'password', 
+        'id',
+        'role_id',
+        'fullname',
+        'username',
+        'email',
+        'password',
         'status'
     ];
     protected $table = 'users';
@@ -47,23 +47,34 @@ class User extends Authenticatable implements JWTSubject
 
     protected $keyType = 'string'; // Tipe UUID
 
+    // public function hasRole($role)
+    // {
+    //     return in_array($role, $this->roles);
+    // }
+
     public function hasRole($role)
     {
-        return in_array($role, $this->roles);
+        return $this->roles && $this->roles->name === $role;
     }
+
 
     public function user_group()
     {
-        return $this->hasMany(UserGroup::class,'user_id','id');
+        return $this->hasMany(UserGroup::class, 'user_id', 'id');
     }
 
     public function merchant()
     {
-        return $this->hasOne(Merchant::class,'user_id','id');
+        return $this->hasOne(Merchant::class, 'user_id', 'id');
     }
     public function roles()
     {
-        return $this->belongsTo(Role::class,'role_id');
+        return $this->belongsTo(Role::class, 'role_id');
+    }
+
+    public function role()
+    {
+        return $this->belongsTo(Role::class, 'role_id');
     }
 
     /**
@@ -94,49 +105,41 @@ class User extends Authenticatable implements JWTSubject
         parent::boot();
 
         self::creating(function ($model) {
-            $model->id          = (string) Uuid::generate(4);
+            $model->id = (string) Uuid::generate(4);
         });
     }
 
-    public function can_access($menu)
-    {
-        $role_id = Auth::user()->role_id;
-        $role_privilege = RolePrivilege::where('role_id',$role_id)
-                                        ->with('privilege')
-                                        ->get();
 
-        $arrPrivilege = array();
-        foreach ($role_privilege as $key => $value) {
-            array_push($arrPrivilege, $value->privilege->name);
-        }
-        
-        if (in_array($menu, $arrPrivilege)) {
-            return true;
-        } else {
-            return false;
-        }
+    public function can_access($routeName)
+    {
+        $role = $this->roles; // Ambil role user
+        $permissions = $role->permissions->pluck('name')->toArray(); // Ambil semua permissions dari role
+
+        return in_array($routeName, $permissions);
     }
+
+
 
     public function has_action($menu, $action)
     {
         $role_id = Auth::user()->role_id;
-        $role_privilege = Privilege::where('role_id',$role_id)
-                                    ->where('name', '=', $menu)
-                                    ->where('key', '=', $action)
-                                    ->select('key', 'value')
-                                    ->first();
+        $role_privilege = Privilege::where('role_id', $role_id)
+            ->where('name', '=', $menu)
+            ->where('key', '=', $action)
+            ->select('key', 'value')
+            ->first();
         return $role_privilege->value;
     }
 
     public function getRole()
     {
         $role_id = Auth::user()->role_id;
-        $role = Role::where('id',$role_id)
+        $role = Role::where('id', $role_id)
             ->first();
 
         if ($role) {
             $result = $role->name;
-        }else{
+        } else {
             $result = 'no role';
         }
 

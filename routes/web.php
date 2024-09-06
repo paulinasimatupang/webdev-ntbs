@@ -20,7 +20,7 @@ Route::get('/', function () {
 Route::get('/login', 'AuthController@login')->name('login');
 Route::post('/login', 'AuthController@doLogin');
 
-Route::group(['middleware' => ['checkMultipleRoles:super-admin,supervisor-cabang,supervisor-pusat,customer-service-cabang,operator-pusat,agen']], function () {
+Route::group(['middleware' => ['auth']], function () {
     Route::get('/logout', 'AuthController@logout')->name('logout');
 
     Route::get('/dashboard/rank', 'TransactionsController@rankTransactions')->name('transaction_rank');
@@ -164,7 +164,7 @@ Route::group(['middleware' => ['checkMultipleRoles:super-admin,supervisor-cabang
     Route::get('/home', 'HomeController@index')->name('home');
 });
 
-Route::group(['middleware' => ['checkMultipleRoles:super-admin,operator-pusat']], function () {
+Route::group(['middleware' => ['auth', 'check.permission']], function () {
     //user
     Route::get('/users', 'UserController@index')->name('users.index');
     Route::get('/users/create', 'UserController@create')->name('users.create');
@@ -182,9 +182,7 @@ Route::group(['middleware' => ['checkMultipleRoles:super-admin,operator-pusat']]
     Route::post('/terminal/{id}/{merchant_id}/delete', 'TerminalsController@deleteMerchantData')->name('terminal_delete');
     Route::get('/terminal/{id}/activateBilliton', 'TerminalsController@activateBilliton')->name('terminal_activate_billiton');
     Route::get('/terminal/{id}/updateBilliton', 'TerminalsController@updateBilliton')->name('terminal_update_billiton');
-});
 
-Route::group(['middleware' => ['checkMultipleRoles:super-admin,agen']], function () {
     Route::get('/transaction', 'TransactionsController@index')->name('transaction');
     Route::get('/transaction_log/edit/{stan}', 'TransactionLogController@edit')->name('transactionlog_edit');
     Route::get('/transaction/updateStatus/{code}', 'TransactionsController@updateStatus')->name('transaction_updateStatus');
@@ -200,9 +198,7 @@ Route::group(['middleware' => ['checkMultipleRoles:super-admin,agen']], function
     Route::get('/transaction/reversal', 'TransactionsController@reversal');
     Route::get('/transaction/reversal/{additional_data}', 'TransactionsController@postReversal')->name('transaction_postReversal');
     Route::get('/transaction/fee', 'TransactionsController@reportFee')->name('transaction_fee');
-});
 
-Route::group(['middleware' => ['checkMultipleRoles:super-admin,supervisor-pusat']], function () {
     Route::get('/fee', 'FeeController@index')->name('fee');
     Route::get('/fee/create', 'FeeController@create')->name('fee_create');
     Route::post('/fee/store', 'FeeController@store')->name('fee_store');
@@ -217,9 +213,7 @@ Route::group(['middleware' => ['checkMultipleRoles:super-admin,supervisor-pusat'
     Route::get('/persen_fee/edit/{id}', 'PersenFeeController@edit')->name('persen_fee_edit');
     Route::post('/persen_fee/update/{id}', 'PersenFeeController@update')->name('persen_fee_update');
     //Route::post('/persen_fee/destroy/{meta_id}/{service_id}/{seq}', 'PersenFeeController@edit')->name('persen_fee_destroy');
-});
 
-Route::group(['middleware' => ['checkMultipleRoles:super-admin,supervisor-cabang']], function () {
     //nasabah approve
     Route::get('/nasabah', 'DataCalonNasabahController@index')->name('nasabah');
     Route::get('/nasabah/list', 'DataCalonNasabahController@list')->name('nasabah_list');
@@ -240,12 +234,10 @@ Route::group(['middleware' => ['checkMultipleRoles:super-admin,supervisor-cabang
     Route::post('/agen/{id}/reject', 'MerchantsController@rejectAgent')->name('agen_reject');
     Route::get('/agen/{id}/edit', 'MerchantsController@edit')->name('agen_edit');
     Route::post('/agen/{id}/update', 'MerchantsController@update')->name('agen_update');
-    Route::post('/agen/{id}/destroy', 'MerchantsController@destroy')->name('agen_destroy'); 
+    Route::post('/agen/{id}/destroy', 'MerchantsController@destroy')->name('agen_destroy');
     //baru ditambahin soalnya di root belum ada
     //root ngirim sms
-});
 
-Route::group(['middleware' => ['checkMultipleRoles:super-admin,customer-service-cabang']], function () {
     //agen
     Route::get('/agen', 'MerchantsController@menu')->name('agen');
     Route::get('/agen/list', 'MerchantsController@index')->name('agen_list');
@@ -263,12 +255,10 @@ Route::group(['middleware' => ['checkMultipleRoles:super-admin,customer-service-
     Route::get('/nasabah/request/detail/{id}', 'DataCalonNasabahController@detailRequest')->name('nasabah_detail_request');
     Route::post('/nasabah/accept/{id}', 'DataCalonNasabahController@acceptNasabah')->name('nasabah_accept');
     Route::post('/nasabah/reject/{id}', 'DataCalonNasabahController@rejectNasabah')->name('nasabah_reject');
-        // Rute untuk menampilkan gambar dari database
+    // Rute untuk menampilkan gambar dari database
     Route::get('/image/{imageName}', 'DataCalonNasabahController@getImage')->name('get_image');
     Route::post('/nasabah/reject/{id}', 'DataCalonNasabahController@rejectNasabah')->name('nasabah_reject');
-});
 
-Route::group(['middleware' => ['checkMultipleRoles:super-admin']], function () {
     //message log
     Route::get('/message', 'MessageLogController@index')->name('message_log');
     //biller
@@ -297,107 +287,104 @@ Route::group(['middleware' => ['checkMultipleRoles:super-admin']], function () {
     Route::post('/roles/{role}/destroy', 'RoleController@destroy')->name('roles.destroy');
     Route::get('/roles/{role}/give-permissions', 'RoleController@addPermissionToRole')->name('roles.addPermissionToRole');
     Route::put('/roles/{role}/give-permissions', 'RoleController@givePermissionToRole')->name('roles.givePermissionToRole');
-});
 
-Route::group(['middleware' => ['checkMultipleRoles:super-admin, call-center']], function () {
     Route::get('/agen', 'MerchantsController@menu')->name('agen');
     Route::post('/agen/{id}/activate', 'MerchantsController@activateMerchant')->name('agen_activate');
     Route::get('/agen/blocked', 'MerchantsController@list_block')->name('agen_blocked');
     Route::get('/agen/blocked/{id}', 'MerchantsController@detail_blocked')->name('agen_blocked_detail');
-
 });
 
-    // Routes for Master Data
-    // Route::get('/hak-akses', 'HakAksesController@index')->name('hakakses');
-    // Route::get('/hak-akses/create', 'HakAksesController@create')->name('hakakses_create');
-    // Route::post('/hak-akses/store', 'HakAksesController@store')->name('hakakses_store');
-    // Route::get('/hak-akses/{id}/edit', 'HakAksesController@edit')->name('hakakses_edit');
-    // Route::post('/hak-akses/{id}/update', 'HakAksesController@update')->name('hakakses_update');
-    // Route::post('/hak-akses/{id}/destroy', 'HakAksesController@destroy')->name('hakakses_destroy');
-    // Route::get('/hak-akses/chart', 'HakAksesController@showChart')->name('hakakses_chart');
+// Routes for Master Data
+// Route::get('/hak-akses', 'HakAksesController@index')->name('hakakses');
+// Route::get('/hak-akses/create', 'HakAksesController@create')->name('hakakses_create');
+// Route::post('/hak-akses/store', 'HakAksesController@store')->name('hakakses_store');
+// Route::get('/hak-akses/{id}/edit', 'HakAksesController@edit')->name('hakakses_edit');
+// Route::post('/hak-akses/{id}/update', 'HakAksesController@update')->name('hakakses_update');
+// Route::post('/hak-akses/{id}/destroy', 'HakAksesController@destroy')->name('hakakses_destroy');
+// Route::get('/hak-akses/chart', 'HakAksesController@showChart')->name('hakakses_chart');
 
-    // Routes for ServiceMeta
-    // Route::get('/servicemeta', 'ServiceMetaController@index')->name('servicemeta');
-    // Route::get('/servicemeta/create', 'ServiceMetaController@create')->name('servicemeta_create');
-    // Route::post('/servicemeta/store', 'ServiceMetaController@store')->name('servicemeta_store');
-    // Route::get('/servicemeta/{id}/edit', 'ServiceMetaController@edit')->name('servicemeta_edit');
-    // Route::post('/servicemeta/{id}/update', 'ServiceMetaController@update')->name('servicemeta_update');
+// Routes for ServiceMeta
+// Route::get('/servicemeta', 'ServiceMetaController@index')->name('servicemeta');
+// Route::get('/servicemeta/create', 'ServiceMetaController@create')->name('servicemeta_create');
+// Route::post('/servicemeta/store', 'ServiceMetaController@store')->name('servicemeta_store');
+// Route::get('/servicemeta/{id}/edit', 'ServiceMetaController@edit')->name('servicemeta_edit');
+// Route::post('/servicemeta/{id}/update', 'ServiceMetaController@update')->name('servicemeta_update');
 
-    // Route::get('/screen', 'ScreenController@index')->name('screen');
-    // Route::get('/screen/create', 'ScreenController@create')->name('screen_create');
-    // Route::post('/screen/store', 'ScreenController@store')->name('screen_store');
-    // Route::get('/screen/{id}/edit', 'ScreenController@edit')->name('screen_edit');
-    // Route::post('/screen/{id}/update', 'ScreenController@update')->name('screen_update');
-    // Route::post('/screen/{id}/destroy', 'ScreenController@destroy')->name('screen_destroy');
+// Route::get('/screen', 'ScreenController@index')->name('screen');
+// Route::get('/screen/create', 'ScreenController@create')->name('screen_create');
+// Route::post('/screen/store', 'ScreenController@store')->name('screen_store');
+// Route::get('/screen/{id}/edit', 'ScreenController@edit')->name('screen_edit');
+// Route::post('/screen/{id}/update', 'ScreenController@update')->name('screen_update');
+// Route::post('/screen/{id}/destroy', 'ScreenController@destroy')->name('screen_destroy');
 
-    // Route::get('/component', 'ComponentController@index')->name('component');
-    // Route::get('/component/create', 'ComponentController@create')->name('component_create');
-    // Route::post('/component/store', 'ComponentController@store')->name('component_store');
-    // Route::get('/component/{id}/edit', 'ComponentController@edit')->name('component_edit');
-    // Route::post('/component/{id}/update', 'ComponentController@update')->name('component_update');
-    // Route::post('/component/{id}/destroy', 'ComponentController@destroy')->name('component_destroy');
+// Route::get('/component', 'ComponentController@index')->name('component');
+// Route::get('/component/create', 'ComponentController@create')->name('component_create');
+// Route::post('/component/store', 'ComponentController@store')->name('component_store');
+// Route::get('/component/{id}/edit', 'ComponentController@edit')->name('component_edit');
+// Route::post('/component/{id}/update', 'ComponentController@update')->name('component_update');
+// Route::post('/component/{id}/destroy', 'ComponentController@destroy')->name('component_destroy');
 
-    // Route::get('/service', 'ServiceController@index')->name('service');
-    // Route::get('/service/create', 'ServiceController@create')->name('service_create');
-    // Route::post('/service/store', 'ServiceController@store')->name('service_store');
-    // Route::get('/service/{id}/edit', 'ServiceController@edit')->name('service_edit');
-    // Route::post('/service/{id}/update', 'ServiceController@update')->name('service_update');
-    // Route::post('/service/{id}/destroy', 'ServiceController@destroy')->name('service_destroy');
+// Route::get('/service', 'ServiceController@index')->name('service');
+// Route::get('/service/create', 'ServiceController@create')->name('service_create');
+// Route::post('/service/store', 'ServiceController@store')->name('service_store');
+// Route::get('/service/{id}/edit', 'ServiceController@edit')->name('service_edit');
+// Route::post('/service/{id}/update', 'ServiceController@update')->name('service_update');
+// Route::post('/service/{id}/destroy', 'ServiceController@destroy')->name('service_destroy');
 
-    // Route::get('/screen-component', 'ScreenComponentController@index')->name('screen_component');
-    // Route::get('/screen-component/create', 'ScreenComponentController@create')->name('screen_component_create');
-    // Route::post('/screen-component/store', 'ScreenComponentController@store')->name('screen_component_store');
-    // Route::get('/screen-component/{screen_id}/edit', 'ScreenComponentController@edit')->name('screen_component_edit');
-    // Route::post('/screen-component/{screen_id}/update', 'ScreenComponentController@update')->name('screen_component_update');
-    // Route::post('/screen-component/{screen_id}/destroy', 'ScreenComponentController@destroy')->name('screen_component_destroy');
+// Route::get('/screen-component', 'ScreenComponentController@index')->name('screen_component');
+// Route::get('/screen-component/create', 'ScreenComponentController@create')->name('screen_component_create');
+// Route::post('/screen-component/store', 'ScreenComponentController@store')->name('screen_component_store');
+// Route::get('/screen-component/{screen_id}/edit', 'ScreenComponentController@edit')->name('screen_component_edit');
+// Route::post('/screen-component/{screen_id}/update', 'ScreenComponentController@update')->name('screen_component_update');
+// Route::post('/screen-component/{screen_id}/destroy', 'ScreenComponentController@destroy')->name('screen_component_destroy');
 
-    // Route::get('/new_features', 'NewFeaturesController@index')->name('new_features');
+// Route::get('/new_features', 'NewFeaturesController@index')->name('new_features');
 
-    // Route::get('/ranking_lakupandai', 'RankingLakuPandaiController@index')->name('ranking_lakupandai');
+// Route::get('/ranking_lakupandai', 'RankingLakuPandaiController@index')->name('ranking_lakupandai');
 
-    // Route::get('/transactionSaleBJB', 'TransactionSaleBJBController@indexSale')->name('transactionSaleBJB');
-    // // Route::post('/transactionSaleBJB/{id}/updatebjb', 'TransactionSaleBJBController@updatebjb')->name('transaction_updatebjb');
+// Route::get('/transactionSaleBJB', 'TransactionSaleBJBController@indexSale')->name('transactionSaleBJB');
+// // Route::post('/transactionSaleBJB/{id}/updatebjb', 'TransactionSaleBJBController@updatebjb')->name('transaction_updatebjb');
 
-    // Route::get('/transaction_log', 'TransactionLogController@index')->name('transaction_log');
-    // Route::get('/transaction_log/create', 'TransactionLogController@create')->name('transactionlog_create');
-    // Route::get('/transaction_log/edit/{stan}', 'TransactionLogController@edit')->name('transactionlog_edit');
-    // Route::put('/transaction_log/update/{additional_data}', 'TransactionLogController@update')->name('transactionlog_update');
-    // Route::get('/transaction_log/show/{additional_data}', 'TransactionLogController@show')->name('transactionlog_show');
-    // Route::post('/transaction_log/destroy/{additional_data}', 'TransactionLogController@destroy')->name('transactionlog_destroy');
-    // Route::post('/transaction_log/store', 'TransactionLogController@store')->name('transactionlog_store');
-    // Route::post('/transaction_log/updatestatus/{additional_data}', 'TransactionsController@updateStatus')->name('transactionlog_updatestatus');
+// Route::get('/transaction_log', 'TransactionLogController@index')->name('transaction_log');
+// Route::get('/transaction_log/create', 'TransactionLogController@create')->name('transactionlog_create');
+// Route::get('/transaction_log/edit/{stan}', 'TransactionLogController@edit')->name('transactionlog_edit');
+// Route::put('/transaction_log/update/{additional_data}', 'TransactionLogController@update')->name('transactionlog_update');
+// Route::get('/transaction_log/show/{additional_data}', 'TransactionLogController@show')->name('transactionlog_show');
+// Route::post('/transaction_log/destroy/{additional_data}', 'TransactionLogController@destroy')->name('transactionlog_destroy');
+// Route::post('/transaction_log/store', 'TransactionLogController@store')->name('transactionlog_store');
+// Route::post('/transaction_log/updatestatus/{additional_data}', 'TransactionsController@updateStatus')->name('transactionlog_updatestatus');
 
-    // Route::post('/transactionBJB/{id}/updatebjb', 'TransactionBJBsController@updatebjb')->name('transaction_updatebjb');
-    // Route::post('/transactionBJB/{id}/update', 'TransactionBJBsController@update')->name('transactionBJB_update');
-    // Route::get('/transactionBJB/{id}/edit', 'TransactionBJBsController@edit')->name('transactionBJB_edit');
-    // Route::get('/transactionBJB', 'TransactionBJBsController@index')->name('transactionBJB');
-    // Route::get('/transactionBJB/export', 'TransactionBJBsController@export');
-    // Route::get('/transactionBJB/exportPDF', 'TransactionBJBsController@exportPDF');
-    // Route::get('/transactionBJB/exportCSV', 'TransactionBJBsController@exportCSV');
-    // Route::get('/transactionBJB/feeExport', 'TransactionBJBsController@feeExport');
-    // Route::get('/transactionBJB/edit/{id}', 'TransactionBJBsController@edit');
+// Route::post('/transactionBJB/{id}/updatebjb', 'TransactionBJBsController@updatebjb')->name('transaction_updatebjb');
+// Route::post('/transactionBJB/{id}/update', 'TransactionBJBsController@update')->name('transactionBJB_update');
+// Route::get('/transactionBJB/{id}/edit', 'TransactionBJBsController@edit')->name('transactionBJB_edit');
+// Route::get('/transactionBJB', 'TransactionBJBsController@index')->name('transactionBJB');
+// Route::get('/transactionBJB/export', 'TransactionBJBsController@export');
+// Route::get('/transactionBJB/exportPDF', 'TransactionBJBsController@exportPDF');
+// Route::get('/transactionBJB/exportCSV', 'TransactionBJBsController@exportCSV');
+// Route::get('/transactionBJB/feeExport', 'TransactionBJBsController@feeExport');
+// Route::get('/transactionBJB/edit/{id}', 'TransactionBJBsController@edit');
 
-    // Route::get('/transactionBJB', 'TransactionBJBsController@index')->name('transactionBJB');
-    // Route::get('/transactionBJB/updateStatus/{code}', 'TransactionBJBsController@updateStatus')->name('transactionBJB_updateStatus');
-    // Route::get('/transactionBJB/{id}/edit', 'TransactionBJBsController@edit')->name('transactionBJB_edit');
-    // Route::post('/transactionBJB/{id}/update', 'TransactionBJBsController@update')->name('transactionBJB_update');
-    // Route::get('/transactionBJB/export', 'TransactionBJBsController@export');
-    // Route::get('/transactionBJB/exportPDF', 'TransactionBJBsController@exportPDF');
-    // Route::get('/transactionBJB/exportCSV', 'TransactionBJBsController@exportCSV');
-    // Route::get('/transactionBJB/saleExport', 'TransactionBJBsController@saleExport');
-    // Route::get('/transactionBJB/feeExport', 'TransactionBJBsController@feeExport');
-    // Route::get('/transactionBJB/reversal', 'TransactionBJBsController@reversal');
-    // Route::get('/transactionBJB/reversal/{additional_data}', 'TransactionBJBsController@postReversal')->name('transactionBJB_postReversal');
+// Route::get('/transactionBJB', 'TransactionBJBsController@index')->name('transactionBJB');
+// Route::get('/transactionBJB/updateStatus/{code}', 'TransactionBJBsController@updateStatus')->name('transactionBJB_updateStatus');
+// Route::get('/transactionBJB/{id}/edit', 'TransactionBJBsController@edit')->name('transactionBJB_edit');
+// Route::post('/transactionBJB/{id}/update', 'TransactionBJBsController@update')->name('transactionBJB_update');
+// Route::get('/transactionBJB/export', 'TransactionBJBsController@export');
+// Route::get('/transactionBJB/exportPDF', 'TransactionBJBsController@exportPDF');
+// Route::get('/transactionBJB/exportCSV', 'TransactionBJBsController@exportCSV');
+// Route::get('/transactionBJB/saleExport', 'TransactionBJBsController@saleExport');
+// Route::get('/transactionBJB/feeExport', 'TransactionBJBsController@feeExport');
+// Route::get('/transactionBJB/reversal', 'TransactionBJBsController@reversal');
+// Route::get('/transactionBJB/reversal/{additional_data}', 'TransactionBJBsController@postReversal')->name('transactionBJB_postReversal');
 
-    // Route::get('/dashboard', 'DashboardController@dashboard')->name('dashboard');
-    // Route::get('/dashboard/ppob', 'DashboardController@detailDashboardPpob')->name('detail_dashboard_ppob');
-    // Route::get('/dashboard/lakupandai', 'DashboardController@detailDashboardLakupandai')->name('detail_dashboard_lakupandai');
-    // Route::get('/dashboard/all', 'DashboardController@detailDashboardAll')->name('detail_dashboard_all');
-    // Route::get('/dashboard/reward', 'DashboardController@agentReward')->name('agent_reward');
-    // Route::get('/dashboard/activeAgent', 'DashboardController@agentActive')->name('agent_active');
-    // Route::get('/dashboard/resignAgent', 'DashboardController@agentResign')->name('agent_resign');
-    // Route::get('/dashboard/allAgent', 'DashboardController@agentAll')->name('agent_all');
+// Route::get('/dashboard', 'DashboardController@dashboard')->name('dashboard');
+// Route::get('/dashboard/ppob', 'DashboardController@detailDashboardPpob')->name('detail_dashboard_ppob');
+// Route::get('/dashboard/lakupandai', 'DashboardController@detailDashboardLakupandai')->name('detail_dashboard_lakupandai');
+// Route::get('/dashboard/all', 'DashboardController@detailDashboardAll')->name('detail_dashboard_all');
+// Route::get('/dashboard/reward', 'DashboardController@agentReward')->name('agent_reward');
+// Route::get('/dashboard/activeAgent', 'DashboardController@agentActive')->name('agent_active');
+// Route::get('/dashboard/resignAgent', 'DashboardController@agentResign')->name('agent_resign');
+// Route::get('/dashboard/allAgent', 'DashboardController@agentAll')->name('agent_all');
 
-    // Route::get('/dashboard', function () {
-    //     return view('apps.landing');
-    // })->name('landing');
+// Route::get('/dashboard', function () {
+//     return view('apps.landing');
+// })->name('landing');

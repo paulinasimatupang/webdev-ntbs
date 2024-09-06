@@ -26,25 +26,50 @@
                     @csrf
                     @method('PUT')
 
-                    <div class="form-group row">
-                        <label class="col-sm-2 col-form-label">Permissions</label>
-                        <div class="col-sm-10">
-                            <div class="row">
-                                @foreach ($permissions as $permission)
-                                <div class="col-md-3 mb-2">
-                                    <label>
-                                        <input
-                                            type="checkbox"
-                                            name="permission[]"
-                                            value="{{ $permission->name }}"
-                                            {{ in_array($permission->id, $rolePermissions) ? 'checked' : '' }} />
-                                        {{ $permission->name }}
-                                    </label>
+                    <div class="form-group">
+                        @foreach ($permissionsGroupedByParent as $parent => $features)
+                        <div class="mb-4">
+                            <div class="parent-group">
+                                <label>
+                                    <strong>{{ ucfirst($parent) }}</strong>
+                                </label>
+                            </div>
+
+                            <div class="ml-4">
+                                @foreach ($features as $feature => $permissions)
+                                <div class="mb-3">
+                                    <div class="feature-group">
+                                        <label>
+                                            <input
+                                                type="checkbox"
+                                                class="feature-checkbox"
+                                                data-parent="{{ $parent }}"
+                                                data-feature="{{ $feature }}">
+                                            <strong>{{ ucfirst($feature) }}</strong>
+                                        </label>
+                                    </div>
+
+                                    <div class="ml-4">
+                                        @foreach ($permissions as $permission)
+                                        <div class="permission-item">
+                                            <label>
+                                                <input
+                                                    type="checkbox"
+                                                    name="permission[]"
+                                                    class="permission-checkbox"
+                                                    data-feature="{{ $feature }}"
+                                                    value="{{ $permission->id }}"
+                                                    {{ in_array($permission->id, $rolePermissions) ? 'checked' : '' }}>
+                                                {{ ucfirst($permission->name) }}
+                                            </label>
+                                        </div>
+                                        @endforeach
+                                    </div>
                                 </div>
                                 @endforeach
                             </div>
-                            @error('permission') <span class="text-danger">{{ $message }}</span> @enderror
                         </div>
+                        @endforeach
                     </div>
 
                     <div class="form-group row">
@@ -62,12 +87,36 @@
 </div>
 @endsection
 
-@section('page-js')
-
-@endsection
-
 @section('bottom-js')
 
-<script src="{{ asset('assets/js/form.validation.script.js') }}"></script>
+<script>
+// Function to update feature checkboxes based on permissions
+function updateFeatureCheckboxes() {
+    $('.feature-checkbox').each(function() {
+        let feature = $(this).data('feature');
+        let allPermissionsChecked = $(`.permission-checkbox[data-feature="${feature}"]`).length === $(`.permission-checkbox[data-feature="${feature}"]`).filter(':checked').length;
+        $(this).prop('checked', allPermissionsChecked);
+    });
+}
+
+// Handle feature checkbox toggle
+$('.feature-checkbox').on('change', function () {
+    let feature = $(this).data('feature');
+    let checked = $(this).is(':checked');
+    $(`.permission-checkbox[data-feature="${feature}"]`).prop('checked', checked);
+});
+
+// Handle permission checkbox toggle
+$('.permission-checkbox').on('change', function () {
+    let feature = $(this).data('feature');
+    let allPermissionsChecked = $(`.permission-checkbox[data-feature="${feature}"]`).length === $(`.permission-checkbox[data-feature="${feature}"]`).filter(':checked').length;
+    $(`.feature-checkbox[data-feature="${feature}"]`).prop('checked', allPermissionsChecked);
+});
+
+// Initialize feature checkboxes on page load
+$(document).ready(function() {
+    updateFeatureCheckboxes();
+});
+</script>
 
 @endsection
