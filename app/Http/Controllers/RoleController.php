@@ -104,12 +104,16 @@ class RoleController extends Controller
 
     public function addPermissionToRole(Role $role)
     {
-        $permissions = Permission::all();
-        $rolePermissions = $role->permissions->pluck('id')->all();  // Simplified
+        // Fetch all permissions and group them by parent feature and feature
+        $permissions = Permission::all()->groupBy('feature_group')->map(function ($permissionsByParent) {
+            return $permissionsByParent->groupBy('feature');
+        });
+
+        $rolePermissions = $role->permissions->pluck('id')->all();  // Permissions yang dimiliki role
 
         return view('apps.role.add-permissions', [
             'role' => $role,
-            'permissions' => $permissions,
+            'permissionsGroupedByParent' => $permissions,
             'rolePermissions' => $rolePermissions
         ]);
     }
