@@ -202,50 +202,62 @@
                     </div>
                 </div>
             </div>
+            <div class="mt-4 text-center">{{ $data->appends(request()->input())->links() }}</div>
         </div>
     </div>
 @endsection
 
 @section('page-js')
-    <script src="{{ asset('assets/scripts/vendor/datatables.min.js') }}"></script>
-    <script src="{{ asset('assets/scripts/vendor/pickadate/picker.js') }}"></script>
-    <script src="{{ asset('assets/scripts/vendor/pickadate/picker.date.js') }}"></script>
+    <script src="{{ asset('assets/js/vendor/echarts.min.js') }}"></script>
+    <script src="{{ asset('assets/js/es5/echart.options.min.js') }}"></script>
+    <!-- <script src="{{ asset('assets/js/vendor/datatables.min.js') }}"></script> -->
+    <!-- <script src="{{ asset('assets/js/datatables.script.js') }}"></script> -->
+    <script src="{{ asset('assets/js/es5/dashboard.v4.script.js') }}"></script>
+    <script src="{{ asset('assets/js/vendor/pickadate/picker.js') }}"></script>
+    <script src="{{ asset('assets/js/vendor/pickadate/picker.date.js') }}"></script>
 
     <script>
-        $(document).ready(function() {
-            $('#default_ordering_table').DataTable({
-                order: [[5, 'desc']]
-            });
+        var $dateFrom = $('.start_date').pickadate({format: 'yyyy-mm-dd'}),
+            dateFromPicker = $dateFrom.pickadate('picker');
 
-            $('.start_date').pickadate({
-                format: 'yyyy-mm-dd'
-            });
+        var $dateTo = $('.end_date').pickadate({format: 'yyyy-mm-dd'}),
+            dateToPicker = $dateTo.pickadate('picker');
 
-            $('.end_date').pickadate({
-                format: 'yyyy-mm-dd'
-            });
+        dateFromPicker.on({
+            open: function(e) {
+                console.log('Open start_date');
+                if ($dateFrom.val()) {
+                    console.log('User is making a change to start_date');
+                }
+            },
+            close: function(e) {
+                if ($dateFrom.val() && !$dateTo.val()) {
+                    console.log('Open end_date via start_date');
+                    dateToPicker.open();
+                } else if (!$dateFrom.val()) {
+                    console.log('User left start_date empty. Not popping end_date');
+                }
+                console.log('Close start_date');
+                // workaround for github issue #160
+                $(document.activeElement).blur();
+            }
+        });
 
-            $('#export-fee-to-excel').on('click', function() {
-                window.location.href = $(this).attr('href');
-            });
-
-            $('#export-to-excel').on('click', function() {
-                window.location.href = $(this).attr('href');
-            });
-
-            $('#export-to-pdf').on('click', function() {
-                window.location.href = $(this).attr('href');
-            });
-
-            $('#export-payment-to-excel').on('click', function() {
-                window.location.href = $(this).attr('href');
-            });
-
-            $('#btn-sale-bjb').on('click', function() {
-                $('#b1').toggle();
-                $('#b2').toggle();
-                $('#b3').toggle();
-            });
+        dateToPicker.on({
+            open: function(e) {
+                console.log('Popped end_date');
+                if ($dateTo.val()) {
+                    console.log('User is making a change to end_date');
+                }
+            },
+            close: function(e) {
+                if (!$dateTo.val()) {
+                    console.log('User left end_date empty. Not popping start_date or end_date');
+                }
+                console.log('Close end_date');
+                // workaround for github issue #160
+                $(document.activeElement).blur();
+            }
         });
     </script>
 @endsection

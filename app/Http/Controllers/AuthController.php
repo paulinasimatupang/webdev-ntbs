@@ -146,7 +146,7 @@ class AuthController extends Controller
                 }
             }
 
-            $token = Auth::attempt($credentials);
+            $token = JWTAuth::attempt($credentials);
         } catch (JWTException $e) {
             if ($request->expectsJson()) {
                 return response()->json([
@@ -173,6 +173,7 @@ class AuthController extends Controller
             ], 200);
         } else {
             $request->session()->put('user', $user);
+            $request->session()->put('merchant', $user->merchant);
             return Redirect::to('landing');
         }
     }

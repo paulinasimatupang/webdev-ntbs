@@ -30,6 +30,7 @@ use App\Entities\TransactionStatus;
 use App\Entities\TransactionFee;
 use App\Entities\transactionPaymentStatus;
 use App\Entities\Group;
+use App\Entities\Role;
 use App\Entities\UserGroup;
 use App\Entities\GroupSchema;
 use App\Entities\GroupSchemaShareholder;
@@ -88,11 +89,22 @@ class TransactionsController extends Controller
     {
         $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
     
-        // Membuat query untuk mendapatkan data transaksi
-        $data = Transaction::select('*')
-            ->with(['event','transactionStatus', 'user','service', 'merchant']);
+        $data = Transaction::query(); 
 
-        $query = Transaction::with('merchant');
+        $user = session()->get('user');
+
+        if ($user) {
+            $role_user = $user->role_id;
+            $role = Role::find($role_user);
+    
+            if ($role && $role->name == 'Agen') {
+                $merchant = session()->get('merchant');
+                if ($merchant) {
+                    $kode_agen = $merchant->mid;
+                    $data->where('kode_agen', $kode_agen);
+                }
+            }
+        }
 
         if ($request->has('search') && $request->get('search') != '') {
             $data->where('transaction_code', '=', $request->get('search'));
@@ -106,11 +118,6 @@ class TransactionsController extends Controller
             $data->where('transaction_time', '<=', $request->get('end_date'). ' 23:59:59.999');
         }
 
-        // if($request->has('service') && $request->get('service')!=''){
-        //     $data->where('service', '=', $request->get('service'). ' 23:59:59.999');
-        // }
-    
-        // Filter berdasarkan status
         if ($request->has('status') && $request->get('status') != '' && $request->get('status') != 'Select Status') {
             $status = $request->get('status');
             switch ($status) {
@@ -126,7 +133,6 @@ class TransactionsController extends Controller
             }
         }
     
-        // Order by handling
         $orderType = $request->get('order_type', 'desc');
         $orderBy = $request->get('order_by', 'transaction_time');
         $data->orderBy($orderBy, $orderType);
@@ -141,10 +147,7 @@ class TransactionsController extends Controller
             'total_fee' => $totalFee,
         ];
     
-        // Pagination
         $data = $data->paginate(10);
-    
-        $user = session()->get('user');
     
         return view('apps.transactions.list')
             ->with('data', $data)

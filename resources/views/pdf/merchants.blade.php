@@ -74,8 +74,8 @@
                     <td>{{ $merchant->phone ?? 'N/A' }}</td>
                     <td>{{ $merchant->tid ?? 'N/A' }}</td>
                     <td>{{ $merchant->status_agen ?? 'N/A' }}</td>
-                    <td>{{ $merchant->activate_date ? $merchant->activate_date->format('Y-m-d') : 'N/A' }}</td>
-                    <td>{{ $merchant->resign_date ? $merchant->resign_date->format('Y-m-d') : 'N/A' }}</td>
+                    <td>{{ $merchant->active_at ?? 'N/A' }}</td>
+                    <td>{{ $merchant->resign_at ??'N/A' }}</td>
                 </tr>
             @endforeach
         </tbody>
