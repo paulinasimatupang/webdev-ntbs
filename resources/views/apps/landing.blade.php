@@ -12,6 +12,11 @@
     }
 </style>
 
+@php
+    $sidebarService = new \App\Services\SidebarService();
+    $features = $sidebarService->getSidebarItems();
+@endphp
+
 @endsection
 @section('main-content')
 <div class="breadcrumb">
@@ -32,61 +37,69 @@
         </div>
     </div>
     <!-- ICON BG -->
-    <div class="col-lg-3 col-md-6 col-sm-6">
-        <a href="dashboard">
-            <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-4">
-                <div class="card-body text-center">
-                    <img src="{{asset('/assets/images/sidebar_icon/dashboard.png')}}" alt="" class="mr-3"
-                        style="width: 50px">
-                    <div class="content">
-                        <p class="lead text-primary text-24 mb-2">Dashboard</p>
+    @if(isset($features['dashboard']))
+        <div class="col-lg-3 col-md-6 col-sm-6">
+            <a href="dashboard">
+                <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-4">
+                    <div class="card-body text-center">
+                        <img src="{{asset('/assets/images/sidebar_icon/dashboard.png')}}" alt="" class="mr-3"
+                            style="width: 50px">
+                        <div class="content">
+                            <p class="lead text-primary text-24 mb-2">Dashboard</p>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </a>
-    </div>
+            </a>
+        </div>
+    @endif
 
-    <div class="col-lg-3 col-md-6 col-sm-6">
-        <a href="transaction">
-            <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-4">
-                <div class="card-body text-center">
-                    <img src="{{asset('/assets/images/sidebar_icon/transaction.png')}}" alt="" class="mr-3"
-                        style="width: 50px">
-                    <div class="content">
-                        <p class="lead text-primary text-24 mb-2" style="text-align: left;">Transaksi</p>
+    @if(isset($features['transaction']))
+        <div class="col-lg-3 col-md-6 col-sm-6">
+            <a href="transaction">
+                <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-4">
+                    <div class="card-body text-center">
+                        <img src="{{asset('/assets/images/sidebar_icon/transaction.png')}}" alt="" class="mr-3"
+                            style="width: 50px">
+                        <div class="content">
+                            <p class="lead text-primary text-24 mb-2" style="text-align: left;">Transaksi</p>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </a>
-    </div>
+            </a>
+        </div>
+    @endif
 
-    <div class="col-lg-3 col-md-6 col-sm-6">
-        <a href="nasabah">
-            <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-4">
-                <div class="card-body text-center">
-                    <img src="{{asset('/assets/images/sidebar_icon/nasabah.png')}}" alt="" class="mr-3"
-                        style="width: 50px">
-                    <div class="content">
-                        <p class="lead text-primary text-24 mb-2">Nasabah</p>
+    @if(isset($features['nasabah']))
+        <div class="col-lg-3 col-md-6 col-sm-6">
+            <a href="nasabah">
+                <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-4">
+                    <div class="card-body text-center">
+                        <img src="{{asset('/assets/images/sidebar_icon/nasabah.png')}}" alt="" class="mr-3"
+                            style="width: 50px">
+                        <div class="content">
+                            <p class="lead text-primary text-24 mb-2">Nasabah</p>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </a>
-    </div>
+            </a>
+        </div>
+    @endif
 
-    <div class="col-lg-3 col-md-6 col-sm-6">
-        <a href="merchant">
-            <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-4">
-                <div class="card-body text-center">
-                    <img src="{{asset('/assets/images/sidebar_icon/agent.png')}}" alt="" class="mr-3"
-                        style="width: 50px">
-                    <div class="content">
-                        <p class="lead text-primary text-24 mb-2">Agen</p>
+    @if(isset($features['agen']))
+        <div class="col-lg-3 col-md-6 col-sm-6">
+            <a href="merchant">
+                <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-4">
+                    <div class="card-body text-center">
+                        <img src="{{asset('/assets/images/sidebar_icon/agent.png')}}" alt="" class="mr-3"
+                            style="width: 50px">
+                        <div class="content">
+                            <p class="lead text-primary text-24 mb-2">Agen</p>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </a>
-    </div>
+            </a>
+        </div>
+    @endif
 </div>
 @endsection
 @section('page-js')

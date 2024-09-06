@@ -23,15 +23,17 @@
                 </a>
                 <div class="triangle"></div>
             </li>
-            <li class="nav-item {{ (request()->is('transaction') || request()->is('transaction/*')) ? 'active' : '' }}">
-                <a class="nav-item-hold" href="{{route('transaction')}}">
+            @if(isset($features['transaction']))
+                <li class="nav-item {{ (request()->is('transaction') || request()->is('transaction/*')) ? 'active' : '' }}">
+                    <a class="nav-item-hold" href="{{route('transaction')}}">
 
-                    <img class="img_bintang_sidebar" src="{{asset('/assets/images/sidebar_icon/transaction.png')}}"
-                        alt="">
-                    <span class="nav-text">Transaksi</span>
-                </a>
-                <div class="triangle"></div>
-            </li>
+                        <img class="img_bintang_sidebar" src="{{asset('/assets/images/sidebar_icon/transaction.png')}}"
+                            alt="">
+                        <span class="nav-text">Transaksi</span>
+                    </a>
+                    <div class="triangle"></div>
+                </li>
+            @endif
             @if(isset($features['terminal_group']))
                         <li class="nav-item {{ (request()->is('terminal') || request()->is('terminal/*')) ? 'active' : '' }}" @php
                             if (session()->get('user')->role_id == 2)
@@ -73,26 +75,30 @@
                     <div class="triangle"></div>
                 </li>
             @endif
-            <li class="nav-item {{ (request()->is('message') || request()->is('message/*')) ? 'active' : '' }}" @php
-                if (session()->get('user')->role_id == 2)
-            echo 'id="b1"'; @endphp>
-                <a class="nav-item-hold" href="{{route('message_log')}}">
+            @if(isset($features['message log']))
+                        <li class="nav-item {{ (request()->is('message') || request()->is('message/*')) ? 'active' : '' }}" @php
+                            if (session()->get('user')->role_id == 2)
+                        echo 'id="b1"'; @endphp>
+                            <a class="nav-item-hold" href="{{route('message_log')}}">
 
-                    <img class="img_bintang_sidebar" src="{{asset('/assets/images/sidebar_icon/log.png')}}" alt="">
-                    <span class="nav-text">Message Log</span>
-                </a>
-                <div class="triangle"></div>
-            </li>
-            <li class="nav-item {{ (request()->is('biller') || request()->is('biller/*')) ? 'active' : '' }}" @php
-                if (session()->get('user')->role_id == 2)
-            echo 'id="b1"'; @endphp>
-                <a class="nav-item-hold" href="{{route('biller')}}">
+                                <img class="img_bintang_sidebar" src="{{asset('/assets/images/sidebar_icon/log.png')}}" alt="">
+                                <span class="nav-text">Message Log</span>
+                            </a>
+                            <div class="triangle"></div>
+                        </li>
+            @endif
+            @if(isset($features['biller']))
+                        <li class="nav-item {{ (request()->is('biller') || request()->is('biller/*')) ? 'active' : '' }}" @php
+                            if (session()->get('user')->role_id == 2)
+                        echo 'id="b1"'; @endphp>
+                            <a class="nav-item-hold" href="{{route('biller')}}">
 
-                    <img class="img_bintang_sidebar" src="{{asset('/assets/images/sidebar_icon/biller.png')}}" alt="">
-                    <span class="nav-text">Biller</span>
-                </a>
-                <div class="triangle"></div>
-            </li>
+                                <img class="img_bintang_sidebar" src="{{asset('/assets/images/sidebar_icon/biller.png')}}" alt="">
+                                <span class="nav-text">Biller</span>
+                            </a>
+                            <div class="triangle"></div>
+                        </li>
+            @endif
             <li class="nav-item {{ request()->is('extrakits/*') ? 'active' : '' }}">
                 <a class="nav-item-hold" href="{{route('dashboard_version_11')}}">
 

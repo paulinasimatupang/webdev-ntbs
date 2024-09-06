@@ -195,8 +195,10 @@ Route::group(['middleware' => ['auth', 'check.permission']], function () {
     Route::get('/transactions.csv', 'TransactionsController@exportCSV')->name('transactions.csv');
     Route::get('/transaction/saleExport', 'TransactionsController@exportCSVPaymentOnly')->name('transactions.csvPaymentOnly');
     Route::get('/transaction/feeExport', 'TransactionsController@exportCSVFeeOnly')->name('transactions.csvFeeOnly');
+
     Route::get('/transaction/reversal', 'TransactionsController@reversal');
     Route::get('/transaction/reversal/{additional_data}', 'TransactionsController@postReversal')->name('transaction_postReversal');
+    
     Route::get('/transaction/fee', 'TransactionsController@reportFee')->name('transaction_fee');
 
     Route::get('/fee', 'FeeController@index')->name('fee');
