@@ -294,6 +294,13 @@ Route::group(['middleware' => ['auth', 'check.permission']], function () {
     Route::post('/agen/{id}/activate', 'MerchantsController@activateMerchant')->name('agen_activate');
     Route::get('/agen/blocked', 'MerchantsController@list_block')->name('agen_blocked');
     Route::get('/agen/blocked/{id}', 'MerchantsController@detail_blocked')->name('agen_blocked_detail');
+
+    Route::get('/cabang', 'CabangController@index')->name('cabang');
+    Route::get('/cabang/create', 'CabangController@create')->name('cabang_create');
+    Route::post('/cabang/store', 'CabangController@store')->name('cabang_store');
+    Route::get('/cabang/edit{id}', 'CabangController@edit')->name('cabang_edit');
+    Route::post('/cabang/update/{id}', 'CabangController@update')->name('cabang_update');
+    Route::post('/cabang/destroy{id}', 'CabangController@destroy')->name('cabang_destroy');
 });
 
 // Routes for Master Data

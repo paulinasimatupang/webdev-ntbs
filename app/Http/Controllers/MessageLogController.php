@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 use Illuminate\Support\Facades\DB;
-
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Entities\MessageLog;
 use App\Entities\ResponseLog;
@@ -69,6 +69,7 @@ class MessageLogController extends Controller
             $logs = MessageLog::where('terminal_id', $request->terminal_id)
                 ->whereIn('service_id', $serviceIds)
                 ->whereNotNull('response_message')
+                ->where('reply_time', '>=', Carbon::today())
                 ->orderBy('reply_time', 'desc')
                 ->get();
 
@@ -80,7 +81,6 @@ class MessageLogController extends Controller
             }
 
             $processedLogs = $logs->map(function ($log) {
-                // Decode request_message JSON
                 $requestMessage = json_decode($log->request_message, true);
                 
                 if (!isset($requestMessage['msg']['msg_dt'])) {
@@ -88,15 +88,13 @@ class MessageLogController extends Controller
                 }
                 
                 $msgDtArray = explode('|', $requestMessage['msg']['msg_dt']);
-                
-                // Determine indices to extract based on service_id
                 switch ($log->service_id) {
                     case 'T00002':
                     case 'OTT001':
-                        $indices = [1, 2, 5];
+                        $indices = [1, 2, 5, 6];
                         break;
                     case 'OT0001':
-                        $indices = [1, 3, 4];
+                        $indices = [1, 3, 4, 5];
                         break;
                     default:
                         $indices = [];
@@ -105,6 +103,7 @@ class MessageLogController extends Controller
                 $noRek = isset($msgDtArray[$indices[0]]) ? $msgDtArray[$indices[0]] : null;
                 $namaRek = isset($msgDtArray[$indices[1]]) ? $msgDtArray[$indices[1]] : null;
                 $nominal = isset($msgDtArray[$indices[2]]) ? $msgDtArray[$indices[2]] : null;
+                $keterangan = isset($msgDtArray[$indices[3]]) ? $msgDtArray[$indices[3]] : null;
 
                 // Reformat the log with extracted values
                 return [
@@ -114,6 +113,7 @@ class MessageLogController extends Controller
                     'no_rek' => $noRek,
                     'nama_rek' => $namaRek,
                     'nominal' => $nominal,
+                    'keterangan' => $keterangan,
                     'status' => $log->message_status,
                     'request_message' => $log->request_message,
                     'response_message' => $log->response_message,

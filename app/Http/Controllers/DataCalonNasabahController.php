@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Log;
 use Ixudra\Curl\Facades\Curl;
 
 use App\Entities\DataCalonNasabah;
+use App\Entities\Role;
 use App\Entities\CompOption;
 
 class DataCalonNasabahController extends Controller
@@ -68,6 +69,18 @@ class DataCalonNasabahController extends Controller
 
         $data = DataCalonNasabah::select('*');
         $data = $data->whereIn('status', [2, 3]);
+
+        $user = session()->get('user');
+
+        if ($user) {
+            $role_user = $user->role_id;
+            $role = Role::find($role_user);
+    
+            if ($role && $role->name == 'Supervisor Cabang') {
+                $branch_id = $user->branchid;
+                $data->where('branchid', $branch_id);
+            }
+        }
 
         if ($request->has('search')) {
             $data = $data->whereRaw('lower(name) like (?)', ["%{$request->search}%"]);
@@ -122,6 +135,18 @@ class DataCalonNasabahController extends Controller
         $data = DataCalonNasabah::select('*');
         $data = $data->where('status', 0);
 
+        $user = session()->get('user');
+
+        if ($user) {
+            $role_user = $user->role_id;
+            $role = Role::find($role_user);
+    
+            if ($role && $role->name == 'Customer Service Cabang') {
+                $branch_id = $user->branchid;
+                $data->where('branchid', $branch_id);
+            }
+        }
+
         if ($request->has('search')) {
             $data = $data->whereRaw('lower(name) like (?)', ["%{$request->search}%"]);
         }
@@ -161,6 +186,18 @@ class DataCalonNasabahController extends Controller
 
         $data = DataCalonNasabah::select('*');
         $data = $data->where('status', 1);
+
+        $user = session()->get('user');
+
+        if ($user) {
+            $role_user = $user->role_id;
+            $role = Role::find($role_user);
+    
+            if ($role && $role->name == 'Supervisor Cabang') {
+                $branch_id = $user->branchid;
+                $data->where('branchid', $branch_id);
+            }
+        }
 
         if ($request->has('search')) {
             $data = $data->whereRaw('lower(name) like (?)', ["%{$request->search}%"]);

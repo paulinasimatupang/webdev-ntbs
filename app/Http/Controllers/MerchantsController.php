@@ -85,6 +85,18 @@ class MerchantsController extends Controller
         $data = Merchant::select('*')
                 ->whereIn('status_agen', [1, 2]);
 
+        $user = session()->get('user');
+
+        if ($user) {
+            $role_user = $user->role_id;
+            $role = Role::find($role_user);
+            
+            if ($role && $role->name == 'Customer Service Cabang') {
+                $branch_id = $user->branchid;
+                $data->where('branchid', $branch_id);
+            }
+        }  
+
         if($request->has('search')){
             $data = $data->whereRaw('lower(name) like (?)',["%{$request->search}%"]);
         }
@@ -134,9 +146,6 @@ class MerchantsController extends Controller
                 $merchant->resign_at = '-';
             }
         }
-
-        $user = session()->get('user');
-        // echo $user->username; die;
 
         return view('apps.merchants.list')
                 ->with('data', $data)
@@ -199,6 +208,18 @@ class MerchantsController extends Controller
 
         $data = $data->where('status_agen', 0);
 
+        $user = session()->get('user');
+
+        if ($user) {
+            $role_user = $user->role_id;
+            $role = Role::find($role_user);
+            
+            if ($role && $role->name == 'Customer Service Cabang') {
+                $branch_id = $user->branchid;
+                $data->where('branchid', $branch_id);
+            }
+        } 
+
         if($request->has('search')){
             $data = $data->whereRaw('lower(name) like (?)', ["%{$request->search}%"]);
         }
@@ -224,8 +245,6 @@ class MerchantsController extends Controller
         }
 
         $data = $data->get();
-
-        $user = session()->get('user');
 
         return view('apps.merchants.list-request')
             ->with('data', $data)

@@ -123,19 +123,21 @@
     </div>
     @endif
     
-    <!-- <div class="col-lg-4 col-md-4 col-sm-4">
-        <a href="/hak-akses" class="card-link">
+    @if ($permissionsByFeature['cabang'] ?? false)
+    <div class="col-lg-4 col-md-4 col-sm-4">
+        <a href="/cabang" class="card-link">
             <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-2">
                 <div class="card-body text-center">
                     <div class="d-flex align-items-center">
-                        <img src="{{ asset('assets/images/new_features/fee.png') }}" alt="Service" class="mr-3" style="width: 50px">
+                        <img src="{{ asset('assets/images/new_features/branch.png') }}" alt="Service" class="mr-3" style="width: 50px">
                         <div class="text-left">
-                            <p class="text-muted mt-2 mb-0">Hak Akses</p>
+                            <p class="text-muted mt-2 mb-0">Daftar Cabang</p>
                         </div>
                     </div>
                 </div>
             </div>
         </a>
-    </div> -->
+    </div>
+    @endif
 </div>
 @endsection
