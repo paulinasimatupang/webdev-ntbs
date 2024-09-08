@@ -91,19 +91,31 @@ class MessageLogController extends Controller
                 switch ($log->service_id) {
                     case 'T00002':
                     case 'OTT001':
-                        $indices = [1, 2, 5, 6];
+                        $indices = [1, 2, 5];
                         break;
                     case 'OT0001':
-                        $indices = [1, 3, 4, 5];
+                        $indices = [1, 3, 4];
                         break;
                     default:
                         $indices = [];
                 }
+
+                $responseMessage = json_decode($log->response_message, true);
+                if (isset($responseMessage['screen']['comps']['comp'])) {
+                    foreach ($responseMessage['screen']['comps']['comp'] as $comp) {
+                        if (strpos($comp['comp_lbl'], 'Keterangan') !== false) {
+                            $keterangan = $comp['comp_values']['comp_value'][0]['value'];
+                        }
+                        if (strpos($comp['comp_lbl'], 'Fee') !== false) {
+                            $fee = floatval($comp['comp_values']['comp_value'][0]['value']);
+                        }
+                    }
+                }
                 
                 $noRek = isset($msgDtArray[$indices[0]]) ? $msgDtArray[$indices[0]] : null;
                 $namaRek = isset($msgDtArray[$indices[1]]) ? $msgDtArray[$indices[1]] : null;
-                $nominal = isset($msgDtArray[$indices[2]]) ? $msgDtArray[$indices[2]] : null;
-                $keterangan = isset($msgDtArray[$indices[3]]) ? $msgDtArray[$indices[3]] : null;
+                $nominal = isset($msgDtArray[$indices[2]]) ? floatval($msgDtArray[$indices[2]]) : null;
+                // $keterangan = isset($msgDtArray[$indices[3]]) ? $msgDtArray[$indices[3]] : null;
 
                 // Reformat the log with extracted values
                 return [
@@ -112,7 +124,7 @@ class MessageLogController extends Controller
                     'service_id' => $log->service_id,
                     'no_rek' => $noRek,
                     'nama_rek' => $namaRek,
-                    'nominal' => $nominal,
+                    'nominal' => $nominal + $fee,
                     'keterangan' => $keterangan,
                     'status' => $log->message_status,
                     'request_message' => $log->request_message,
