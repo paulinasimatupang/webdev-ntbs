@@ -1,4 +1,10 @@
 @extends('layouts.master')
+
+@php
+    $permissionService = new \App\Services\FeatureService();
+    $routes_user = $permissionService->getUserAllowedRoutes();
+@endphp
+
 @section('page-css')
      <link rel="stylesheet" href="{{asset('assets/styles/vendor/datatables.min.css')}}">
      <link rel="stylesheet" href="{{asset('assets/styles/vendor/pickadate/classic.css')}}">
@@ -11,6 +17,7 @@
             </div>
             <div class="separator-breadcrumb border-top"></div>
             <div class="row mb-4">
+                @if (in_array('cabang_create', $routes_user))
                 <div class="col-lg-12 col-md-12 col-sm-12 d-flex justify-content-center mb-3">
                     <div class="input-group">
                         <a href="{{route('cabang_create')}}">
@@ -18,6 +25,7 @@
                         </a>
                     </div>
                 </div>
+                @endif
                 <div class="col-md-12 mb-3">
                     <div class="card text-left">
                         <div class="card-body">
@@ -55,9 +63,11 @@
                                             <td>{{$item->kode_cabang}}</td>
                                             <td>{{$item->nama_cabang}}</td>
                                             <td>
+                                            @if (in_array('cabang_edit', $routes_user))
                                                 <a href="{{route('cabang_edit',[$item->id])}}">
                                                     <button class="btn btn-success ripple btn-sm m-1 edit-btn" type="button">Detail</button>
                                                 </a>
+                                            @endif
                                             </td>
                                         </tr>
                                         @php
