@@ -109,6 +109,30 @@ $('.feature-checkbox').on('change', function () {
 // Handle permission checkbox toggle
 $('.permission-checkbox').on('change', function () {
     let feature = $(this).data('feature');
+    let permissionName = $(this).parent().text().toLowerCase();
+    
+    // Automatically check "view" permission if "edit", "delete", "create", or "detail" is checked
+    if (permissionName.includes('edit') || permissionName.includes('delete') || permissionName.includes('create') || permissionName.includes('detail')) {
+        let viewCheckbox = $(`.permission-checkbox[data-feature="${feature}"]`).filter(function() {
+            return $(this).parent().text().toLowerCase().includes('view');
+        });
+        viewCheckbox.prop('checked', true);
+        viewCheckbox.prop('disabled', true); // Disable the "view" checkbox
+    }
+
+    // Check if all edit/create/delete/detail are unchecked, then enable the view checkbox
+    let relatedPermissionsUnchecked = $(`.permission-checkbox[data-feature="${feature}"]`).filter(function() {
+        return $(this).parent().text().toLowerCase().includes('edit') || $(this).parent().text().toLowerCase().includes('delete') || $(this).parent().text().toLowerCase().includes('create') || $(this).parent().text().toLowerCase().includes('detail');
+    }).filter(':checked').length === 0;
+    
+    if (relatedPermissionsUnchecked) {
+        let viewCheckbox = $(`.permission-checkbox[data-feature="${feature}"]`).filter(function() {
+            return $(this).parent().text().toLowerCase().includes('view');
+        });
+        viewCheckbox.prop('disabled', false); // Enable the "view" checkbox
+    }
+
+    // Update the feature checkbox based on individual permissions
     let allPermissionsChecked = $(`.permission-checkbox[data-feature="${feature}"]`).length === $(`.permission-checkbox[data-feature="${feature}"]`).filter(':checked').length;
     $(`.feature-checkbox[data-feature="${feature}"]`).prop('checked', allPermissionsChecked);
 });
