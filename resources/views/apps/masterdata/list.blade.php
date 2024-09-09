@@ -6,6 +6,11 @@
 <link rel="stylesheet" href="{{ asset('assets/styles/vendor/pickadate/classic.date.css') }}">
 @endsection
 
+@php
+    $featureService = new \App\Services\FeatureService();
+    $feature = $featureService->getFeatureItems();
+@endphp
+
 @section('main-content')
 <style type="text/css">
     #b1,
@@ -38,7 +43,7 @@
 <div class="separator-breadcrumb border-top"></div>
 
 <div class="row mb-4">
-    @if ($permissionsByFeature['fee'] ?? false)
+    @if(isset($feature['fee']))
     <div class="col-lg-4 col-md-4 col-sm-4">
         <a href="/fee" class="card-link">
             <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-2">
@@ -55,7 +60,7 @@
     </div>
     @endif
 
-    @if ($permissionsByFeature['persen_fee'] ?? false)
+    @if(isset($feature['persen fee']))
     <div class="col-lg-4 col-md-4 col-sm-4">
         <a href="/persen_fee" class="card-link">
             <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-2">
@@ -72,7 +77,7 @@
     </div>
     @endif
 
-    @if ($permissionsByFeature['role'] ?? false)
+    @if(isset($feature['role']))
     <div class="col-lg-4 col-md-4 col-sm-4">
         <a href="/roles" class="card-link">
             <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-2">
@@ -89,7 +94,7 @@
     </div>
     @endif
 
-    @if ($permissionsByFeature['permission'] ?? false)
+    @if(isset($feature['permission']))
     <div class="col-lg-4 col-md-4 col-sm-4">
         <a href="/permissions" class="card-link">
             <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-2">
@@ -106,7 +111,7 @@
     </div>
     @endif
 
-    @if ($permissionsByFeature['user'] ?? false)
+    @if(isset($feature['user']))
     <div class="col-lg-4 col-md-4 col-sm-4">
         <a href="/users" class="card-link">
             <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-2">
@@ -123,7 +128,7 @@
     </div>
     @endif
     
-    @if ($permissionsByFeature['cabang'] ?? false)
+    @if(isset($feature['cabang']))
     <div class="col-lg-4 col-md-4 col-sm-4">
         <a href="/cabang" class="card-link">
             <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-2">
