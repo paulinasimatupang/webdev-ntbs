@@ -130,7 +130,7 @@
     
     @if(isset($feature['cabang']))
     <div class="col-lg-4 col-md-4 col-sm-4">
-        <a href="/cabang" class="card-link">
+        <a href="/branch" class="card-link">
             <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-2">
                 <div class="card-body text-center">
                     <div class="d-flex align-items-center">

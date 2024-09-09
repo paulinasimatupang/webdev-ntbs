@@ -103,7 +103,7 @@ class DataCalonNasabahController extends Controller
                 }
             }
         } else {
-            $data->orderBy('request_time', 'desc');
+            $data->orderBy('request_time', 'asc');
         }
 
         $data = $data->get();
@@ -168,7 +168,7 @@ class DataCalonNasabahController extends Controller
                 }
             }
         } else {
-            $data->orderBy('request_time', 'desc');
+            $data->orderBy('request_time', 'asc');
         }
 
         $data = $data->get();
@@ -220,7 +220,7 @@ class DataCalonNasabahController extends Controller
                 }
             }
         } else {
-            $data->orderBy('request_time', 'desc');
+            $data->orderBy('request_time', 'asc');
         }
 
         $data = $data->get();

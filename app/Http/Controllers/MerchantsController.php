@@ -83,7 +83,7 @@ class MerchantsController extends Controller
         $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
 
         $data = Merchant::select('*')
-                ->whereIn('status_agen', [1, 2]);
+                ->whereIn('status_agen', [1, 2, 3]);
 
         $user = session()->get('user');
 
@@ -126,7 +126,7 @@ class MerchantsController extends Controller
                 }
             }
         }else{
-            $data->orderBy('created_at', 'desc');
+            $data->orderBy('created_at', 'asc');
         }
 
         $data = $data->get();
@@ -136,6 +136,8 @@ class MerchantsController extends Controller
                 $merchant->status_text = 'Active';
             } else if ($merchant->status_agen == 2){ 
                 $merchant->status_text = 'Deactive';
+            } else if ($merchant->status_agen == 3){ 
+                $merchant->status_text = 'Blocked';
             }
 
             if($merchant->active_at == null || $merchant->active_at == ''){
@@ -188,7 +190,7 @@ class MerchantsController extends Controller
                 }
             }
         }else{
-            $data->orderBy('created_at', 'desc');
+            $data->orderBy('created_at', 'asc');
         }
 
         $data = $data->get();
@@ -241,7 +243,7 @@ class MerchantsController extends Controller
                 }
             }
         } else {
-            $data->orderBy('created_at', 'desc');
+            $data->orderBy('created_at', 'asc');
         }
 
         $data = $data->get();

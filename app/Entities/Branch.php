@@ -11,17 +11,19 @@ use Prettus\Repository\Traits\TransformableTrait;
  *
  * @package namespace App\Entities;
  */
-class Cabang extends Model implements Transformable
+class Branch extends Model implements Transformable
 {
     use TransformableTrait;
     protected $connection = 'pgsql_billiton';
-    protected $table = 'cabang';
+    protected $table = 'branch';
     public $incrementing = false;
     public $timestamps = false;
 
     protected $fillable = [
-        'kode_cabang',
-        'nama_cabang',
-        'created_at'
+        'branch_code',
+        'branch_name',
+        'address',
+        'city',
+        'office_type'
     ];
 }

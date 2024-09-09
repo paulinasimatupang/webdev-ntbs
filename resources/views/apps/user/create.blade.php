@@ -22,7 +22,7 @@
                         @csrf
 
                         <div class="form-group row">
-                            <label class="col-sm-2 col-form-label">Name</label>
+                            <label class="col-sm-2 col-form-label">Nama Lengkap</label>
                             <div class="col-sm-10">
                                 <input type="text" name="fullname" class="form-control" placeholder="Name" required />
                             </div>
@@ -49,9 +49,20 @@
                             <label class="col-sm-2 col-form-label">Role</label>
                             <div class="col-sm-10">
                                 <select name="role_id" class="form-control" required>
-                                    <option value="" disabled>Select Role</option>
+                                    <option value="" disabled selected>Pilih Role</option>
                                     @foreach ($roles as $role)
                                         <option value="{{ $role->id }}">{{ $role->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="branch_id" class="col-sm-2 col-form-label">Cabang</label>
+                            <div class="col-sm-10">
+                                <select name="branch_id" id="branch_id" class="form-control" required>
+                                    <option value="" disabled selected>Pilih Cabang</option>
+                                    @foreach ($branch as $branchid)
+                                        <option value="{{ $branchid->branch_id }}">{{ $branchid->branch_name }}</option>
                                     @endforeach
                                 </select>
                             </div>

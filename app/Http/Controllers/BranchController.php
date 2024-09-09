@@ -5,13 +5,13 @@ use DB;
 use Redirect;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Entities\Cabang;
+use App\Entities\Branch;
 
-class CabangController extends Controller
+class BranchController extends Controller
 {
     public function index(Request $request)
     {
-        $data = Cabang::select('*');
+        $data = Branch::select('*');
 
         $total = $data->count();
 
@@ -31,18 +31,17 @@ class CabangController extends Controller
     public function store(Request $request){
         DB::beginTransaction();
             try {
-                $check = Cabang::where('kode_cabang', $request->kode_cabang)
-                                ->orWhere('nama_cabang',$request->nama_cabang)
+                $check = Branch::where('branch_code', $request->kode_cabang)
+                                ->orWhere('branch_name',$request->nama_cabang)
                                 ->first();
                 if($check){
                     Redirect::to('cabang/create')
-                                ->with('error', 'Kode atau Nama Cabang Sudah Terdaftar');
+                                ->with('error', 'Kode atau Nama Branch Sudah Terdaftar');
                 }
                 
-                $cabang = Cabang::create([
-                                'kode_cabang'          =>  $request->kode_cabang,
-                                'nama_cabang'          => $request->nama_cabang,
-                                'created_at'           => now()
+                $cabang = Branch::create([
+                                'branch_code'          =>  $request->kode_cabang,
+                                'branch_name'          => $request->nama_cabang,
                             ]);
 
                 DB::commit();

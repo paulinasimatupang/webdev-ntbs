@@ -60,8 +60,8 @@
                                         @foreach($data as $item)
                                         <tr>
                                             <th scope="row">{{ $no }}</th>
-                                            <td>{{$item->kode_cabang}}</td>
-                                            <td>{{$item->nama_cabang}}</td>
+                                            <td>{{$item->branch_code}}</td>
+                                            <td>{{$item->branch_name}}</td>
                                             <td>
                                             @if (in_array('cabang_edit', $routes_user))
                                                 <a href="{{route('cabang_edit',[$item->id])}}">

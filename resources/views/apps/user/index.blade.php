@@ -43,23 +43,27 @@
                         style="width:100%">
                         <thead>
                             <tr>
-                                <th>Id</th>
-                                <th>Fullname</th>
+                                <th>No</th>
+                                <th>Nama Lengkap</th>
                                 <th>Username</th>
                                 <th>Email</th>
-                                <!-- <th>Roles</th> -->
-                                <th>Role ID</th> <!-- Kolom baru untuk Role ID -->
+                                <th>Role</th> 
+                                <th>Status</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
+                            @php
+                                $no = 1;
+                            @endphp
                             @foreach ($users as $user)
                                 <tr>
-                                    <td>{{ $user->id }}</td>
+                                    <th scope="row">{{ $no }}</th>
                                     <td>{{ $user->fullname }}</td>
                                     <td>{{ $user->username }}</td>
                                     <td>{{ $user->email }}</td>
-                                    <td>{{ $user->role_id }}</td>
+                                    <td>{{ $user->role->name }}</td>
+                                    <td>{{ $user->status_text }}</td>
                                     <td>
                                         @if (in_array('users.edit', $routes_user))
                                             <a href="{{ route('users.edit', $user->id) }}">
@@ -77,6 +81,9 @@
                                         @endif
                                     </td>
                                 </tr>
+                            @php
+                                $no++;
+                            @endphp
                             @endforeach
                         </tbody>
                     </table>

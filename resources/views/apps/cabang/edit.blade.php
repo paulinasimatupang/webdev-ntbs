@@ -22,25 +22,25 @@
         <div class="col-md-12">
             <div class="card mb-5">
                 <div class="card-body">
-                    <form action="{{ route('cabang_update', [$cabang->id]) }}" method="POST">
+                    <form action="{{ route('branch_update', [$branch->id]) }}" method="POST">
                         @csrf
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label">Kode Cabang</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" value="{{ $cabang->kode_cabang }}" name="kode_cabang" placeholder="Kode Cabang" required>
+                                <input type="text" class="form-control" value="{{ $branch->branch_code }}" name="kode_cabang" placeholder="Kode Cabang" required>
                             </div>
                         </div>
 
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label">Nama Cabang</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" value="{{ $cabang->nama_cabang }}" name="nama_cabang" placeholder="Nama Cabang" required>
+                                <input type="text" class="form-control" value="{{ $beranch->branch_name }}" name="nama_cabang" placeholder="Nama Cabang" required>
                             </div>
                         </div>
 
                         <div class="form-group row">
                             <div class="col-sm-12 text-right">
-                                <a href="{{ route('cabang') }}">
+                                <a href="{{ route('branch') }}">
                                     <button type="button" class="btn btn-danger">Back</button>
                                 </a>
                                 <button type="submit" class="btn btn-primary">Save</button>

@@ -78,6 +78,12 @@ class User extends Authenticatable implements JWTSubject
         return $this->belongsTo(Role::class, 'role_id');
     }
 
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class, 'branchid', 'branch_code');
+    }
+
+
     /**
      * Get the identifier that will be stored in the subject claim of the JWT.
      *

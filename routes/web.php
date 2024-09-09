@@ -172,6 +172,13 @@ Route::group(['middleware' => ['auth', 'check.permission']], function () {
     Route::get('/users/{user}/edit', 'UserController@edit')->name('users.edit');
     Route::put('/users/{user}', 'UserController@update')->name('users.update');
     Route::post('/users/{user}/destroy', 'UserController@destroy')->name('users.destroy');
+    
+    Route::get('/users/menu', 'UserController@menu')->name('users.menu');
+    Route::get('/users/request', 'UserController@request_list')->name('users.list-request');
+    Route::get('/users/detail/{id}', 'UserController@detail_request')->name('users.detail');
+    Route::post('/users/accept/{id}', 'UserController@acceptUser')->name('users.accept');
+    Route::post('/users/reject/{id}', 'UserController@rejectUser')->name('users.reject');
+
     //terminal (gatau mau di role mana, sementara di sini dulu)
     Route::get('/terminal', 'TerminalsController@index')->name('terminal');
     Route::get('/terminal/create', 'TerminalsController@create')->name('terminal_create');
@@ -295,12 +302,12 @@ Route::group(['middleware' => ['auth', 'check.permission']], function () {
     Route::get('/agen/blocked', 'MerchantsController@list_block')->name('agen_blocked');
     Route::get('/agen/blocked/{id}', 'MerchantsController@detail_blocked')->name('agen_blocked_detail');
 
-    Route::get('/cabang', 'CabangController@index')->name('cabang');
-    Route::get('/cabang/create', 'CabangController@create')->name('cabang_create');
-    Route::post('/cabang/store', 'CabangController@store')->name('cabang_store');
-    Route::get('/cabang/edit{id}', 'CabangController@edit')->name('cabang_edit');
-    Route::post('/cabang/update/{id}', 'CabangController@update')->name('cabang_update');
-    Route::post('/cabang/destroy{id}', 'CabangController@destroy')->name('cabang_destroy');
+    Route::get('/branch', 'BranchController@index')->name('branch');
+    Route::get('/branch/create', 'BranchController@create')->name('branch_create');
+    Route::post('/branch/store', 'BranchController@store')->name('branch_store');
+    Route::get('/branch/edit{id}', 'BranchController@edit')->name('branch_edit');
+    Route::post('/branch/update/{id}', 'BranchController@update')->name('branch_update');
+    Route::post('/branch/destroy{id}', 'BranchController@destroy')->name('branch_destroy');
 });
 
 // Routes for Master Data
