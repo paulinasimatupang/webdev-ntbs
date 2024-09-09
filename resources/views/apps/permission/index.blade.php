@@ -6,19 +6,26 @@
 <link rel="stylesheet" href="{{ asset('assets/styles/vendor/pickadate/classic.date.css') }}">
 @endsection
 
+@php
+    $permissionService = new \App\Services\FeatureService();
+    $routes_user = $permissionService->getUserAllowedRoutes();
+@endphp
+
 @section('main-content')
 <div class="breadcrumb">
     <h1>Permission</h1>
 </div>
 <div class="separator-breadcrumb border-top"></div>
 <div class="row mb-4">
-    <div class="col-lg-12 col-md-12 col-sm-12 d-flex justify-content-center mb-3">
-        <div class="input-group">
-            <a href="{{ route('permissions.create') }}">
-                <button class="btn btn-warning ripple m-1 add-new-btn" type="button">Add Permission</button>
-            </a>
+        <div class="col-lg-12 col-md-12 col-sm-12 d-flex justify-content-center mb-3">
+        @if (in_array('permissions.create', $routes_user))
+            <div class="input-group">
+                <a href="{{ route('permissions.create') }}">
+                    <button class="btn btn-warning ripple m-1 add-new-btn" type="button">Add Permission</button>
+                </a>
+            </div>
         </div>
-    </div>
+        @endif
     <div class="col-md-12 mb-3">
         <div class="card text-left">
             <div class="card-body">
@@ -27,14 +34,15 @@
                 </div>
 
                 @if (session('status'))
-                <div class="alert alert-success">
-                    <p>{{ session('status') }}</p>
-                </div>
+                    <div class="alert alert-success">
+                        <p>{{ session('status') }}</p>
+                    </div>
                 @endif
 
                 <div class="table-responsive">
                     <!-- Tambahkan ID pada tabel -->
-                    <table id="default_ordering_table" class="display table table-striped table-bordered" style="width:100%">
+                    <table id="default_ordering_table" class="display table table-striped table-bordered"
+                        style="width:100%">
                         <thead>
                             <tr>
                                 <th>Id</th>
@@ -44,20 +52,25 @@
                         </thead>
                         <tbody>
                             @foreach ($permissions as $permission)
-                            <tr>
-                                <td>{{ $permission->id }}</td>
-                                <td>{{ $permission->name }}</td>
-                                <td>
-                                    <a href="{{ route('permissions.edit', $permission->id) }}">
-                                        <button class="btn btn-primary" type="button">Edit Permission</button>
-                                    </a>
-                                    <form action="{{ route('permissions.destroy', $permission->id) }}" method="POST" style="display:inline;">
-                                        @csrf
-                                        @method('POST')
-                                        <button type="submit" class="btn btn-danger">Delete</button>
-                                    </form>
-                                </td>
-                            </tr>
+                                <tr>
+                                    <td>{{ $permission->id }}</td>
+                                    <td>{{ $permission->name }}</td>
+                                    <td>
+                                        @if (in_array('permissions.edit', $routes_user))
+                                            <a href="{{ route('permissions.edit', $permission->id) }}">
+                                                <button class="btn btn-primary" type="button">Edit Permission</button>
+                                            </a>
+                                        @endif
+                                        @if (in_array('permissions.destroy', $routes_user))
+                                            <form action="{{ route('permissions.destroy', $permission->id) }}" method="POST"
+                                                style="display:inline;">
+                                                @csrf
+                                                @method('POST')
+                                                <button type="submit" class="btn btn-danger">Delete</button>
+                                            </form>
+                                        @endif
+                                    </td>
+                                </tr>
                             @endforeach
                         </tbody>
                     </table>
@@ -81,7 +94,7 @@
 @section('bottom-js')
 <script src="{{ asset('assets/js/form.basic.script.js') }}"></script>
 <script>
-    $(document).ready(function() {
+    $(document).ready(function () {
         $('#default_ordering_table').DataTable({
             "paging": true, // Menyediakan fitur paging
             "lengthMenu": [10], // Menampilkan 10 data per halaman
@@ -97,11 +110,11 @@
 
             $.post(url, {
                 _token: "{{ csrf_token() }}",
-            }, function(data, status) {
+            }, function (data, status) {
                 location.reload(true);
-            }).done(function() {
+            }).done(function () {
                 location.reload(true);
-            }).fail(function() {
+            }).fail(function () {
                 alert("Error, Please try again later!");
             });
         }

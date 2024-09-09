@@ -1,4 +1,10 @@
 @extends('layouts.master')
+
+@php
+    $permissionService = new \App\Services\FeatureService();
+    $routes_user = $permissionService->getUserAllowedRoutes();
+@endphp
+
 @section('page-css')
      <link rel="stylesheet" href="{{asset('assets/styles/vendor/datatables.min.css')}}">
      <link rel="stylesheet" href="{{asset('assets/styles/vendor/pickadate/classic.css')}}">
@@ -37,6 +43,7 @@
                                     <p>{{ $message }}</p>
                                 </div>
                             @endif
+                            
                             <div style="display: inline-block;     float: right;" class="export-button-wrapper">
 
                             <a id="export-fee-to-excel" class="btn btn-outline-secondary" href="{{ route('merchants.excel') }}">
@@ -91,9 +98,11 @@
                                             <td>{{$item->active_at}}</td>
                                             <td>{{$item->resign_at}}</td>
                                             <td>
-                                                <a href="{{route('agen_edit',[$item->id])}}">
-                                                    <button class="btn btn-warning ripple btn-sm m-1 edit-btn" type="button"  @php if(session()->get('user')->role_id == 2) echo 'id="b1"'; @endphp>Edit</button>
-                                                </a>
+                                                @if (in_array('agen_edit', $routes_user))
+                                                    <a href="{{route('agen_edit',[$item->id])}}">
+                                                        <button class="btn btn-warning ripple btn-sm m-1 edit-btn" type="button"  @php if(session()->get('user')->role_id == 2) echo 'id="b1"'; @endphp>Edit</button>
+                                                    </a>
+                                                @endif
                                             </td>
                                         </tr>
                                         @php

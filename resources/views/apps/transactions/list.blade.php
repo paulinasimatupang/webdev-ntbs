@@ -6,6 +6,11 @@
     <link rel="stylesheet" href="{{ asset('assets/styles/vendor/pickadate/classic.date.css') }}">
 @endsection
 
+@php
+    $permissionService = new \App\Services\FeatureService();
+    $routes_user = $permissionService->getUserAllowedRoutes();
+@endphp
+
 @section('main-content')
     <style>
         #b1, #b2, #b3 {
@@ -106,7 +111,11 @@
         </div>
 
         <div class="col-lg-4 col-md-4 col-sm-4">
-            <a href="/transaction/fee" class="card-link">
+            @if (in_array('transaction_fee', $routes_user))
+                <a href="/transaction/fee" class="card-link">
+            @else
+                <a href="javascript:void(0);" class="card-link disabled">
+            @endif
                 <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-2">
                     <div class="card-body text-center">
                         <div class="d-flex align-items-center">
@@ -128,9 +137,9 @@
                         <h4 class="col-sm-9 col-md-6 card-title mb-3" style="line-height: 2.1rem;">List Transaction</h4>
                         <div class="col-sm-3 col-md-12 mb-3">
                             <div class="export-button-wrapper" style="float: right;">
-                                @if($username == 'selada_produktif')
+                                <!-- @if($username == 'selada_produktif')
                                     <a id="btn-sale-bjb" href="#" class="btn btn-outline-secondary">Ubah Status Transaksi</a>
-                                @endif
+                                @endif -->
                                 <a id="export-fee-to-csv" href="{{ route('transactions.excel') }}" class="btn btn-outline-secondary">Export to CSV</a>
                                 <a id="export-fee-to-txt" href="{{ route('transactions.txt') }}" class="btn btn-outline-secondary">Export to Text</a>
                                 <a id="export-fee-to-excel" href="{{ route('transactions.csvFeeOnly') }}" class="btn btn-outline-secondary">Export to Excel (Only Fee)</a>

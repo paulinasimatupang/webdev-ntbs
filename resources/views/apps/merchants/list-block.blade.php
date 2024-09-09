@@ -5,6 +5,12 @@
      <link rel="stylesheet" href="{{asset('assets/styles/vendor/pickadate/classic.date.css')}}">
 
 @endsection
+
+@php
+    $permissionService = new \App\Services\FeatureService();
+    $routes_user = $permissionService->getUserAllowedRoutes();
+@endphp
+
 @section('main-content')
             <div class="breadcrumb">
                 <h1>Agen Blocked</h1>
@@ -50,9 +56,11 @@
                                             <td>{{$item->mid}}</td>
                                             <td>{{$item->name}}</td>
                                             <td>
-                                                <a href="{{route('agen_blocked_detail',[$item->id])}}">
-                                                    <button class="btn btn-warning ripple btn-sm m-1 edit-btn" type="button">Detail</button>
-                                                </a>
+                                                @if (in_array('agen_blocked_detail', $routes_user))
+                                                    <a href="{{route('agen_blocked_detail',[$item->id])}}">
+                                                        <button class="btn btn-warning ripple btn-sm m-1 edit-btn" type="button">Detail</button>
+                                                    </a>
+                                                @endif
                                             </td>
                                         </tr>
                                         @php

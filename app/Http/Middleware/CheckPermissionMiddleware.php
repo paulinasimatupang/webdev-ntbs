@@ -24,7 +24,7 @@ class CheckPermissionMiddleware
 
         if (!$role) {
             Log::warning('User dengan ID: ' . $user->id . ' tidak memiliki role.');
-            abort(403, 'Unauthorized action.');
+            abort(403, 'Tidak Memiliki Akses.');
         }
 
         // Fetch route_name and feature_group using role_id
@@ -61,7 +61,7 @@ class CheckPermissionMiddleware
         // Check if the current route or its parent feature is in the allowed routes
         if (!in_array($currentRoute, $routes_user)) {
             Log::warning('User ID: ' . $user->id . ' mencoba mengakses route: ' . $currentRoute . ' tanpa permission yang sesuai.');
-            abort(403, 'Unauthorized action.');
+            abort(403, 'Tidak Memiliki Akses.');
         }
 
         return $next($request);

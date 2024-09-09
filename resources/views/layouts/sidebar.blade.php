@@ -36,7 +36,7 @@
                     <div class="triangle"></div>
                 </li>
             @endif
-            @if(isset($features['terminal_group']))
+            @if(isset($features['terminal']))
                         <li class="nav-item {{ (request()->is('terminal') || request()->is('terminal/*')) ? 'active' : '' }}" @php
                             if (session()->get('user')->role_id == 2)
                         echo 'id="b1"'; @endphp>
@@ -58,14 +58,16 @@
                     <div class="triangle"></div>
                 </li>
             @endif
-            <li class="nav-item {{ (request()->is('nasabah') || request()->is('nasabah/*')) ? 'active' : '' }}">
-                <a class="nav-item-hold" href="{{route('nasabah')}}">
+            @if(isset($features['nasabah']))
+                <li class="nav-item {{ (request()->is('nasabah') || request()->is('nasabah/*')) ? 'active' : '' }}">
+                    <a class="nav-item-hold" href="{{route('nasabah')}}">
 
-                    <img class="img_bintang_sidebar" src="{{asset('/assets/images/sidebar_icon/nasabah.png')}}" alt="">
-                    <span class="nav-text">Nasabah</span>
-                </a>
-                <div class="triangle"></div>
-            </li>
+                        <img class="img_bintang_sidebar" src="{{asset('/assets/images/sidebar_icon/nasabah.png')}}" alt="">
+                        <span class="nav-text">Nasabah</span>
+                    </a>
+                    <div class="triangle"></div>
+                </li>
+            @endif
             @if(isset($features['masterdata']))
                 <li class="nav-item {{ (request()->is('masterdata') || request()->is('masterdata/*')) ? 'active' : '' }}">
                     <a class="nav-item-hold" href="{{route('masterdata')}}">

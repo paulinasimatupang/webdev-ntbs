@@ -6,6 +6,11 @@
 <link rel="stylesheet" href="{{ asset('assets/styles/vendor/pickadate/classic.date.css') }}">
 @endsection
 
+@php
+    $permissionService = new \App\Services\FeatureService();
+    $routes_user = $permissionService->getUserAllowedRoutes();
+@endphp
+
 @section('main-content')
 <div class="breadcrumb">
     <h1>Fee</h1>
@@ -27,19 +32,20 @@
                 </div>
 
                 @if ($message = Session::get('success'))
-                <div class="alert alert-success">
-                    <p>{{ $message }}</p>
-                </div>
+                    <div class="alert alert-success">
+                        <p>{{ $message }}</p>
+                    </div>
                 @endif
 
                 @if ($message = Session::get('failed'))
-                <div class="alert alert-failed">
-                    <p>{{ $message }}</p>
-                </div>
+                    <div class="alert alert-failed">
+                        <p>{{ $message }}</p>
+                    </div>
                 @endif
 
                 <div class="table-responsive">
-                    <table id="deafult_ordering_table" class="display table table-striped table-bordered" style="width:100%">
+                    <table id="deafult_ordering_table" class="display table table-striped table-bordered"
+                        style="width:100%">
                         <thead>
                             <tr>
                                 <th scope="col">No</th>
@@ -51,19 +57,23 @@
                         <tbody>
                             @php $no = 1; @endphp
                             @foreach($groups as $group)
-                            <tr>
-                                <th scope="row">{{ $no }}</th>
-                                <td>{{ str_replace(['Review', 'OTP'], '', $group->service->service_name) }}</td>
-                                <td>{{ $group->meta_default }}</td>
-                                <td>
-                                    <a href="{{ route('fee_edit', ['meta_id' => $group->meta_id, 'service_id' => $group->service_id, 'seq' => $group->seq]) }}">
-                                        <button class="btn btn-edit ripple btn-sm m-1 edit-btn" type="button">Edit</button>
-                                    </a>
-                                    <!-- <a href="#" onclick="deleteConfirm('{{ $group->meta_id }}', '{{ $group->service_id }}', '{{ $group->seq }}'); return false;" class="btn btn-danger ripple btn-sm m-1">Delete</a> -->
-                                </td>
+                                <tr>
+                                    <th scope="row">{{ $no }}</th>
+                                    <td>{{ str_replace(['Review', 'OTP'], '', $group->service->service_name) }}</td>
+                                    <td>{{ $group->meta_default }}</td>
+                                    <td>
+                                        @if (in_array('fee_edit', $routes_user))
+                                            <a
+                                                href="{{ route('fee_edit', ['meta_id' => $group->meta_id, 'service_id' => $group->service_id, 'seq' => $group->seq]) }}">
+                                                <button class="btn btn-edit ripple btn-sm m-1 edit-btn"
+                                                    type="button">Edit</button>
+                                            </a>
+                                        @endif
+                                        <!-- <a href="#" onclick="deleteConfirm('{{ $group->meta_id }}', '{{ $group->service_id }}', '{{ $group->seq }}'); return false;" class="btn btn-danger ripple btn-sm m-1">Delete</a> -->
+                                    </td>
 
-                            </tr>
-                            @php $no++; @endphp
+                                </tr>
+                                @php    $no++; @endphp
                             @endforeach
                         </tbody>
                     </table>
@@ -94,15 +104,15 @@
             url = url.replace(':meta_id', meta_id).replace(':service_id', service_id).replace(':seq', seq);
 
             $.post(url, {
-                    _token: "{{ csrf_token() }}",
-                },
-                function(data, status) {
+                _token: "{{ csrf_token() }}",
+            },
+                function (data, status) {
                     location.reload(true);
-                }).done(function() {
-                location.reload(true);
-            }).fail(function() {
-                alert("Error, Please try again later!");
-            })
+                }).done(function () {
+                    location.reload(true);
+                }).fail(function () {
+                    alert("Error, Please try again later!");
+                })
         }
     }
 </script>

@@ -1,4 +1,10 @@
 @extends('layouts.master')
+
+@php
+    $permissionService = new \App\Services\FeatureService();
+    $routes_user = $permissionService->getUserAllowedRoutes();
+@endphp
+
 @section('page-css')
      <link rel="stylesheet" href="{{asset('assets/styles/vendor/datatables.min.css')}}">
      <link rel="stylesheet" href="{{asset('assets/styles/vendor/pickadate/classic.css')}}">
@@ -56,10 +62,12 @@
                                             <td>{{$item->no_hp}}</td>
                                             <td>{{ \Carbon\Carbon::parse($item->request_time)->format('Y-m-d H:i:s') }}</td>
                                             <td>
+                                            @if (in_array('nasabah_detail_request', $routes_user))
                                                 <form action="{{ route('nasabah_detail_request', [$item->id]) }}" style="display: inline;">
                                                     @csrf
                                                     <button class="btn btn-primary ripple btn-sm m-1 primary-btn" type="submit">Detail</button>
                                                 </form>
+                                            @endif
                                             </td>
                                         </tr>
                                         @php

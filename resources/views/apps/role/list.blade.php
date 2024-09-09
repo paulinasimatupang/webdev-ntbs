@@ -4,6 +4,11 @@
 <link rel="stylesheet" href="{{ asset('assets/styles/vendor/datatables.min.css') }}">
 @endsection
 
+@php
+    $permissionService = new \App\Services\FeatureService();
+    $routes_user = $permissionService->getUserAllowedRoutes();
+@endphp
+
 @section('main-content')
 <div class="breadcrumb">
     <h1>Role Management</h1>
@@ -17,7 +22,8 @@
                 <a href="{{ route('roles.add') }}">
                     <button class="btn btn-warning ripple m-1 add-new-btn" type="button">Add Role</button>
                 </a>
-            @endif         </div>
+            @endif         
+        </div>
     </div>
     <div class="col-md-12 mb-3">
         <div class="card text-left">

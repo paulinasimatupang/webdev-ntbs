@@ -6,6 +6,11 @@
 <link rel="stylesheet" href="{{ asset('assets/styles/vendor/pickadate/classic.date.css') }}">
 @endsection
 
+@php
+    $permissionService = new \App\Services\FeatureService();
+    $routes_user = $permissionService->getUserAllowedRoutes();
+@endphp
+
 @section('main-content')
 <div class="breadcrumb">
     <h1>Users Management</h1>
@@ -13,13 +18,15 @@
 <div class="separator-breadcrumb border-top"></div>
 
 <div class="row mb-4">
-    <div class="col-lg-12 col-md-12 col-sm-12 d-flex justify-content-center mb-3">
-        <div class="input-group">
-            <a href="{{ route('users.create') }}">
-                <button class="btn btn-warning ripple m-1 add-new-btn" type="button">Add User</button>
-            </a>
+    @if (in_array('users.create', $routes_user))
+        <div class="col-lg-12 col-md-12 col-sm-12 d-flex justify-content-center mb-3">
+            <div class="input-group">
+                <a href="{{ route('users.create') }}">
+                    <button class="btn btn-warning ripple m-1 add-new-btn" type="button">Add User</button>
+                </a>
+            </div>
         </div>
-    </div>
+    @endif
     <div class="col-md-12 mb-3">
         <div class="card text-left">
             <div class="card-body">
@@ -28,11 +35,12 @@
                 </div>
 
                 @if (session('status'))
-                <div class="alert alert-success mt-2">{{ session('status') }}</div>
+                    <div class="alert alert-success mt-2">{{ session('status') }}</div>
                 @endif
 
                 <div class="table-responsive">
-                    <table id="default_ordering_table" class="display table table-striped table-bordered" style="width:100%">
+                    <table id="default_ordering_table" class="display table table-striped table-bordered"
+                        style="width:100%">
                         <thead>
                             <tr>
                                 <th>Id</th>
@@ -46,23 +54,29 @@
                         </thead>
                         <tbody>
                             @foreach ($users as $user)
-                            <tr>
-                                <td>{{ $user->id }}</td>
-                                <td>{{ $user->fullname }}</td>
-                                <td>{{ $user->username }}</td>
-                                <td>{{ $user->email }}</td>
-                                <td>{{ $user->role_id }}</td>
-                                <td>
-                                    <a href="{{ route('users.edit', $user->id) }}">
-                                        <button class="btn btn-warning ripple btn-sm m-1 edit-btn" type="button">Edit</button>
-                                    </a>
-                                    <form action="{{ route('users.destroy', $user) }}" method="POST" style="display:inline;">
-                                        @csrf
-                                        @method('POST')
-                                        <button type="submit" class="btn btn-danger">Delete</button>
-                                    </form>
-                                </td>
-                            </tr>
+                                <tr>
+                                    <td>{{ $user->id }}</td>
+                                    <td>{{ $user->fullname }}</td>
+                                    <td>{{ $user->username }}</td>
+                                    <td>{{ $user->email }}</td>
+                                    <td>{{ $user->role_id }}</td>
+                                    <td>
+                                        @if (in_array('users.edit', $routes_user))
+                                            <a href="{{ route('users.edit', $user->id) }}">
+                                                <button class="btn btn-warning ripple btn-sm m-1 edit-btn"
+                                                    type="button">Edit</button>
+                                            </a>
+                                        @endif
+                                        @if (in_array('users.destroy', $routes_user))
+                                        <form action="{{ route('users.destroy', $user) }}" method="POST"
+                                            style="display:inline;">
+                                            @csrf
+                                            @method('POST')
+                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                        </form>
+                                        @endif
+                                    </td>
+                                </tr>
                             @endforeach
                         </tbody>
                     </table>
@@ -86,7 +100,7 @@
 @section('bottom-js')
 <script src="{{ asset('assets/js/form.basic.script.js') }}"></script>
 <script>
-    $(document).ready(function() {
+    $(document).ready(function () {
         $('#default_ordering_table').DataTable({
             "paging": true, // Menyediakan fitur paging
             "lengthMenu": [10], // Menampilkan 10 data per halaman
@@ -103,10 +117,10 @@
                 data: {
                     _token: "{{ csrf_token() }}",
                 },
-                success: function(response) {
+                success: function (response) {
                     location.reload(true);
                 },
-                error: function(response) {
+                error: function (response) {
                     alert("Error, Please try again later!");
                 }
             });

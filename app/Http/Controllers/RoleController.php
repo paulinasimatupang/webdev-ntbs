@@ -20,33 +20,7 @@ class RoleController extends Controller
     public function index()
     {
         $roles = Role::all();
-        $permissions = Permission::all(); // Get all permissions
-
-        // Get the current user and their permissions
-        $user = auth()->user();
-        $role = $user->role; // Assuming user has a role
-
-        if ($role) {
-            $userPermissions = Permission::whereIn('id', function ($query) use ($role) {
-                $query->select('permission_id')
-                    ->from('role_has_permissions')
-                    ->where('role_id', $role->id);
-            })->pluck('route_name')->toArray();
-
-            // Process route names to get the list of user permissions
-            $routes_user = [];
-            foreach ($userPermissions as $routeName) {
-                $routes_user = array_merge($routes_user, explode(' | ', $routeName));
-            }
-        } else {
-            $routes_user = [];
-        }
-
-        return view('apps.role.list', [
-            'roles' => $roles,
-            'permissions' => $permissions,
-            'routes_user' => $routes_user, // Pass the user routes to the view
-        ]);
+        return view('apps.role.list', ['roles' => $roles]);
     }
 
     public function create()

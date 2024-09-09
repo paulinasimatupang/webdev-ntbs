@@ -87,7 +87,7 @@
 
     @if(isset($features['agen']))
         <div class="col-lg-3 col-md-6 col-sm-6">
-            <a href="merchant">
+            <a href="agen">
                 <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-4">
                     <div class="card-body text-center">
                         <img src="{{asset('/assets/images/sidebar_icon/agent.png')}}" alt="" class="mr-3"

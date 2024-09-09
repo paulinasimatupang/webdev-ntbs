@@ -5,6 +5,12 @@
      <link rel="stylesheet" href="{{asset('assets/styles/vendor/pickadate/classic.date.css')}}">
 
 @endsection
+
+@php
+    $permissionService = new \App\Services\FeatureService();
+    $routes_user = $permissionService->getUserAllowedRoutes();
+@endphp
+
 @section('main-content')
             <div class="breadcrumb">
                 <h1>List Nasabah</h1>
@@ -60,9 +66,11 @@
                                             <td>{{ \Carbon\Carbon::parse($item->reply_time)->format('Y-m-d H:i:s') }}</td>
                                             <td>{{$item->status_text}}</td>
                                             <td>
-                                                <a href="{{route('nasabah_detail',[$item->id])}}">
-                                                    <button class="btn btn-success ripple btn-sm m-1 edit-btn" type="button">Detail</button>
-                                                </a>
+                                                @if (in_array('nasabah_detail', $routes_user))
+                                                    <a href="{{route('nasabah_detail',[$item->id])}}">
+                                                        <button class="btn btn-success ripple btn-sm m-1 edit-btn" type="button">Detail</button>
+                                                    </a>
+                                                @endif
                                             </td>
                                         </tr>
                                         @php
