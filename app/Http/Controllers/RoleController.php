@@ -78,16 +78,37 @@ class RoleController extends Controller
 
     public function addPermissionToRole(Role $role)
     {
-        // Fetch all permissions and group them by parent feature and feature
-        $permissions = Permission::all()->groupBy('feature_group')->map(function ($permissionsByParent) {
-            return $permissionsByParent->groupBy('feature');
-        });
-
-        $rolePermissions = $role->permissions->pluck('id')->all();  // Permissions yang dimiliki role
+        $permissions = Permission::all();
+        
+        $groupedPermissions = $permissions->reduce(function ($result, $permission) {
+            $parts = explode('|', $permission->feature);
+            $mainFeature = trim($parts[0]);
+            $subFeature = isset($parts[1]) ? trim($parts[1]) : null;
+            
+            if (!isset($result[$mainFeature])) {
+                $result[$mainFeature] = [];
+            }
+            
+            if ($subFeature) {
+                if (!isset($result[$mainFeature][$subFeature])) {
+                    $result[$mainFeature][$subFeature] = [];
+                }
+                $result[$mainFeature][$subFeature][] = $permission;
+            } else {
+                if (!isset($result[$mainFeature])) {
+                    $result[$mainFeature] = [];
+                }
+                $result[$mainFeature][] = $permission;
+            }
+            
+            return $result;
+        }, []);
+        
+        $rolePermissions = $role->permissions->pluck('id')->all();
 
         return view('apps.role.add-permissions', [
             'role' => $role,
-            'permissionsGroupedByParent' => $permissions,
+            'groupedPermissions' => $groupedPermissions,
             'rolePermissions' => $rolePermissions
         ]);
     }
