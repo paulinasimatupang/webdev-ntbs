@@ -162,6 +162,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::view('others/search-result', 'others.search-result')->name('search-result');
     // Auth::routes();
     Route::get('/home', 'HomeController@index')->name('home');
+    
+    Route::get('/users/menu', 'UserController@menu')->name('users.menu');
 });
 
 Route::group(['middleware' => ['auth', 'check.permission']], function () {
@@ -173,7 +175,6 @@ Route::group(['middleware' => ['auth', 'check.permission']], function () {
     Route::put('/users/{user}', 'UserController@update')->name('users.update');
     Route::post('/users/{user}/destroy', 'UserController@destroy')->name('users.destroy');
     
-    Route::get('/users/menu', 'UserController@menu')->name('users.menu');
     Route::get('/users/request', 'UserController@request_list')->name('users.list-request');
     Route::get('/users/detail/{id}', 'UserController@detail_request')->name('users.detail');
     Route::post('/users/accept/{id}', 'UserController@acceptUser')->name('users.accept');

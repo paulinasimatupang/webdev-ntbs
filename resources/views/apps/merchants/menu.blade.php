@@ -8,14 +8,12 @@
 
 @php
     $featureService = new \App\Services\FeatureService();
-    $feature = $featureService->getFeatureItems();
+    $features = $featureService->getFeatureItems();
 @endphp
 
 @section('main-content')
 <style type="text/css">
-    #b1,
-    #b2,
-    #b3 {
+    #b1, #b2, #b3 {
         display: none;
     }
 
@@ -41,6 +39,7 @@
     <h1>Agen</h1>
 </div>
 <div class="separator-breadcrumb border-top"></div>
+
 @if ($message = Session::get('success'))
     <div class="alert alert-success">
         <p>{{ $message }}</p>
@@ -52,15 +51,15 @@
         <p>{{ $message }}</p>
     </div>
 @endif
+
 <div class="row mb-4">
-    @if(isset($feature['add agen']))
+    @if(isset($features['add agen']))
         <div class="col-lg-4 col-md-4 col-sm-4">
             <a href="/agen/create/inquiry" class="card-link">
                 <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-2">
                     <div class="card-body text-center">
                         <div class="d-flex align-items-center">
-                            <img src="{{ asset('assets/images/new_features/add.png') }}" alt="Total Transaction"
-                                class="mr-3" style="width: 50px">
+                            <img src="{{ asset('assets/images/new_features/add.png') }}" alt="Add Agen" class="mr-3" style="width: 50px;">
                             <div class="text-left">
                                 <p class="text-muted mt-2 mb-0">Add Agen</p>
                             </div>
@@ -71,14 +70,13 @@
         </div>
     @endif
 
-    @if(isset($feature['request agen']))
+    @if(isset($features['request agen']))
         <div class="col-lg-4 col-md-4 col-sm-4">
             <a href="/agen/request" class="card-link">
                 <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-2">
                     <div class="card-body text-center">
                         <div class="d-flex align-items-center">
-                            <img src="{{ asset('assets/images/new_features/request.png') }}" alt="Total Transaction"
-                                class="mr-3" style="width: 50px">
+                            <img src="{{ asset('assets/images/new_features/request.png') }}" alt="Request Agen" class="mr-3" style="width: 50px;">
                             <div class="text-left">
                                 <p class="text-muted mt-2 mb-0">Request Agen</p>
                             </div>
@@ -89,14 +87,13 @@
         </div>
     @endif
 
-    @if(isset($feature['list agen']))
+    @if(isset($features['list agen']))
         <div class="col-lg-4 col-md-4 col-sm-4">
             <a href="/agen/list" class="card-link">
                 <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-2">
                     <div class="card-body text-center">
                         <div class="d-flex align-items-center">
-                            <img src="{{ asset('assets/images/new_features/list.png') }}" alt="Total Transaction"
-                                class="mr-3" style="width: 50px">
+                            <img src="{{ asset('assets/images/new_features/list.png') }}" alt="List Agen" class="mr-3" style="width: 50px;">
                             <div class="text-left">
                                 <p class="text-muted mt-2 mb-0">List Agen</p>
                             </div>
@@ -108,15 +105,14 @@
     @endif
 </div>
 
-@if(isset($feature['list block agen']))
+@if(isset($features['list block agen']))
     <div class="row mb-4">
         <div class="col-lg-4 col-md-4 col-sm-4">
             <a href="/agen/blocked" class="card-link">
                 <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-2">
                     <div class="card-body text-center">
                         <div class="d-flex align-items-center">
-                            <img src="{{ asset('assets/images/new_features/request.png') }}" alt="Total Transaction"
-                                class="mr-3" style="width: 50px">
+                            <img src="{{ asset('assets/images/new_features/request.png') }}" alt="List Block Agen" class="mr-3" style="width: 50px;">
                             <div class="text-left">
                                 <p class="text-muted mt-2 mb-0">List Block Agen</p>
                             </div>
@@ -125,36 +121,7 @@
                 </div>
             </a>
         </div>
+    </div>
 @endif
 
-    <!-- <div class="col-lg-4 col-md-4 col-sm-4">
-            <a href="/agen/request" class="card-link">
-                <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-2">
-                    <div class="card-body text-center">
-                        <div class="d-flex align-items-center">
-                            <img src="{{ asset('assets/images/new_features/request.png') }}" alt="Total Transaction" class="mr-3" style="width: 50px">
-                            <div class="text-left">
-                                <p class="text-muted mt-2 mb-0">Request Agen</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </a>
-        </div> -->
-
-    <!-- <div class="col-lg-4 col-md-4 col-sm-4">
-            <a href="/agen/list" class="card-link">
-                <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-2">
-                    <div class="card-body text-center">
-                        <div class="d-flex align-items-center">
-                            <img src="{{ asset('assets/images/new_features/list.png') }}" alt="Total Transaction" class="mr-3" style="width: 50px">
-                            <div class="text-left">
-                                <p class="text-muted mt-2 mb-0">List Agen</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </a>
-        </div> -->
-</div>
 @endsection
