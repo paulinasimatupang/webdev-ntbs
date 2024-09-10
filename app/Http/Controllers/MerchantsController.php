@@ -1006,5 +1006,37 @@ class MerchantsController extends Controller
 
         return response($txtData, 200, $headers);
     }
-
+ 
+    // public function sendNotification($fcm_token, $title, $message) {
+    //     $fcmUrl = 'https://fcm.googleapis.com/fcm/send';
+    
+    //     $notification = [
+    //         'title' => $title,
+    //         'body' => $message,
+    //         'sound' => 'default'
+    //     ];
+    
+    //     $fcmNotification = [
+    //         'to' => $fcm_token, // Token agen
+    //         'notification' => $notification,
+    //     ];
+    
+    //     $headers = [
+    //         'Authorization: key=YOUR_SERVER_KEY', // Server key dari Firebase
+    //         'Content-Type: application/json'
+    //     ];
+    
+    //     $ch = curl_init();
+    //     curl_setopt($ch, CURLOPT_URL, $fcmUrl);
+    //     curl_setopt($ch, CURLOPT_POST, true);
+    //     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    //     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    //     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    //     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($fcmNotification));
+    //     $result = curl_exec($ch);
+    //     curl_close($ch);
+    
+    //     return $result;
+    // }
+    
 }
