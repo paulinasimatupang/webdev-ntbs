@@ -60,14 +60,14 @@ class TerminalsController extends Controller
 
         $data = Terminal::select('*');
 
-	    $data = $data->whereHas('merchant.user', function($query){
-            $query->where(function($q){
-                $q->where('is_user_mireta', '!=', 1)->orWhereNull('is_user_mireta');
-            });
-            $query->where(function($q){
-                $q->where('is_development_user', '!=', 1)->orWhereNull('is_development_user');
-            });
-        });
+	    // $data = $data->whereHas('merchant.user', function($query){
+        //     $query->where(function($q){
+        //         $q->where('is_user_mireta', '!=', 1)->orWhereNull('is_user_mireta');
+        //     });
+        //     $query->where(function($q){
+        //         $q->where('is_development_user', '!=', 1)->orWhereNull('is_development_user');
+        //     });
+        // });
 
         if($request->has('search')){
             $data = $data->whereRaw('lower(name) like (?)',["%{$request->search}%"]);
@@ -144,43 +144,62 @@ class TerminalsController extends Controller
     {
         DB::beginTransaction();
         try {
+            // Validasi data
             $this->validator->with($request->all())->passesOrFail(ValidatorInterface::RULE_CREATE);
-            $merchant = Merchant::where('id', $request->merchant_id)->first();
-            if($merchant){    
-                $reqData = $request->all();
-                $reqData['merchant_id']             = $merchant->mid;
-                $reqData['merchant_name']           = $merchant->name;
-                $reqData['merchant_address']        = $merchant->address;
-                $reqData['merchant_account_number'] = $merchant->no;
-                $data   = $this->repository->create($reqData);
-            }else{
-                $data   = $this->repository->create($request->all());
-            }
-            if($data){
-                if($merchant){   
-                    $merchant->terminal_id = $request->tid;
-                    $merchant->save();
-                }
 
-                DB::commit();
-                return Redirect::to('terminal')
-                                    ->with('message', 'Terminal created');
-            }else{
+            // Ambil merchant
+            $merchant = Merchant::where('id', $request->mid)->first();
+            if (!$merchant) {
+                throw new \Exception('Merchant not found');
+            }
+
+            $terminalData = $request->except('merchant_id');
+            $data = $this->repository->create($terminalData);
+    
+            if ($data) {
+                $merchant->terminal_id = $request->tid;
+                $merchant->save();
+    
+                $data->merchant_id         = $merchant->mid;
+                $data->merchant_name         = $merchant->name;
+                $data->merchant_address        = $merchant->address;
+                $data->merchant_account_number = $merchant->no;
+
+                $data->save();
+
+                $activated = $this->activateBilliton(new TerminalUpdateRequest([
+                    'merchant_id' => $request->mid,
+                    'tid' => $request->tid
+                ]), $data->id);
+
+                if ($activated) {
+                    DB::commit();
+                    return Redirect::to('terminal')
+                        ->with('success', 'Terminal created and activated');
+                } else {
+                    // Jika aktivasi gagal, rollback transaksi dan beri pesan kesalahan
+                    DB::rollBack();
+                    return Redirect::to('terminal/create')
+                        ->with('error', 'Terminal created but activation failed')
+                        ->withInput();
+                }
+            } else {
+                // Jika penyimpanan gagal, rollback transaksi
                 DB::rollBack();
                 return Redirect::to('terminal/create')
-                            ->with('error', $data->error)
-                            ->withInput();
+                    ->with('error', 'Failed to create terminal')
+                    ->withInput();
             }
         } catch (Exception $e) {
             DB::rollBack();
-                return Redirect::to('terminal/create')
-                            ->with('error', $e)
-                            ->withInput();
+            return Redirect::to('terminal/create')
+                ->with('error', $e->getMessage())
+                ->withInput();
         } catch (\Illuminate\Database\QueryException $e) {
             DB::rollBack();
-                return Redirect::to('terminal/create')
-                            ->with('error', $e)
-                            ->withInput();
+            return Redirect::to('terminal/create')
+                ->with('error', $e->getMessage())
+                ->withInput();
         }
     }
 
@@ -194,90 +213,102 @@ class TerminalsController extends Controller
      * @throws \Prettus\Validator\Exceptions\ValidatorException
      */
     
-    public function activateBilliton(TerminalUpdateRequest $request, $id)
-    {
-        DB::beginTransaction();
-            $this->validator->with($request->all())->passesOrFail(ValidatorInterface::RULE_UPDATE);
-            
-            $terminal = Terminal::where('id', $id)->first();
-            
-            if ($request->has('merchant_id')) {
-                $merchant = Merchant::where('mid', $request->merchant_id)->first();
-                if ($merchant) {
-                    $reqData['merchant_id']             = $merchant->mid;
-                    $reqData['merchant_name']           = $merchant->name;
-                    $reqData['merchant_address']        = $merchant->address;
-                    $reqData['merchant_account_number'] = $merchant->no;
-                } else {
-                    $reqData['merchant_id']             = null;
-                    $reqData['merchant_name']           = null;
-                    $reqData['merchant_address']        = null;
-                    $reqData['merchant_account_number'] = null;
-                }
-
-                $data = $this->repository->update($reqData, $id);
-            }
-
-            if ($terminal) {
-                $terminalBilliton = new TerminalBilliton();
-                $terminalBilliton->terminal_id          = $terminal->tid;
-                $terminalBilliton->terminal_type        = '1';
-                $terminalBilliton->terminal_imei        = $terminal->imei;
-                $terminalBilliton->terminal_name        = $terminal->serial_number;
-                $terminalBilliton->merchant_id          = $terminal->merchant_id;
-                $terminalBilliton->terminal_sim_number  = $terminal->iccid;
-                $terminalBilliton->save();
-
-                if ($terminalBilliton) {
-                    $user = UsersBilliton::select('*')
-                                        ->orderBy('user_uid', 'desc')
-                                        ->first();
-
-                    if ($user) {
-                        $userId = (int)$user->user_uid + 1;
-                        $usersBilliton = UsersBilliton::create([
-                                'user_uid'                  => $userId,
-                                'user_status_uid'           => 1,
-                                'user_type_uid'             => 1,
-                                'username'                  => $terminal->tid,
-                                'version'                   => '1.7',
-                                'brand'                     => $terminal->merchant_name,
-                                'model'                     => $terminal->merchant_address,
-                                'os_ver'                    => 'AGEN BJB BISA',
-                                'account_name'              => $terminal->merchant_account_number,
-                                'app_ver'                   => $terminal->sid,
-                                'need_approval'             => 't',
-                                'batch_no'                  => 0,
-                            ]);
-
-                        if ($usersBilliton) {
-                            $terminalUserBilliton = TerminalUserBilliton::create([
-                                'terminal_id'               => $terminal->tid,
-                                'user_uid'                  => $userId,
-                                ]);
-
-                            if ($terminalUserBilliton) {
-                                DB::commit();
-                                return Redirect::to('terminal')
-                                                    ->with('success', 'Activate Successfully');
-                            } else {
-                                DB::rollback();
-                                return Redirect::to('terminal')
-                                                    ->with('failed', 'Activate Failed');
-                            }
-                        } else {
-                            DB::rollback();
-                            return Redirect::to('terminal')
-                                                ->with('failed', 'Activate Failed');
-                        }
-                    } else {
-                        DB::rollback();
-                        return Redirect::to('terminal')
-                                            ->with('failed', 'Activate Failed');
-                    }
-                }
-            }
-    }
+     public function activateBilliton(TerminalUpdateRequest $request, $id)
+     {
+         try {
+             DB::beginTransaction();
+     
+             // Validasi data
+             $this->validator->with($request->all())->passesOrFail(ValidatorInterface::RULE_UPDATE);
+     
+             // Ambil terminal
+             $terminal = Terminal::where('id', $id)->first();
+             if (!$terminal) {
+                 throw new \Exception('Terminal not found');
+             }
+     
+             // Siapkan data merchant
+             $reqData = [];
+             if ($request->has('merchant_id')) {
+                 $merchant = Merchant::where('mid', $request->merchant_id)->first();
+                 if ($merchant) {
+                     $reqData['merchant_id']             = $merchant->mid;
+                     $reqData['merchant_name']           = $merchant->name;
+                     $reqData['merchant_address']        = $merchant->address;
+                     $reqData['merchant_account_number'] = $merchant->no;
+                 } else {
+                     $reqData['merchant_id']             = null;
+                     $reqData['merchant_name']           = null;
+                     $reqData['merchant_address']        = null;
+                     $reqData['merchant_account_number'] = null;
+                 }
+     
+                 // Update terminal
+                 $this->repository->update($reqData, $id);
+             }
+     
+             // Simpan terminal Billiton
+             $terminalBilliton = new TerminalBilliton();
+             $terminalBilliton->terminal_id          = $terminal->tid;
+             $terminalBilliton->terminal_type        = '1';
+             $terminalBilliton->terminal_imei        = $terminal->imei;
+             $terminalBilliton->terminal_name        = $terminal->serial_number;
+             $terminalBilliton->merchant_id          = $terminal->merchant_id;
+             $terminalBilliton->terminal_sim_number  = $terminal->iccid;
+             $terminalBilliton->save();
+     
+             if ($terminalBilliton) {
+                 $user = UsersBilliton::select('*')
+                                     ->orderBy('user_uid', 'desc')
+                                     ->first();
+     
+                 if ($user) {
+                     $userId = (int)$user->user_uid + 1;
+                     $usersBilliton = UsersBilliton::create([
+                         'user_uid'                  => $userId,
+                         'user_status_uid'           => 1,
+                         'user_type_uid'             => 1,
+                         'username'                  => $terminal->tid,
+                         'version'                   => '1.7',
+                         'brand'                     => $terminal->merchant_name,
+                         'model'                     => $terminal->merchant_address,
+                         'os_ver'                    => 'AGEN BJB BISA',
+                         'account_name'              => $terminal->merchant_account_number,
+                         'app_ver'                   => $terminal->sid,
+                         'need_approval'             => 't',
+                         'batch_no'                  => 0,
+                     ]);
+     
+                     if ($usersBilliton) {
+                         $terminalUserBilliton = TerminalUserBilliton::create([
+                             'terminal_id' => $terminal->tid,
+                             'user_uid'    => $userId,
+                         ]);
+     
+                         if ($terminalUserBilliton) {
+                             DB::commit();
+                             return true;
+                         } else {
+                             DB::rollback();
+                             return false;
+                         }
+                     } else {
+                         DB::rollback();
+                         return false;
+                     }
+                 } else {
+                     DB::rollback();
+                     return false;
+                 }
+             }
+     
+             DB::rollback();
+             return false;
+         } catch (Exception $e) {
+             DB::rollback();
+             return false;
+         }
+     }
 
     public function updateBilliton(TerminalUpdateRequest $request, $id)
     {

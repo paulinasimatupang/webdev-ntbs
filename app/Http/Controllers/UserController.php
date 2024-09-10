@@ -111,11 +111,11 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'fullname' => 'required|string|max:255',
-            'username' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:users,email',
-            'password' => 'required|string|min:8|max:20',
-            'role_id' => 'required|exists:roles,id',
+            'fullname' => 'required',
+            'username' => 'required',
+            'email' => 'required',
+            'password' => 'required',
+            'role_id' => 'required',
         ]);
 
         $role = Role::find($request->role_id);
@@ -131,9 +131,9 @@ class UserController extends Controller
             'created_at' => now()
         ]);
 
-        $user->syncRoles([$request->role_id]);
+        // $user->syncRoles([$request->role_id]);
 
-        return redirect()->route('users.index')->with('success', 'User berhasil dibuat.');
+        return redirect()->route('users.menu')->with('success', 'User berhasil dibuat.');
     }
 
     public function acceptUser($id)

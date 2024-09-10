@@ -138,8 +138,23 @@ class TransactionsController extends Controller
         $data->orderBy($orderBy, $orderType);
 
         $totalAmount = $data->sum('amount');
-        $fee = TransactionFee::select('fee');
-        $totalFee = $fee->sum('fee');
+        $transactionCode = $data->pluck('transaction_code')->unique();
+        $transactions = Transaction::whereIn('transaction_code', $transactionCode)->get();
+        $totalFee = 0;
+
+        foreach ($transactions as $transaction) {
+            if ($role && $role->name == 'Agen') {
+                $fees = TransactionFee::where('transaction_code', $transaction->transaction_code)
+                                    ->where('penerima', 'Agent')
+                                    ->pluck('fee');
+                $totalFee += $fees->sum();
+            } else {
+                $fees = TransactionFee::where('transaction_code', $transaction->transaction_code)
+                                    ->pluck('fee');
+                $totalFee += $fees->sum();
+            }
+
+        }
 
         $dataRevenue = [
             'total_trx' => $data->count(),
