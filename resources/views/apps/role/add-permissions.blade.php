@@ -117,6 +117,12 @@ function updateFeatureCheckboxes() {
         let feature = $(this).data('feature');
         let allPermissionsChecked = $(`.permission-checkbox[data-feature="${feature}"]`).length === $(`.permission-checkbox[data-feature="${feature}"]`).filter(':checked').length;
         $(this).prop('checked', allPermissionsChecked);
+
+        $('.sub-feature-checkbox[data-feature="' + feature + '"]').each(function() {
+            let subFeature = $(this).data('sub-feature');
+            let allSubFeaturePermissionsChecked = $(`.permission-checkbox[data-feature="${feature}"][data-sub-feature="${subFeature}"]`).length === $(`.permission-checkbox[data-feature="${feature}"][data-sub-feature="${subFeature}"]`).filter(':checked').length;
+            $(this).prop('checked', allSubFeaturePermissionsChecked);
+        });
     });
 }
 
@@ -185,14 +191,15 @@ $('.permission-checkbox').on('change', function () {
 
     let allPermissionsChecked;
     if (subFeature) {
-        allPermissionsChecked = $(`.permission-checkbox[data-feature="${feature}"][data-sub-feature="${subFeature}"]`).length === 
-                                $(`.permission-checkbox[data-feature="${feature}"][data-sub-feature="${subFeature}"]`).filter(':checked').length;
+        allPermissionsChecked = $(`.permission-checkbox[data-feature="${feature}"][data-sub-feature="${subFeature}"]`).length === $(`.permission-checkbox[data-feature="${feature}"][data-sub-feature="${subFeature}"]`).filter(':checked').length;
         $(`.sub-feature-checkbox[data-feature="${feature}"][data-sub-feature="${subFeature}"]`).prop('checked', allPermissionsChecked);
     } else {
-        allPermissionsChecked = $(`.permission-checkbox[data-feature="${feature}"]`).length === 
-                                $(`.permission-checkbox[data-feature="${feature}"]`).filter(':checked').length;
+        allPermissionsChecked = $(`.permission-checkbox[data-feature="${feature}"]`).length === $(`.permission-checkbox[data-feature="${feature}"]`).filter(':checked').length;
         $(`.feature-checkbox[data-feature="${feature}"]`).prop('checked', allPermissionsChecked);
     }
+
+    let allSubFeaturesChecked = $(`.sub-feature-checkbox[data-feature="${feature}"]`).length === $(`.sub-feature-checkbox[data-feature="${feature}"]`).filter(':checked').length;
+    $(`.feature-checkbox[data-feature="${feature}"]`).prop('checked', allSubFeaturesChecked);
 });
 
 
