@@ -144,7 +144,7 @@ $('.permission-checkbox').on('change', function () {
     let subFeature = $(this).data('sub-feature');
     let permissionName = $(this).parent().text().toLowerCase();
 
-    if (permissionName.includes('edit') || permissionName.includes('delete') || permissionName.includes('create')) {
+    if (permissionName.includes('edit') || permissionName.includes('delete') || permissionName.includes('create') ||  permissionName.includes('detail')) {
         let viewCheckbox;
         if (subFeature) {
             viewCheckbox = $(`.permission-checkbox[data-feature="${feature}"][data-sub-feature="${subFeature}"]`).filter(function() {
@@ -155,9 +155,15 @@ $('.permission-checkbox').on('change', function () {
                 return $(this).parent().text().toLowerCase().includes('view');
             });
         }
-        
         viewCheckbox.prop('checked', true);
-        viewCheckbox.prop('disabled', true); 
+        viewCheckbox.prop('disabled', true);
+        if (!viewCheckbox.next('input[type="hidden"]').length) {
+            $('<input>').attr({
+                type: 'hidden',
+                name: 'permission[]',
+                value: viewCheckbox.val()
+            }).insertAfter(viewCheckbox);
+        }
     }
 
     let relatedPermissionsUnchecked;
