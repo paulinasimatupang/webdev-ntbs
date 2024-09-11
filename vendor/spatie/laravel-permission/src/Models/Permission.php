@@ -19,6 +19,7 @@ class Permission extends Model implements PermissionContract
     use RefreshesPermissionCache;
 
     protected $guarded = ['id'];
+    public $timestamps = false;
 
     public function __construct(array $attributes = [])
     {

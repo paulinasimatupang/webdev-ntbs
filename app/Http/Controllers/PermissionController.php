@@ -23,7 +23,7 @@ class PermissionController extends Controller
             'permissions' => $permissions
         ]);
     }
-    
+
     public function create()
     {
         return view('apps.permission.create');
@@ -34,15 +34,15 @@ class PermissionController extends Controller
         $request->validate([
             'name' => 'required|string|unique:permissions,name',
         ]);
-    
+
         Permission::create([
             'name' => $request->name,
             'guard_name' => 'web',
         ]);
-    
+
         return redirect()->route('permissions.index')->with('status', 'Permission created successfully.');
     }
-    
+
 
     public function edit(Permission $permission)
     {
@@ -59,15 +59,26 @@ class PermissionController extends Controller
                 'required',
                 'string',
                 'unique:permissions,name,' . $permission->id
+            ],
+            'feature' => [
+                'nullable', 
+                'string',
+            ],
+            'feature_group' => [
+                'nullable', 
+                'string',
             ]
         ]);
 
         $permission->update([
-            'name' => $request->name
+            'name' => $request->name,
+            'feature' => $request->feature,
+            'feature_group' => $request->feature_group,
         ]);
 
         return redirect()->route('permissions.index')->with('status', 'Permission Updated Successfully');
     }
+
     public function destroy($permissionId)
     {
         $permission = Permission::findOrFail($permissionId);

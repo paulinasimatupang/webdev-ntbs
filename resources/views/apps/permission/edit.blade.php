@@ -6,15 +6,13 @@
 </div>
 <div class="separator-breadcrumb border-top"></div>
 
-@if(Session('error'))
-@foreach (Session('error') as $key => $item)
-<div class="alert alert-danger" role="alert">
-    <strong class="text-capitalize">Error : </strong> {{ $item[0] }}
+@if(Session::has('status'))
+<div class="alert alert-success" role="alert">
+    <strong>Success:</strong> {{ Session::get('status') }}
     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
         <span aria-hidden="true">&times;</span>
     </button>
 </div>
-@endforeach
 @endif
 
 @if ($errors->any())
@@ -39,6 +37,18 @@
                         </div>
                     </div>
                     <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Feature</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="feature" value="{{ old('feature', $permission->feature) }}" class="form-control" placeholder="Feature">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Feature Group</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="feature_group" value="{{ old('feature_group', $permission->feature_group) }}" class="form-control" placeholder="Feature Group">
+                        </div>
+                    </div>
+                    <div class="form-group row">
                         <div class="col-sm-12 text-right">
                             <a href="{{ route('permissions.index') }}" class="btn btn-secondary">Back</a>
                             <button type="submit" class="btn btn-primary">Update</button>
@@ -56,7 +66,5 @@
 @endsection
 
 @section('bottom-js')
-
 <script src="{{ asset('assets/js/form.validation.script.js') }}"></script>
-
 @endsection

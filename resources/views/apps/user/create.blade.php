@@ -69,7 +69,7 @@
                         </div>
                         <div class="form-group row">
                             <div class="col-sm-12 text-right">
-                                <a href="{{ url('users') }}">
+                                <a href="{{ url('users/menu') }}">
                                     <button type="button" class="btn btn-danger">Back</button>
                                 </a>
                                 <button type="submit" class="btn btn-primary">Save</button>

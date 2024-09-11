@@ -17,7 +17,7 @@
 </div>
 <div class="separator-breadcrumb border-top"></div>
 <div class="row mb-4">
-        <div class="col-lg-12 col-md-12 col-sm-12 d-flex justify-content-center mb-3">
+        <!-- <div class="col-lg-12 col-md-12 col-sm-12 d-flex justify-content-center mb-3">
         @if (in_array('permissions.create', $routes_user))
             <div class="input-group">
                 <a href="{{ route('permissions.create') }}">
@@ -25,7 +25,7 @@
                 </a>
             </div>
         </div>
-        @endif
+        @endif -->
     <div class="col-md-12 mb-3">
         <div class="card text-left">
             <div class="card-body">
@@ -47,6 +47,8 @@
                             <tr>
                                 <th>Id</th>
                                 <th>Name</th>
+                                <th>Feature</th>
+                                <th>Feature Group</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -55,6 +57,8 @@
                                 <tr>
                                     <td>{{ $permission->id }}</td>
                                     <td>{{ $permission->name }}</td>
+                                    <td>{{ $permission->feature }}</td>
+                                    <td>{{ $permission->feature_group }}</td>                                    
                                     <td>
                                         @if (in_array('permissions.edit', $routes_user))
                                             <a href="{{ route('permissions.edit', $permission->id) }}">

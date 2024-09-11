@@ -464,6 +464,7 @@ class DataCalonNasabahController extends Controller
             DB::commit();
             
             $this->send_sms($id);
+            
             return Redirect::to('/nasabah/approve')->with('success', 'Nasabah berhasil disetujui, CIF dan rekening berhasil dibuat.');
         } catch (Exception $e) {
             DB::rollBack();
