@@ -371,24 +371,21 @@ class MerchantsController extends Controller
     public function store(Request $request){
         DB::beginTransaction();
             try {
-                $check = User::where('username', $request->username)
-                                ->orWhere('email',$request->email)
+                $check = User::where('email',$request->email)
                                 ->first();
                 if($check){
-                    return response()->json([
-                        'status'=> false, 
-                        'error'=> 'Username or Email already used'
-                    ], 403);
+                    return Redirect::to('agen/create')
+                    ->with('error', 'Email Sudah Terdaftar')
+                    ->withInput();
                 }
 
                 $role = Role::where('name', 'Agen')->first();
                 if ($role) {
                     $role_id = $role->id;
                 } else {
-                    return response()->json([
-                        'status' => false, 
-                        'error' => 'Role not found'
-                    ], 404);
+                    return Redirect::to('agen/create')
+                    ->with('error', 'Role Tidak Ditemukan')
+                    ->withInput();
                 }
 
                 
