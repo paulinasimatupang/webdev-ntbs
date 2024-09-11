@@ -24,13 +24,6 @@
                 <!-- Konten detail merchant -->
                 @csrf
                 <div class="form-group row">
-                    <label class="col-sm-2 col-form-label">Kode Agen</label>
-                    <div class="col-sm-10">
-                        <p class="form-control-static">{{ $merchant->mid }}</p>
-                    </div>
-                </div>
-
-                <div class="form-group row">
                     <label class="col-sm-2 col-form-label">Nama Lengkap</label>
                     <div class="col-sm-10">
                         <p class="form-control-static">{{ $merchant->name }}</p>

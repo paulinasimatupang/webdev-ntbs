@@ -41,7 +41,7 @@
                                     <thead>
                                         <tr>
                                             <th scope="col">No</th>
-                                            <th scope="col">Id</th>
+                                            <th scope="col">No Rekening</th>
                                             <th scope="col">Name</th>
                                             <th scope="col">Action</th>
                                         </tr>
@@ -53,7 +53,7 @@
                                         @foreach($data as $item)
                                         <tr>
                                             <th scope="row">{{ $no }}</th>
-                                            <td>{{$item->mid}}</td>
+                                            <td>{{$item->no}}</td>
                                             <td>{{$item->name}}</td>
                                             <td>
                                                 @if (in_array('agen_request_detail', $routes_user))

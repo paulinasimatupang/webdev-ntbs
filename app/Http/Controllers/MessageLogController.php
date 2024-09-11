@@ -100,6 +100,9 @@ class MessageLogController extends Controller
                         $indices = [];
                 }
 
+                $fee = 0;
+                $keterangan = null;
+
                 $responseMessage = json_decode($log->response_message, true);
                 if (isset($responseMessage['screen']['comps']['comp'])) {
                     foreach ($responseMessage['screen']['comps']['comp'] as $comp) {
