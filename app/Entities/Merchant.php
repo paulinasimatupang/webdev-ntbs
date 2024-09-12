@@ -65,6 +65,4 @@ class Merchant extends Model implements Transformable
     {
         return $this->hasMany(Transaction::class, 'kode_agen', 'mid');
     }
-
-
 }
