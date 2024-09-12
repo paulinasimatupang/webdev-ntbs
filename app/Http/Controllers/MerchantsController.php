@@ -635,8 +635,10 @@ class MerchantsController extends Controller
                 throw new \Exception("Merchant not found");
             }
 
+            $user = session()->get('user');
+
             if ($merchant->status_agen == 0) {
-                $branchid = '001';
+                $branchid = $user->branchid;
 
                 $prefix = 'NTB';
                 $lastMID = Merchant::where('mid', 'LIKE', $prefix . $branchid .'%')

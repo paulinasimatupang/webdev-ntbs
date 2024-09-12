@@ -140,66 +140,94 @@ class TerminalsController extends Controller
      *
      * @throws \Prettus\Validator\Exceptions\ValidatorException
      */
-    public function store(TerminalCreateRequest $request)
+    public function store($imei, $merchantId)
     {
         DB::beginTransaction();
         try {
-            // Validasi data
-            $this->validator->with($request->all())->passesOrFail(ValidatorInterface::RULE_CREATE);
-
-            // Ambil merchant
-            $merchant = Merchant::where('id', $request->mid)->first();
+            $merchant = Merchant::where('mid', $merchantId)->first();
             if (!$merchant) {
                 throw new \Exception('Merchant not found');
             }
 
-            $terminalData = $request->except('merchant_id');
+            $prefix = 'TID';
+            $lastTid = Terminal::where('tid', 'LIKE', $prefix . '%')
+                                ->orderBy('created_at', 'desc')
+                                ->first();
+            
+            if ($lastTid) {
+                $lastTid = $lastTid->mid;
+                $number = substr($lastTid, strlen($prefix));
+                $newNumber = (int)$number + 1;
+                $newNumberPadded = str_pad($newNumber, 6, '0', STR_PAD_LEFT);
+                $tid = $prefix . $newNumberPadded;
+
+                while (Terminal::where('mid', $tid)->exists()) {
+                    $newNumber = (int)substr($tid, strlen($prefix)) + 1;
+                    $tid = $prefix . str_pad($newNumber, 6, '0', STR_PAD_LEFT);
+                }
+            } else {
+                $tid = $prefix . '000001';
+            }
+
+            $terminalData = [
+                'tid' => $tid,
+                'imei' => $imei,
+                'merchant_id' => $merchantId
+            ];
+
             $data = $this->repository->create($terminalData);
-    
+
             if ($data) {
-                $merchant->terminal_id = $request->tid;
+                $merchant->terminal_id = $tid;
                 $merchant->save();
-    
+
                 $data->merchant_id         = $merchant->mid;
-                $data->merchant_name         = $merchant->name;
-                $data->merchant_address        = $merchant->address;
+                $data->merchant_name       = $merchant->name;
+                $data->merchant_address    = $merchant->address;
                 $data->merchant_account_number = $merchant->no;
 
                 $data->save();
 
                 $activated = $this->activateBilliton(new TerminalUpdateRequest([
-                    'merchant_id' => $request->mid,
-                    'tid' => $request->tid
+                    'merchant_id' => $merchantId,
+                    'tid' => $tid
                 ]), $data->id);
 
                 if ($activated) {
                     DB::commit();
-                    return Redirect::to('terminal')
-                        ->with('success', 'Terminal created and activated');
+                    return response()->json([
+                        'success' => true,
+                        'message' => 'Terminal created and activated',
+                        'data' => $data
+                    ], 201);
                 } else {
                     // Jika aktivasi gagal, rollback transaksi dan beri pesan kesalahan
                     DB::rollBack();
-                    return Redirect::to('terminal/create')
-                        ->with('error', 'Terminal created but activation failed')
-                        ->withInput();
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Terminal created but activation failed'
+                    ], 500);
                 }
             } else {
                 // Jika penyimpanan gagal, rollback transaksi
                 DB::rollBack();
-                return Redirect::to('terminal/create')
-                    ->with('error', 'Failed to create terminal')
-                    ->withInput();
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to create terminal'
+                ], 500);
             }
         } catch (Exception $e) {
             DB::rollBack();
-            return Redirect::to('terminal/create')
-                ->with('error', $e->getMessage())
-                ->withInput();
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
         } catch (\Illuminate\Database\QueryException $e) {
             DB::rollBack();
-            return Redirect::to('terminal/create')
-                ->with('error', $e->getMessage())
-                ->withInput();
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
         }
     }
 

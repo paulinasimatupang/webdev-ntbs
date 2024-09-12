@@ -20,7 +20,7 @@
 </div>
 <div class="separator-breadcrumb border-top"></div>
 <div class="row mb-4">
-    @if (in_array('terminal_create', $routes_user))
+    <!-- @if (in_array('terminal_create', $routes_user))
         <div class="col-lg-12 col-md-12 col-sm-12 d-flex justify-content-center mb-3">
             <div class="input-group">
                 <a href="{{route('terminal_create')}}">
@@ -28,7 +28,7 @@
                 </a>
             </div>
         </div>
-    @endif
+    @endif -->
     <div class="col-md-12 mb-3">
         <div class="card text-left">
             <div class="card-body">
