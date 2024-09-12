@@ -161,7 +161,7 @@ class TerminalsController extends Controller
                 $newNumberPadded = str_pad($newNumber, 6, '0', STR_PAD_LEFT);
                 $tid = $prefix . $newNumberPadded;
 
-                while (Terminal::where('mid', $tid)->exists()) {
+                while (Terminal::where('tid', $tid)->exists()) {
                     $newNumber = (int)substr($tid, strlen($prefix)) + 1;
                     $tid = $prefix . str_pad($newNumber, 6, '0', STR_PAD_LEFT);
                 }
