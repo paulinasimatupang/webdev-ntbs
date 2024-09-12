@@ -155,7 +155,7 @@ class TerminalsController extends Controller
                                 ->first();
             
             if ($lastTid) {
-                $lastTid = $lastTid->mid;
+                $lastTid = $lastTid->tid;
                 $number = substr($lastTid, strlen($prefix));
                 $newNumber = (int)$number + 1;
                 $newNumberPadded = str_pad($newNumber, 6, '0', STR_PAD_LEFT);
