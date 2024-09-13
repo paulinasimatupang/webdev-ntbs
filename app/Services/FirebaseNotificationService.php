@@ -13,7 +13,7 @@ class FirebaseNotificationService
     {
         $this->client = new Google_Client();
         // Pastikan path ke file JSON sesuai dengan lokasi file di server Anda
-        $this->client->setAuthConfig(storage_path('firebase/ntbspushnotification-firebase-adminsdk-yd8ub-8b7fcb3240.json'));
+        $this->client->setAuthConfig(storage_path('firebase/ntbs-lakupandai-firebase-adminsdk-6o46s-e72605460b.json'));
         $this->client->addScope('https://www.googleapis.com/auth/firebase.messaging');
     }
 

@@ -20,7 +20,7 @@ class SendPushNotification
         $fcmToken = $user->fcm_token; // Mengambil FCM token dari user
 
         // Path ke file JSON Service Account yang sudah kamu download dari Firebase Console
-        $serviceAccountFile = 'firebase/ntbspushnotification-7fd86-b5013327e1b5.json'; // Ganti dengan path ke file JSON kamu
+        $serviceAccountFile = 'firebase/ntbs-lakupandai-firebase-adminsdk-6o46s-e72605460b.json'; // Ganti dengan path ke file JSON kamu
 
         // Menggunakan Service Account untuk otentikasi
         $scopes = ['https://www.googleapis.com/auth/firebase.messaging'];
@@ -54,7 +54,7 @@ class SendPushNotification
 
         try {
             // Kirim POST request ke FCM API v1
-            $response = $client->post('v1/projects/ntbspushnotification-7fd86/messages:send', [
+            $response = $client->post('v1/projects/ntbs-lakupandai/messages:send', [
                 'json' => $message,
             ]);
 
