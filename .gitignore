@@ -1,0 +1,2 @@
+# Tambahkan baris ini untuk mengabaikan file JSON sensitif
+storage/firebase/*.json
