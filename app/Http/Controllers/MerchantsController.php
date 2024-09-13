@@ -257,6 +257,73 @@ class MerchantsController extends Controller
         return view('apps.merchants.inquiry-rek');
     }
 
+    public function cek_saldo($norek, $nama){
+        $terminal = '353471045058692';
+        $dateTime = date("YmdHms");
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, "http://108.137.154.8:8080/ARRest/api/");
+        $data = json_encode([
+            'msg'=>([
+            'msg_id' =>  "$terminal$dateTime",
+            'msg_ui' => "$terminal",
+            'msg_si' => 'N00001',
+            'msg_dt' => 'admin|'. $norek .'|'. $nama .'|null'
+            ])
+        ]);
+       
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: text/plain'
+        ]);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+
+        $output = curl_exec($ch);
+        $err = curl_error($ch);
+        $info = curl_getinfo($ch);
+        curl_close($ch);
+
+        Log::info('cURL Request URL: '  . $info['url']);
+        Log::info('cURL Request Data: ' . $data);
+        Log::info('cURL Response: ' . $output);
+
+        $match = false;
+
+        $responseArray = json_decode($output, true);
+        
+        $prodId = null;
+
+        if ($err) {
+            Log::error('cURL Error: ' . $err);
+        } else {
+            if (isset($responseArray['screen']['comps']['comp'])) {
+                foreach ($responseArray['screen']['comps']['comp'] as $comp) {
+                    if (isset($comp['comp_values']['comp_value'][0]['value'])) {
+                        $value = $comp['comp_values']['comp_value'][0]['value'];
+                        if ($value !== 'null' && $value !== null) {
+                            switch ($comp['comp_lbl']) {
+                                case 'ProdID':
+                                    $prodId = $value;
+                                    break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if ($prodId === '36'){
+            return "Nomor Rekening yang Anda Masukkan Tidak Dapat Didaftarkan Sebagai Agen";
+        }
+        else if (isset($responseArray['screen']['title']) && $responseArray['screen']['title'] === 'Gagal') {
+            return  "Pengecekan Rekening Gagal";
+        }
+        else {
+            return true;
+        }
+    }
+
     public function store_inquiry_rek(Request $request)
     {
         $rek = $request->input('rek');
@@ -345,12 +412,17 @@ class MerchantsController extends Controller
                             ->with('error', "No Rekening Belum Terdaftar")
                             ->withInput();
         } else {
+            $cekSaldoResult = $this->cek_saldo($norek, $nama_rek);
+            if ($cekSaldoResult !== true) {
+                return Redirect::to('/agen/create/inquiry')->with('error', $cekSaldoResult)->withInput();
+            }
+
             return Redirect::to('/agen/create')
-                            ->with('no_cif', $cifid)
-                            ->with('fullname', $nama_rek)
-                            ->with('address', $alamat)
-                            ->with('no', $norek)
-                            ->with('phone', $no_hp);
+            ->with('no_cif', $cifid)
+            ->with('fullname', $nama_rek)
+            ->with('address', $alamat)
+            ->with('no', $norek)
+            ->with('phone', $no_hp);
         }
     }
 
