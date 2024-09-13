@@ -25,6 +25,7 @@ Route::group(['middleware' => 'auth'], function () {
         return view('apps.landing');
     })->name('landing');
 });
+Route::post('api/update-token', 'AuthController@updateToken')->middleware('auth:api');
 
 Route::get('banks', 'BanksController@index');
 Route::post('banks', 'BanksController@store');
@@ -184,6 +185,9 @@ Route::delete('users/{id}', 'UsersController@destroy');
 // Route::delete('master-data/{id}', [MasterDataController::class, 'destroy']); // Untuk menghapus data berdasarkan ID
 
 // Route::get('nasabah/list', 'DataCalonNasabahController@listJson');
+Route::post('nasabah/approve/{id}', 'DataCalonNasabahController@approveNasabah')->name('nasabah_approve');
+
+
 Route::middleware('auth:api')->get('nasabah/list/{kode_agen}', 'DataCalonNasabahController@listJson');
 Route::middleware('auth:api')->get('history/detail', 'MessageLogController@historyDetail');
 Route::middleware('auth:api')->get('history', 'MessageLogController@historyList');

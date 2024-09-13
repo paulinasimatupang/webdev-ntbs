@@ -13,3 +13,4 @@ interface TerminalRepository extends RepositoryInterface
 {
     //
 }
+    

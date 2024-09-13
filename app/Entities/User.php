@@ -34,7 +34,9 @@ class User extends Authenticatable implements JWTSubject
         'email',
         'password',
         'branchid',
-        'status'
+        'status',
+        'fcm_token'
+
     ];
     protected $table = 'users';
     protected $casts = [

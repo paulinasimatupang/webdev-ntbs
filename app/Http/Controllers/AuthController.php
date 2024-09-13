@@ -400,4 +400,22 @@ class AuthController extends Controller
         $request->session()->forget('user');
         return Redirect::to('login');
     }
+
+    public function updateToken(Request $request)
+{
+    $request->validate([
+        'fcm_token' => 'required|string'
+    ]);
+
+    $user = Auth::user(); // Asumsi user sudah terautentikasi
+    if (!$user) {
+        return response()->json(['message' => 'User not authenticated'], 401);
+    }
+
+    $user->fcm_token = $request->fcm_token;
+    $user->save();
+
+    return response()->json(['message' => 'FCM token successfully updated'], 200);
+}
+
 }

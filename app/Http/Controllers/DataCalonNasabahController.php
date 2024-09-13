@@ -17,10 +17,13 @@ use App\Http\Requests\DataCalonNasabahUpdateRequest;
 use App\Repositories\DataCalonNasabahRepository;
 use App\Validators\DataCalonNasabahValidator;
 
+use App\Services\SendPushNotification;
+
 use Illuminate\Support\Facades\Log;
 use Ixudra\Curl\Facades\Curl;
 
 use App\Entities\DataCalonNasabah;
+use App\Entities\User;
 use App\Entities\Role;
 use App\Entities\CompOption;
 
@@ -440,6 +443,7 @@ class DataCalonNasabahController extends Controller
                     ->with('error', "Data nasabah tidak ditemukan");
             }
 
+            // Proses pembuatan CIF dan rekening
             $this->registration_code($id);
 
             if (!$this->registration_code($id)) {
@@ -460,11 +464,17 @@ class DataCalonNasabahController extends Controller
             $nasabah->status = 2;
             $nasabah->reply_time = now();
             $nasabah->save();
-            
+
             DB::commit();
-            
+
+            // Mengirim push notification ke Android menggunakan service SendPushNotification
+            $userId = $nasabah->user_id; // Ambil user ID dari nasabah
+            $pushNotification = new SendPushNotification();
+            $pushNotification->sendNotification($userId); // Kirim push notification
+
+            // Mengirim SMS
             $this->send_sms($id);
-            
+
             return Redirect::to('/nasabah/approve')->with('success', 'Nasabah berhasil disetujui, CIF dan rekening berhasil dibuat.');
         } catch (Exception $e) {
             DB::rollBack();
