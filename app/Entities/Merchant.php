@@ -15,7 +15,6 @@ use Prettus\Repository\Traits\TransformableTrait;
 class Merchant extends Model implements Transformable
 {
     use TransformableTrait;
-    use SoftDeletes;
 
     public $incrementing = true;
 
@@ -23,29 +22,37 @@ class Merchant extends Model implements Transformable
         'id',
         'name',
         'no',
-        'code',
         'address',
         'phone',
         'email',
-        'balance',
-        'avatar',
         'status',
         'user_id',
         'terminal_id',
         'city',
-        'screen_id',
         'mid',
         'status_agen',
         'active_at',
         'resign_at',
         'branchid',
         'no_cif',
-        'kode_produk',
-        'no_registrasi',
         'file_ktp',
-        'file_kk',
+        'foto_lokasi_usaha',
         'file_npwp',
-        'pin'
+        'pin',
+        'pekerjaan',
+        'jenis_kelamin',
+        'jenis_agen',
+        'kode_pos',
+        'lokasi',
+        'kecamatan',
+        'kelurahan',
+        'provinsi',
+        'no_perjanjian_kerjasama',
+        'tgl_perjanjian',
+        'tgl_pelaksanaan',
+        'no_ktp',
+        'no_npwp',
+        'no_telp'
     ];
 
     protected $table = 'merchants';

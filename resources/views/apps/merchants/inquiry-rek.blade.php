@@ -28,7 +28,7 @@
                                         <a href="{{route('agen')}}">
                                             <button type="button" class="btn btn-primary">Back</button>
                                         </a>
-                                        <button type="submit" class="btn btn-primary">Save</button>
+                                        <button type="submit" class="btn btn-primary">Inquiry</button>
                                     </div>
                                 </div>
                             </form>

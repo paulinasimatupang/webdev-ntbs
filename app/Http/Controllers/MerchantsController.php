@@ -30,6 +30,7 @@ use App\Entities\Terminal;
 use App\Entities\Group;
 use App\Entities\TerminalBilliton;
 use App\Entities\UserGroup;
+use App\Entities\Assesment;
 use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade as Pdf;
 
@@ -426,8 +427,10 @@ class MerchantsController extends Controller
         }
     }
 
-    public function create(Request $request){
-        return view('apps.merchants.add');
+    public function create(Request $request)
+    {
+        $assessments = Assessment::all();
+        return view('apps.merchants.add', compact('assessments'));
     }
 
     /**
