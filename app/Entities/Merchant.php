@@ -52,7 +52,9 @@ class Merchant extends Model implements Transformable
         'tgl_pelaksanaan',
         'no_ktp',
         'no_npwp',
-        'no_telp'
+        'no_telp',
+        'rt',
+        'rw'
     ];
 
     protected $table = 'merchants';

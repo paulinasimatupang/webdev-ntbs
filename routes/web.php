@@ -309,6 +309,13 @@ Route::group(['middleware' => ['auth', 'check.permission']], function () {
     Route::get('/branch/edit{id}', 'BranchController@edit')->name('branch_edit');
     Route::post('/branch/update/{id}', 'BranchController@update')->name('branch_update');
     Route::post('/branch/destroy{id}', 'BranchController@destroy')->name('branch_destroy');
+
+    Route::get('/assesment', 'AssesmentController@index')->name('assesment');
+    Route::get('/assesment/create', 'AssesmentController@create')->name('assesment_create');
+    Route::post('/assesment/store', 'AssesmentController@store')->name('assesment_store');
+    Route::get('/assesment/edit{id}', 'AssesmentController@edit')->name('assesment_edit');
+    Route::post('/assesment/update/{id}', 'AssesmentController@update')->name('assesment_update');
+    Route::post('/assesment/destroy{id}', 'AssesmentController@destroy')->name('assesment_destroy');
 });
 
 // Routes for Master Data

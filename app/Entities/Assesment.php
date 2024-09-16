@@ -16,6 +16,8 @@ class Assesment extends Model implements Transformable
     use TransformableTrait;
 
     public $incrementing = true;
+    
+    public $timestamps = false;
 
     protected $fillable = [
         'pertanyaan',

@@ -11,7 +11,7 @@ use Prettus\Repository\Traits\TransformableTrait;
  *
  * @package namespace App\Entities;
  */
-class AssesmentResult extends Model implements Transformable
+class AssesmentResultDetail extends Model implements Transformable
 {
     use TransformableTrait;
 
@@ -19,11 +19,11 @@ class AssesmentResult extends Model implements Transformable
     public $timestamps = false;
 
     protected $fillable = [
-        'user_id',
-        'total_poin',
-        'catatan'
+        'assesment_id',
+        'pertanyaan_id',
+        'poin'
     ];
 
-    protected $table = 'assesments_result';
+    protected $table = 'assesments_result_detail';
     protected $connection = 'pgsql_billiton';
 }

@@ -31,6 +31,9 @@ use App\Entities\Group;
 use App\Entities\TerminalBilliton;
 use App\Entities\UserGroup;
 use App\Entities\Assesment;
+use App\Entities\AssesmentResult;
+use App\Entities\AssesmentResultDetail;
+use App\Entities\CompOption;
 use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade as Pdf;
 
@@ -68,9 +71,11 @@ class MerchantsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function menu()
+    public function menu() 
     {
-        return view('apps.merchants.menu');
+        $jumlah_request = Merchant::where('status_agen', 0)->count();
+
+        return view('apps.merchants.menu', compact('jumlah_request'));
     }
 
     /**
@@ -392,7 +397,8 @@ class MerchantsController extends Controller
         
                                 case 'Nomor Rekening':
                                     $norek = $value;
-                                    $match = Merchant::where('no', $norek)->exists();
+                                    // $match = Merchant::where('no', $norek)->exists();
+                                    $match=null;
                                     break;
         
                                 case 'Nomor Handphone':
@@ -429,9 +435,27 @@ class MerchantsController extends Controller
 
     public function create(Request $request)
     {
-        $assessments = Assessment::all();
-        return view('apps.merchants.add', compact('assessments'));
+        $assessments = Assesment::all();
+        
+        $provinsi = CompOption::where('comp_id', 'CIF14')
+                    ->orderBy('opt_label')
+                    ->get();
+                    
+        $kota_kabupaten = CompOption::where('comp_id', 'CIF13')
+                    ->orderBy('opt_label')
+                    ->get();
+
+        $provinsi = $provinsi->sortBy(function($item) {
+            return $item->opt_label === 'Lain-Lain' ? 'zzzz' : $item->opt_label;
+        });
+
+        $kota_kabupaten = $kota_kabupaten->sortBy(function($item) {
+            return $item->opt_label === 'Lain-Lain' ? 'zzzz' : $item->opt_label;
+        });
+
+        return view('apps.merchants.add', compact('assessments', 'kota_kabupaten', 'provinsi'));
     }
+
 
     /**
      * Store a newly created resource in storage.
@@ -462,20 +486,22 @@ class MerchantsController extends Controller
                     ->with('error', 'Role Tidak Ditemukan')
                     ->withInput();
                 }
-
+                
+                $user_login = session()->get('user');
                 
                 $user = User::create([
                                 'role_id'           => $role_id,
                                 'fullname'          => $request->fullname,
                                 'email'             => $request->email,
+                                'branchid'          => $user_login->branchid,
                                 'status'            => 0
                             ]);
 
                 $uploadPath = public_path('uploads/');
                 $filePaths = [
                     'file_ktp' => null,
-                    'file_kk' => null,
-                    'file_npwp' => null
+                    'file_npwp' => null,
+                    'foto_lokasi_usaha' => null
                 ];
 
                 foreach ($filePaths as $fileKey => &$filePath) {
@@ -500,15 +526,14 @@ class MerchantsController extends Controller
                 }
 
 
-                $reqData = $request->except(['file_ktp', 'file_kk', 'file_npwp']); 
+                $reqData = $request->except(['file_ktp', 'foto_lokasi_usaha', 'file_npwp']); 
                 $reqData['user_id'] = $user->id;
                 $reqData['name']    = $user->fullname;
                 $reqData['status_agen']    = 0;
                 $reqData['file_ktp'] = $filePaths['file_ktp'];
-                $reqData['file_kk'] = $filePaths['file_kk'];
+                $reqData['foto_lokasi_usaha'] = $filePaths['foto_lokasi_usaha'];
                 $reqData['file_npwp'] = $filePaths['file_npwp'];
-                $reqData['active_at'] =now();
-
+                $reqData['tgl_perjanjian'] =now();
                 $data   = $this->repository->create($reqData);
 
                 $checkGroup = Group::where('name','Agen')->first();
@@ -516,13 +541,40 @@ class MerchantsController extends Controller
                     $checkUG = UserGroup::where('user_id',$user->id)
                                         ->where('group_id',$checkGroup->id)
                                         ->first();
-                    if(!$checkGroup){
+                    if(!$checkUG){
                         $userGroup = UserGroup::create([
                             'user_id'   => $user->id,
                             'group_id'  => $checkGroup->id
                         ]);
                     }
                 }
+
+                $assesmentResult = AssesmentResult::create([
+                    'user_id'   => $user->id,
+                    'catatan'   => $request->catatan,
+                    'total_poin' => 0,
+                ]);
+
+                $totalPoin = 0;
+
+                foreach ($request->answer as $pertanyaan_id  => $answer) {
+                    $assesment = Assesment::find($pertanyaan_id );
+
+                    if ($answer === 'yes') {
+                        $poin = $assesment->poin;
+                        $totalPoin += $poin;
+                    } else {
+                        $poin = 0;
+                    }
+
+                    AssesmentResultDetail::create([
+                        'assesment_id'  => $assesmentResult->id,
+                        'pertanyaan_id' => $assesment->id,
+                        'poin'          => $poin,
+                    ]);
+                }
+
+                $assesmentResult->update(['total_poin' => $totalPoin]);
 
                 DB::commit();
                 return Redirect::to('agen')
@@ -740,6 +792,8 @@ class MerchantsController extends Controller
                 $merchant->mid = $newMid;
                 $merchant->pin = $generatePin;
                 $merchant->status_agen = 1;
+                $merchant->active_at = now();
+                $merchant->tgl_pelaksanaan = now();
                 $merchant->save();
 
                 $user = User::where('id', $merchant->user_id)->first();
