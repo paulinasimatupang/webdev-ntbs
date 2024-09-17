@@ -1,7 +1,8 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use DB;
+use Redirect;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Entities\Pengaduan;
@@ -11,9 +12,10 @@ class PengaduanController extends Controller
 {
     public function menu() 
     {
-        $jumlah_request = Pengaduan::where('status', 0)->count();
+        $jumlah_pending = Pengaduan::where('status', 0)->count();
+        $jumlah_process = Pengaduan::where('status', 1)->count();
 
-        return view('apps.pengaduan.menu', compact('jumlah_request'));
+        return view('apps.pengaduan.menu', compact('jumlah_pending', 'jumlah_process'));
     }
 
     public function list_pending(Request $request)
@@ -192,7 +194,7 @@ class PengaduanController extends Controller
 
     public function detail_pending($id)
     {
-        $data = Pengaduan::find($id)->whereHas('merchant');
+        $data = Pengaduan::with('merchant')->find($id);
         if($data){
             return view('apps.pengaduan.detail-pending')
                 ->with('data', $data);
@@ -204,7 +206,7 @@ class PengaduanController extends Controller
 
     public function detail_process($id)
     {
-        $data = Pengaduan::find($id)->whereHas('merchant');
+        $data = Pengaduan::with('merchant')->find($id);
         if($data){
             return view('apps.pengaduan.detail-process')
                 ->with('data', $data);
@@ -216,7 +218,7 @@ class PengaduanController extends Controller
 
     public function detail_resolved($id)
     {
-        $data = Pengaduan::find($id)->whereHas('merchant');
+        $data = Pengaduan::with('merchant')->find($id);
         if($data){
             return view('apps.pengaduan.detail-resolved')
                 ->with('data', $data);
@@ -258,6 +260,7 @@ class PengaduanController extends Controller
             }
 
             $data->status = 2;
+            $data->reply_time = now();
             $data->save();
 
             DB::commit();

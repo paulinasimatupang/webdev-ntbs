@@ -13,7 +13,7 @@
 
 @section('main-content')
             <div class="breadcrumb">
-                <h1>Request Pengaduan</h1>
+                <h1>Pengaduan Process</h1>
                 <!-- <ul>
                     <li><a href="">Selada</a></li> -->
             </div>
@@ -23,7 +23,7 @@
                     <div class="card text-left">
                         <div class="card-body">
                             <div class="row">
-                                <h4 class=" col-sm-12 col-md-6 card-title mb-3">List Request Pengaduan</h4>
+                                <h4 class=" col-sm-12 col-md-6 card-title mb-3">List Pengaduan</h4>
                             </div>
                             @if ($message = Session::get('success'))
                                 <div class="alert alert-success">

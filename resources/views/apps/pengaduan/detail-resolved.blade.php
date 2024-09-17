@@ -1,7 +1,7 @@
 @extends('layouts.master')
 @section('main-content')
 <div class="breadcrumb">
-    <h1>Detail Calon Nasabah</h1>
+    <h1>DetailPengaduanh</h1>
 </div>
 <div class="separator-breadcrumb border-top"></div>
 
@@ -41,7 +41,7 @@
                     </div>
 
                     <div class="col-sm-12 d-flex justify-content-end">
-                        <a href="{{ route('list_resolved') }}" class="btn btn-primary mr-2">Back</a>
+                        <a href="{{ route('pengaduan_resolved') }}" class="btn btn-primary mr-2">Back</a>
                     </div>
             </div>
         </div>

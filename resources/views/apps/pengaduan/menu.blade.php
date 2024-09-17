@@ -63,7 +63,7 @@
                             <p class="text-muted mt-2 mb-0">Pending</p>
                         </div>
                         <div class="text-right">
-                            <h3 class="mb-0" style="font-size: 30px; color: #0a6e44;">{{ $jumlah_request }}</h3>
+                            <h3 class="mb-0" style="font-size: 30px; color: #0a6e44;">{{ $jumlah_pending }}</h3>
                         </div>
                     </div>
                 </div>
@@ -71,17 +71,17 @@
         </div>
     @endif
 
-    @if(isset($feature['pengaduan process']))
+    @if(isset($features['pengaduan process']))
         <div class="col-lg-4 col-md-4 col-sm-4">
             <a href="/pengaduan/process" class="card-link">
                 <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-2">
-                    <div class="card-body text-center">
-                        <div class="d-flex align-items-center">
-                            <img src="{{ asset('assets/images/new_features/request.png') }}" alt="Total Transaction"
-                                class="mr-3" style="width: 50px">
-                            <div class="text-left">
-                                <p class="text-muted mt-2 mb-0">On Process</p>
-                            </div>
+                    <div class="card-body d-flex align-items-center">
+                        <img src="{{ asset('assets/images/new_features/request.png') }}" alt="Request Pengaduan" class="mr-3" style="width: 50px;">
+                        <div class="flex-grow-1">
+                            <p class="text-muted mt-2 mb-0">On Process</p>
+                        </div>
+                        <div class="text-right">
+                            <h3 class="mb-0" style="font-size: 30px; color: #0a6e44;">{{ $jumlah_process }}</h3>
                         </div>
                     </div>
                 </div>

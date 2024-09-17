@@ -1,7 +1,7 @@
 @extends('layouts.master')
 @section('main-content')
 <div class="breadcrumb">
-    <h1>Detail Calon Nasabah</h1>
+    <h1>Detail Pengaduan</h1>
 </div>
 <div class="separator-breadcrumb border-top"></div>
 
@@ -41,13 +41,13 @@
                     </div>
 
                     <div class="col-sm-12 d-flex justify-content-end">
-                        <a href="{{ route('list_process') }}" class="btn btn-primary mr-2">Back</a>
+                        <a href="{{ route('pengaduan_process', ['id' => $data->id]) }}" class="btn btn-primary mr-2">Back</a>
                         <form id="actionForm" method="POST" class="d-inline">
                             @csrf
                             <input type="hidden" name="data_id" value="{{ $data->id }}">
                             <input type="hidden" name="action" id="formAction">
                             <button type="button" id="approve" class="btn btn-success">
-                                Approve
+                                Done
                             </button>
                         </form>
                     </div>
@@ -60,7 +60,7 @@
 @section('page-js')
 <script>
 document.getElementById('approve').addEventListener('click', function() {
-    if (confirm('Apakah anda yakin akan menerima data ini?')) {
+    if (confirm('Apakah Anda yakin pengaduan sudah teratasi??')) {
         document.getElementById('formAction').value = 'activate';
         document.getElementById('actionForm').action = "{{ route('pengaduan_resolved', ['id' => $data->id]) }}";
         document.getElementById('actionForm').submit();
