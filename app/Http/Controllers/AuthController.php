@@ -11,7 +11,7 @@ use JWTAuth;
 use Redirect;
 use Auth;
 
-use Illuminate\Http\Request; 
+use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Password;
 use App\Http\Requests;
@@ -79,12 +79,13 @@ class AuthController extends Controller
         }
     }
 
-    public function login(Request $request){
+    public function login(Request $request)
+    {
         $user = $request->session()->get('user');
         // return response()->json($user,200);
-        if($user){
+        if ($user) {
             return Redirect::to('landing');
-        }else{
+        } else {
             return view('sessions.signIn');
         }
     }
@@ -147,6 +148,9 @@ class AuthController extends Controller
             }
 
             $token = JWTAuth::attempt($credentials);
+
+            // Log the token
+            Log::info('Generated Token: ' . $token);
         } catch (JWTException $e) {
             if ($request->expectsJson()) {
                 return response()->json([
@@ -161,8 +165,8 @@ class AuthController extends Controller
         }
 
         $user = User::where('username', $credentials['username'])
-                    ->with('user_group.group', 'merchant.terminal')
-                    ->first();
+            ->with('user_group.group', 'merchant.terminal')
+            ->first();
 
         if ($request->expectsJson()) {
             return response()->json([
@@ -233,16 +237,16 @@ class AuthController extends Controller
                     DB::commit();
 
                     $response = [
-                        'status'  => true,
+                        'status' => true,
                         'message' => 'Password berhasil diubah.',
                     ];
-                    return response()->json($response, 200);            
+                    return response()->json($response, 200);
                 } else {
                     DB::rollBack();
 
                     $response = [
                         'status' => false,
-                        'error'  => 'Password lama salah. Mohon isi dengan password yang benar untuk mengubah password baru.',
+                        'error' => 'Password lama salah. Mohon isi dengan password yang benar untuk mengubah password baru.',
                     ];
 
                     return response()->json($response, 400);
@@ -252,7 +256,7 @@ class AuthController extends Controller
 
                 $response = [
                     'status' => false,
-                    'error'  => 'User tidak ditemukan.',
+                    'error' => 'User tidak ditemukan.',
                 ];
 
                 return response()->json($response, 404);
@@ -260,40 +264,40 @@ class AuthController extends Controller
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             DB::rollBack();
             $response = [
-                'status'  => false,
-                'error'   => 'Data tidak ditemukan.',
+                'status' => false,
+                'error' => 'Data tidak ditemukan.',
                 'details' => $e->getMessage()
             ];
             return response()->json($response, 404);
         } catch (\Illuminate\Validation\ValidationException $e) {
             DB::rollBack();
             $response = [
-                'status'  => false,
-                'error'   => 'Validasi gagal.',
+                'status' => false,
+                'error' => 'Validasi gagal.',
                 'details' => $e->errors()
             ];
             return response()->json($response, 422);
         } catch (\Illuminate\Database\QueryException $e) {
             DB::rollBack();
             $response = [
-                'status'  => false,
-                'error'   => 'Kesalahan query database.',
+                'status' => false,
+                'error' => 'Kesalahan query database.',
                 'details' => $e->getMessage()
             ];
             return response()->json($response, 500);
         } catch (\PDOException $e) {
             DB::rollBack();
             $response = [
-                'status'  => false,
-                'error'   => 'Kesalahan koneksi database.',
+                'status' => false,
+                'error' => 'Kesalahan koneksi database.',
                 'details' => $e->getMessage()
             ];
             return response()->json($response, 500);
         } catch (Exception $e) {
             DB::rollBack();
             $response = [
-                'status'    => false,
-                'error'     => 'Terjadi kesalahan yang tidak terduga.',
+                'status' => false,
+                'error' => 'Terjadi kesalahan yang tidak terduga.',
                 'exception' => $e->getMessage()
             ];
             return response()->json($response, 500);
@@ -327,7 +331,7 @@ class AuthController extends Controller
                     DB::commit();
 
                     $response = [
-                        'status'  => true,
+                        'status' => true,
                         'message' => 'PIN berhasil diubah.',
                     ];
                     return response()->json($response, 200);
@@ -336,7 +340,7 @@ class AuthController extends Controller
 
                     $response = [
                         'status' => false,
-                        'error'  => 'PIN lama salah. Mohon isi dengan PIN yang benar untuk mengubah PIN baru.',
+                        'error' => 'PIN lama salah. Mohon isi dengan PIN yang benar untuk mengubah PIN baru.',
                     ];
 
                     return response()->json($response, 400);
@@ -346,7 +350,7 @@ class AuthController extends Controller
 
                 $response = [
                     'status' => false,
-                    'error'  => 'Merchant tidak ditemukan.',
+                    'error' => 'Merchant tidak ditemukan.',
                 ];
 
                 return response()->json($response, 404);
@@ -354,40 +358,40 @@ class AuthController extends Controller
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             DB::rollBack();
             $response = [
-                'status'  => false,
-                'error'   => 'Data tidak ditemukan.',
+                'status' => false,
+                'error' => 'Data tidak ditemukan.',
                 'details' => $e->getMessage()
             ];
             return response()->json($response, 404);
         } catch (\Illuminate\Validation\ValidationException $e) {
             DB::rollBack();
             $response = [
-                'status'  => false,
-                'error'   => 'Validasi gagal.',
+                'status' => false,
+                'error' => 'Validasi gagal.',
                 'details' => $e->errors()
             ];
             return response()->json($response, 422);
         } catch (\Illuminate\Database\QueryException $e) {
             DB::rollBack();
             $response = [
-                'status'  => false,
-                'error'   => 'Kesalahan query database.',
+                'status' => false,
+                'error' => 'Kesalahan query database.',
                 'details' => $e->getMessage()
             ];
             return response()->json($response, 500);
         } catch (\PDOException $e) {
             DB::rollBack();
             $response = [
-                'status'  => false,
-                'error'   => 'Kesalahan koneksi database.',
+                'status' => false,
+                'error' => 'Kesalahan koneksi database.',
                 'details' => $e->getMessage()
             ];
             return response()->json($response, 500);
         } catch (Exception $e) {
             DB::rollBack();
             $response = [
-                'status'    => false,
-                'error'     => 'Terjadi kesalahan yang tidak terduga.',
+                'status' => false,
+                'error' => 'Terjadi kesalahan yang tidak terduga.',
                 'exception' => $e->getMessage()
             ];
             return response()->json($response, 500);
@@ -402,20 +406,20 @@ class AuthController extends Controller
     }
 
     public function updateToken(Request $request)
-{
-    $request->validate([
-        'fcm_token' => 'required|string'
-    ]);
+    {
+        $request->validate([
+            'fcm_token' => 'required|string'
+        ]);
 
-    $user = Auth::user(); // Asumsi user sudah terautentikasi
-    if (!$user) {
-        return response()->json(['message' => 'User not authenticated'], 401);
+        $user = Auth::user(); // Asumsi user sudah terautentikasi
+        if (!$user) {
+            return response()->json(['message' => 'User not authenticated'], 401);
+        }
+
+        $user->fcm_token = $request->fcm_token;
+        $user->save();
+
+        return response()->json(['message' => 'FCM token successfully updated'], 200);
     }
-
-    $user->fcm_token = $request->fcm_token;
-    $user->save();
-
-    return response()->json(['message' => 'FCM token successfully updated'], 200);
-}
 
 }

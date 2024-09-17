@@ -195,3 +195,4 @@ Route::middleware('auth:api')->post('auth/changePassword', 'AuthController@chang
 Route::middleware('auth:api')->post('auth/changePin', 'AuthController@changePin');
 Route::middleware('auth:api')->post('agen/block', 'MerchantsController@blockAgen');
 Route::middleware('auth:api')->post('terminal/create/{imei}/{mid}', 'TerminalsController@store');
+Route::middleware('auth:api')->post('imei/store', 'TerminalsController@storeImei');

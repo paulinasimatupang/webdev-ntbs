@@ -162,7 +162,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::view('others/search-result', 'others.search-result')->name('search-result');
     // Auth::routes();
     Route::get('/home', 'HomeController@index')->name('home');
-    
+
     Route::get('/users/menu', 'UserController@menu')->name('users.menu');
 });
 
@@ -174,7 +174,7 @@ Route::group(['middleware' => ['auth', 'check.permission']], function () {
     Route::get('/users/{user}/edit', 'UserController@edit')->name('users.edit');
     Route::put('/users/{user}', 'UserController@update')->name('users.update');
     Route::post('/users/{user}/destroy', 'UserController@destroy')->name('users.destroy');
-    
+
     Route::get('/users/request', 'UserController@request_list')->name('users.list-request');
     Route::get('/users/detail/{id}', 'UserController@detail_request')->name('users.detail');
     Route::post('/users/accept/{id}', 'UserController@acceptUser')->name('users.accept');
@@ -190,6 +190,9 @@ Route::group(['middleware' => ['auth', 'check.permission']], function () {
     Route::post('/terminal/{id}/{merchant_id}/delete', 'TerminalsController@deleteMerchantData')->name('terminal_delete');
     Route::get('/terminal/{id}/activateBilliton', 'TerminalsController@activateBilliton')->name('terminal_activate_billiton');
     Route::get('/terminal/{id}/updateBilliton', 'TerminalsController@updateBilliton')->name('terminal_update_billiton');
+    Route::get('/terminal/request', 'TerminalsController@list_request')->name('imei_request');
+    Route::get('/imei/accept/{id}', 'TerminalsController@acceptChangeImei')->name('imei_accept');
+    Route::get('/imei/reject/{id}', 'TerminalsController@rejectChangeImei')->name('imei_reject');
 
     Route::get('/transaction', 'TransactionsController@index')->name('transaction');
     Route::get('/transaction_log/edit/{stan}', 'TransactionLogController@edit')->name('transactionlog_edit');
@@ -206,7 +209,7 @@ Route::group(['middleware' => ['auth', 'check.permission']], function () {
 
     Route::get('/transaction/reversal', 'TransactionsController@reversal');
     Route::get('/transaction/reversal/{additional_data}', 'TransactionsController@postReversal')->name('transaction_postReversal');
-    
+
     Route::get('/transaction/fee', 'TransactionsController@reportFee')->name('transaction_fee');
 
     Route::get('/fee', 'FeeController@index')->name('fee');

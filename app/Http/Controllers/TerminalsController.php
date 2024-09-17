@@ -13,12 +13,15 @@ use App\Http\Requests\TerminalCreateRequest;
 use App\Http\Requests\TerminalUpdateRequest;
 use App\Repositories\TerminalRepository;
 use App\Validators\TerminalValidator;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 use App\Entities\Terminal;
 use App\Entities\Merchant;
 use App\Entities\TerminalBilliton;
 use App\Entities\TerminalUserBilliton;
 use App\Entities\UsersBilliton;
+use App\Entities\Imei;
 
 /**
  * Class TerminalsController.
@@ -46,7 +49,7 @@ class TerminalsController extends Controller
     public function __construct(TerminalRepository $repository, TerminalValidator $validator)
     {
         $this->repository = $repository;
-        $this->validator  = $validator;
+        $this->validator = $validator;
     }
 
     /**
@@ -60,7 +63,7 @@ class TerminalsController extends Controller
 
         $data = Terminal::select('*');
 
-	    // $data = $data->whereHas('merchant.user', function($query){
+        // $data = $data->whereHas('merchant.user', function($query){
         //     $query->where(function($q){
         //         $q->where('is_user_mireta', '!=', 1)->orWhereNull('is_user_mireta');
         //     });
@@ -69,48 +72,48 @@ class TerminalsController extends Controller
         //     });
         // });
 
-        if($request->has('search')){
-            $data = $data->whereRaw('lower(name) like (?)',["%{$request->search}%"]);
+        if ($request->has('search')) {
+            $data = $data->whereRaw('lower(name) like (?)', ["%{$request->search}%"]);
         }
 
-        if($request->has('status')){
-            $data = $data->where('status',$request->status);
+        if ($request->has('status')) {
+            $data = $data->where('status', $request->status);
         }
 
         $total = $data->count();
-    
-        if($request->has('limit')){
+
+        if ($request->has('limit')) {
             $data->take($request->get('limit'));
-            
-            if($request->has('offset')){
-            	$data->skip($request->get('offset'));
+
+            if ($request->has('offset')) {
+                $data->skip($request->get('offset'));
             }
         }
 
-        if($request->has('order_type')){
-            if($request->get('order_type') == 'asc'){
-                if($request->has('order_by')){
+        if ($request->has('order_type')) {
+            if ($request->get('order_type') == 'asc') {
+                if ($request->has('order_by')) {
                     $data->orderBy($request->get('order_by'));
-                }else{
+                } else {
                     $data->orderBy('created_at');
                 }
-            }else{
-                if($request->has('order_by')){
+            } else {
+                if ($request->has('order_by')) {
                     $data->orderBy($request->get('order_by'), 'desc');
-                }else{
+                } else {
                     $data->orderBy('created_at', 'desc');
                 }
             }
-        }else{
+        } else {
             $data->orderBy('created_at', 'desc');
-        } 
+        }
 
         $data = $data->get();
 
-        foreach($data as $item){
-            if($item->merchant_id){
+        foreach ($data as $item) {
+            if ($item->merchant_id) {
                 $item->status = 'Used';
-            }else{
+            } else {
                 $item->status = 'Not Used';
             }
         }
@@ -118,17 +121,18 @@ class TerminalsController extends Controller
         $user = session()->get('user');
 
         return view('apps.terminals.list')
-                ->with('data', $data)
-                ->with('username', $user->username);
+            ->with('data', $data)
+            ->with('username', $user->username);
     }
 
-    public function create(Request $request){
-        $merchant = Merchant::where('terminal_id',null)->orderBy('name')->get();
+    public function create(Request $request)
+    {
+        $merchant = Merchant::where('terminal_id', null)->orderBy('name')->get();
         $merchant = $merchant->where('status_agen', 1);
 
 
         return view('apps.terminals.add')
-                ->with('merchant', $merchant);
+            ->with('merchant', $merchant);
     }
 
     /**
@@ -151,18 +155,18 @@ class TerminalsController extends Controller
 
             $prefix = 'TID';
             $lastTid = Terminal::where('tid', 'LIKE', $prefix . '%')
-                                ->orderBy('created_at', 'desc')
-                                ->first();
-            
+                ->orderBy('created_at', 'desc')
+                ->first();
+
             if ($lastTid) {
                 $lastTid = $lastTid->tid;
                 $number = substr($lastTid, strlen($prefix));
-                $newNumber = (int)$number + 1;
+                $newNumber = (int) $number + 1;
                 $newNumberPadded = str_pad($newNumber, 6, '0', STR_PAD_LEFT);
                 $tid = $prefix . $newNumberPadded;
 
                 while (Terminal::where('tid', $tid)->exists()) {
-                    $newNumber = (int)substr($tid, strlen($prefix)) + 1;
+                    $newNumber = (int) substr($tid, strlen($prefix)) + 1;
                     $tid = $prefix . str_pad($newNumber, 6, '0', STR_PAD_LEFT);
                 }
             } else {
@@ -181,9 +185,9 @@ class TerminalsController extends Controller
                 $merchant->terminal_id = $tid;
                 $merchant->save();
 
-                $data->merchant_id         = $merchant->mid;
-                $data->merchant_name       = $merchant->name;
-                $data->merchant_address    = $merchant->address;
+                $data->merchant_id = $merchant->mid;
+                $data->merchant_name = $merchant->name;
+                $data->merchant_address = $merchant->address;
                 $data->merchant_account_number = $merchant->no;
 
                 $data->save();
@@ -240,131 +244,131 @@ class TerminalsController extends Controller
      *
      * @throws \Prettus\Validator\Exceptions\ValidatorException
      */
-    
-     public function activateBilliton(TerminalUpdateRequest $request, $id)
-     {
-         try {
-             DB::beginTransaction();
-     
-             // Validasi data
-             $this->validator->with($request->all())->passesOrFail(ValidatorInterface::RULE_UPDATE);
-     
-             // Ambil terminal
-             $terminal = Terminal::where('id', $id)->first();
-             if (!$terminal) {
-                 throw new \Exception('Terminal not found');
-             }
-     
-             // Siapkan data merchant
-             $reqData = [];
-             if ($request->has('merchant_id')) {
-                 $merchant = Merchant::where('mid', $request->merchant_id)->first();
-                 if ($merchant) {
-                     $reqData['merchant_id']             = $merchant->mid;
-                     $reqData['merchant_name']           = $merchant->name;
-                     $reqData['merchant_address']        = $merchant->address;
-                     $reqData['merchant_account_number'] = $merchant->no;
-                 } else {
-                     $reqData['merchant_id']             = null;
-                     $reqData['merchant_name']           = null;
-                     $reqData['merchant_address']        = null;
-                     $reqData['merchant_account_number'] = null;
-                 }
-     
-                 // Update terminal
-                 $this->repository->update($reqData, $id);
-             }
-     
-             // Simpan terminal Billiton
-             $terminalBilliton = new TerminalBilliton();
-             $terminalBilliton->terminal_id          = $terminal->tid;
-             $terminalBilliton->terminal_type        = '1';
-             $terminalBilliton->terminal_imei        = $terminal->imei;
-             $terminalBilliton->terminal_name        = $terminal->serial_number;
-             $terminalBilliton->merchant_id          = $terminal->merchant_id;
-             $terminalBilliton->terminal_sim_number  = $terminal->iccid;
-             $terminalBilliton->save();
-     
-             if ($terminalBilliton) {
-                 $user = UsersBilliton::select('*')
-                                     ->orderBy('user_uid', 'desc')
-                                     ->first();
-     
-                 if ($user) {
-                     $userId = (int)$user->user_uid + 1;
-                     $usersBilliton = UsersBilliton::create([
-                         'user_uid'                  => $userId,
-                         'user_status_uid'           => 1,
-                         'user_type_uid'             => 1,
-                         'username'                  => $terminal->tid,
-                         'version'                   => '1.7',
-                         'brand'                     => $terminal->merchant_name,
-                         'model'                     => $terminal->merchant_address,
-                         'os_ver'                    => 'AGEN BJB BISA',
-                         'account_name'              => $terminal->merchant_account_number,
-                         'app_ver'                   => $terminal->sid,
-                         'need_approval'             => 't',
-                         'batch_no'                  => 0,
-                     ]);
-     
-                     if ($usersBilliton) {
-                         $terminalUserBilliton = TerminalUserBilliton::create([
-                             'terminal_id' => $terminal->tid,
-                             'user_uid'    => $userId,
-                         ]);
-     
-                         if ($terminalUserBilliton) {
-                             DB::commit();
-                             return true;
-                         } else {
-                             DB::rollback();
-                             return false;
-                         }
-                     } else {
-                         DB::rollback();
-                         return false;
-                     }
-                 } else {
-                     DB::rollback();
-                     return false;
-                 }
-             }
-     
-             DB::rollback();
-             return false;
-         } catch (Exception $e) {
-             DB::rollback();
-             return false;
-         }
-     }
+
+    public function activateBilliton(TerminalUpdateRequest $request, $id)
+    {
+        try {
+            DB::beginTransaction();
+
+            // Validasi data
+            $this->validator->with($request->all())->passesOrFail(ValidatorInterface::RULE_UPDATE);
+
+            // Ambil terminal
+            $terminal = Terminal::where('id', $id)->first();
+            if (!$terminal) {
+                throw new \Exception('Terminal not found');
+            }
+
+            // Siapkan data merchant
+            $reqData = [];
+            if ($request->has('merchant_id')) {
+                $merchant = Merchant::where('mid', $request->merchant_id)->first();
+                if ($merchant) {
+                    $reqData['merchant_id'] = $merchant->mid;
+                    $reqData['merchant_name'] = $merchant->name;
+                    $reqData['merchant_address'] = $merchant->address;
+                    $reqData['merchant_account_number'] = $merchant->no;
+                } else {
+                    $reqData['merchant_id'] = null;
+                    $reqData['merchant_name'] = null;
+                    $reqData['merchant_address'] = null;
+                    $reqData['merchant_account_number'] = null;
+                }
+
+                // Update terminal
+                $this->repository->update($reqData, $id);
+            }
+
+            // Simpan terminal Billiton
+            $terminalBilliton = new TerminalBilliton();
+            $terminalBilliton->terminal_id = $terminal->tid;
+            $terminalBilliton->terminal_type = '1';
+            $terminalBilliton->terminal_imei = $terminal->imei;
+            $terminalBilliton->terminal_name = $terminal->serial_number;
+            $terminalBilliton->merchant_id = $terminal->merchant_id;
+            $terminalBilliton->terminal_sim_number = $terminal->iccid;
+            $terminalBilliton->save();
+
+            if ($terminalBilliton) {
+                $user = UsersBilliton::select('*')
+                    ->orderBy('user_uid', 'desc')
+                    ->first();
+
+                if ($user) {
+                    $userId = (int) $user->user_uid + 1;
+                    $usersBilliton = UsersBilliton::create([
+                        'user_uid' => $userId,
+                        'user_status_uid' => 1,
+                        'user_type_uid' => 1,
+                        'username' => $terminal->tid,
+                        'version' => '1.7',
+                        'brand' => $terminal->merchant_name,
+                        'model' => $terminal->merchant_address,
+                        'os_ver' => 'AGEN BJB BISA',
+                        'account_name' => $terminal->merchant_account_number,
+                        'app_ver' => $terminal->sid,
+                        'need_approval' => 't',
+                        'batch_no' => 0,
+                    ]);
+
+                    if ($usersBilliton) {
+                        $terminalUserBilliton = TerminalUserBilliton::create([
+                            'terminal_id' => $terminal->tid,
+                            'user_uid' => $userId,
+                        ]);
+
+                        if ($terminalUserBilliton) {
+                            DB::commit();
+                            return true;
+                        } else {
+                            DB::rollback();
+                            return false;
+                        }
+                    } else {
+                        DB::rollback();
+                        return false;
+                    }
+                } else {
+                    DB::rollback();
+                    return false;
+                }
+            }
+
+            DB::rollback();
+            return false;
+        } catch (Exception $e) {
+            DB::rollback();
+            return false;
+        }
+    }
 
     public function updateBilliton(TerminalUpdateRequest $request, $id)
     {
         DB::beginTransaction();
-            $this->validator->with($request->all())->passesOrFail(ValidatorInterface::RULE_UPDATE);
-            
-            $terminal = Terminal::where('id', $id)->first();
+        $this->validator->with($request->all())->passesOrFail(ValidatorInterface::RULE_UPDATE);
 
-            if ($terminal) {
-                $terminalBilliton = new TerminalBilliton();
-                $terminalBilliton->terminal_id          = $terminal->tid;
-                $terminalBilliton->terminal_type        = '1';
-                $terminalBilliton->terminal_imei        = $terminal->imei;
-                $terminalBilliton->terminal_name        = $terminal->serial_number;
-                $terminalBilliton->merchant_id          = $terminal->merchant_id;
-                $terminalBilliton->terminal_sim_number  = $terminal->iccid;
-                $terminalBilliton->save();
+        $terminal = Terminal::where('id', $id)->first();
 
-                if ($terminalBilliton) {
-                    DB::commit();
-                    return Redirect::to('terminal')
-                                                    ->with('success', 'Update Successfully');
-                } else {
-                    DB::rollback();
-                    return Redirect::to('terminal')
-                                                    ->with('failed', 'Update Failed');
-                }
+        if ($terminal) {
+            $terminalBilliton = new TerminalBilliton();
+            $terminalBilliton->terminal_id = $terminal->tid;
+            $terminalBilliton->terminal_type = '1';
+            $terminalBilliton->terminal_imei = $terminal->imei;
+            $terminalBilliton->terminal_name = $terminal->serial_number;
+            $terminalBilliton->merchant_id = $terminal->merchant_id;
+            $terminalBilliton->terminal_sim_number = $terminal->iccid;
+            $terminalBilliton->save();
+
+            if ($terminalBilliton) {
+                DB::commit();
+                return Redirect::to('terminal')
+                    ->with('success', 'Update Successfully');
+            } else {
+                DB::rollback();
+                return Redirect::to('terminal')
+                    ->with('failed', 'Update Failed');
             }
+        }
     }
 
     /**
@@ -377,11 +381,11 @@ class TerminalsController extends Controller
     public function show($id)
     {
         $data = $this->repository->find($id);
-        
+
         $response = [
-            'status'  => true,
+            'status' => true,
             'message' => 'Success',
-            'data'    => $data,
+            'data' => $data,
         ];
 
         return response()->json($response, 200);
@@ -398,11 +402,11 @@ class TerminalsController extends Controller
     {
         $terminal = Terminal::find($id);
         $checkTerminalBilliton = false;
-        if($terminal){
+        if ($terminal) {
             $terminalBilliton = TerminalBilliton::where('terminal_imei', $terminal->imei)
-                                                ->first();
+                ->first();
 
-            if($terminalBilliton){
+            if ($terminalBilliton) {
                 $checkTerminalBilliton = true;
                 $tidBilliton = $terminalBilliton->terminal_id;
             } else {
@@ -410,10 +414,10 @@ class TerminalsController extends Controller
                 $tidBilliton = " ";
             }
 
-            $merchant = Merchant::where('terminal_id',null)
-                                ->orWhere('terminal_id',$terminal->tid)
-                                ->orderBy('name')
-                                ->get();
+            $merchant = Merchant::where('terminal_id', null)
+                ->orWhere('terminal_id', $terminal->tid)
+                ->orderBy('name')
+                ->get();
 
             return view('apps.terminals.edit')
                 ->with('terminal', $terminal)
@@ -422,9 +426,9 @@ class TerminalsController extends Controller
                 ->with('checkTerminalBilliton', $checkTerminalBilliton);
         } else {
             return Redirect::to('terminal')
-                            ->with('error', 'Data not found');
+                ->with('error', 'Data not found');
         }
-        
+
     }
 
     /**
@@ -464,7 +468,7 @@ class TerminalsController extends Controller
 
             if (!$data) {
                 DB::rollBack();
-                return Redirect::to('terminal/'.$id.'/edit')->with('error', 'Failed to update terminal data.');
+                return Redirect::to('terminal/' . $id . '/edit')->with('error', 'Failed to update terminal data.');
             }
 
             $terminalBilliton = TerminalBilliton::where('terminal_id', $request->get('tid'))->first();
@@ -476,7 +480,7 @@ class TerminalsController extends Controller
                 ]);
             } else {
                 DB::rollBack();
-                return Redirect::to('terminal/'.$id.'/edit')->with('error', 'TerminalBilliton not found for terminal_id: ' . $request->get('tid'));
+                return Redirect::to('terminal/' . $id . '/edit')->with('error', 'TerminalBilliton not found for terminal_id: ' . $request->get('tid'));
             }
 
             DB::commit();
@@ -484,14 +488,14 @@ class TerminalsController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return Redirect::to('terminal/'.$id.'/edit')
-                        ->with('error', $e->getMessage())
-                        ->withInput();
+            return Redirect::to('terminal/' . $id . '/edit')
+                ->with('error', $e->getMessage())
+                ->withInput();
         } catch (\Illuminate\Database\QueryException $e) {
             DB::rollBack();
-            return Redirect::to('terminal/'.$id.'/edit')
-                        ->with('error', $e->getMessage())
-                        ->withInput();
+            return Redirect::to('terminal/' . $id . '/edit')
+                ->with('error', $e->getMessage())
+                ->withInput();
         }
     }
 
@@ -507,10 +511,10 @@ class TerminalsController extends Controller
         DB::beginTransaction();
         try {
             $data = Terminal::find($id);
-            if($data){
-                if($data->merchant_id != null){
-                    $merchant = Merchant::where('mid',$data->merchant_id)->first();
-                    if($merchant){
+            if ($data) {
+                if ($data->merchant_id != null) {
+                    $merchant = Merchant::where('mid', $data->merchant_id)->first();
+                    if ($merchant) {
                         $merchant->terminal_id = null;
                         $merchant->save();
                     }
@@ -518,23 +522,23 @@ class TerminalsController extends Controller
             }
             $deleted = $this->repository->delete($id);
 
-            if($deleted){
+            if ($deleted) {
                 $response = [
-                    'status'  => true,
+                    'status' => true,
                     'message' => 'Terminal deleted.'
                 ];
-    
+
                 DB::commit();
                 return response()->json($response, 200);
             }
-            
+
         } catch (Exception $e) {
             // For rollback data if one data is error
             DB::rollBack();
 
             return response()->json([
-                'status'    => false, 
-                'error'     => 'Something wrong!',
+                'status' => false,
+                'error' => 'Something wrong!',
                 'exception' => $e
             ], 500);
         } catch (\Illuminate\Database\QueryException $e) {
@@ -542,16 +546,17 @@ class TerminalsController extends Controller
             DB::rollBack();
 
             return response()->json([
-                'status'    => false, 
-                'error'     => 'Something wrong!',
+                'status' => false,
+                'error' => 'Something wrong!',
                 'exception' => $e
             ], 500);
         }
     }
 
-    public function deleteMerchantData($id, $mid){
+    public function deleteMerchantData($id, $mid)
+    {
         $terminal = Terminal::find($id);
-        if($terminal){
+        if ($terminal) {
             $terminal->merchant_id = null;
             $terminal->merchant_name = null;
             $terminal->merchant_address = null;
@@ -559,10 +564,134 @@ class TerminalsController extends Controller
             $terminal->save();
         }
 
-        $merchant = Merchant::where('mid',$mid)->first();
-        if($merchant){
+        $merchant = Merchant::where('mid', $mid)->first();
+        if ($merchant) {
             $merchant->terminal_id = null;
             $merchant->save();
+        }
+    }
+
+    public function list_request(Request $request)
+    {
+        $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
+
+        $data = Imei::select('*');
+        $user = session()->get('user');
+
+        if ($request->has('search')) {
+            $data = $data->whereRaw('lower(name) like (?)', ["%{$request->search}%"]);
+        }
+
+        $data = $data->get();
+
+        $user = session()->get('user');
+
+        return view('apps.terminals.list-request')
+            ->with('data', $data)
+            ->with('username', $user->username);
+    }
+
+    public function acceptChangeImei($id)
+    {
+        DB::beginTransaction();
+        try {
+            // Ambil data IMEI berdasarkan ID
+            $imeiRequest = Imei::where('id', $id)->first();
+            if (!$imeiRequest) {
+                throw new \Exception("Request IMEI not found");
+            }
+
+            // Cari Terminal berdasarkan TID dari IMEI Request
+            $terminal = Terminal::where('tid', $imeiRequest->tid)->first();
+            if (!$terminal) {
+                throw new \Exception("Terminal not found");
+            }
+
+            // Update IMEI di Terminal
+            // $terminal->imei = $imeiRequest->imei;
+            $terminal->imei = null;
+            $terminal->save();
+
+            // Hapus permintaan IMEI setelah diterima
+            $imeiRequest->delete();
+
+            DB::commit();
+            return redirect()->route('imei_request')->with('success', 'Permintaan IMEI berhasil disetujui.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error: ' . $e->getMessage());
+            return redirect()->route('imei_request')->with('error', $e->getMessage());
+        }
+    }
+
+    public function rejectChangeImei($id)
+    {
+        DB::beginTransaction();
+        try {
+            // Ambil data IMEI berdasarkan ID
+            $imeiRequest = Imei::where('id', $id)->first();
+            if (!$imeiRequest) {
+                throw new \Exception("Request IMEI not found");
+            }
+
+            // Hapus permintaan IMEI setelah ditolak
+            $imeiRequest->delete();
+
+            DB::commit();
+            return redirect()->route('imei_request')->with('success', 'Permintaan IMEI berhasil ditolak.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error: ' . $e->getMessage());
+            return redirect()->route('imei_request')->with('error', $e->getMessage());
+        }
+    }
+
+    public function storeImei(Request $request)
+    {
+        // Check if user is authenticated
+        $user = auth()->user();
+
+        if (!$user) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        // Validate the request data
+        $validator = Validator::make($request->all(), [
+            'tid' => 'required|string|max:255',
+            'imei' => 'required|string|max:255',
+            'mid' => 'required|string|max:255',
+        ]);
+
+        // If validation fails, return the error response
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], 400);
+        }
+
+        try {
+            // Create a new IMEI entry in the database
+            $imei = Imei::create([
+                'tid' => $request->input('tid'),
+                'imei' => $request->input('imei'),
+                'mid' => $request->input('mid'),
+            ]);
+
+            // Return success response
+            return response()->json([
+                'success' => true,
+                'message' => 'IMEI data saved successfully',
+                'data' => $imei
+            ], 201);
+        } catch (\Exception $e) {
+            // Return error response if something goes wrong
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to save IMEI data',
+                'error' => $e->getMessage()
+            ], 500);
         }
     }
 }
