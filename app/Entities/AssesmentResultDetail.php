@@ -26,4 +26,13 @@ class AssesmentResultDetail extends Model implements Transformable
 
     protected $table = 'assesments_result_detail';
     protected $connection = 'pgsql_billiton';
+
+    public function assesment()
+    {
+        return $this->belongsTo(Assesment::class, 'pertanyaan_id', 'id');
+    }
+    public function assesmentResult()
+    {
+        return $this->belongsTo(AssesmentResult::class, 'assesment_id', 'id');
+    }
 }

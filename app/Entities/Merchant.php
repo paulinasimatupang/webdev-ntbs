@@ -54,7 +54,9 @@ class Merchant extends Model implements Transformable
         'no_npwp',
         'no_telp',
         'rt',
-        'rw'
+        'rw',
+        'latitude',
+        'longitude'
     ];
 
     protected $table = 'merchants';
@@ -73,5 +75,10 @@ class Merchant extends Model implements Transformable
     public function transactions()
     {
         return $this->hasMany(Transaction::class, 'kode_agen', 'mid');
+    }
+
+    public function assesmentResult()
+    {
+        return $this->hasOne(AssesmentResult::class, 'user_id', 'user_id');
     }
 }

@@ -19,7 +19,7 @@ class FeeController extends Controller
             $username = auth()->user()->username; 
 
            $groups = ServiceMeta::where('meta_id', 'fee')
-                ->whereIn('influx', [3])
+                ->whereIn('influx', [2,3,5])
                 ->with('service') 
                 ->orderBy('service_id') 
                 ->get();

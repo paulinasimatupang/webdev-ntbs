@@ -72,11 +72,11 @@
                                 <label class="col-sm-2 col-form-label">Jenis Agen</label>
                                 <div class="col-sm-10">
                                     <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="option" id="option1" value="option1">
+                                        <input class="form-check-input" type="radio" name="jenis_agen" id="option1" value="Agen Individu">
                                         <label class="form-check-label" for="option1">Agen Individu</label>
                                     </div>
                                     <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="option" id="option2" value="option2">
+                                        <input class="form-check-input" type="radio" name="jenis_agen" id="option2" value="Agen Badan Hukum">
                                         <label class="form-check-label" for="option2">Agen Badan Hukum</label>
                                     </div>
                                 </div>
@@ -91,6 +91,19 @@
                                 <label class="col-sm-2 col-form-label">Nama Pemilik</label>
                                 <div class="col-sm-10">
                                     <input type="text" class="form-control" name="fullname" value="{{ old('fullname', session('fullname', null)) }}" placeholder="Nama Lengkap" disbaled>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-sm-2 col-form-label">Jenis Kelamin</label>
+                                <div class="col-sm-10">
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="jenis_kelamin" id="option1" value="Laki - Laki">
+                                        <label class="form-check-label" for="option1">Laki - Laki</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="jenis_kelamin" id="option2" value="perempuan">
+                                        <label class="form-check-label" for="option2">Perempuan</label>
+                                    </div>
                                 </div>
                             </div>
                             <div class="form-group row">
@@ -212,6 +225,26 @@
                                     <input type="text" class="form-control" name="kode_pos" value="{{ old('kode_pos', session('kode_pos', null)) }}" placeholder="Kode Pos">
                                 </div>
                             </div>
+                            
+                            <div class="form-group row">
+                                <div class="col-sm-12">
+                                    <div id="map-container">
+                                        <div id="map"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-sm-2 col-form-label" for="latitude">Latitude:</label>
+                                <div class="col-sm-4">
+                                    <input type="text" class="form-control" id="latitude" name="latitude" readonly>
+                                </div>
+                                <label class="col-sm-2 col-form-label" for="longitude">Longitude:</label>
+                                <div class="col-sm-4">
+                                    <input type="text" class="form-control" id="longitude" name="longitude" readonly>
+                                </div>
+                            </div>
+
                             <div class="form-group row">
                                 <div class="col-sm-12 text-right">
                                     <button type="button" class="btn btn-secondary" id="prevBtn">Previous</button>
@@ -259,7 +292,31 @@
 @endsection
 
 @section('page-css')
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
     <style>
+        #map-container {
+            width: 100%;
+            height: 500px;
+            position: relative;
+            margin-bottom: 20px;
+        }
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .leaflet-control-geocoder {
+            width: 100%;
+            max-width: none;
+            margin-top: 10px;
+        }
+        .leaflet-control-geocoder-form input {
+            width: calc(100% - 30px);
+        }
+
         .step-indicator {
             display: flex;
             justify-content: space-around;
@@ -284,6 +341,8 @@
 @endsection
 
 @section('bottom-js')
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
     <script>
         document.getElementById('nextBtn').addEventListener('click', function () {
             document.getElementById('step1').style.display = 'none';
@@ -318,6 +377,67 @@
             document.getElementById('stepIndicator1').classList.remove('active');
             document.getElementById('stepIndicator2').classList.add('active');
             document.getElementById('stepIndicator3').classList.remove('active');
+        });
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            var map = L.map('map', {
+                center: [-2.5489, 118.0149],
+                zoom: 10,
+                minZoom: 3,
+                maxBounds: [
+                    [-11.0, 94.0], 
+                    [6.0, 141.0] 
+                ],
+                maxBoundsViscosity: 1.0
+            });
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+
+            var marker;
+
+            var geocoder = L.Control.geocoder({
+                defaultMarkGeocode: false,
+                placeholder: 'Cari lokasi...',
+                errorMessage: 'Tidak ditemukan.',
+                suggestMinLength: 3,
+                suggestTimeout: 250,
+                queryMinLength: 1
+            })
+            .on('markgeocode', function(e) {
+                var latlng = e.geocode.center;
+                setMarkerAndView(latlng);
+            })
+            .addTo(map);
+
+            function setMarkerAndView(latlng) {
+                if (marker) {
+                    map.removeLayer(marker);
+                }
+                marker = L.marker(latlng).addTo(map);
+                map.setView(latlng, 14);
+                
+                document.getElementById('latitude').value = latlng.lat.toFixed(6);
+                document.getElementById('longitude').value = latlng.lng.toFixed(6);
+            }
+
+            map.on('click', function(e) {
+                setMarkerAndView(e.latlng);
+            });
+
+            setTimeout(function() {
+                map.invalidateSize();
+            }, 100);
+
+            document.addEventListener('visibilitychange', function() {
+                if (!document.hidden) {
+                    setTimeout(function() {
+                        map.invalidateSize();
+                    }, 100);
+                }
+            });
         });
     </script>
 @endsection
