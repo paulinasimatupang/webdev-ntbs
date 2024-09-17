@@ -319,6 +319,16 @@ Route::group(['middleware' => ['auth', 'check.permission']], function () {
     Route::get('/assesment/edit{id}', 'AssesmentController@edit')->name('assesment_edit');
     Route::post('/assesment/update/{id}', 'AssesmentController@update')->name('assesment_update');
     Route::post('/assesment/destroy{id}', 'AssesmentController@destroy')->name('assesment_destroy');
+
+    Route::get('/pengaduan', 'PengaduanController@menu')->name('pengaduan');
+    Route::get('/pengaduan/pending', 'PengaduanController@list_pending')->name('pengaduan_pending');
+    Route::get('/pengaduan/process', 'PengaduanController@list_process')->name('pengaduan_process');
+    Route::get('/pengaduan/resolved', 'PengaduanController@list_resolved')->name('pengaduan_resolved');
+    Route::get('/pengaduan/detail/pending/{id}', 'PengaduanController@detail_pending')->name('pengaduan_detail_pending');
+    Route::get('/pengaduan/detail/process/{id}', 'PengaduanController@detail_process')->name('pengaduan_detail_process');
+    Route::get('/pengaduan/detail/resolved/{id}', 'PengaduanController@detail_resolved')->name('pengaduan_detail_resolved');
+    Route::post('/pengaduan/process/{id}', 'PengaduanController@onProcessRequest')->name('pengaduan_process');
+    Route::post('/pengaduan/resolved/{id}', 'PengaduanController@resolvedRequest')->name('pengaduan_resolved');
 });
 
 // Routes for Master Data

@@ -233,7 +233,7 @@
                                     </div>
                                 </div>
                             </div>
-
+                            
                             <div class="form-group row">
                                 <label class="col-sm-2 col-form-label" for="latitude">Latitude:</label>
                                 <div class="col-sm-4">
@@ -382,8 +382,8 @@
         document.addEventListener('DOMContentLoaded', function() {
             var map = L.map('map', {
                 center: [-2.5489, 118.0149],
-                zoom: 10,
-                minZoom: 3,
+                zoom: 8,
+                minZoom: 5,
                 maxBounds: [
                     [-11.0, 94.0], 
                     [6.0, 141.0] 
