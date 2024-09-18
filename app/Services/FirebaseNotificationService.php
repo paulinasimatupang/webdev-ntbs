@@ -12,18 +12,15 @@ class FirebaseNotificationService
     public function __construct()
     {
         $this->client = new Google_Client();
-        // Pastikan path ke file JSON sesuai dengan lokasi file di server Anda
         $this->client->setAuthConfig(storage_path('firebase/ntbs-lakupandai-firebase-adminsdk-6o46s-e72605460b.json'));
         $this->client->addScope('https://www.googleapis.com/auth/firebase.messaging');
     }
 
     public function sendFirebaseNotification($message)
     {
-        // Mendapatkan access token dari Google API
         $this->client->fetchAccessTokenWithAssertion();
         $accessToken = $this->client->getAccessToken();
         
-        // Memastikan access token ada dan valid
         if (!isset($accessToken['access_token'])) {
             Log::error('Failed to retrieve access token');
             return;
@@ -35,7 +32,6 @@ class FirebaseNotificationService
             'Content-Type: application/json'
         ];
 
-        // Mempersiapkan cURL
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_POST, true);

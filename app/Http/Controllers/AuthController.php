@@ -11,7 +11,7 @@ use JWTAuth;
 use Redirect;
 use Auth;
 
-use Illuminate\Http\Request; 
+use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Password;
 use App\Http\Requests;
@@ -79,12 +79,13 @@ class AuthController extends Controller
         }
     }
 
-    public function login(Request $request){
+    public function login(Request $request)
+    {
         $user = $request->session()->get('user');
         // return response()->json($user,200);
-        if($user){
+        if ($user) {
             return Redirect::to('landing');
-        }else{
+        } else {
             return view('sessions.signIn');
         }
     }
@@ -161,8 +162,8 @@ class AuthController extends Controller
         }
 
         $user = User::where('username', $credentials['username'])
-                    ->with('user_group.group', 'merchant.terminal')
-                    ->first();
+            ->with('user_group.group', 'merchant.terminal')
+            ->first();
 
         if ($request->expectsJson()) {
             return response()->json([
@@ -236,7 +237,7 @@ class AuthController extends Controller
                         'status'  => true,
                         'message' => 'Password berhasil diubah.',
                     ];
-                    return response()->json($response, 200);            
+                    return response()->json($response, 200);
                 } else {
                     DB::rollBack();
 
@@ -402,20 +403,49 @@ class AuthController extends Controller
     }
 
     public function updateToken(Request $request)
-{
-    $request->validate([
-        'fcm_token' => 'required|string'
-    ]);
+    {
+        $request->validate([
+            'fcm_token' => 'required|string'
+        ]);
 
-    $user = Auth::user(); // Asumsi user sudah terautentikasi
-    if (!$user) {
-        return response()->json(['message' => 'User not authenticated'], 401);
+        $user = Auth::user();
+        if (!$user) {
+            return response()->json(['message' => 'User not authenticated'], 401);
+        }
+
+        $user->fcm_token = $request->fcm_token;
+        $user->save();
+
+        return response()->json(['message' => 'FCM token successfully updated'], 200);
     }
 
-    $user->fcm_token = $request->fcm_token;
-    $user->save();
-
-    return response()->json(['message' => 'FCM token successfully updated'], 200);
-}
-
+    public function getPhoneByUsername(Request $request)
+    {
+        $username = $request->input('username');
+        
+        // Mencari user berdasarkan username
+        $user = User::where('username', $username)->first();
+        
+        if ($user) {
+            // Cari nomor telepon di tabel merchants (berdasarkan relasi user_id)
+            $merchant = Merchant::where('user_id', $user->id)->first();
+            
+            if ($merchant && $merchant->phone) {
+                return response()->json([
+                    'status' => 'success',
+                    'phone' => $merchant->phone
+                ]);
+            }
+            
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Nomor telepon tidak ditemukan'
+            ], 404);
+        }
+        
+        return response()->json([
+            'status' => 'error',
+            'message' => 'User tidak ditemukan'
+        ], 404);
+    }    
 }

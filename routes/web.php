@@ -19,6 +19,7 @@ Route::get('/', function () {
 
 Route::get('/login', 'AuthController@login')->name('login');
 Route::post('/login', 'AuthController@doLogin');
+Route::post('//get-phone-by-username', 'AuthController@getPhoneByUsername')->name('getPhoneByUsername');;
 
 Route::group(['middleware' => ['auth']], function () {
     Route::get('/logout', 'AuthController@logout')->name('logout');
