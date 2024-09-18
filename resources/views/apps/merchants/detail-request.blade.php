@@ -223,7 +223,15 @@
                         <div class="form-group row">
                             <div class="col-sm-12 text-right">
                                 <button type="button" class="btn btn-secondary" id="prevBtn2">Previous</button>
-                                <button type="submit" class="btn btn-primary">Submit</button>
+                                <form id="actionForm" method="POST" class="d-inline">
+                                    @csrf
+                                    <input type="hidden" name="agen_id" value="{{ $merchant->id }}">
+                                    <input type="hidden" name="action" id="formAction">
+
+                                    <button type="button" id="approve" class="btn btn-success">
+                                        Approve
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -259,6 +267,13 @@
 
 @section('bottom-js')
     <script>
+        document.getElementById('approve').addEventListener('click', function() {
+            if (confirm('Apakah Anda yakin akan mengaktivasi agen ini?')) {
+                document.getElementById('formAction').value = 'activate';
+                document.getElementById('actionForm').action = "{{ route('agen_activate', ['id' => $merchant->id]) }}";
+                document.getElementById('actionForm').submit();
+            }
+        });
         document.getElementById('nextBtn').addEventListener('click', function () {
             document.getElementById('step1').style.display = 'none';
             document.getElementById('step2').style.display = 'block';

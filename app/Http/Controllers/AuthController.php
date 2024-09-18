@@ -458,7 +458,7 @@ class AuthController extends Controller
         $request->validate([
             'username' => 'required|string',
             'old_password' => 'required|string',
-            'new_password' => 'required|string|min:8',
+            'new_password' => 'required|string',
         ]);
 
         // Cari user berdasarkan username

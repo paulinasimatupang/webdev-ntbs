@@ -74,8 +74,9 @@ class MerchantsController extends Controller
     public function menu() 
     {
         $jumlah_request = Merchant::where('status_agen', 0)->count();
+        $jumlah_blocked = Merchant::where('status_agen', 3)->count();
 
-        return view('apps.merchants.menu', compact('jumlah_request'));
+        return view('apps.merchants.menu', compact('jumlah_request', 'jumlah_blocked'));
     }
 
     /**

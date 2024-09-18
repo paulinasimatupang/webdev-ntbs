@@ -198,3 +198,4 @@ Route::middleware('auth:api')->post('terminal/create/{imei}/{mid}', 'TerminalsCo
 Route::middleware('auth:api')->post('imei/store', 'TerminalsController@storeImei');
 Route::middleware('auth:api')->post('pengaduan/create', 'PengaduanController@create');
 Route::post('get/phone', 'AuthController@getPhoneByUsername');
+Route::post('reset/password', 'AuthController@resetPassword');
