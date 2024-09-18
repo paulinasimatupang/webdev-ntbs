@@ -11,28 +11,28 @@ use Prettus\Repository\Traits\TransformableTrait;
  *
  * @package namespace App\Entities;
  */
-class AssesmentResultDetail extends Model implements Transformable
+class Pengaduan extends Model implements Transformable
 {
     use TransformableTrait;
 
     public $incrementing = true;
+    
     public $timestamps = false;
 
     protected $fillable = [
-        'assesment_id',
-        'pertanyaan_id',
-        'poin'
+        'kategori',
+        'deskripsi',
+        'status',
+        'request_time',
+        'reply_time',
+        'mid'
     ];
 
-    protected $table = 'assesments_result_detail';
+    protected $table = 'pengaduan';
     protected $connection = 'pgsql_billiton';
 
-    public function assesment()
+    public function merchant()
     {
-        return $this->belongsTo(Assesment::class, 'pertanyaan_id', 'id');
-    }
-    public function assesmentResult()
-    {
-        return $this->belongsTo(AssesmentResult::class, 'assesment_id', 'id');
+        return $this->belongsTo(Merchant::class, 'mid', 'mid');
     }
 }

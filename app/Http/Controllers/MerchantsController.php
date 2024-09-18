@@ -624,11 +624,24 @@ class MerchantsController extends Controller
         $merchant = Merchant::find($id);
         if($merchant){
             $user = User::find($merchant->user_id);
-            return view('apps.merchants.edit')
-                ->with('merchant', $merchant)
-                ->with('user', $user);
+            $provinsi = CompOption::where('comp_id', 'CIF14')
+                    ->orderBy('opt_label')
+                    ->get();
+                    
+            $kota_kabupaten = CompOption::where('comp_id', 'CIF13')
+                        ->orderBy('opt_label')
+                        ->get();
+
+            $provinsi = $provinsi->sortBy(function($item) {
+                return $item->opt_label === 'Lain-Lain' ? 'zzzz' : $item->opt_label;
+            });
+
+            $kota_kabupaten = $kota_kabupaten->sortBy(function($item) {
+                return $item->opt_label === 'Lain-Lain' ? 'zzzz' : $item->opt_label;
+            });
+            return view('apps.merchants.edit', compact('merchant', 'kota_kabupaten', 'provinsi', 'user'));
         }else{
-            return Redirect::to('terminal')
+            return Redirect::to('agen')
                             ->with('error', 'Data not found');
         }
     }
@@ -636,13 +649,31 @@ class MerchantsController extends Controller
     public function detail_request($id)
     {
         $merchant = Merchant::find($id);
-        if($merchant){
-            $user = User::find($merchant->user_id);
-            return view('apps.merchants.detail-request')
-                ->with('merchant', $merchant)
-                ->with('user', $user);
-        }else{
-            return Redirect::to('agen_request')
+
+        if ($merchant) {
+            $user = $merchant->user;
+
+            $assesmentResult = $merchant->assesmentResult;
+
+            if ($assesmentResult) {
+                $assesmentDetails = AssesmentResultDetail::with('assesment')
+                    ->where('assesment_id', $assesmentResult->id)
+                    ->get();
+
+                $totalPoints = $assesmentDetails->sum('poin');
+
+                return view('apps.merchants.detail-request')
+                    ->with('merchant', $merchant)
+                    ->with('user', $user)
+                    ->with('assesmentResult', $assesmentResult)
+                    ->with('assesmentDetails', $assesmentDetails)
+                    ->with('totalPoints', $totalPoints);
+            } else {
+                return redirect()->to('agen_request')
+                                ->with('error', 'Assesment result not found');
+            }
+        } else {
+            return redirect()->to('agen_request')
                             ->with('error', 'Data not found');
         }
     }

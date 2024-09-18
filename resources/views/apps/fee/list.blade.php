@@ -49,6 +49,7 @@
                         <thead>
                             <tr>
                                 <th scope="col">No</th>
+                                <th scope="col">Service</th>
                                 <th scope="col">Fitur</th>
                                 <th scope="col">Nominal</th>
                                 <th scope="col">Action</th>
@@ -59,8 +60,10 @@
                             @foreach($groups as $group)
                                 <tr>
                                     <th scope="row">{{ $no }}</th>
+                                    <td>{{  $group->service_id  }}</td>
                                     <td>{{ str_replace(['Review', 'OTP'], '', $group->service->service_name) }}</td>
                                     <td>{{ $group->meta_default }}</td>
+                                    <td>{{  $group->influx  }}</td>
                                     <td>
                                         @if (in_array('fee_edit', $routes_user))
                                             <a
