@@ -411,10 +411,10 @@ class AuthController extends Controller
             'fcm_token' => 'required|string'
         ]);
 
-    $user = Auth::user(); // Asumsi user sudah terautentikasi
-    if (!$user) {
-        return response()->json(['message' => 'User not authenticated'], 401);
-    }
+        $user = Auth::user(); // Asumsi user sudah terautentikasi
+        if (!$user) {
+            return response()->json(['message' => 'User not authenticated'], 401);
+        }
 
         $user->fcm_token = $request->fcm_token;
         $user->save();
@@ -425,30 +425,68 @@ class AuthController extends Controller
     public function getPhoneByUsername(Request $request)
     {
         $username = $request->input('username');
-        
+
         // Mencari user berdasarkan username
         $user = User::where('username', $username)->first();
-        
+
         if ($user) {
             // Cari nomor telepon di tabel merchants (berdasarkan relasi user_id)
             $merchant = Merchant::where('user_id', $user->id)->first();
-            
+
             if ($merchant && $merchant->phone) {
                 return response()->json([
                     'status' => 'success',
                     'phone' => $merchant->phone
                 ]);
             }
-            
+
             return response()->json([
                 'status' => 'error',
                 'message' => 'Nomor telepon tidak ditemukan'
             ], 404);
         }
-        
+
         return response()->json([
             'status' => 'error',
             'message' => 'User tidak ditemukan'
         ], 404);
-    }    
+    }
+
+    public function resetPassword(Request $request)
+    {
+        // Validasi input
+        $request->validate([
+            'username' => 'required|string',
+            'old_password' => 'required|string',
+            'new_password' => 'required|string|min:8',
+        ]);
+
+        // Cari user berdasarkan username
+        $user = User::where('username', $request->username)->first();
+
+        // Jika user tidak ditemukan
+        if (!$user) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Username tidak ditemukan.',
+            ], 404);
+        }
+
+        // Periksa apakah password lama benar
+        if (!Hash::check($request->old_password, $user->password)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Password lama salah.',
+            ], 400);
+        }
+
+        // Ubah password user
+        $user->password = Hash::make($request->new_password);
+        $user->save();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Password berhasil diperbarui.',
+        ], 200);
+    }
 }
