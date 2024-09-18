@@ -21,6 +21,7 @@ class Pengaduan extends Model implements Transformable
 
     protected $fillable = [
         'kategori',
+        'judul',
         'deskripsi',
         'status',
         'request_time',

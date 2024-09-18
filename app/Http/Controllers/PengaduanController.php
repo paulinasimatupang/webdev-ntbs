@@ -279,6 +279,7 @@ class PengaduanController extends Controller
             $pengaduan = new Pengaduan();
             $pengaduan->mid = $request->mid;
             $pengaduan->kategori = $request->kategori;
+            $pengaduan->judul = $request->judul;
             $pengaduan->deskripsi = $request->deskripsi;
             $pengaduan->status = 0; 
             $pengaduan->request_time = now(); 
