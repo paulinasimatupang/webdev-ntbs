@@ -18,8 +18,8 @@ class FeeController extends Controller
         try {
             $username = auth()->user()->username; 
 
-           $groups = ServiceMeta::where('meta_id', 'fee')
-                ->whereIn('influx', [2,3,5])
+            $groups = ServiceMeta::where('meta_id', 'fee')
+                // ->whereIn('influx', [3,2,5])
                 ->with('service') 
                 ->orderBy('service_id') 
                 ->get();
@@ -29,7 +29,6 @@ class FeeController extends Controller
                 'influx_values' => [3],
                 'total_groups' => $groups->count(),
             ]);
-
 
             return view('apps.fee.list', compact('groups', 'username'));
         } catch (Exception $e) {
@@ -83,14 +82,15 @@ class FeeController extends Controller
         }
     }
 
-    public function edit($meta_id, $service_id, $seq)
+    public function edit($meta_id, $service_id, $seq, $influx)
     {
         try {
             // Mengambil data dengan ketiga kunci
             $group = ServiceMeta::where([
                 ['meta_id', $meta_id],
                 ['service_id', $service_id],
-                ['seq', $seq]
+                ['seq', $seq],
+                ['influx', $influx]
             ])->firstOrFail();
 
             return view('apps.fee.edit', compact('group'));
@@ -100,7 +100,7 @@ class FeeController extends Controller
         }
     }
 
-    public function update(Request $request, $meta_id, $service_id, $seq)
+    public function update(Request $request, $meta_id, $service_id, $seq, $influx)
     {
         DB::beginTransaction();
         try {
@@ -109,12 +109,11 @@ class FeeController extends Controller
                 'meta_default' => 'nullable|string',
             ]);
 
-            // Update meta_default untuk influx 3
             $updated = DB::connection('pgsql_billiton')->table('service_meta')
                 ->where('meta_id', '=', $meta_id)
                 ->where('service_id', '=', $service_id)
                 ->where('seq', '=', $seq)
-                ->where('influx', '=', 3)
+                ->where('influx', '=', $influx)
                 ->update([
                     'meta_default' => $request->input('meta_default'),
                 ]);
@@ -127,11 +126,10 @@ class FeeController extends Controller
             DB::connection('pgsql_billiton')->table('service_meta')
                 ->where('meta_id', '=', $meta_id)
                 ->where('service_id', '=', $service_id)
-                ->where('influx', '=', 5)
+                ->whereIn('influx', [1, 2, 3,4, 5])
                 ->update([
                     'meta_default' => $request->input('meta_default'),
                 ]);
-
             DB::commit();
             return redirect()->route('fee')->with('success', 'Data berhasil diperbarui.');
         } catch (Exception $e) {

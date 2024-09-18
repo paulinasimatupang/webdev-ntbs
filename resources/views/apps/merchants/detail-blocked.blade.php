@@ -24,18 +24,13 @@
                 <!-- Konten detail merchant -->
                 @csrf
                 <div class="form-group row">
-                    <label class="col-sm-2 col-form-label">Kode Agen</label>
-                    <div class="col-sm-10">
-                        <p class="form-control-static">{{ $merchant->mid }}</p>
-                    </div>
-                </div>
-
-                <div class="form-group row">
-                    <label class="col-sm-2 col-form-label">Jenis Agen</label>
-                    <div class="col-sm-10">
-                        <p class="form-control-static">{{ $merchant->option == 'Agen Individu' ? 'Agen Individu' : 'Agen Badan Hukum' }}</p>
-                    </div>
-                </div>
+                            <label class="col-sm-2 col-form-label">Jenis Agen</label>
+                            <div class="col-sm-10">
+                                <p class="form-control-static">
+                                    {{ $merchant->jenis_agen == 'Agen Individu' ? 'Agen Individu' : 'Agen Badan Hukum' }}
+                                </p>
+                            </div>
+                        </div>
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label">Nomor Perjanjian Kerjasama</label>
                             <div class="col-sm-10">
@@ -155,8 +150,8 @@
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label" for="file_ktp">KTP</label>
                             @if(isset($merchant) && $merchant->file_ktp)
-                            <div class="col-sm-10">
-                                <a href="{{ asset('uploads/' . $merchant->file_ktp) }}" target="_blank">Lihat File NPWP</a>
+                            <div class="mb-2">
+                                <a href="{{ asset('uploads/' . $merchant->file_ktp) }}" target="_blank">Lihat File KTP</a>
                             </div>
                             @endif
                         </div>
@@ -164,7 +159,7 @@
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label" for="file_npwp">NPWP</label>
                             @if(isset($merchant) && $merchant->file_npwp)
-                            <div class="col-sm-10">
+                            <div class="mb-2">
                                 <a href="{{ asset('uploads/' . $merchant->file_npwp) }}" target="_blank">Lihat File NPWP</a>
                             </div>
                             @endif
@@ -173,14 +168,14 @@
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label" for="foto_lokasi_usaha">Foto Lokasi Usaha</label>
                             @if(isset($merchant) && $merchant->foto_lokasi_usaha)
-                            <div class="col-sm-10">
-                                <a href="{{ asset('uploads/' . $merchant->foto_lokasi_usaha) }}" target="_blank">Lihat File NPWP</a>
+                            <div class="mb-2">
+                                <a href="{{ asset('uploads/' . $merchant->foto_lokasi_usaha) }}" target="_blank">Lihat Foto Lokasi Usaha</a>
                             </div>
                             @endif
                         </div>
                 <div class="form-group row">
                     <div class="col-sm-12 text-right">
-                        <a href="{{ route('agen_request') }}" class="btn btn-primary">Back</a>
+                        <a href="{{ route('agen_blocked') }}" class="btn btn-primary">Back</a>
                         <form id="actionForm" method="POST" class="d-inline">
                             @csrf
                             <input type="hidden" name="agen_id" value="{{ $merchant->id }}">

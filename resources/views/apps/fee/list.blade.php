@@ -52,6 +52,7 @@
                                 <th scope="col">Service</th>
                                 <th scope="col">Fitur</th>
                                 <th scope="col">Nominal</th>
+                                <th scope="col">Influx</th>
                                 <th scope="col">Action</th>
                             </tr>
                         </thead>
@@ -67,7 +68,7 @@
                                     <td>
                                         @if (in_array('fee_edit', $routes_user))
                                             <a
-                                                href="{{ route('fee_edit', ['meta_id' => $group->meta_id, 'service_id' => $group->service_id, 'seq' => $group->seq]) }}">
+                                                href="{{ route('fee_edit', ['meta_id' => $group->meta_id, 'service_id' => $group->service_id, 'seq' => $group->seq, 'influx' => $group->influx]) }}">
                                                 <button class="btn btn-edit ripple btn-sm m-1 edit-btn"
                                                     type="button">Edit</button>
                                             </a>

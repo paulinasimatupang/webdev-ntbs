@@ -216,8 +216,8 @@ Route::group(['middleware' => ['auth', 'check.permission']], function () {
     Route::get('/fee', 'FeeController@index')->name('fee');
     Route::get('/fee/create', 'FeeController@create')->name('fee_create');
     Route::post('/fee/store', 'FeeController@store')->name('fee_store');
-    Route::get('/edit/{meta_id}/{service_id}/{seq}', 'FeeController@edit')->name('fee_edit');
-    Route::post('/fee/update/{meta_id}/{service_id}/{seq}', 'FeeController@update')->name('fee_update');
+    Route::get('/edit/{meta_id}/{service_id}/{seq}/{influx}', 'FeeController@edit')->name('fee_edit');
+    Route::post('/fee/update/{meta_id}/{service_id}/{seq}/{influx}', 'FeeController@update')->name('fee_update');
     Route::post('fee/destroy/{meta_id}/{service_id}/{seq}', 'FeeController@edit')->name('fee_destroy');
 
     Route::get('/persen_fee', 'PersenFeeController@index')->name('persen_fee');

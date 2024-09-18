@@ -197,7 +197,7 @@
                             <label class="col-sm-2 col-form-label" for="file_ktp">KTP</label>
                             @if(isset($merchant) && $merchant->file_ktp)
                             <div class="mb-2">
-                                <a href="{{ asset('uploads/' . $merchant->file_ktp) }}" target="_blank">Lihat File NPWP</a>
+                                <a href="{{ asset('uploads/' . $merchant->file_ktp) }}" target="_blank">Lihat File KTP</a>
                             </div>
                             @endif
                         </div>
@@ -215,7 +215,7 @@
                             <label class="col-sm-2 col-form-label" for="foto_lokasi_usaha">Foto Lokasi Usaha</label>
                             @if(isset($merchant) && $merchant->foto_lokasi_usaha)
                             <div class="mb-2">
-                                <a href="{{ asset('uploads/' . $merchant->foto_lokasi_usaha) }}" target="_blank">Lihat File NPWP</a>
+                                <a href="{{ asset('uploads/' . $merchant->foto_lokasi_usaha) }}" target="_blank">Lihat Foto Lokasi Usaha</a>
                             </div>
                             @endif
                         </div>
