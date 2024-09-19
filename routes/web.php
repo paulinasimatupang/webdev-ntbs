@@ -20,6 +20,7 @@ Route::get('/', function () {
 
 Route::get('/login', 'AuthController@login')->name('login');
 Route::post('/login', 'AuthController@doLogin');
+Route::post('//get-phone-by-username', 'AuthController@getPhoneByUsername')->name('getPhoneByUsername');;
 
 Route::group(['middleware' => ['auth']], function () {
     Route::get('/logout', 'AuthController@logout')->name('logout');
@@ -163,7 +164,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::view('others/search-result', 'others.search-result')->name('search-result');
     // Auth::routes();
     Route::get('/home', 'HomeController@index')->name('home');
-    
+
     Route::get('/users/menu', 'UserController@menu')->name('users.menu');
 });
 
@@ -175,7 +176,7 @@ Route::group(['middleware' => ['auth', 'check.permission']], function () {
     Route::get('/users/{user}/edit', 'UserController@edit')->name('users.edit');
     Route::put('/users/{user}', 'UserController@update')->name('users.update');
     Route::post('/users/{user}/destroy', 'UserController@destroy')->name('users.destroy');
-    
+
     Route::get('/users/request', 'UserController@request_list')->name('users.list-request');
     Route::get('/users/detail/{id}', 'UserController@detail_request')->name('users.detail');
     Route::post('/users/accept/{id}', 'UserController@acceptUser')->name('users.accept');
@@ -191,6 +192,9 @@ Route::group(['middleware' => ['auth', 'check.permission']], function () {
     Route::post('/terminal/{id}/{merchant_id}/delete', 'TerminalsController@deleteMerchantData')->name('terminal_delete');
     Route::get('/terminal/{id}/activateBilliton', 'TerminalsController@activateBilliton')->name('terminal_activate_billiton');
     Route::get('/terminal/{id}/updateBilliton', 'TerminalsController@updateBilliton')->name('terminal_update_billiton');
+    Route::get('/terminal/request', 'TerminalsController@list_request')->name('imei_request');
+    Route::get('/imei/accept/{id}', 'TerminalsController@acceptChangeImei')->name('imei_accept');
+    Route::get('/imei/reject/{id}', 'TerminalsController@rejectChangeImei')->name('imei_reject');
 
     Route::get('/transaction', 'TransactionsController@index')->name('transaction');
     Route::get('/transaction_log/edit/{stan}', 'TransactionLogController@edit')->name('transactionlog_edit');
@@ -207,14 +211,14 @@ Route::group(['middleware' => ['auth', 'check.permission']], function () {
 
     Route::get('/transaction/reversal', 'TransactionsController@reversal');
     Route::get('/transaction/reversal/{additional_data}', 'TransactionsController@postReversal')->name('transaction_postReversal');
-    
+
     Route::get('/transaction/fee', 'TransactionsController@reportFee')->name('transaction_fee');
 
     Route::get('/fee', 'FeeController@index')->name('fee');
     Route::get('/fee/create', 'FeeController@create')->name('fee_create');
     Route::post('/fee/store', 'FeeController@store')->name('fee_store');
-    Route::get('/edit/{meta_id}/{service_id}/{seq}', 'FeeController@edit')->name('fee_edit');
-    Route::post('/fee/update/{meta_id}/{service_id}/{seq}', 'FeeController@update')->name('fee_update');
+    Route::get('/edit/{meta_id}/{service_id}/{seq}/{influx}', 'FeeController@edit')->name('fee_edit');
+    Route::post('/fee/update/{meta_id}/{service_id}/{seq}/{influx}', 'FeeController@update')->name('fee_update');
     Route::post('fee/destroy/{meta_id}/{service_id}/{seq}', 'FeeController@edit')->name('fee_destroy');
 
     Route::get('/persen_fee', 'PersenFeeController@index')->name('persen_fee');
@@ -310,6 +314,23 @@ Route::group(['middleware' => ['auth', 'check.permission']], function () {
     Route::get('/branch/edit{id}', 'BranchController@edit')->name('branch_edit');
     Route::post('/branch/update/{id}', 'BranchController@update')->name('branch_update');
     Route::post('/branch/destroy{id}', 'BranchController@destroy')->name('branch_destroy');
+
+    Route::get('/assesment', 'AssesmentController@index')->name('assesment');
+    Route::get('/assesment/create', 'AssesmentController@create')->name('assesment_create');
+    Route::post('/assesment/store', 'AssesmentController@store')->name('assesment_store');
+    Route::get('/assesment/edit{id}', 'AssesmentController@edit')->name('assesment_edit');
+    Route::post('/assesment/update/{id}', 'AssesmentController@update')->name('assesment_update');
+    Route::post('/assesment/destroy{id}', 'AssesmentController@destroy')->name('assesment_destroy');
+
+    Route::get('/pengaduan', 'PengaduanController@menu')->name('pengaduan');
+    Route::get('/pengaduan/pending', 'PengaduanController@list_pending')->name('pengaduan_pending');
+    Route::get('/pengaduan/process', 'PengaduanController@list_process')->name('pengaduan_process');
+    Route::get('/pengaduan/resolved', 'PengaduanController@list_resolved')->name('pengaduan_resolved');
+    Route::get('/pengaduan/detail/pending/{id}', 'PengaduanController@detail_pending')->name('pengaduan_detail_pending');
+    Route::get('/pengaduan/detail/process/{id}', 'PengaduanController@detail_process')->name('pengaduan_detail_process');
+    Route::get('/pengaduan/detail/resolved/{id}', 'PengaduanController@detail_resolved')->name('pengaduan_detail_resolved');
+    Route::post('/pengaduan/process/{id}', 'PengaduanController@onProcessRequest')->name('pengaduan_process');
+    Route::post('/pengaduan/resolved/{id}', 'PengaduanController@resolvedRequest')->name('pengaduan_resolved');
 });
 
 Route::post('/send-test-notif', 'DataCalonNasabahController@sendTestNotification')->name('send_test_notification');

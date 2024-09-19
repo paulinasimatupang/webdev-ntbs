@@ -30,6 +30,10 @@ use App\Entities\Terminal;
 use App\Entities\Group;
 use App\Entities\TerminalBilliton;
 use App\Entities\UserGroup;
+use App\Entities\Assesment;
+use App\Entities\AssesmentResult;
+use App\Entities\AssesmentResultDetail;
+use App\Entities\CompOption;
 use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade as Pdf;
 
@@ -67,9 +71,12 @@ class MerchantsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function menu()
+    public function menu() 
     {
-        return view('apps.merchants.menu');
+        $jumlah_request = Merchant::where('status_agen', 0)->count();
+        $jumlah_blocked = Merchant::where('status_agen', 3)->count();
+
+        return view('apps.merchants.menu', compact('jumlah_request', 'jumlah_blocked'));
     }
 
     /**
@@ -257,6 +264,73 @@ class MerchantsController extends Controller
         return view('apps.merchants.inquiry-rek');
     }
 
+    public function cek_saldo($norek, $nama){
+        $terminal = '353471045058692';
+        $dateTime = date("YmdHms");
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, "http://108.137.154.8:8080/ARRest/api/");
+        $data = json_encode([
+            'msg'=>([
+            'msg_id' =>  "$terminal$dateTime",
+            'msg_ui' => "$terminal",
+            'msg_si' => 'N00001',
+            'msg_dt' => 'admin|'. $norek .'|'. $nama .'|null'
+            ])
+        ]);
+       
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: text/plain'
+        ]);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+
+        $output = curl_exec($ch);
+        $err = curl_error($ch);
+        $info = curl_getinfo($ch);
+        curl_close($ch);
+
+        Log::info('cURL Request URL: '  . $info['url']);
+        Log::info('cURL Request Data: ' . $data);
+        Log::info('cURL Response: ' . $output);
+
+        $match = false;
+
+        $responseArray = json_decode($output, true);
+        
+        $prodId = null;
+
+        if ($err) {
+            Log::error('cURL Error: ' . $err);
+        } else {
+            if (isset($responseArray['screen']['comps']['comp'])) {
+                foreach ($responseArray['screen']['comps']['comp'] as $comp) {
+                    if (isset($comp['comp_values']['comp_value'][0]['value'])) {
+                        $value = $comp['comp_values']['comp_value'][0]['value'];
+                        if ($value !== 'null' && $value !== null) {
+                            switch ($comp['comp_lbl']) {
+                                case 'ProdID':
+                                    $prodId = $value;
+                                    break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if ($prodId === '36'){
+            return "Nomor Rekening yang Anda Masukkan Tidak Dapat Didaftarkan Sebagai Agen";
+        }
+        else if (isset($responseArray['screen']['title']) && $responseArray['screen']['title'] === 'Gagal') {
+            return  "Pengecekan Rekening Gagal";
+        }
+        else {
+            return true;
+        }
+    }
+
     public function store_inquiry_rek(Request $request)
     {
         $rek = $request->input('rek');
@@ -324,7 +398,8 @@ class MerchantsController extends Controller
         
                                 case 'Nomor Rekening':
                                     $norek = $value;
-                                    $match = Merchant::where('no', $norek)->exists();
+                                    // $match = Merchant::where('no', $norek)->exists();
+                                    $match=null;
                                     break;
         
                                 case 'Nomor Handphone':
@@ -345,18 +420,43 @@ class MerchantsController extends Controller
                             ->with('error', "No Rekening Belum Terdaftar")
                             ->withInput();
         } else {
+            $cekSaldoResult = $this->cek_saldo($norek, $nama_rek);
+            if ($cekSaldoResult !== true) {
+                return Redirect::to('/agen/create/inquiry')->with('error', $cekSaldoResult)->withInput();
+            }
+
             return Redirect::to('/agen/create')
-                            ->with('no_cif', $cifid)
-                            ->with('fullname', $nama_rek)
-                            ->with('address', $alamat)
-                            ->with('no', $norek)
-                            ->with('phone', $no_hp);
+            ->with('no_cif', $cifid)
+            ->with('fullname', $nama_rek)
+            ->with('address', $alamat)
+            ->with('no', $norek)
+            ->with('phone', $no_hp);
         }
     }
 
-    public function create(Request $request){
-        return view('apps.merchants.add');
+    public function create(Request $request)
+    {
+        $assessments = Assesment::all();
+        
+        $provinsi = CompOption::where('comp_id', 'CIF14')
+                    ->orderBy('opt_label')
+                    ->get();
+                    
+        $kota_kabupaten = CompOption::where('comp_id', 'CIF13')
+                    ->orderBy('opt_label')
+                    ->get();
+
+        $provinsi = $provinsi->sortBy(function($item) {
+            return $item->opt_label === 'Lain-Lain' ? 'zzzz' : $item->opt_label;
+        });
+
+        $kota_kabupaten = $kota_kabupaten->sortBy(function($item) {
+            return $item->opt_label === 'Lain-Lain' ? 'zzzz' : $item->opt_label;
+        });
+
+        return view('apps.merchants.add', compact('assessments', 'kota_kabupaten', 'provinsi'));
     }
+
 
     /**
      * Store a newly created resource in storage.
@@ -387,20 +487,22 @@ class MerchantsController extends Controller
                     ->with('error', 'Role Tidak Ditemukan')
                     ->withInput();
                 }
-
+                
+                $user_login = session()->get('user');
                 
                 $user = User::create([
                                 'role_id'           => $role_id,
                                 'fullname'          => $request->fullname,
                                 'email'             => $request->email,
+                                'branchid'          => $user_login->branchid,
                                 'status'            => 0
                             ]);
 
                 $uploadPath = public_path('uploads/');
                 $filePaths = [
                     'file_ktp' => null,
-                    'file_kk' => null,
-                    'file_npwp' => null
+                    'file_npwp' => null,
+                    'foto_lokasi_usaha' => null
                 ];
 
                 foreach ($filePaths as $fileKey => &$filePath) {
@@ -425,15 +527,14 @@ class MerchantsController extends Controller
                 }
 
 
-                $reqData = $request->except(['file_ktp', 'file_kk', 'file_npwp']); 
+                $reqData = $request->except(['file_ktp', 'foto_lokasi_usaha', 'file_npwp']); 
                 $reqData['user_id'] = $user->id;
                 $reqData['name']    = $user->fullname;
                 $reqData['status_agen']    = 0;
                 $reqData['file_ktp'] = $filePaths['file_ktp'];
-                $reqData['file_kk'] = $filePaths['file_kk'];
+                $reqData['foto_lokasi_usaha'] = $filePaths['foto_lokasi_usaha'];
                 $reqData['file_npwp'] = $filePaths['file_npwp'];
-                $reqData['active_at'] =now();
-
+                $reqData['tgl_perjanjian'] =now();
                 $data   = $this->repository->create($reqData);
 
                 $checkGroup = Group::where('name','Agen')->first();
@@ -441,13 +542,40 @@ class MerchantsController extends Controller
                     $checkUG = UserGroup::where('user_id',$user->id)
                                         ->where('group_id',$checkGroup->id)
                                         ->first();
-                    if(!$checkGroup){
+                    if(!$checkUG){
                         $userGroup = UserGroup::create([
                             'user_id'   => $user->id,
                             'group_id'  => $checkGroup->id
                         ]);
                     }
                 }
+
+                $assesmentResult = AssesmentResult::create([
+                    'user_id'   => $user->id,
+                    'catatan'   => $request->catatan,
+                    'total_poin' => 0,
+                ]);
+
+                $totalPoin = 0;
+
+                foreach ($request->answer as $pertanyaan_id  => $answer) {
+                    $assesment = Assesment::find($pertanyaan_id );
+
+                    if ($answer === 'yes') {
+                        $poin = $assesment->poin;
+                        $totalPoin += $poin;
+                    } else {
+                        $poin = 0;
+                    }
+
+                    AssesmentResultDetail::create([
+                        'assesment_id'  => $assesmentResult->id,
+                        'pertanyaan_id' => $assesment->id,
+                        'poin'          => $poin,
+                    ]);
+                }
+
+                $assesmentResult->update(['total_poin' => $totalPoin]);
 
                 DB::commit();
                 return Redirect::to('agen')
@@ -497,11 +625,24 @@ class MerchantsController extends Controller
         $merchant = Merchant::find($id);
         if($merchant){
             $user = User::find($merchant->user_id);
-            return view('apps.merchants.edit')
-                ->with('merchant', $merchant)
-                ->with('user', $user);
+            $provinsi = CompOption::where('comp_id', 'CIF14')
+                    ->orderBy('opt_label')
+                    ->get();
+                    
+            $kota_kabupaten = CompOption::where('comp_id', 'CIF13')
+                        ->orderBy('opt_label')
+                        ->get();
+
+            $provinsi = $provinsi->sortBy(function($item) {
+                return $item->opt_label === 'Lain-Lain' ? 'zzzz' : $item->opt_label;
+            });
+
+            $kota_kabupaten = $kota_kabupaten->sortBy(function($item) {
+                return $item->opt_label === 'Lain-Lain' ? 'zzzz' : $item->opt_label;
+            });
+            return view('apps.merchants.edit', compact('merchant', 'kota_kabupaten', 'provinsi', 'user'));
         }else{
-            return Redirect::to('terminal')
+            return Redirect::to('agen')
                             ->with('error', 'Data not found');
         }
     }
@@ -509,13 +650,31 @@ class MerchantsController extends Controller
     public function detail_request($id)
     {
         $merchant = Merchant::find($id);
-        if($merchant){
-            $user = User::find($merchant->user_id);
-            return view('apps.merchants.detail-request')
-                ->with('merchant', $merchant)
-                ->with('user', $user);
-        }else{
-            return Redirect::to('agen_request')
+
+        if ($merchant) {
+            $user = $merchant->user;
+
+            $assesmentResult = $merchant->assesmentResult;
+
+            if ($assesmentResult) {
+                $assesmentDetails = AssesmentResultDetail::with('assesment')
+                    ->where('assesment_id', $assesmentResult->id)
+                    ->get();
+
+                $totalPoints = $assesmentDetails->sum('poin');
+
+                return view('apps.merchants.detail-request')
+                    ->with('merchant', $merchant)
+                    ->with('user', $user)
+                    ->with('assesmentResult', $assesmentResult)
+                    ->with('assesmentDetails', $assesmentDetails)
+                    ->with('totalPoints', $totalPoints);
+            } else {
+                return redirect()->to('agen_request')
+                                ->with('error', 'Assesment result not found');
+            }
+        } else {
+            return redirect()->to('agen_request')
                             ->with('error', 'Data not found');
         }
     }
@@ -665,6 +824,8 @@ class MerchantsController extends Controller
                 $merchant->mid = $newMid;
                 $merchant->pin = $generatePin;
                 $merchant->status_agen = 1;
+                $merchant->active_at = now();
+                $merchant->tgl_pelaksanaan = now();
                 $merchant->save();
 
                 $user = User::where('id', $merchant->user_id)->first();

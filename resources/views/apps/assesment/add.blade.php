@@ -1,7 +1,7 @@
 @extends('layouts.master')
 @section('main-content')
     <div class="breadcrumb">
-                <h1>Inquiry CIF By No Rekening</h1>
+                <h1>Add Pertanyaan Assesment</h1>
             </div>
             <div class="separator-breadcrumb border-top"></div>
 
@@ -15,20 +15,27 @@
                 <div class="col-md-12">
                     <div class="card mb-5">
                         <div class="card-body">
-                            <form action="{{route('agen_store_inquiry_rek')}}" method="POST">
+                            <form action="{{route('assesment_store')}}" method="POST">
                                 <div class="form-group row">
                                     <input name="_token" type="hidden" value="{{ csrf_token() }}"/>
-                                    <label class="col-sm-2 col-form-label">Nomor Rekening</label>
+                                    <label class="col-sm-2 col-form-label">Pertanyaan</label>
                                     <div class="col-sm-10">
-                                        <input type="text" class="form-control" value="{{Request::old('rek')}}" name="rek" placeholder="Nomor Rekening" required>
+                                        <input type="text" class="form-control" value="{{Request::old('pertanyaan')}}" name="pertanyaan" placeholder="Pertanyaan" required>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <input name="_token" type="hidden" value="{{ csrf_token() }}"/>
+                                    <label class="col-sm-2 col-form-label">Poin</label>
+                                    <div class="col-sm-10">
+                                        <input type="number" class="form-control" value="{{Request::old('poin')}}" name="poin" placeholder="Poin" required>
                                     </div>
                                 </div>
                                 <div class="form-group row">
                                     <div class="col-sm-12 text-right">
-                                        <a href="{{route('agen')}}">
+                                        <a href="{{route('assesment')}}">
                                             <button type="button" class="btn btn-primary">Back</button>
                                         </a>
-                                        <button type="submit" class="btn btn-primary">Inquiry</button>
+                                        <button type="submit" class="btn btn-primary">Save</button>
                                     </div>
                                 </div>
                             </form>

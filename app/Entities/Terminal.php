@@ -38,4 +38,9 @@ class Terminal extends Model implements Transformable
     {
         return $this->belongsTo(Merchant::class,'merchant_id','mid');
     }
+
+    public function imei()
+    {
+        return $this->hasOne(Imei::class, 'tid', 'tid');
+    }
 }

@@ -49,8 +49,10 @@
                         <thead>
                             <tr>
                                 <th scope="col">No</th>
+                                <th scope="col">Service</th>
                                 <th scope="col">Fitur</th>
                                 <th scope="col">Nominal</th>
+                                <th scope="col">Influx</th>
                                 <th scope="col">Action</th>
                             </tr>
                         </thead>
@@ -59,12 +61,14 @@
                             @foreach($groups as $group)
                                 <tr>
                                     <th scope="row">{{ $no }}</th>
+                                    <td>{{  $group->service_id  }}</td>
                                     <td>{{ str_replace(['Review', 'OTP'], '', $group->service->service_name) }}</td>
                                     <td>{{ $group->meta_default }}</td>
+                                    <td>{{  $group->influx  }}</td>
                                     <td>
                                         @if (in_array('fee_edit', $routes_user))
                                             <a
-                                                href="{{ route('fee_edit', ['meta_id' => $group->meta_id, 'service_id' => $group->service_id, 'seq' => $group->seq]) }}">
+                                                href="{{ route('fee_edit', ['meta_id' => $group->meta_id, 'service_id' => $group->service_id, 'seq' => $group->seq, 'influx' => $group->influx]) }}">
                                                 <button class="btn btn-edit ripple btn-sm m-1 edit-btn"
                                                     type="button">Edit</button>
                                             </a>

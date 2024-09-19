@@ -35,7 +35,8 @@ class User extends Authenticatable implements JWTSubject
         'password',
         'branchid',
         'status',
-        'fcm_token'
+        'fcm_token',
+        'finger_print'
 
     ];
     protected $table = 'users';

@@ -60,7 +60,10 @@ class DataCalonNasabahController extends Controller
      */
     public function index(Request $request)
     {
-        return view('apps.calon_nasabah.menu');
+        $jumlah_request = DataCalonNasabah::where('status', 0)->count();
+        $jumlah_approve = DataCalonNasabah::where('status', 1)->count();
+
+        return view('apps.calon_nasabah.menu', compact('jumlah_request', 'jumlah_approve'));
     }
 
     /**

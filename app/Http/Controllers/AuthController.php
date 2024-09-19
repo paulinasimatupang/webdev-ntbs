@@ -11,7 +11,7 @@ use JWTAuth;
 use Redirect;
 use Auth;
 
-use Illuminate\Http\Request; 
+use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Password;
 use App\Http\Requests;
@@ -79,12 +79,72 @@ class AuthController extends Controller
         }
     }
 
-    public function login(Request $request){
+
+    public function loginWithFingerprint(Request $request)
+    {
+        $fingerPrint = $request->get('finger_print');
+
+        if (empty($fingerPrint)) {
+            return response()->json(['status' => false, 'message' => 'Fingerprint is required'], 400);
+        }
+
+        $user = User::where('finger_print', $fingerPrint)->first();
+
+        if (!$user) {
+            return response()->json(['status' => false, 'message' => 'Fingerprint not recognized'], 404);
+        }
+
+        try {
+            $token = JWTAuth::fromUser($user);
+        } catch (JWTException $e) {
+            return response()->json(['status' => false, 'message' => 'Could not create token'], 500);
+        }
+
+        return response()->json(['status' => true, 'message' => 'Login successful', 'token' => $token, 'data' => $user], 200);
+    }
+    /**
+     * Simpan data fingerprint user baru
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function registerFingerprint(Request $request)
+    {
+        $fingerPrint = $request->get('finger_print');
+        $id = $request->get('id');
+
+        if (!$fingerPrint || !$id) {
+            return response()->json(['status' => false, 'message' => 'All fields are required'], 400);
+        }
+
+        $existingUser = User::where('id', $id)
+                            ->where('finger_print', $fingerPrint)
+                            ->first();
+
+        if ($existingUser) {
+            return response()->json(['status' => false, 'message' => 'Fingerprint already registered for this user'], 409);
+        }
+
+        $user = User::find($id);
+        if (!$user) {
+            return response()->json(['status' => false, 'message' => 'User not found'], 404);
+        }
+
+        $user->finger_print = $fingerPrint;
+        $user->save();
+
+        return response()->json(['status' => true, 'message' => 'Fingerprint registered successfully'], 200);
+    }
+
+
+
+
+    public function login(Request $request)
+    {
         $user = $request->session()->get('user');
         // return response()->json($user,200);
-        if($user){
+        if ($user) {
             return Redirect::to('landing');
-        }else{
+        } else {
             return view('sessions.signIn');
         }
     }
@@ -147,6 +207,9 @@ class AuthController extends Controller
             }
 
             $token = JWTAuth::attempt($credentials);
+
+            // Log the token
+            Log::info('Generated Token: ' . $token);
         } catch (JWTException $e) {
             if ($request->expectsJson()) {
                 return response()->json([
@@ -161,8 +224,8 @@ class AuthController extends Controller
         }
 
         $user = User::where('username', $credentials['username'])
-                    ->with('user_group.group', 'merchant.terminal')
-                    ->first();
+            ->with('user_group.group', 'merchant.terminal')
+            ->first();
 
         if ($request->expectsJson()) {
             return response()->json([
@@ -233,16 +296,16 @@ class AuthController extends Controller
                     DB::commit();
 
                     $response = [
-                        'status'  => true,
+                        'status' => true,
                         'message' => 'Password berhasil diubah.',
                     ];
-                    return response()->json($response, 200);            
+                    return response()->json($response, 200);
                 } else {
                     DB::rollBack();
 
                     $response = [
                         'status' => false,
-                        'error'  => 'Password lama salah. Mohon isi dengan password yang benar untuk mengubah password baru.',
+                        'error' => 'Password lama salah. Mohon isi dengan password yang benar untuk mengubah password baru.',
                     ];
 
                     return response()->json($response, 400);
@@ -252,7 +315,7 @@ class AuthController extends Controller
 
                 $response = [
                     'status' => false,
-                    'error'  => 'User tidak ditemukan.',
+                    'error' => 'User tidak ditemukan.',
                 ];
 
                 return response()->json($response, 404);
@@ -260,40 +323,40 @@ class AuthController extends Controller
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             DB::rollBack();
             $response = [
-                'status'  => false,
-                'error'   => 'Data tidak ditemukan.',
+                'status' => false,
+                'error' => 'Data tidak ditemukan.',
                 'details' => $e->getMessage()
             ];
             return response()->json($response, 404);
         } catch (\Illuminate\Validation\ValidationException $e) {
             DB::rollBack();
             $response = [
-                'status'  => false,
-                'error'   => 'Validasi gagal.',
+                'status' => false,
+                'error' => 'Validasi gagal.',
                 'details' => $e->errors()
             ];
             return response()->json($response, 422);
         } catch (\Illuminate\Database\QueryException $e) {
             DB::rollBack();
             $response = [
-                'status'  => false,
-                'error'   => 'Kesalahan query database.',
+                'status' => false,
+                'error' => 'Kesalahan query database.',
                 'details' => $e->getMessage()
             ];
             return response()->json($response, 500);
         } catch (\PDOException $e) {
             DB::rollBack();
             $response = [
-                'status'  => false,
-                'error'   => 'Kesalahan koneksi database.',
+                'status' => false,
+                'error' => 'Kesalahan koneksi database.',
                 'details' => $e->getMessage()
             ];
             return response()->json($response, 500);
         } catch (Exception $e) {
             DB::rollBack();
             $response = [
-                'status'    => false,
-                'error'     => 'Terjadi kesalahan yang tidak terduga.',
+                'status' => false,
+                'error' => 'Terjadi kesalahan yang tidak terduga.',
                 'exception' => $e->getMessage()
             ];
             return response()->json($response, 500);
@@ -327,7 +390,7 @@ class AuthController extends Controller
                     DB::commit();
 
                     $response = [
-                        'status'  => true,
+                        'status' => true,
                         'message' => 'PIN berhasil diubah.',
                     ];
                     return response()->json($response, 200);
@@ -336,7 +399,7 @@ class AuthController extends Controller
 
                     $response = [
                         'status' => false,
-                        'error'  => 'PIN lama salah. Mohon isi dengan PIN yang benar untuk mengubah PIN baru.',
+                        'error' => 'PIN lama salah. Mohon isi dengan PIN yang benar untuk mengubah PIN baru.',
                     ];
 
                     return response()->json($response, 400);
@@ -346,7 +409,7 @@ class AuthController extends Controller
 
                 $response = [
                     'status' => false,
-                    'error'  => 'Merchant tidak ditemukan.',
+                    'error' => 'Merchant tidak ditemukan.',
                 ];
 
                 return response()->json($response, 404);
@@ -354,40 +417,40 @@ class AuthController extends Controller
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             DB::rollBack();
             $response = [
-                'status'  => false,
-                'error'   => 'Data tidak ditemukan.',
+                'status' => false,
+                'error' => 'Data tidak ditemukan.',
                 'details' => $e->getMessage()
             ];
             return response()->json($response, 404);
         } catch (\Illuminate\Validation\ValidationException $e) {
             DB::rollBack();
             $response = [
-                'status'  => false,
-                'error'   => 'Validasi gagal.',
+                'status' => false,
+                'error' => 'Validasi gagal.',
                 'details' => $e->errors()
             ];
             return response()->json($response, 422);
         } catch (\Illuminate\Database\QueryException $e) {
             DB::rollBack();
             $response = [
-                'status'  => false,
-                'error'   => 'Kesalahan query database.',
+                'status' => false,
+                'error' => 'Kesalahan query database.',
                 'details' => $e->getMessage()
             ];
             return response()->json($response, 500);
         } catch (\PDOException $e) {
             DB::rollBack();
             $response = [
-                'status'  => false,
-                'error'   => 'Kesalahan koneksi database.',
+                'status' => false,
+                'error' => 'Kesalahan koneksi database.',
                 'details' => $e->getMessage()
             ];
             return response()->json($response, 500);
         } catch (Exception $e) {
             DB::rollBack();
             $response = [
-                'status'    => false,
-                'error'     => 'Terjadi kesalahan yang tidak terduga.',
+                'status' => false,
+                'error' => 'Terjadi kesalahan yang tidak terduga.',
                 'exception' => $e->getMessage()
             ];
             return response()->json($response, 500);
@@ -402,20 +465,87 @@ class AuthController extends Controller
     }
 
     public function updateToken(Request $request)
-{
-    $request->validate([
-        'fcm_token' => 'required|string'
-    ]);
+    {
+        $request->validate([
+            'fcm_token' => 'required|string'
+        ]);
 
-    $user = Auth::user(); // Asumsi user sudah terautentikasi
-    if (!$user) {
-        return response()->json(['message' => 'User not authenticated'], 401);
+        $user = Auth::user(); // Asumsi user sudah terautentikasi
+        if (!$user) {
+            return response()->json(['message' => 'User not authenticated'], 401);
+        }
+
+        $user->fcm_token = $request->fcm_token;
+        $user->save();
+
+        return response()->json(['message' => 'FCM token successfully updated'], 200);
     }
 
-    $user->fcm_token = $request->fcm_token;
-    $user->save();
+    public function getPhoneByUsername(Request $request)
+    {
+        $username = $request->input('username');
 
-    return response()->json(['message' => 'FCM token successfully updated'], 200);
-}
+        // Mencari user berdasarkan username
+        $user = User::where('username', $username)->first();
 
+        if ($user) {
+            // Cari nomor telepon di tabel merchants (berdasarkan relasi user_id)
+            $merchant = Merchant::where('user_id', $user->id)->first();
+
+            if ($merchant && $merchant->phone) {
+                return response()->json([
+                    'status' => 'success',
+                    'phone' => $merchant->phone
+                ]);
+            }
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Nomor telepon tidak ditemukan'
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => 'error',
+            'message' => 'User tidak ditemukan'
+        ], 404);
+    }
+
+    public function resetPassword(Request $request)
+    {
+        // Validasi input
+        $request->validate([
+            'username' => 'required|string',
+            'old_password' => 'required|string',
+            'new_password' => 'required|string',
+        ]);
+
+        // Cari user berdasarkan username
+        $user = User::where('username', $request->username)->first();
+
+        // Jika user tidak ditemukan
+        if (!$user) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Username tidak ditemukan.',
+            ], 404);
+        }
+
+        // Periksa apakah password lama benar
+        if (!Hash::check($request->old_password, $user->password)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Password lama salah.',
+            ], 400);
+        }
+
+        // Ubah password user
+        $user->password = Hash::make($request->new_password);
+        $user->save();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Password berhasil diperbarui.',
+        ], 200);
+    }
 }
