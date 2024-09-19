@@ -199,3 +199,4 @@ Route::middleware('auth:api')->post('imei/store', 'TerminalsController@storeImei
 Route::middleware('auth:api')->post('pengaduan/create', 'PengaduanController@create');
 Route::post('get/phone', 'AuthController@getPhoneByUsername');
 Route::post('reset/password', 'AuthController@resetPassword');
+Route::middleware('auth:api')->get('pengaduan/history', 'PengaduanController@history_pengaduan');

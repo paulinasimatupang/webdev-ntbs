@@ -297,4 +297,27 @@ class PengaduanController extends Controller
         }
     }
 
+    public function history_pengaduan(Request $request)
+    {
+        $user = auth()->user();
+
+        if (!$user) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        $mid = $request->input('mid');
+
+        if (!$mid) {
+            return response()->json(['error' => 'Merchant ID is required'], 400);
+        }
+
+        $data = Pengaduan::where('mid', $mid)
+            ->orderBy('request_time', 'asc')
+            ->get(); 
+            
+        return response()->json([
+            'status' => true,
+            'data' => $data,
+        ], 200);
+    }
 }
