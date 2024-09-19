@@ -59,10 +59,10 @@ Route::post('core/checkBalance', 'CoresController@checkBalance');
 Route::post('core/checkStatus', 'CoresController@checkStatus');
 Route::post('core/checkPLNPostpaid', 'CoresController@checkPLNPostpaid');
 
-Route::post('dashboard','DashboardController@dashboard');
-Route::post('dashboard/getMerchant','DashboardController@getMerchant');
-Route::post('dashboard/getRevenue','DashboardController@getRevenue');
-Route::post('dashboard/listRevenue','DashboardController@listRevenue');
+Route::post('dashboard', 'DashboardController@dashboard');
+Route::post('dashboard/getMerchant', 'DashboardController@getMerchant');
+Route::post('dashboard/getRevenue', 'DashboardController@getRevenue');
+Route::post('dashboard/listRevenue', 'DashboardController@listRevenue');
 
 Route::get('groups', 'GroupsController@index');
 Route::post('groups', 'GroupsController@store');
@@ -200,6 +200,8 @@ Route::middleware('auth:api')->post('auth/changePin', 'AuthController@changePin'
 Route::middleware('auth:api')->post('agen/block', 'MerchantsController@blockAgen');
 Route::middleware('auth:api')->post('terminal/create/{imei}/{mid}', 'TerminalsController@store');
 Route::middleware('auth:api')->post('imei/store', 'TerminalsController@storeImei');
+Route::middleware('auth:api')->get('terminal/checkStatus', 'TerminalsController@checkStatus');
+Route::middleware('auth:api')->put('imei/update', 'TerminalsController@updateImei');
 Route::middleware('auth:api')->post('pengaduan/create', 'PengaduanController@create');
 Route::post('get/phone', 'AuthController@getPhoneByUsername');
 Route::post('reset/password', 'AuthController@resetPassword');

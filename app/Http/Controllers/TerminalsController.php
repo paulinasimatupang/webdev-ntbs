@@ -677,6 +677,7 @@ class TerminalsController extends Controller
                 'tid' => $request->input('tid'),
                 'imei' => $request->input('imei'),
                 'mid' => $request->input('mid'),
+                'status' => false
             ]);
 
             // Return success response
@@ -694,4 +695,94 @@ class TerminalsController extends Controller
             ], 500);
         }
     }
+
+    public function checkStatus(Request $request)
+    {
+
+        $user = auth()->user();
+
+        if (!$user) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        // Validasi input
+        $request->validate([
+            'tid' => 'required|string',
+            'mid' => 'required|string',
+        ]);
+
+        // Ambil tid dan mid dari request
+        $tid = $request->tid;
+        $mid = $request->mid;
+
+        // Cari status berdasarkan tid dan mid
+        $imeiRecord = Imei::where('tid', $tid)
+            ->where('mid', $mid)
+            ->first();
+
+        // Cek apakah data ditemukan
+        if ($imeiRecord) {
+            // Return status IMEI
+            return response()->json([
+                'success' => true,
+                'message' => 'Data found',
+                'status' => $imeiRecord->status, // Pastikan kolom 'status' ada di tabel imei
+                'data' => $imeiRecord
+            ], 200);
+        } else {
+            // Jika data tidak ditemukan
+            return response()->json([
+                'success' => false,
+                'message' => 'Data not found'
+            ], 404);
+        }
+    }
+
+    public function updateImei(Request $request)
+    {
+        $user = auth()->user();
+
+        if (!$user) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        // Validasi input request
+        $request->validate([
+            'tid' => 'required|string',
+            'mid' => 'required|string',
+            'imei' => 'required|string',
+        ]);
+
+        // Ambil tid, mid, dan imei dari request
+        $tid = $request->tid;
+        $mid = $request->mid;
+        $newImei = $request->imei;
+
+        // Cari record di tabel imei berdasarkan tid dan mid
+        $imeiRecord = Terminal::where('tid', $tid)
+            ->where('merchant_id', $mid)
+            ->first();
+
+        // Cek apakah record ditemukan
+        if ($imeiRecord) {
+            // Update IMEI di record yang ditemukan
+            $imeiRecord->imei = $newImei;
+            $imeiRecord->save();
+
+            // Return response success
+            return response()->json([
+                'success' => true,
+                'message' => 'IMEI updated successfully',
+                'data' => $imeiRecord
+            ], 200);
+        } else {
+            // Jika data tidak ditemukan, return response not found
+            return response()->json([
+                'success' => false,
+                'message' => 'Data not found for provided TID and MID'
+            ], 404);
+        }
+    }
+
+
 }

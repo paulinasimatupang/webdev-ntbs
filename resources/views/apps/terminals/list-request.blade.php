@@ -44,6 +44,7 @@
                                             <th scope="col">TID</th>
                                             <th scope="col">MID</th>
                                             <th scope="col">Imei</th>
+                                            <th scope="col">Status</th>
                                             <th scope="col">Action</th>
                                         </tr>
                                     </thead>
@@ -57,6 +58,7 @@
                                             <td>{{$item->tid}}</td>
                                             <td>{{$item->mid}}</td>
                                             <td>{{$item->imei}}</td>
+                                            <td>{{$item->status}}</td>
                                             <td>
                                                     <a href="{{ route('imei_accept', $item->id) }}">
                                                         <button class="btn btn-success ripple btn-sm m-1" type="button">Approve</button>

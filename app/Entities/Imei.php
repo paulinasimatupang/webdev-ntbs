@@ -12,8 +12,14 @@ class Imei extends Model
     protected $fillable = [
         'tid',
         'imei',
-        'mid'
+        'mid',
+        'status'
     ];
 
     protected $table = 'public.request_imei';
+    
+    public function terminal()
+    {
+        return $this->belongsTo(Terminal::class, 'tid', 'tid');
+    }
 }
