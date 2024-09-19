@@ -607,13 +607,8 @@ class TerminalsController extends Controller
                 throw new \Exception("Terminal not found");
             }
 
-            // Update IMEI di Terminal
-            // $terminal->imei = $imeiRequest->imei;
-            $terminal->imei = null;
-            $terminal->save();
-
-            // Hapus permintaan IMEI setelah diterima
-            $imeiRequest->delete();
+            $imeiRequest->status = true;
+            $imeiRequest->save();
 
             DB::commit();
             return redirect()->route('imei_request')->with('success', 'Permintaan IMEI berhasil disetujui.');
@@ -634,8 +629,8 @@ class TerminalsController extends Controller
                 throw new \Exception("Request IMEI not found");
             }
 
-            // Hapus permintaan IMEI setelah ditolak
-            $imeiRequest->delete();
+            $imeiRequest->status = false;
+            $imeiRequest->save();
 
             DB::commit();
             return redirect()->route('imei_request')->with('success', 'Permintaan IMEI berhasil ditolak.');
