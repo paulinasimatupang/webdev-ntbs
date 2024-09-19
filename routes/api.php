@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\MasterDataController;
+use App\Http\Controllers\NotificationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -186,6 +187,7 @@ Route::delete('users/{id}', 'UsersController@destroy');
 
 // Route::get('nasabah/list', 'DataCalonNasabahController@listJson');
 Route::post('nasabah/approve/{id}', 'DataCalonNasabahController@approveNasabah')->name('nasabah_approve');
+Route::post('/send-test-notif', 'DataCalonNasabahController@sendTestNotification')->name('send_test_notification');
 
 
 Route::middleware('auth:api')->get('nasabah/list/{kode_agen}', 'DataCalonNasabahController@listJson');

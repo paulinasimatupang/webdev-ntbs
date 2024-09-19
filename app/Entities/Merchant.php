@@ -3,7 +3,6 @@
 namespace App\Entities;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Prettus\Repository\Contracts\Transformable;
 use Prettus\Repository\Traits\TransformableTrait;
 
@@ -15,7 +14,6 @@ use Prettus\Repository\Traits\TransformableTrait;
 class Merchant extends Model implements Transformable
 {
     use TransformableTrait;
-    use SoftDeletes;
 
     public $incrementing = true;
 
@@ -45,7 +43,8 @@ class Merchant extends Model implements Transformable
         'file_ktp',
         'file_kk',
         'file_npwp',
-        'pin'
+        'pin',
+        'fcm_token'
     ];
 
     protected $table = 'merchants';

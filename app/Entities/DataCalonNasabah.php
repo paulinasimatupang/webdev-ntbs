@@ -49,6 +49,7 @@ class DataCalonNasabah extends Model
         'foto_ktp',
         'foto_ttd',
         'foto_diri',
+        'fcm_token'
     ];
 
     protected $table = 'public.data_calon_nasabah';

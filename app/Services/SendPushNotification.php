@@ -2,67 +2,84 @@
 
 namespace App\Services;
 
-use Google\Auth\Credentials\ServiceAccountCredentials;
+use Google_Client;
 use GuzzleHttp\Client;
-use App\Entities\User; 
+use Illuminate\Support\Facades\Log;
+use App\Entities\DataCalonNasabah;
+use Exception;
 
 class SendPushNotification
 {
-    public function sendNotification($userId)
+    // Fungsi untuk mengirim notifikasi berdasarkan token FCM
+    public function sendNotificationToToken($fcmToken, $dataPayload)
     {
-        // Menggunakan model User untuk mendapatkan FCM token
-        $user = User::find($userId); // Mengambil user berdasarkan user ID
-
-        if (!$user || !$user->fcm_token) {
-            die('FCM token tidak ditemukan untuk user ID ' . $userId);
-        }
-
-        $fcmToken = $user->fcm_token; // Mengambil FCM token dari user
-
-        // Path ke file JSON Service Account yang sudah kamu download dari Firebase Console
-        $serviceAccountFile = 'firebase/ntbs-lakupandai-firebase-adminsdk-6o46s-e72605460b.json'; // Ganti dengan path ke file JSON kamu
-
-        // Menggunakan Service Account untuk otentikasi
-        $scopes = ['https://www.googleapis.com/auth/firebase.messaging'];
-        $credentials = new ServiceAccountCredentials($scopes, $serviceAccountFile);
-
-        // Fetch Access Token dari Service Account
-        $token = $credentials->fetchAuthToken()['access_token'];
-
-        // Membuat HTTP client menggunakan Guzzle
-        $client = new Client([
-            'base_uri' => 'https://fcm.googleapis.com/',
-            'headers' => [
-                'Authorization' => 'Bearer ' . $token,  // Access Token
-                'Content-Type' => 'application/json',
-            ],
-        ]);
-
-        // Data notifikasi yang ingin dikirim
-        $notification = [
-            'title' => 'Permohonan Disetujui',
-            'body' => 'Pengajuan rekening Anda telah disetujui oleh supervisor.',
-        ];
-
-        // Data untuk FCM API request
-        $message = [
-            'message' => [
-                'token' => $fcmToken, // Menggunakan FCM token yang diambil dari database
-                'notification' => $notification,
-            ],
-        ];
-
         try {
-            // Kirim POST request ke FCM API v1
-            $response = $client->post('v1/projects/ntbs-lakupandai/messages:send', [
+            if (empty($fcmToken)) {
+                throw new Exception("FCM token is missing.");
+            }
+
+            Log::info('Sending notification to FCM token: ' . $fcmToken);
+
+            // Path to the Firebase Service Account JSON file
+            $serviceAccountFile = storage_path('firebase/ntbs-lakupa-firebase-adminsdk-w89ha-b54092da9b.json');
+
+            // Initialize Google Client
+            $client = new Google_Client();
+            $client->setAuthConfig($serviceAccountFile);
+            $client->addScope('https://www.googleapis.com/auth/firebase.messaging');
+
+            // Fetch the access token
+            $client->fetchAccessTokenWithAssertion();
+            $accessToken = $client->getAccessToken();
+            if (!isset($accessToken['access_token'])) {
+                throw new Exception('Failed to retrieve access token.');
+            }
+
+            Log::info('Access Token: ' . $accessToken['access_token']);
+
+            // Send notification using FCM
+            $httpClient = new Client([
+                'base_uri' => 'https://fcm.googleapis.com/',
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $accessToken['access_token'],
+                    'Content-Type' => 'application/json',
+                ],
+            ]);
+
+            // Gunakan data payload yang dikirimkan melalui parameter
+            $message = [
+                'message' => [
+                    'token' => $fcmToken,
+                    'notification' => [
+                        'title' => $dataPayload['title'] ?? 'Notifikasi',
+                        'body' => $dataPayload['message'] ?? 'Pesan notifikasi',
+                    ],
+                    'data' => $dataPayload
+                ],
+            ];
+
+            Log::info('Sending Message: ' . json_encode($message));
+
+            // Send POST request to FCM API
+            $response = $httpClient->post('v1/projects/ntbs-lakupa/messages:send', [
                 'json' => $message,
             ]);
 
-            // Menampilkan hasil respons dari Firebase
-            echo $response->getBody()->getContents();
+            // Check response status
+            $statusCode = $response->getStatusCode();
+            $responseBody = $response->getBody()->getContents();
+            if ($statusCode != 200) {
+                Log::error('FCM send error: ' . $statusCode . ' - ' . $responseBody);
+            }
+
+            Log::info('FCM Response: ' . $responseBody);
+            return $responseBody;
         } catch (Exception $e) {
-            // Menangani error
-            echo 'Error: ' . $e->getMessage();
+            Log::error('Error sending FCM notification: ' . $e->getMessage());
+            return [
+                'status' => 'error',
+                'message' => 'Gagal mengirim notifikasi: ' . $e->getMessage(),
+            ];
         }
     }
 }

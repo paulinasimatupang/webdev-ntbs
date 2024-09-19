@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\RankingLakuPandaiController;
+use App\Http\Controllers\NotificationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -310,6 +311,8 @@ Route::group(['middleware' => ['auth', 'check.permission']], function () {
     Route::post('/branch/update/{id}', 'BranchController@update')->name('branch_update');
     Route::post('/branch/destroy{id}', 'BranchController@destroy')->name('branch_destroy');
 });
+
+Route::post('/send-test-notif', 'DataCalonNasabahController@sendTestNotification')->name('send_test_notification');
 
 // Routes for Master Data
 // Route::get('/hak-akses', 'HakAksesController@index')->name('hakakses');
