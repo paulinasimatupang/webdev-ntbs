@@ -19,6 +19,10 @@ Route::get('/', function (Request $request) {
 });
 
 Route::post('auth/register', 'AuthController@register');
+Route::post('auth/loginWithFingerprint', 'AuthController@loginWithFingerprint');
+Route::post('auth/registerFingerprint', 'AuthController@registerFingerprint');
+
+
 Route::post('auth/login', 'AuthController@doLogin');
 Route::group(['middleware' => 'auth'], function () {
     Route::get('/landing', function () {

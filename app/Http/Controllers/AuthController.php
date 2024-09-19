@@ -79,6 +79,65 @@ class AuthController extends Controller
         }
     }
 
+
+    public function loginWithFingerprint(Request $request)
+    {
+        $fingerPrint = $request->get('finger_print');
+
+        if (empty($fingerPrint)) {
+            return response()->json(['status' => false, 'message' => 'Fingerprint is required'], 400);
+        }
+
+        $user = User::where('finger_print', $fingerPrint)->first();
+
+        if (!$user) {
+            return response()->json(['status' => false, 'message' => 'Fingerprint not recognized'], 404);
+        }
+
+        try {
+            $token = JWTAuth::fromUser($user);
+        } catch (JWTException $e) {
+            return response()->json(['status' => false, 'message' => 'Could not create token'], 500);
+        }
+
+        return response()->json(['status' => true, 'message' => 'Login successful', 'token' => $token, 'data' => $user], 200);
+    }
+    /**
+     * Simpan data fingerprint user baru
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function registerFingerprint(Request $request)
+    {
+        $fingerPrint = $request->get('finger_print');
+        $id = $request->get('id');
+
+        if (!$fingerPrint || !$id) {
+            return response()->json(['status' => false, 'message' => 'All fields are required'], 400);
+        }
+
+        $existingUser = User::where('id', $id)
+                            ->where('finger_print', $fingerPrint)
+                            ->first();
+
+        if ($existingUser) {
+            return response()->json(['status' => false, 'message' => 'Fingerprint already registered for this user'], 409);
+        }
+
+        $user = User::find($id);
+        if (!$user) {
+            return response()->json(['status' => false, 'message' => 'User not found'], 404);
+        }
+
+        $user->finger_print = $fingerPrint;
+        $user->save();
+
+        return response()->json(['status' => true, 'message' => 'Fingerprint registered successfully'], 200);
+    }
+
+
+
+
     public function login(Request $request)
     {
         $user = $request->session()->get('user');
