@@ -36,7 +36,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach($assessments->slice(0, 5) as $index => $assessment)
+                                    @foreach($assessments as $index => $assessment)
                                     <tr>
                                         <td>{{ $index + 1 }}</td>
                                         <td>{{ $assessment->pertanyaan }}</td>
