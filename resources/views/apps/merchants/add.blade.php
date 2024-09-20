@@ -109,13 +109,13 @@
                             <div class="form-group row">
                                 <label class="col-sm-2 col-form-label">Nomor Rekening</label>
                                 <div class="col-sm-10">
-                                    <input type="text" class="form-control" name="no" value="{{ old('no', session('no', null)) }}" placeholder="Nomor Rekening">
+                                    <input type="text" class="form-control" name="no" value="{{ old('no', session('no', null)) }}" placeholder="Nomor Rekening" disabled>
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label class="col-sm-2 col-form-label">Nomor CIF</label>
                                 <div class="col-sm-10">
-                                    <input type="text" class="form-control" name="no_cif" value="{{ old('no_cif', session('no_cif', null)) }}" placeholder="Nomor CIF">
+                                    <input type="text" class="form-control" name="no_cif" value="{{ old('no_cif', session('no_cif', null)) }}" placeholder="Nomor CIF" disabled>
                                 </div>
                             </div>
                             <div class="form-group row">
@@ -157,7 +157,7 @@
                             <div class="form-group row">
                                 <label class="col-sm-2 col-form-label">Alamat</label>
                                 <div class="col-sm-10">
-                                    <input type="text" class="form-control" name="address" value="{{ old('address', session('address', null)) }}" placeholder="Alamat">
+                                    <input type="text" class="form-control" name="address" value="{{ old('address', session('address', null)) }}" placeholder="Alamat" disabled>
                                 </div>
                             </div>
                             <div class="form-group row">
