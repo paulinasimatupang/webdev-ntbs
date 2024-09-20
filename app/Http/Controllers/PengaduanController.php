@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Entities\Pengaduan;
 use App\Entities\Role;
+use App\Entities\Imei;
 
 class PengaduanController extends Controller
 {
@@ -14,8 +15,9 @@ class PengaduanController extends Controller
     {
         $jumlah_pending = Pengaduan::where('status', 0)->count();
         $jumlah_process = Pengaduan::where('status', 1)->count();
+        $jumlah_request = Imei::count();
 
-        return view('apps.pengaduan.menu', compact('jumlah_pending', 'jumlah_process'));
+        return view('apps.pengaduan.menu', compact('jumlah_pending', 'jumlah_process', 'jumlah_request'));
     }
 
     public function list_pending(Request $request)
