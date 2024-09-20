@@ -22,8 +22,8 @@ class PengaduanController extends Controller
 
     public function list_pending(Request $request)
     {
-        $data = Pengaduan::select('*')
-                ->whereIn('status', [0]);
+        $data = Pengaduan::with('merchant')
+        ->whereIn('status', [0]);    
 
         $user = session()->get('user');
 

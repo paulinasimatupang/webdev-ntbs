@@ -23,13 +23,19 @@
                     <div class="form-group row">
                         <label class="col-sm-2 col-form-label">Nama Agen</label>
                         <div class="col-sm-10">
-                            <p class="form-control-static">{{ $data->merchant->name }}</p>
+                            <p class="form-control-static">{{ $data->merchant->name ?? $data->mid }}</p>
                         </div>
                     </div>
                     <div class="form-group row">
                         <label class="col-sm-2 col-form-label">Kategori</label>
                         <div class="col-sm-10">
                             <p class="form-control-static">{{ $data->kategori }}</p>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Judul</label>
+                        <div class="col-sm-10">
+                            <p class="form-control-static">{{ $data->judul }}</p>
                         </div>
                     </div>
 
