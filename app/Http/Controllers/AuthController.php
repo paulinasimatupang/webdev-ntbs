@@ -231,7 +231,7 @@ class AuthController extends Controller
     
         // Mengambil user dan merchant terkait
         $user = User::where('username', $credentials['username'])
-            ->with('merchant')  // Mengambil data merchant terkait
+            ->with('merchant.terminal')  // Mengambil data merchant terkait
             ->first();
     
         if (!$user->merchant) {
