@@ -607,6 +607,12 @@ class TerminalsController extends Controller
                 throw new \Exception("Terminal not found");
             }
 
+            $pengaduan = Pengaduan::find($imeiRequest->id_pengaduan); // Ganti dengan cara yang sesuai untuk mendapatkan pengaduan terkait
+            if ($pengaduan) {
+                $pengaduan->status = 2; 
+                $pengaduan->save();
+            }
+
             $imeiRequest->status = true;
             $imeiRequest->save();
 
@@ -629,8 +635,14 @@ class TerminalsController extends Controller
                 throw new \Exception("Request IMEI not found");
             }
 
+            $pengaduan = Pengaduan::find($imeiRequest->id_pengaduan); // Ganti dengan cara yang sesuai untuk mendapatkan pengaduan terkait
+            if ($pengaduan) {
+                $pengaduan->status = 3; 
+                $pengaduan->save();
+            }
+
             $imeiRequest->status = false;
-            $imeiRequest->save();
+            $imeiRequest->delete();
 
             DB::commit();
             return redirect()->route('imei_request')->with('success', 'Permintaan IMEI berhasil ditolak.');
@@ -655,6 +667,7 @@ class TerminalsController extends Controller
             'tid' => 'required|string|max:255',
             'imei' => 'required|string|max:255',
             'mid' => 'required|string|max:255',
+            'id_pengaduan' => 'required|string|max:255',
         ]);
 
         // If validation fails, return the error response
@@ -672,6 +685,7 @@ class TerminalsController extends Controller
                 'tid' => $request->input('tid'),
                 'imei' => $request->input('imei'),
                 'mid' => $request->input('mid'),
+                'id_pengaduan' => $request->input('id_pengaduan'),
                 'status' => false
             ]);
 
@@ -779,6 +793,58 @@ class TerminalsController extends Controller
                 'success' => false,
                 'message' => 'Data not found for provided TID and MID'
             ], 404);
+        }
+    }
+
+    public function create_request()
+    {
+        return view('apps.terminals.add-request');
+    }
+
+    public function store_request(Request $request)
+    {
+        // Autentikasi pengguna
+        $user = auth()->user();
+
+        if (!$user) {
+            return redirect()->route('login')->with('error', 'Unauthorized');
+        }
+
+        // Validasi input
+        $request->validate([
+            'tid' => 'required|string',
+            'mid' => 'required|string',
+            'imei' => 'required|string', // Unik untuk imei
+        ]);
+
+        // Mulai transaksi database
+        DB::beginTransaction();
+
+        try {
+            // Membuat record IMEI baru dengan status 'inactive' (false)
+            $imeiRecord = Imei::create([
+                'tid' => $request->tid,
+                'mid' => $request->mid,
+                'imei' => $request->imei,
+                'status' => false, // Set status otomatis ke 'false'
+            ]);
+
+            // Commit transaksi
+            DB::commit();
+
+            // Redirect kembali ke route 'imei.request' dengan pesan sukses
+            return redirect()->route('imei_request')->with('status', 'IMEI created successfully');
+
+        } catch (Exception $e) {
+            // Jika terjadi kesalahan, rollback transaksi
+            DB::rollBack();
+
+            return redirect()->route('imei_request')->with('error', 'Something went wrong: ' . $e->getMessage());
+        } catch (\Illuminate\Database\QueryException $e) {
+            // Menangani kesalahan query database
+            DB::rollBack();
+
+            return redirect()->route('imei_request')->with('error', 'Database error: ' . $e->getMessage());
         }
     }
 

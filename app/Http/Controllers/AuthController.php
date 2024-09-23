@@ -516,7 +516,6 @@ class AuthController extends Controller
         // Validasi input
         $request->validate([
             'username' => 'required|string',
-            'old_password' => 'required|string',
             'new_password' => 'required|string',
         ]);
 
@@ -529,14 +528,6 @@ class AuthController extends Controller
                 'status' => 'error',
                 'message' => 'Username tidak ditemukan.',
             ], 404);
-        }
-
-        // Periksa apakah password lama benar
-        if (!Hash::check($request->old_password, $user->password)) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Password lama salah.',
-            ], 400);
         }
 
         // Ubah password user

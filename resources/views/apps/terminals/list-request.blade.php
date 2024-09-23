@@ -17,7 +17,21 @@
                 <!-- <ul>
                     <li><a href="">Selada</a></li> -->
             </div>
+            <div class="col-lg-12 col-md-12 col-sm-12 d-flex justify-content-center mb-3">
             <div class="separator-breadcrumb border-top"></div>
+            <div class="input-group">
+                        <a href="{{ route('imei.add') }}">
+                            <button class="btn btn-warning ripple m-1 add-new-btn" type="button">Add Request</button>
+                        </a>     
+                </div>
+            </div>
+            @if (session('status'))
+            <div class="alert alert-success">{{ session('status') }}</div>
+            @endif
+            <!-- Menampilkan pesan error jika ada -->
+            @if (session('error'))
+            <div class="alert alert-danger">{{ session('error') }}</div>
+            @endif
             <div class="row mb-4">
                 <div class="col-md-12 mb-3">
                     <div class="card text-left">

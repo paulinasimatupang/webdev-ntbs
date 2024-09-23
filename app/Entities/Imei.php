@@ -13,7 +13,8 @@ class Imei extends Model
         'tid',
         'imei',
         'mid',
-        'status'
+        'status',
+        'id_pengaduan'
     ];
 
     protected $table = 'public.request_imei';
@@ -21,5 +22,10 @@ class Imei extends Model
     public function terminal()
     {
         return $this->belongsTo(Terminal::class, 'tid', 'tid');
+    }
+
+    public function pengaduan()
+    {
+        return $this->belongsTo(Pengaduan::class, 'id_pengaduan', 'id');
     }
 }
