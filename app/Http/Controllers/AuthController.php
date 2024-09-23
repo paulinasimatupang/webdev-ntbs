@@ -547,6 +547,8 @@ class AuthController extends Controller
         'user_id' => 'required|string',  // Pastikan user_id diterima sebagai string atau integer
         'fcm_token' => 'required|string', // FCM Token yang dikirim dari MyFirebaseMessagingService.kt
     ]);
+    Log::info("Received data: user_id => " . $request->user_id . ", fcm_token => " . $request->fcm_token);
+
 
     if ($validator->fails()) {
         return response()->json([
