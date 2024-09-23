@@ -553,7 +553,7 @@ class AuthController extends Controller
      public function updateFCMToken(Request $request)
      {
          $validator = Validator::make($request->all(), [
-             'user_id' => 'required|integer',  // Diterima dari Android
+             'user_id' => 'required',  // Diterima dari Android
              'fcm_token' => 'required|string', // FCM Token yang dikirim dari MyFirebaseMessagingService.kt
          ]);
  
