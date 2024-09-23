@@ -184,6 +184,7 @@
                                 <p class="form-control-static">{{ $merchant->kode_pos }}</p>
                             </div>
                         </div>
+                        <div id="map" style="height: 400px;"></div>
                         <div class="form-group row">
                             <div class="col-sm-12 text-right">
                                 <button type="button" class="btn btn-secondary" id="prevBtn">Previous</button>
@@ -241,6 +242,7 @@
     </div>
 @endsection
 @section('page-css')
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <style>
         .step-indicator {
             display: flex;
@@ -266,6 +268,21 @@
 @endsection
 
 @section('bottom-js')
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<script>
+    var latitude = {{ $merchant->latitude }};
+    var longitude = {{ $merchant->longitude }};
+
+    var map = L.map('map').setView([latitude, longitude], 13);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    L.marker([latitude, longitude]).addTo(map)
+        .bindPopup('Agen')
+        .openPopup();
+</script>
     <script>
         document.getElementById('approve').addEventListener('click', function() {
             if (confirm('Apakah Anda yakin akan mengaktivasi agen ini?')) {

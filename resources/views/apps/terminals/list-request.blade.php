@@ -58,7 +58,7 @@
                                             <td>{{$item->tid}}</td>
                                             <td>{{$item->mid}}</td>
                                             <td>{{$item->imei}}</td>
-                                            <td>{{$item->status}}</td>
+                                            <td>{{ $item->status ? 'True' : 'False' }}</td>
                                             <td>
                                                     <a href="{{ route('imei_accept', $item->id) }}">
                                                         <button class="btn btn-success ripple btn-sm m-1" type="button">Approve</button>

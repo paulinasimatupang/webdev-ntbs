@@ -764,10 +764,13 @@ class TerminalsController extends Controller
             $imeiRecord->imei = $newImei;
             $imeiRecord->save();
 
+            // Setelah update, hapus data dari tabel Imei berdasarkan TID yang diupdate
+            Imei::where('tid', $tid)->delete();
+
             // Return response success
             return response()->json([
                 'success' => true,
-                'message' => 'IMEI updated successfully',
+                'message' => 'IMEI updated successfully and Imei data deleted',
                 'data' => $imeiRecord
             ], 200);
         } else {
@@ -778,6 +781,5 @@ class TerminalsController extends Controller
             ], 404);
         }
     }
-
 
 }

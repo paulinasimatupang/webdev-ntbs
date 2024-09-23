@@ -185,6 +185,24 @@
                             <input type="text" class="form-control" value="{{ $merchant->kode_pos }}" name="kode_pos" placeholder="Kode Pos" required>
                         </div>
                     </div>
+                    <div class="form-group row">
+                                <div class="col-sm-12">
+                                    <div id="map-container">
+                                        <div id="map"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group row">
+                                <label class="col-sm-2 col-form-label" for="latitude">Latitude:</label>
+                                <div class="col-sm-4">
+                                    <input type="text" class="form-control" id="latitude" name="latitude" readonly>
+                                </div>
+                                <label class="col-sm-2 col-form-label" for="longitude">Longitude:</label>
+                                <div class="col-sm-4">
+                                    <input type="text" class="form-control" id="longitude" name="longitude" readonly>
+                                </div>
+                            </div>
                     
                     <div class="form-group row">
                         <label class="col-sm-2 col-form-label" for="file_ktp">KTP</label>
@@ -307,9 +325,119 @@
 </div>
 @endsection
 
-@section('page-js')
+
+@section('page-css')
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+    <style>
+        #map-container {
+            width: 100%;
+            height: 500px;
+            position: relative;
+            margin-bottom: 20px;
+        }
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .leaflet-control-geocoder {
+            width: 100%;
+            max-width: none;
+            margin-top: 10px;
+        }
+        .leaflet-control-geocoder-form input {
+            width: calc(100% - 30px);
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+        .step {
+            width: 40px;
+            height: 40px;
+            line-height: 40px;
+            background-color: #f1f1f1;
+            border: 1px solid #ddd;
+            border-radius: 50%;
+            text-align: center;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        .step.active {
+            background-color: #007bff;
+            color: white;
+        }
+    </style>
 @endsection
 
 @section('bottom-js')
-<script src="{{asset('assets/js/form.validation.script.js')}}"></script>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var map = L.map('map', {
+                center: [-2.5489, 118.0149],
+                zoom: 8,
+                minZoom: 5,
+                maxBounds: [
+                    [-11.0, 94.0], 
+                    [6.0, 141.0] 
+                ],
+                maxBoundsViscosity: 1.0
+            });
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+
+            var marker;
+
+            var geocoder = L.Control.geocoder({
+                defaultMarkGeocode: false,
+                placeholder: 'Cari lokasi...',
+                errorMessage: 'Tidak ditemukan.',
+                suggestMinLength: 3,
+                suggestTimeout: 250,
+                queryMinLength: 1
+            })
+            .on('markgeocode', function(e) {
+                var latlng = e.geocode.center;
+                setMarkerAndView(latlng);
+            })
+            .addTo(map);
+
+            function setMarkerAndView(latlng) {
+                if (marker) {
+                    map.removeLayer(marker);
+                }
+                marker = L.marker(latlng).addTo(map);
+                map.setView(latlng, 14);
+                
+                document.getElementById('latitude').value = latlng.lat.toFixed(6);
+                document.getElementById('longitude').value = latlng.lng.toFixed(6);
+            }
+
+            map.on('click', function(e) {
+                setMarkerAndView(e.latlng);
+            });
+
+            setTimeout(function() {
+                map.invalidateSize();
+            }, 100);
+
+            document.addEventListener('visibilitychange', function() {
+                if (!document.hidden) {
+                    setTimeout(function() {
+                        map.invalidateSize();
+                    }, 100);
+                }
+            });
+        });
+    </script>
 @endsection

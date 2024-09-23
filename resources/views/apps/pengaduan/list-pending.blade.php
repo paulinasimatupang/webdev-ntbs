@@ -43,6 +43,7 @@
                                             <th scope="col">No</th>
                                             <th scope="col">Nama Agen</th>
                                             <th scope="col">Kategori</th>
+                                            <th scope="col">Judul</th>
                                             <th scope="col">Request Time</th>
                                             <th scope="col">Action</th>
                                         </tr>
@@ -54,8 +55,9 @@
                                         @foreach($data as $item)
                                         <tr>
                                             <th scope="row">{{ $no }}</th>
-                                            <td>{{$item->merchant->name}}</td>
+                                            <td>{{ $item->merchant->name ??  $item->mid }}</td>
                                             <td>{{$item->kategori}}</td>
+                                            <td>{{$item->judul}}</td>
                                             <td>{{$item->request_time}}</td>
                                             <td>
                                                 @if (in_array('pengaduan_detail_pending', $routes_user))

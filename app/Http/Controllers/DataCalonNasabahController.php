@@ -290,7 +290,7 @@ class DataCalonNasabahController extends Controller
                 return true; // CIF sudah ada, tidak perlu buat lagi
             }
 
-            $terminal = '353471045058692';
+            $terminal = '89b2c0aa8e0ac7c2';
             $dateTime = date("YmdHis");
 
             $ch = curl_init();
@@ -428,7 +428,7 @@ private function moveToUsersTable($nasabah)
                 $no_registrasi = $nasabah->no_registrasi;
                 $branchid = $nasabah->branchid;
 
-                $terminal = '353471045058692';
+                $terminal = '89b2c0aa8e0ac7c2';
                 $dateTime = date("YmdHis");
 
                 $ch = curl_init();
