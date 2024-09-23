@@ -607,11 +607,11 @@ class TerminalsController extends Controller
                 throw new \Exception("Terminal not found");
             }
 
-            $pengaduan = Pengaduan::find($imeiRequest->id_pengaduan); // Ganti dengan cara yang sesuai untuk mendapatkan pengaduan terkait
-            if ($pengaduan) {
-                $pengaduan->status = 2; 
-                $pengaduan->save();
-            }
+            // $pengaduan = Pengaduan::find($imeiRequest->id_pengaduan); // Ganti dengan cara yang sesuai untuk mendapatkan pengaduan terkait
+            // if ($pengaduan) {
+            //     $pengaduan->status = 2;
+            //     $pengaduan->save();
+            // }
 
             $imeiRequest->status = true;
             $imeiRequest->save();
@@ -635,11 +635,11 @@ class TerminalsController extends Controller
                 throw new \Exception("Request IMEI not found");
             }
 
-            $pengaduan = Pengaduan::find($imeiRequest->id_pengaduan); // Ganti dengan cara yang sesuai untuk mendapatkan pengaduan terkait
-            if ($pengaduan) {
-                $pengaduan->status = 3; 
-                $pengaduan->save();
-            }
+            // $pengaduan = Pengaduan::find($imeiRequest->id_pengaduan); // Ganti dengan cara yang sesuai untuk mendapatkan pengaduan terkait
+            // if ($pengaduan) {
+            //     $pengaduan->status = 3;
+            //     $pengaduan->save();
+            // }
 
             $imeiRequest->status = false;
             $imeiRequest->delete();
@@ -667,7 +667,7 @@ class TerminalsController extends Controller
             'tid' => 'required|string|max:255',
             'imei' => 'required|string|max:255',
             'mid' => 'required|string|max:255',
-            'id_pengaduan' => 'required|string|max:255',
+            // 'id_pengaduan' => 'required|string|max:255',
         ]);
 
         // If validation fails, return the error response
@@ -685,7 +685,7 @@ class TerminalsController extends Controller
                 'tid' => $request->input('tid'),
                 'imei' => $request->input('imei'),
                 'mid' => $request->input('mid'),
-                'id_pengaduan' => $request->input('id_pengaduan'),
+                // 'id_pengaduan' => $request->input('id_pengaduan'),
                 'status' => false
             ]);
 
@@ -767,34 +767,68 @@ class TerminalsController extends Controller
         $mid = $request->mid;
         $newImei = $request->imei;
 
-        // Cari record di tabel imei berdasarkan tid dan mid
-        $imeiRecord = Terminal::where('tid', $tid)
-            ->where('merchant_id', $mid)
-            ->first();
+        // Mulai transaksi database
+        DB::beginTransaction();
+        try {
+            // Cari record di tabel Terminal berdasarkan tid dan mid
+            $imeiRecord = Terminal::where('tid', $tid)
+                ->where('merchant_id', $mid)
+                ->first();
 
-        // Cek apakah record ditemukan
-        if ($imeiRecord) {
-            // Update IMEI di record yang ditemukan
-            $imeiRecord->imei = $newImei;
-            $imeiRecord->save();
+            // Cek apakah record ditemukan
+            if ($imeiRecord) {
+                // Update IMEI di record yang ditemukan
+                $imeiRecord->imei = $newImei;
+                $imeiRecord->save();
 
-            // Setelah update, hapus data dari tabel Imei berdasarkan TID yang diupdate
-            Imei::where('tid', $tid)->delete();
+                // Hapus data dari tabel Imei berdasarkan TID yang diupdate
+                Imei::where('tid', $tid)->delete();
 
-            // Return response success
+                // Update terminal_imei di tabel TerminalBilliton
+                $terminalBilliton = TerminalBilliton::where('terminal_id', $tid)->first();
+                if ($terminalBilliton) {
+                    $terminalBilliton->update([
+                        'terminal_imei' => $newImei,
+                    ]);
+
+                    // Log sukses update
+                    Log::info("TerminalBilliton for TID: $tid successfully updated with new IMEI: $newImei");
+                } else {
+                    // Jika data TerminalBilliton tidak ditemukan, rollback dan return error
+                    DB::rollBack();
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'TerminalBilliton not found for terminal_id: ' . $tid
+                    ], 404);
+                }
+
+                // Commit transaksi
+                DB::commit();
+
+                // Return response success
+                return response()->json([
+                    'success' => true,
+                    'message' => 'IMEI updated successfully and Imei data deleted',
+                    'data' => $imeiRecord
+                ], 200);
+            } else {
+                // Rollback jika data tidak ditemukan
+                DB::rollBack();
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Data not found for provided TID and MID'
+                ], 404);
+            }
+        } catch (\Exception $e) {
+            // Rollback jika terjadi kesalahan
+            DB::rollBack();
             return response()->json([
-                'success' => true,
-                'message' => 'IMEI updated successfully and Imei data deleted',
-                'data' => $imeiRecord
-            ], 200);
-        } else {
-            // Jika data tidak ditemukan, return response not found
-            return response()->json([
-                'success' => false,
-                'message' => 'Data not found for provided TID and MID'
-            ], 404);
+                'error' => 'An error occurred: ' . $e->getMessage()
+            ], 500);
         }
     }
+
+
 
     public function create_request()
     {
