@@ -195,6 +195,8 @@ Route::group(['middleware' => ['auth', 'check.permission']], function () {
     Route::get('/terminal/request', 'TerminalsController@list_request')->name('imei_request');
     Route::get('/imei/accept/{id}', 'TerminalsController@acceptChangeImei')->name('imei_accept');
     Route::get('/imei/reject/{id}', 'TerminalsController@rejectChangeImei')->name('imei_reject');
+    Route::get('/request_imei/create', 'TerminalsController@create_request')->name('imei.add');
+    Route::post('/request_imei/store', 'TerminalsController@store_request')->name('imei.store');
 
     Route::get('/transaction', 'TransactionsController@index')->name('transaction');
     Route::get('/transaction_log/edit/{stan}', 'TransactionLogController@edit')->name('transactionlog_edit');

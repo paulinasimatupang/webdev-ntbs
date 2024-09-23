@@ -630,7 +630,7 @@ class TerminalsController extends Controller
             }
 
             $imeiRequest->status = false;
-            $imeiRequest->save();
+            $imeiRequest->delete();
 
             DB::commit();
             return redirect()->route('imei_request')->with('success', 'Permintaan IMEI berhasil ditolak.');
@@ -779,6 +779,58 @@ class TerminalsController extends Controller
                 'success' => false,
                 'message' => 'Data not found for provided TID and MID'
             ], 404);
+        }
+    }
+
+    public function create_request()
+    {
+        return view('apps.terminals.add-request');
+    }
+
+    public function store_request(Request $request)
+    {
+        // Autentikasi pengguna
+        $user = auth()->user();
+
+        if (!$user) {
+            return redirect()->route('login')->with('error', 'Unauthorized');
+        }
+
+        // Validasi input
+        $request->validate([
+            'tid' => 'required|string',
+            'mid' => 'required|string',
+            'imei' => 'required|string', // Unik untuk imei
+        ]);
+
+        // Mulai transaksi database
+        DB::beginTransaction();
+
+        try {
+            // Membuat record IMEI baru dengan status 'inactive' (false)
+            $imeiRecord = Imei::create([
+                'tid' => $request->tid,
+                'mid' => $request->mid,
+                'imei' => $request->imei,
+                'status' => false, // Set status otomatis ke 'false'
+            ]);
+
+            // Commit transaksi
+            DB::commit();
+
+            // Redirect kembali ke route 'imei.request' dengan pesan sukses
+            return redirect()->route('imei_request')->with('status', 'IMEI created successfully');
+
+        } catch (Exception $e) {
+            // Jika terjadi kesalahan, rollback transaksi
+            DB::rollBack();
+
+            return redirect()->route('imei_request')->with('error', 'Something went wrong: ' . $e->getMessage());
+        } catch (\Illuminate\Database\QueryException $e) {
+            // Menangani kesalahan query database
+            DB::rollBack();
+
+            return redirect()->route('imei_request')->with('error', 'Database error: ' . $e->getMessage());
         }
     }
 
