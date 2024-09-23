@@ -559,27 +559,43 @@ private function moveToUsersTable($nasabah)
     }
     
     public function rejectNasabah($id)
-    {
-        DB::beginTransaction();
-        try {
-            $nasabah = DataCalonNasabah::where('id', $id)->first();
-            if (!$nasabah) {
-                throw new \Exception("nasabah not found");
-            }
-
-            $nasabah->status = 3;
-            $nasabah->reply_time = now();
-            $nasabah->save();
-
-            DB::commit();
-            return redirect()->route('nasabah')->with('success', 'Permintaan Berhasil Ditolak.');
-        } catch (Exception $e) {
-            DB::rollBack();
-            Log::error('Error : ' . $e->getMessage());
-            return Redirect::to('nasabah')
-                ->with('error', $e->getMessage());
+{
+    DB::beginTransaction();
+    try {
+        $nasabah = DataCalonNasabah::where('id', $id)->first();
+        if (!$nasabah) {
+            throw new \Exception("Nasabah not found");
         }
+
+        // Mengubah status nasabah menjadi "rejected" (status 3)
+        $nasabah->status = 3;
+        $nasabah->reply_time = now();
+        $nasabah->save();
+
+        // Ambil FCM token dari tabel data_calon_nasabah
+        $fcmToken = $nasabah->fcm_token;
+
+        // Validasi token FCM
+        if ($this->isValidFcmToken($fcmToken)) {
+            // Jika FCM token tersedia, kirim notifikasi
+            $notificationService = new SendPushNotification();
+            $notificationService->sendNotificationToToken($fcmToken, [
+                'title' => 'Pengajuan Ditolak',
+                'message' => "Pengajuan nasabah atas nama {$nasabah->nama_lengkap} telah ditolak oleh supervisor.",
+            ]);
+        } else {
+            Log::warning("FCM token tidak valid atau tidak ditemukan untuk nasabah ID: {$nasabah->id}");
+        }
+
+        DB::commit();
+        return redirect()->route('nasabah')->with('success', 'Permintaan Berhasil Ditolak.');
+    } catch (Exception $e) {
+        DB::rollBack();
+        Log::error('Error in rejectNasabah: ' . $e->getMessage());
+        return Redirect::to('nasabah')
+            ->with('error', $e->getMessage());
     }
+}
 
     public function acceptNasabah($id)
     {

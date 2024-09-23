@@ -338,6 +338,14 @@ document.getElementById('reject').addEventListener('click', function() {
         document.getElementById('actionForm').submit();
     }
 });
+
+document.getElementById('reject').addEventListener('click', function() {
+    if (confirm('Apakah Anda yakin akan menolak nasabah ini?')) {
+        document.getElementById('formAction').value = 'reject';
+        document.getElementById('actionForm').action = "{{ route('nasabah_reject', ['id' => $nasabah->id]) }}";
+        document.getElementById('actionForm').submit();
+    }
+});
 </script>
 @endsection
 
