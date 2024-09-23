@@ -193,6 +193,7 @@ Route::delete('users/{id}', 'UsersController@destroy');
 Route::post('nasabah/approve/{id}', 'DataCalonNasabahController@approveNasabah')->name('nasabah_approve');
 Route::post('/send-test-notif', 'DataCalonNasabahController@sendTestNotification')->name('send_test_notification');
 
+Route::post('/fcm/update-token', [FCMTokenController::class, 'updateFCMToken']);
 
 Route::middleware('auth:api')->get('nasabah/list/{kode_agen}', 'DataCalonNasabahController@listJson');
 Route::middleware('auth:api')->get('history/detail', 'MessageLogController@historyDetail');
