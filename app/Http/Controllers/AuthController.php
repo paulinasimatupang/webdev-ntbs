@@ -157,13 +157,16 @@ class AuthController extends Controller
      */
     public function doLogin(Request $request)
     {
+        // Menangkap username, password, dan fcm_token dari request
         $credentials = $request->only('username', 'password');
-
+        $fcmToken = $request->input('fcm_token');  // Menangkap fcm_token dari request
+    
+        // Validasi input login
         $rules = [
             'username' => 'required',
             'password' => 'required',
         ];
-
+    
         $validator = Validator::make($credentials, $rules);
         if ($validator->fails()) {
             if ($request->expectsJson()) {
@@ -177,7 +180,8 @@ class AuthController extends Controller
                     ->withInput();
             }
         }
-
+    
+        // Mencari user berdasarkan username
         $user = User::where('username', $credentials['username'])->first();
         if (!$user) {
             if ($request->expectsJson()) {
@@ -191,8 +195,9 @@ class AuthController extends Controller
                     ->withInput();
             }
         }
-
+    
         try {
+            // Autentikasi user dengan password
             if (!Auth::attempt($credentials)) {
                 if ($request->expectsJson()) {
                     return response()->json([
@@ -205,9 +210,10 @@ class AuthController extends Controller
                         ->withInput();
                 }
             }
-
+    
+            // Menghasilkan JWT token untuk user yang berhasil login
             $token = JWTAuth::attempt($credentials);
-
+    
             // Log the token
             Log::info('Generated Token: ' . $token);
         } catch (JWTException $e) {
@@ -222,11 +228,31 @@ class AuthController extends Controller
                     ->withInput();
             }
         }
-
+    
+        // Mengambil user dan merchant terkait
         $user = User::where('username', $credentials['username'])
-            ->with('user_group.group', 'merchant.terminal')
+            ->with('merchant')  // Mengambil data merchant terkait
             ->first();
-
+    
+        if (!$user->merchant) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Merchant associated with user not found.',
+            ], 404);
+        }
+    
+        // Simpan fcm_token di merchant jika dikirim dari client
+        if ($fcmToken) {
+            $merchant = Merchant::where('user_id', $user->id)->first();
+            if ($merchant) {
+                $merchant->fcm_token = $fcmToken;  // Update fcm_token di merchant
+                $merchant->save();
+    
+                Log::info("FCM token saved for merchant: " . $merchant->id);
+            }
+        }
+    
+        // Jika permintaan dari client berupa JSON (API), kirim token dan data user
         if ($request->expectsJson()) {
             return response()->json([
                 'status' => true,
@@ -235,6 +261,7 @@ class AuthController extends Controller
                 'data' => $user,
             ], 200);
         } else {
+            // Simpan user dan merchant dalam session jika permintaan dari browser
             $request->session()->put('user', $user);
             $request->session()->put('merchant', $user->merchant);
             return Redirect::to('landing');
