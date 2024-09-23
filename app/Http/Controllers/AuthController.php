@@ -542,55 +542,43 @@ class AuthController extends Controller
 
      // Fungsi untuk menyimpan atau memperbarui FCM Token
      public function updateFCMToken(Request $request)
-{
-    $validator = Validator::make($request->all(), [
-        'user_id' => 'required|string',  // Pastikan user_id diterima sebagai string atau integer
-        'fcm_token' => 'required|string', // FCM Token yang dikirim dari MyFirebaseMessagingService.kt
-    ]);
-
-    if ($validator->fails()) {
-        return response()->json([
-            'status' => false,
-            'message' => $validator->messages()->first(),
-        ], 400);
-    }
-
-    try {
-        // Cari user berdasarkan ID yang dikirim
-        $user = User::find($request->user_id);
-
-        if (!$user) {
-            return response()->json([
-                'status' => false,
-                'message' => 'User not found',
-            ], 404);
-        }
-
-        // Simpan atau perbarui FCM token di database
-        $user->fcm_token = $request->fcm_token;
-        $user->save();
-
-        // Simpan FCM token juga di merchant jika user memiliki merchant
-        if ($user->merchant) {
-            $merchant = $user->merchant;
-            $merchant->fcm_token = $request->fcm_token;
-            $merchant->save();
-        }
-
-        Log::info("FCM token updated for user: " . $user->id);
-
-        return response()->json([
-            'status' => true,
-            'message' => 'FCM token updated successfully',
-        ], 200);
-
-    } catch (\Exception $e) {
-        Log::error("Failed to update FCM token: " . $e->getMessage());
-
-        return response()->json([
-            'status' => false,
-            'message' => 'Failed to update FCM token',
-        ], 500);
-    }
-}
+     {
+         // Periksa jika data dikirim melalui body, bukan query string
+         $validator = Validator::make($request->all(), [
+             'user_id' => 'required|string',
+             'fcm_token' => 'required|string',
+         ]);
+     
+         if ($validator->fails()) {
+             return response()->json([
+                 'status' => false,
+                 'message' => $validator->messages()->first(),
+             ], 400);
+         }
+     
+         try {
+             $user = User::find($request->user_id);
+     
+             if (!$user) {
+                 return response()->json([
+                     'status' => false,
+                     'message' => 'User not found',
+                 ], 404);
+             }
+     
+             $user->fcm_token = $request->fcm_token;
+             $user->save();
+     
+             return response()->json([
+                 'status' => true,
+                 'message' => 'FCM token updated successfully',
+             ], 200);
+         } catch (\Exception $e) {
+             return response()->json([
+                 'status' => false,
+                 'message' => 'Failed to update FCM token',
+             ], 500);
+         }
+     }
+     
 }
