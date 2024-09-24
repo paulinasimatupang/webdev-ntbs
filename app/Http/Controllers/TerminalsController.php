@@ -601,17 +601,16 @@ class TerminalsController extends Controller
                 throw new \Exception("Request IMEI not found");
             }
 
-            // Cari Terminal berdasarkan TID dari IMEI Request
             $terminal = Terminal::where('tid', $imeiRequest->tid)->first();
             if (!$terminal) {
                 throw new \Exception("Terminal not found");
             }
 
-            // $pengaduan = Pengaduan::find($imeiRequest->id_pengaduan); // Ganti dengan cara yang sesuai untuk mendapatkan pengaduan terkait
-            // if ($pengaduan) {
-            //     $pengaduan->status = 2;
-            //     $pengaduan->save();
-            // }
+            $pengaduan = Pengaduan::find($imeiRequest->id_pengaduan); 
+            if ($pengaduan) {
+                $pengaduan->status = 2;
+                $pengaduan->save();
+            }
 
             $imeiRequest->status = true;
             $imeiRequest->save();
@@ -635,11 +634,11 @@ class TerminalsController extends Controller
                 throw new \Exception("Request IMEI not found");
             }
 
-            // $pengaduan = Pengaduan::find($imeiRequest->id_pengaduan); // Ganti dengan cara yang sesuai untuk mendapatkan pengaduan terkait
-            // if ($pengaduan) {
-            //     $pengaduan->status = 3;
-            //     $pengaduan->save();
-            // }
+            $pengaduan = Pengaduan::find($imeiRequest->id_pengaduan);
+            if ($pengaduan) {
+                $pengaduan->status = 3;
+                $pengaduan->save();
+            }
 
             $imeiRequest->status = false;
             $imeiRequest->delete();
@@ -667,7 +666,7 @@ class TerminalsController extends Controller
             'tid' => 'required|string|max:255',
             'imei' => 'required|string|max:255',
             'mid' => 'required|string|max:255',
-            // 'id_pengaduan' => 'required|string|max:255',
+            'id_pengaduan' => 'required|string|max:255',
         ]);
 
         // If validation fails, return the error response
@@ -685,7 +684,7 @@ class TerminalsController extends Controller
                 'tid' => $request->input('tid'),
                 'imei' => $request->input('imei'),
                 'mid' => $request->input('mid'),
-                // 'id_pengaduan' => $request->input('id_pengaduan'),
+                'id_pengaduan' => $request->input('id_pengaduan'),
                 'status' => false
             ]);
 
