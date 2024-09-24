@@ -52,7 +52,7 @@ class MessageLogController extends Controller
     public function historyList(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'terminal_id' => 'required|integer',
+            'terminal_id' => 'required',
         ]);
 
         if ($validator->fails()) {
