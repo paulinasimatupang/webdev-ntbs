@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Validator;
 
 use App\Entities\Terminal;
 use App\Entities\Merchant;
+use App\Entities\Pengaduan;
 use App\Entities\TerminalBilliton;
 use App\Entities\TerminalUserBilliton;
 use App\Entities\UsersBilliton;
