@@ -102,6 +102,9 @@ class AuthController extends Controller
 
         return response()->json(['status' => true, 'message' => 'Login successful', 'token' => $token, 'data' => $user], 200);
     }
+
+
+
     /**
      * Simpan data fingerprint user baru
      * @param Request $request
@@ -112,7 +115,7 @@ class AuthController extends Controller
         $fingerPrint = $request->get('finger_print');
         $id = $request->get('id');
 
-        if (!$fingerPrint || !$id) {
+        if (empty($fingerPrint) || empty($id)) {
             return response()->json(['status' => false, 'message' => 'All fields are required'], 400);
         }
 
@@ -130,9 +133,11 @@ class AuthController extends Controller
         }
 
         $user->finger_print = $fingerPrint;
-        $user->save();
-
-        return response()->json(['status' => true, 'message' => 'Fingerprint registered successfully'], 200);
+        if ($user->save()) {
+            return response()->json(['status' => true, 'message' => 'Fingerprint registered successfully'], 200);
+        } else {
+            return response()->json(['status' => false, 'message' => 'Failed to register fingerprint'], 500);
+        }
     }
 
 
