@@ -30,7 +30,7 @@ class Service extends Model implements Transformable
         'is_to_core',
         'service_class',
         'param1',
-        'param_2',
+        'param2',
         'trx_tbl',
         'service_url',
         'system_markup'

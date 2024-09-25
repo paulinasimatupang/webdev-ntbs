@@ -374,6 +374,13 @@ Route::post('/send-test-notif', 'DataCalonNasabahController@sendTestNotification
 // Route::post('/service/{id}/update', 'ServiceController@update')->name('service_update');
 // Route::post('/service/{id}/destroy', 'ServiceController@destroy')->name('service_destroy');
 
+Route::get('/service-biller', 'ServiceBillerController@index')->name('service_biller');
+Route::get('/service-biller/create', 'ServiceController@create')->name('service_create');
+Route::post('/service/store', 'ServiceController@store')->name('service_store');
+Route::get('/service/{id}/edit', 'ServiceController@edit')->name('service_edit');
+Route::post('/service/{id}/update', 'ServiceController@update')->name('service_update');
+Route::post('/service/{id}/destroy', 'ServiceController@destroy')->name('service_destroy');
+
 // Route::get('/screen-component', 'ScreenComponentController@index')->name('screen_component');
 // Route::get('/screen-component/create', 'ScreenComponentController@create')->name('screen_component_create');
 // Route::post('/screen-component/store', 'ScreenComponentController@store')->name('screen_component_store');
