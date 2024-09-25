@@ -83,25 +83,31 @@ class AuthController extends Controller
     public function loginWithFingerprint(Request $request)
     {
         $fingerPrint = $request->get('finger_print');
-
+        Log::info("Fingerprint login attempt");
+    
         if (empty($fingerPrint)) {
+            Log::error("Fingerprint is missing");
             return response()->json(['status' => false, 'message' => 'Fingerprint is required'], 400);
         }
-
+    
         $user = User::where('finger_print', $fingerPrint)->first();
-
         if (!$user) {
+            Log::warning("Fingerprint not recognized for fingerprint: {$fingerPrint}");
             return response()->json(['status' => false, 'message' => 'Fingerprint not recognized'], 404);
         }
-
+    
         try {
             $token = JWTAuth::fromUser($user);
+            Log::info("Token generated successfully for user ID: {$user->id}");
         } catch (JWTException $e) {
+            Log::error("Failed to generate token for user ID: {$user->id}, Error: " . $e->getMessage());
             return response()->json(['status' => false, 'message' => 'Could not create token'], 500);
         }
-
+    
+        Log::info("Fingerprint login successful for user ID: {$user->id}");
         return response()->json(['status' => true, 'message' => 'Login successful', 'token' => $token, 'data' => $user], 200);
     }
+    
 
 
 
@@ -115,7 +121,10 @@ class AuthController extends Controller
         $fingerPrint = $request->get('finger_print');
         $id = $request->get('id');
 
+        Log::info("Registering fingerprint for user ID: {$id}");
+
         if (empty($fingerPrint) || empty($id)) {
+            Log::error("Fingerprint or ID missing. Fingerprint: {$fingerPrint}, ID: {$id}");
             return response()->json(['status' => false, 'message' => 'All fields are required'], 400);
         }
 
@@ -124,22 +133,25 @@ class AuthController extends Controller
                             ->first();
 
         if ($existingUser) {
+            Log::warning("Fingerprint already registered for user ID: {$id}");
             return response()->json(['status' => false, 'message' => 'Fingerprint already registered for this user'], 409);
         }
 
         $user = User::find($id);
         if (!$user) {
+            Log::error("User with ID {$id} not found.");
             return response()->json(['status' => false, 'message' => 'User not found'], 404);
         }
 
         $user->finger_print = $fingerPrint;
         if ($user->save()) {
+            Log::info("Fingerprint registered successfully for user ID: {$id}");
             return response()->json(['status' => true, 'message' => 'Fingerprint registered successfully'], 200);
         } else {
+            Log::error("Failed to save fingerprint for user ID: {$id}");
             return response()->json(['status' => false, 'message' => 'Failed to register fingerprint'], 500);
         }
     }
-
 
 
 
