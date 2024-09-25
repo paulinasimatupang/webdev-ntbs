@@ -84,19 +84,22 @@ class AuthController extends Controller
     {
         $fingerPrint = $request->get('finger_print');
         Log::info("Fingerprint login attempt");
-    
+
         if (empty($fingerPrint)) {
             Log::error("Fingerprint is missing");
             return response()->json(['status' => false, 'message' => 'Fingerprint is required'], 400);
         }
-    
-        $user = User::where('finger_print', $fingerPrint)->first();
+
+        $user = User::where('finger_print', $fingerPrint)
+                    ->with('user_group.group', 'merchant.terminal')
+                    ->first();
+        
         if (!$user) {
             Log::warning("Fingerprint not recognized for fingerprint: {$fingerPrint}");
             Log::info("Fingerprint received for login: {$fingerPrint}");
             return response()->json(['status' => false, 'message' => 'Fingerprint not recognized'], 404);
         }
-    
+
         try {
             $token = JWTAuth::fromUser($user);
             Log::info("Token generated successfully for user ID: {$user->id}");
@@ -104,10 +107,11 @@ class AuthController extends Controller
             Log::error("Failed to generate token for user ID: {$user->id}, Error: " . $e->getMessage());
             return response()->json(['status' => false, 'message' => 'Could not create token'], 500);
         }
-    
+
         Log::info("Fingerprint login successful for user ID: {$user->id}");
         return response()->json(['status' => true, 'message' => 'Login successful', 'token' => $token, 'data' => $user], 200);
     }
+
     
 
 
