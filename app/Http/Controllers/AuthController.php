@@ -135,6 +135,7 @@ class AuthController extends Controller
 
         if ($existingUser) {
             Log::warning("Fingerprint already registered for user ID: {$id}");
+            Log::warning("Fingerprint already registered for user ID: {$fingerPrint}");
             return response()->json(['status' => false, 'message' => 'Fingerprint already registered for this user'], 409);
         }
 
