@@ -93,6 +93,7 @@ class AuthController extends Controller
         $user = User::where('finger_print', $fingerPrint)->first();
         if (!$user) {
             Log::warning("Fingerprint not recognized for fingerprint: {$fingerPrint}");
+            Log::info("Fingerprint received for login: {$fingerPrint}");
             return response()->json(['status' => false, 'message' => 'Fingerprint not recognized'], 404);
         }
     
