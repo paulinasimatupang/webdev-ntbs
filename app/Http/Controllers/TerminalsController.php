@@ -23,6 +23,9 @@ use App\Entities\TerminalBilliton;
 use App\Entities\TerminalUserBilliton;
 use App\Entities\UsersBilliton;
 use App\Entities\Imei;
+use App\Services\SendPushNotification;
+
+
 
 /**
  * Class TerminalsController.
@@ -593,65 +596,110 @@ class TerminalsController extends Controller
     }
 
     public function acceptChangeImei($id)
-    {
-        DB::beginTransaction();
-        try {
-            // Ambil data IMEI berdasarkan ID
-            $imeiRequest = Imei::where('id', $id)->first();
-            if (!$imeiRequest) {
-                throw new \Exception("Request IMEI not found");
-            }
-
-            $terminal = Terminal::where('tid', $imeiRequest->tid)->first();
-            if (!$terminal) {
-                throw new \Exception("Terminal not found");
-            }
-
-            $pengaduan = Pengaduan::find($imeiRequest->id_pengaduan); 
-            if ($pengaduan) {
-                $pengaduan->status = 2;
-                $pengaduan->save();
-            }
-
-            $imeiRequest->status = true;
-            $imeiRequest->save();
-
-            DB::commit();
-            return redirect()->route('imei_request')->with('success', 'Permintaan IMEI berhasil disetujui.');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Error: ' . $e->getMessage());
-            return redirect()->route('imei_request')->with('error', $e->getMessage());
+{
+    DB::beginTransaction();
+    try {
+        // Ambil data IMEI berdasarkan ID
+        $imeiRequest = Imei::where('id', $id)->first();
+        if (!$imeiRequest) {
+            throw new \Exception("Request IMEI not found");
         }
-    }
 
-    public function rejectChangeImei($id)
-    {
-        DB::beginTransaction();
-        try {
-            // Ambil data IMEI berdasarkan ID
-            $imeiRequest = Imei::where('id', $id)->first();
-            if (!$imeiRequest) {
-                throw new \Exception("Request IMEI not found");
-            }
-
-            $pengaduan = Pengaduan::find($imeiRequest->id_pengaduan);
-            if ($pengaduan) {
-                $pengaduan->status = 3;
-                $pengaduan->save();
-            }
-
-            $imeiRequest->status = false;
-            $imeiRequest->delete();
-
-            DB::commit();
-            return redirect()->route('imei_request')->with('success', 'Permintaan IMEI berhasil ditolak.');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Error: ' . $e->getMessage());
-            return redirect()->route('imei_request')->with('error', $e->getMessage());
+        $terminal = Terminal::where('tid', $imeiRequest->tid)->first();
+        if (!$terminal) {
+            throw new \Exception("Terminal not found");
         }
+
+        $pengaduan = Pengaduan::find($imeiRequest->id_pengaduan); 
+        if ($pengaduan) {
+            $pengaduan->status = 2; // Update status pengaduan
+            $pengaduan->save();
+        }
+
+        $imeiRequest->status = true; // Set IMEI request as approved
+        $imeiRequest->save();
+
+        // Cari Merchant berdasarkan MID atau TID yang ada pada IMEI
+        $merchant = Merchant::where('mid', $imeiRequest->mid)->first();
+        if (!$merchant) {
+            throw new \Exception("Merchant not found");
+        }
+
+        // Ambil FCM token dari Merchant
+        $fcmToken = $merchant->fcm_token;
+
+        // Validasi token FCM
+        if ($this->isValidFcmToken($fcmToken)) {
+            // Jika FCM token tersedia, kirim notifikasi
+            $notificationService = new SendPushNotification();
+            $notificationService->sendNotificationToToken($fcmToken, [
+                'title' => 'IMEI Request Approved',
+                'message' => "Your IMEI change request for terminal {$terminal->tid} has been approved.",
+            ]);
+        } else {
+            Log::warning("FCM token tidak valid atau tidak ditemukan untuk merchant MID: {$merchant->mid}");
+        }
+
+        DB::commit();
+        return redirect()->route('imei_request')->with('success', 'IMEI request approved successfully.');
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+        Log::error('Error in acceptChangeImei: ' . $e->getMessage());
+        return redirect()->route('imei_request')->with('error', $e->getMessage());
     }
+}
+
+public function rejectChangeImei($id)
+{
+    DB::beginTransaction();
+    try {
+        Log::info('Rejecting IMEI request with ID: ' . $id); // Tambahkan logging
+
+        // Ambil data IMEI berdasarkan ID
+        $imeiRequest = Imei::where('id', $id)->first();
+        if (!$imeiRequest) {
+            throw new \Exception("Request IMEI not found");
+        }
+
+        // Log data imeiRequest untuk debugging
+        Log::info('IMEI Request found: ' . json_encode($imeiRequest));
+
+        $pengaduan = Pengaduan::find($imeiRequest->id_pengaduan);
+        if ($pengaduan) {
+            $pengaduan->status = 3;
+            $pengaduan->save();
+        }
+
+        $imeiRequest->status = false;
+        $imeiRequest->delete();
+
+        // Cari Merchant berdasarkan MID atau TID yang ada pada IMEI
+        $merchant = Merchant::where('mid', $imeiRequest->mid)->first();
+        if (!$merchant) {
+            throw new \Exception("Merchant not found");
+        }
+
+        // Ambil FCM token dari Merchant
+        $fcmToken = $merchant->fcm_token;
+
+        if ($this->isValidFcmToken($fcmToken)) {
+            $notificationService = new SendPushNotification();
+            $notificationService->sendNotificationToToken($fcmToken, [
+                'title' => 'IMEI Request Rejected',
+                'message' => "Your IMEI change request for terminal {$imeiRequest->tid} has been rejected.",
+            ]);
+        }
+
+        DB::commit();
+        return redirect()->route('imei_request')->with('success', 'IMEI request rejected successfully.');
+    } catch (Exception $e) {
+        DB::rollBack();
+        Log::error('Error in rejectChangeImei: ' . $e->getMessage());
+        return redirect()->route('imei_request')->with('error', $e->getMessage());
+    }
+}
+
 
     public function storeImei(Request $request)
     {
@@ -705,6 +753,12 @@ class TerminalsController extends Controller
         }
     }
 
+    private function isValidFcmToken($fcmToken)
+    {
+        // Validasi sederhana untuk FCM token. Ini dapat disesuaikan dengan aturan validasi yang diperlukan.
+        return !empty($fcmToken) && preg_match('/^[a-zA-Z0-9\-_:.]+$/', $fcmToken);
+    }    
+    
     public function checkStatus(Request $request)
     {
 
