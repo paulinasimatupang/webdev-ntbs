@@ -185,6 +185,7 @@ return [
         // App\Providers\RepositoriesServiceProvider::class,
         Maatwebsite\Excel\ExcelServiceProvider::class,
         Spatie\Permission\PermissionServiceProvider::class,
+        OwenIt\Auditing\AuditingServiceProvider::class
 
     ],
 

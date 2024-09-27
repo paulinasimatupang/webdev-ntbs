@@ -374,6 +374,9 @@ class MerchantsController extends Controller
         $alamat = null;
         $norek = null;
         $no_hp = null;
+        $no_telp = null;
+        $no_npwp = null;
+        $no_ktp = null;
 
         if ($err) {
             Log::error('cURL Error: ' . $err);
@@ -405,6 +408,18 @@ class MerchantsController extends Controller
                                 case 'Nomor Handphone':
                                     $no_hp = $value;
                                     break;
+                                
+                                case 'NIK':
+                                    $no_ktp = $value;
+                                    break;
+                                
+                                case 'NPWP':
+                                    $no_npwp = $value;
+                                    break;
+                                
+                                case 'No Telepon':
+                                    $no_telp = $value;
+                                    break;
                             }
                         }
                     }
@@ -413,7 +428,7 @@ class MerchantsController extends Controller
         }
         
         if ($match){
-            return Redirect::to('/agen/create/inquiry')->with('error', "Merchant dengan Nomor Rekening yang diinputkan Sudah Terdaftar")->withInput();
+            return Redirect::to('/agen/create/inquiry')->with('error', "Agen dengan Nomor Rekening yang diinputkan Sudah Terdaftar")->withInput();
         }
         else if (isset($responseArray['screen']['title']) && $responseArray['screen']['title'] === 'Gagal') {
             return Redirect::to('/agen/create/inquiry')
@@ -430,7 +445,10 @@ class MerchantsController extends Controller
             ->with('fullname', $nama_rek)
             ->with('address', $alamat)
             ->with('no', $norek)
-            ->with('phone', $no_hp);
+            ->with('phone', $no_hp)
+            ->with('no_ktp', $no_ktp)
+            ->with('no_npwp', $no_npwp)
+            ->with('no_telp', $no_telp);
         }
     }
 
@@ -469,6 +487,73 @@ class MerchantsController extends Controller
      */
 
     public function store(Request $request){
+        $rules = [
+            'jenis_agen' => 'required',
+            'no_perjanjian_kerjasama' => 'required|min:5|max:255',
+            'fullname' => 'required',
+            'jenis_kelamin' => 'required',
+            'no' => 'required',
+            'no_cif' => 'required',
+            'no_ktp' => 'required',
+            'no_npwp' => 'required',
+            'no_telp' => 'required',
+            'phone' => 'required',
+            'email' => 'required',
+            'pekerjaan' => 'required',
+            'address' => 'required',
+            'rt' => 'required',
+            'rw' => 'required',
+            'kelurahan' => 'required',
+            'kecamatan' => 'required',
+            'city' => 'required',
+            'provinsi' => 'required',
+            'kode_pos' => 'required',
+            'file_ktp' => 'required',
+            'file_npwp' => 'required',
+            'foto_lokasi_usaha' => 'required',
+        ];
+
+        $customFields = [
+            'jenis_agen' => 'Jenis Agen',
+            'no_perjanjian_kerjasama' => 'Nomor Perjanjian Kerjasama',
+            'fullname' => 'Nama Pemilik',
+            'jenis_kelamin' => 'Jenis Kelamin',
+            'no' => 'Nomor Rekening',
+            'no_cif' => 'Nomor CIF',
+            'no_ktp' => 'Nomor KTP',
+            'no_npwp' => 'Nomor NPWP',
+            'no_telp' => 'Nomor Telepon',
+            'phone' => 'Nomor Handphone',
+            'email' => 'Email',
+            'pekerjaan' => 'Pekerjaan',
+            'address' => 'Alamat',
+            'rt' => 'RT',
+            'rw' => 'RW',
+            'kelurahan' => 'Kelurahan',
+            'kecamatan' => 'Kecamatan',
+            'city' => 'Kota/Kabupaten',
+            'provinsi' => 'Provinsi',
+            'kode_pos' => 'Kode Pos',
+            'file_ktp' => 'File KTP',
+            'file_npwp' => 'File NPWP',
+            'foto_lokasi_usaha' => 'Foto Lokasi Usaha',
+        ];
+
+        $messages = [];
+        foreach ($customFields as $field => $label) {
+            $messages["{$field}.required"] = "{$label} harus diisi.";
+            $messages["{$field}.min"] = "{$label} harus terdiri dari minimal :min karakter.";
+            $messages["{$field}.max"] = "{$label} harus terdiri dari maksminal :max karakter.";
+        }
+
+        $validator = Validator::make($request->all(), $rules, $messages);
+        if ($validator->fails()) {
+            return Redirect::to('agen/create')
+                ->withErrors($validator) 
+                ->with('error', 'Data yang Anda isi tidak valid, Mohon perbaiki sesuai dengan aturan.')
+                ->withInput();
+        }
+
         DB::beginTransaction();
             try {
                 $check = User::where('email',$request->email)
@@ -579,7 +664,7 @@ class MerchantsController extends Controller
 
                 DB::commit();
                 return Redirect::to('agen')
-                                ->with('message', 'Merchant created');
+                                ->with('success', 'Agen berhasil didaftarkan, Mohon menunggu konfirmasi dari Supervisor Cabang');
             } catch (Exception $e) {
                 DB::rollBack();
                     return Redirect::to('agen/create')
@@ -761,7 +846,7 @@ class MerchantsController extends Controller
                 }
                 DB::commit();
                 return Redirect::to('agen/list')
-                                    ->with('message', 'Merchant updated');
+                                    ->with('message', 'Agen updated');
             }else{
                 DB::rollBack();
                 return Redirect::to('agen/'.$id.'/edit')
@@ -791,7 +876,7 @@ class MerchantsController extends Controller
             $merchant = Merchant::where('id', $id)->first();
             
             if (!$merchant) {
-                throw new \Exception("Merchant not found");
+                throw new \Exception("Agen not found");
             }
 
             $user = session()->get('user');
@@ -907,7 +992,7 @@ class MerchantsController extends Controller
             }
 
             DB::commit();
-            return redirect()->route('agen')->with('success', 'Merchant activated successfully.');
+            return redirect()->route('agen')->with('success', 'Agent activated successfully.');
         } catch (\Illuminate\Database\QueryException $e) {
             DB::rollBack();
             Log::error('Database error during agent activation', ['error' => $e->getMessage()]);
@@ -927,7 +1012,7 @@ class MerchantsController extends Controller
             $merchant = Merchant::find($id);
 
             if (!$merchant) {
-                return redirect()->back()->with('error', 'Merchant tidak ditemukan');
+                return redirect()->back()->with('error', 'Agen tidak ditemukan');
             }
 
             $user = User::find($merchant->user_id);
@@ -956,7 +1041,7 @@ class MerchantsController extends Controller
             $merchant = Merchant::where('id', $id)->first();
             
             if (!$merchant) {
-                throw new \Exception("Merchant not found");
+                throw new \Exception("Agen not found");
             }
 
             if ($merchant->status_agen == 1) {
@@ -973,7 +1058,7 @@ class MerchantsController extends Controller
             }
 
             DB::commit();
-            return redirect()->route('agen/list')->with('success', 'Merchant deactivated successfully.');
+            return redirect()->route('agen/list')->with('success', 'Agen deactivated successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Agent deactivation failed', ['error' => $e->getMessage()]);
@@ -999,7 +1084,7 @@ class MerchantsController extends Controller
             if($deleted){
                 $response = [
                     'status'  => true,
-                    'message' => 'Merchant deleted.'
+                    'message' => 'Agen deleted.'
                 ];
     
                 DB::commit();
