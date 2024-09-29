@@ -53,9 +53,12 @@
                             </tr>
                         </thead>
                         <tbody>
+                            @php
+                                $no = 1;
+                            @endphp
                             @foreach ($permissions as $permission)
                                 <tr>
-                                    <td>{{ $permission->id }}</td>
+                                    <th scope="row">{{ $no }}</th>
                                     <td>{{ $permission->name }}</td>
                                     <td>{{ $permission->feature }}</td>
                                     <td>{{ $permission->feature_group }}</td>                                    
@@ -75,6 +78,9 @@
                                         @endif
                                     </td>
                                 </tr>
+                                @php
+                                    $no++;
+                                @endphp
                             @endforeach
                         </tbody>
                     </table>

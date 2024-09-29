@@ -77,7 +77,7 @@
     </div>
     @endif
 
-    @if(isset($feature['role']))
+    <!-- @if(isset($feature['role']))
     <div class="col-lg-4 col-md-4 col-sm-4">
         <a href="/roles" class="card-link">
             <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-2">
@@ -92,17 +92,17 @@
             </div>
         </a>
     </div>
-    @endif
+    @endif -->
 
-    @if(isset($feature['permission']))
+    @if(isset($feature['role']))
     <div class="col-lg-4 col-md-4 col-sm-4">
-        <a href="/permissions" class="card-link">
+        <a href="/roles" class="card-link">
             <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-2">
                 <div class="card-body text-center">
                     <div class="d-flex align-items-center">
                         <img src="{{ asset('assets/images/new_features/permission.png') }}" alt="Service Meta" class="mr-3" style="width: 50px">
                         <div class="text-left">
-                            <p class="text-muted mt-2 mb-0">Permission</p>
+                            <p class="text-muted mt-2 mb-0">Role Permission</p>
                         </div>
                     </div>
                 </div>

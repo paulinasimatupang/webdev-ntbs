@@ -41,15 +41,18 @@
                         style="width:100%">
                         <thead>
                             <tr>
-                                <th>Id</th>
+                                <th>No</th>
                                 <th>Name</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
+                            @php
+                                $no = 1;
+                            @endphp
                             @foreach ($roles as $role)
                                 <tr>
-                                    <td>{{ $role->id }}</td>
+                                    <th scope="row">{{ $no }}</th>
                                     <td>{{ $role->name }}</td>
                                     <td>
                                         @if (in_array('roles.addPermissionToRole', $routes_user))
@@ -75,6 +78,9 @@
                                         @endif
                                     </td>
                                 </tr>
+                                @php
+                                    $no++;
+                                @endphp
                             @endforeach
                         </tbody>
                     </table>

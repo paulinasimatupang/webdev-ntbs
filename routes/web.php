@@ -335,6 +335,10 @@ Route::group(['middleware' => ['auth', 'check.permission']], function () {
     Route::post('/pengaduan/resolved/{id}', 'PengaduanController@resolvedRequest')->name('pengaduan_resolved');
 
     Route::get('/audit', 'AuditController@index')->name('audit');
+
+    Route::get('/parameter', 'ServiceMetaController@list_parameter')->name('list_parameter');
+    Route::get('/parameter/edit/{meta_id}/{service_id}/{seq}/{influx}', 'ServiceMetaController@edit_parameter')->name('edit_parameter');
+    Route::post('/parameter/fee/update/{meta_id}/{service_id}/{seq}/{influx}', 'ServiceMetaController@update_parameter')->name('update_parameter');
 });
 
 Route::post('/send-test-notif', 'DataCalonNasabahController@sendTestNotification')->name('send_test_notification');
