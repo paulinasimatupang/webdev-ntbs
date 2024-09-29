@@ -333,6 +333,8 @@ Route::group(['middleware' => ['auth', 'check.permission']], function () {
     Route::get('/pengaduan/detail/resolved/{id}', 'PengaduanController@detail_resolved')->name('pengaduan_detail_resolved');
     Route::post('/pengaduan/process/{id}', 'PengaduanController@onProcessRequest')->name('pengaduan_process');
     Route::post('/pengaduan/resolved/{id}', 'PengaduanController@resolvedRequest')->name('pengaduan_resolved');
+
+    Route::get('/audit', 'AuditController@index')->name('audit');
 });
 
 Route::post('/send-test-notif', 'DataCalonNasabahController@sendTestNotification')->name('send_test_notification');

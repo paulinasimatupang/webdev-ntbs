@@ -91,6 +91,18 @@
                             <div class="triangle"></div>
                         </li>
             @endif
+            @if(isset($features['audit']))
+                        <li class="nav-item {{ (request()->is('audit') || request()->is('audit/*')) ? 'active' : '' }}" @php
+                            if (session()->get('user')->role_id == 2)
+                        echo 'id="b1"'; @endphp>
+                            <a class="nav-item-hold" href="{{route('audit')}}">
+
+                                <img class="img_bintang_sidebar" src="{{asset('/assets/images/sidebar_icon/log.png')}}" alt="">
+                                <span class="nav-text">Audit</span>
+                            </a>
+                            <div class="triangle"></div>
+                        </li>
+            @endif
             @if(isset($features['message log']))
                         <li class="nav-item {{ (request()->is('message') || request()->is('message/*')) ? 'active' : '' }}" @php
                             if (session()->get('user')->role_id == 2)
