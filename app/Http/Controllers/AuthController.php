@@ -205,6 +205,43 @@ class AuthController extends Controller
      */
     public function doLogin(Request $request)
     {
+        if (!$request->has('username') && !$request->has('username')) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Username dan Password harus diisi',
+                ], 400);
+            } else {
+                return Redirect::to('login')
+                    ->with('error', 'Username dan Password harus diisi')
+                    ->withInput();
+            }
+        }
+        else if (!$request->has('username')) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Username harus diisi',
+                ], 400);
+            } else {
+                return Redirect::to('login')
+                    ->with('error', 'Username harus diisi')
+                    ->withInput();
+            }
+        }
+        else if (!$request->has('password')) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Password harus diisi',
+                ], 400);
+            } else {
+                return Redirect::to('login')
+                    ->with('error', 'Password harus diisi')
+                    ->withInput();
+            }
+        }
+
         $credentials = $request->only('username', 'password');
 
         $rules = [
@@ -231,7 +268,7 @@ class AuthController extends Controller
             if ($request->expectsJson()) {
                 return response()->json([
                     'status' => false,
-                    'message' => 'Username not found.',
+                    'message' => 'Username Tidak Terdaftar.',
                 ], 404);
             } else {
                 return Redirect::to('login')

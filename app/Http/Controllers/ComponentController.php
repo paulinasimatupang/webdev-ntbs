@@ -176,4 +176,23 @@ class ComponentController extends Controller
                 ->with('error', 'Terjadi kesalahan saat menghapus data: ' . $e->getMessage());
         }
     }
+
+    public function list_parameter()
+    {
+        try {
+            $username = auth()->user()->username; 
+
+            $data = Component::whereIn('comp_lbl', ['max_pin', 'max_password', 'min_poin'])
+                ->get();
+
+            return view('apps.masterdata.list-parameter', compact('data', 'username'));
+        } catch (Exception $e) {
+            Log::error('Terjadi kesalahan saat memuat data.', [
+                'error_message' => $e->getMessage(),
+                'stack_trace' => $e->getTraceAsString(),
+            ]);
+            return redirect()->route('list_parameter')
+                ->with('error', 'Terjadi kesalahan saat memuat data: ' . $e->getMessage());
+        }
+    }
 }
