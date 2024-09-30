@@ -9,6 +9,8 @@ use App\Entities\ServiceMeta;
 use App\Entities\MetaType;
 use App\Entities\Service;
 use Exception;
+use Illuminate\Support\Facades\Log;
+
 
 class ServiceMetaController extends Controller
 {
@@ -190,4 +192,40 @@ class ServiceMetaController extends Controller
                 ->withInput();
         }
     }
+
+    public function findServiceMeta(Request $request)
+    {
+        $request->validate([
+            'service_id' => 'required|string',
+        ]);
+    
+        $service_id = $request->input('service_id');
+        $serviceMeta = ServiceMeta::where('service_id', $service_id)
+                                  ->where('meta_default', '!=', '')
+                                  ->get(['meta_id', 'meta_default']);
+    
+        if ($serviceMeta->isEmpty()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Service Meta with default meta not found',
+                'data' => []
+            ], 404);
+        }
+    
+        $result = $serviceMeta->pluck('meta_default', 'meta_id');
+    
+        if ($result->has('nominal_debit') && $result->has('buffer') && $result->has('fee')) {
+            $nominalDebit = (float) $result->get('nominal_debit');
+            $buffer = (float) $result->get('buffer');
+            $fee = (float) $result->get('fee');
+            $totalTransfer = $nominalDebit + $buffer + $fee;
+            $result->put('total_transfer', $totalTransfer);
+        }
+    
+        return response()->json([
+            'status' => true,
+            'message' => 'Service Meta retrieved successfully',
+            'service_meta' => $result
+        ], 200);
+    }    
 }

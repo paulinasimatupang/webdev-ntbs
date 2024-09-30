@@ -23,6 +23,10 @@ Route::post('auth/register', 'AuthController@register');
 Route::post('auth/loginWithFingerprint', 'AuthController@loginWithFingerprint');
 Route::post('auth/registerFingerprint', 'AuthController@registerFingerprint');
 
+Route::get('/findServiceMetaWithDefault', 'ServiceMetaController@findServiceMetaWithDefault');
+// Route::get('/service_meta', 'ServiceMetaController@findServiceMeta')->name('service.meta');
+
+Route::middleware('auth:api')->get('/service_meta', 'ServiceMetaController@findServiceMeta')->name('service.meta');
 
 Route::post('auth/login', 'AuthController@doLogin');
 Route::group(['middleware' => 'auth'], function () {
