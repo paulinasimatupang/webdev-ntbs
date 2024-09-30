@@ -147,6 +147,7 @@ class AuthController extends Controller
             return response()->json(['status' => false, 'message' => 'All fields are required'], 400);
         }
 
+        // Check if the fingerprint is already registered by another user
         $existingFingerprint = User::where('finger_print', $fingerPrint)
                                     ->where('id', '!=', $id) 
                                     ->first();
@@ -156,6 +157,7 @@ class AuthController extends Controller
             return response()->json(['status' => false, 'message' => 'Fingerprint already registered by another user'], 409);
         }
 
+        // Check if the fingerprint is already registered for the current user
         $existingUser = User::where('id', $id)
                             ->where('finger_print', $fingerPrint)
                             ->first();
@@ -165,12 +167,14 @@ class AuthController extends Controller
             return response()->json(['status' => false, 'message' => 'Fingerprint already registered for this user'], 409);
         }
 
+        // Now find the user and register the fingerprint if not registered before
         $user = User::find($id);
         if (!$user) {
             Log::error("User with ID {$id} not found.");
             return response()->json(['status' => false, 'message' => 'User not found'], 404);
         }
 
+        // Set the new fingerprint
         $user->finger_print = $fingerPrint;
         if ($user->save()) {
             Log::info("Fingerprint registered successfully for user ID: {$id}");
@@ -180,8 +184,6 @@ class AuthController extends Controller
             return response()->json(['status' => false, 'message' => 'Failed to register fingerprint'], 500);
         }
     }
-
-
 
 
     public function login(Request $request)
