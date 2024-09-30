@@ -205,7 +205,7 @@ class AuthController extends Controller
      */
     public function doLogin(Request $request)
     {
-        if (!$request->has('username') && !$request->has('username')) {
+        if (!$request->has('username') && !$request->has('password')) {
             if ($request->expectsJson()) {
                 return response()->json([
                     'status' => false,
@@ -229,7 +229,7 @@ class AuthController extends Controller
                     ->withInput();
             }
         }
-        else if (!$request->has('password')) {
+        if (!$request->has('password')) {
             if ($request->expectsJson()) {
                 return response()->json([
                     'status' => false,
