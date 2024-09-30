@@ -5,15 +5,16 @@ namespace App\Entities;
 use Illuminate\Database\Eloquent\Model;
 use Prettus\Repository\Contracts\Transformable;
 use Prettus\Repository\Traits\TransformableTrait;
+use OwenIt\Auditing\Contracts\Auditable;
 
 /**
  * Class Merchants.
  *
  * @package namespace App\Entities;
  */
-class Merchant extends Model implements Transformable
+class Merchant extends Model implements Auditable
 {
-    use TransformableTrait;
+    use \OwenIt\Auditing\Auditable;
 
     public $incrementing = true;
 

@@ -54,7 +54,7 @@
                                         @foreach($data as $item)
                                         <tr>
                                             <th scope="row">{{ $no }}</th>
-                                            <td>{{$item->user_type}}</td>
+                                            <td>{{$item->auditable_type}}</td>
                                             <td>{{$item->event}}</td>
                                             <td>{{$item->old_values}}</td>
                                             <td>{{$item->new_values}}</td>

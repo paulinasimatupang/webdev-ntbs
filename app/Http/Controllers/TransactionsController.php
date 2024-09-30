@@ -88,82 +88,78 @@ class TransactionsController extends Controller
     public function index(Request $request)
     {
         $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
-    
-        $data = Transaction::query(); 
+
+        $query = Transaction::query();
 
         $user = session()->get('user');
 
         if ($user) {
             $role_user = $user->role_id;
             $role = Role::find($role_user);
-    
+
             if ($role && $role->name == 'Agen') {
                 $merchant = session()->get('merchant');
                 if ($merchant) {
                     $kode_agen = $merchant->mid;
-                    $data->where('kode_agen', $kode_agen);
+                    $query->where('kode_agen', $kode_agen);
                 }
             }
         }
 
         if ($request->has('search') && $request->get('search') != '') {
-            $data->where('transaction_code', '=', $request->get('search'));
-        } 
-
-        if($request->has('start_date') && $request->get('start_date')!=''){
-            $data->where('transaction_time', '>', $request->get('start_date'). ' 00:00:00.000');
+            $query->where('transaction_code', '=', $request->get('search'));
         }
 
-        if($request->has('end_date') && $request->get('end_date')!=''){
-            $data->where('transaction_time', '<=', $request->get('end_date'). ' 23:59:59.999');
+        if ($request->has('mid') && $request->get('mid') != '') {
+            $query->where('kode_agen', '=', $request->get('mid'));
+        }
+
+        if ($request->has('start_date') && $request->get('start_date') != '') {
+            $query->where('transaction_time', '>', $request->get('start_date') . ' 00:00:00.000');
+        }
+
+        if ($request->has('end_date') && $request->get('end_date') != '') {
+            $query->where('transaction_time', '<=', $request->get('end_date') . ' 23:59:59.999');
         }
 
         if ($request->has('status') && $request->get('status') != '' && $request->get('status') != 'Select Status') {
             $status = $request->get('status');
             switch ($status) {
                 case 'Success':
-                    $data->where('transaction_status_id', 0);
+                    $query->where('transaction_status_id', 0);
                     break;
                 case 'Failed':
-                    $data->where('transaction_status_id', 1);
+                    $query->where('transaction_status_id', 1);
                     break;
                 case 'Pending':
-                    $data->where('transaction_status_id', 2);
+                    $query->where('transaction_status_id', 2);
                     break;
             }
         }
-    
+
         $orderType = $request->get('order_type', 'desc');
         $orderBy = $request->get('order_by', 'transaction_time');
-        $data->orderBy($orderBy, $orderType);
+        $query->orderBy($orderBy, $orderType);
 
-        $totalAmount = $data->sum('amount');
-        $transactionCode = $data->pluck('transaction_code')->unique();
-        $transactions = Transaction::whereIn('transaction_code', $transactionCode)->get();
-        $totalFee = 0;
+        $data = $query->paginate(10);
 
-        foreach ($transactions as $transaction) {
-            if ($role && $role->name == 'Agen') {
-                $fees = TransactionFee::where('transaction_code', $transaction->transaction_code)
+        $totalAmount = $query->sum('amount');
+        $transactionCodes = $query->pluck('transaction_code')->unique();
+        if ($role && $role->name == 'Agen') {
+            // Jika role adalah 'Agen', ambil fee dari tabel TransactionFee dengan penerima 'Agent'
+            $totalFee = TransactionFee::whereIn('transaction_code', $transactionCodes)
                                     ->where('penerima', 'Agent')
-                                    ->pluck('fee');
-                $totalFee += $fees->sum();
-            } else {
-                $fees = TransactionFee::where('transaction_code', $transaction->transaction_code)
-                                    ->pluck('fee');
-                $totalFee += $fees->sum();
-            }
-
+                                    ->sum('fee');
+        } else {
+            $totalFee = $query->sum('fee');
         }
 
         $dataRevenue = [
-            'total_trx' => $data->count(),
+            'total_trx' => $query->count(),
             'amount_trx' => $totalAmount,
             'total_fee' => $totalFee,
         ];
-    
-        $data = $data->paginate(10);
-    
+
         return view('apps.transactions.list')
             ->with('data', $data)
             ->with('dataRevenue', $dataRevenue)

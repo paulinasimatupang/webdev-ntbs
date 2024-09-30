@@ -6,14 +6,16 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Prettus\Repository\Contracts\Transformable;
 use Prettus\Repository\Traits\TransformableTrait;
+use OwenIt\Auditing\Contracts\Auditable;
 
 /**
  * Class Terminals.
  *
  * @package namespace App\Entities;
  */
-class Terminal extends Model implements Transformable
+class Terminal extends Model implements Auditable
 {
+    use \OwenIt\Auditing\Auditable;
     use TransformableTrait;
     use SoftDeletes;
 

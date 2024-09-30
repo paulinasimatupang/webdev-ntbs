@@ -338,7 +338,7 @@ class MerchantsController extends Controller
         $dateTime = date("YmdHms");
 
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, "http://108.137.154.8:8080/ARRest/api/");
+        curl_setopt($ch, CURLOPT_URL, "http://16.78.84.90:8080/ARRest/api/");
         $data = json_encode([
             'msg'=>([
             'msg_id' =>  "$terminal$dateTime",
@@ -349,7 +349,8 @@ class MerchantsController extends Controller
         ]);
        
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'Content-Type: text/plain'
+            'Content-Type: text/plain',
+            'Accept: text/plain'
         ]);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
@@ -401,8 +402,7 @@ class MerchantsController extends Controller
         
                                 case 'Nomor Rekening':
                                     $norek = $value;
-                                    // $match = Merchant::where('no', $norek)->exists();
-                                    $match=null;
+                                    $match = Merchant::where('no', $norek)->exists();
                                     break;
         
                                 case 'Nomor Handphone':
@@ -428,11 +428,18 @@ class MerchantsController extends Controller
         }
         
         if ($match){
-            return Redirect::to('/agen/create/inquiry')->with('error', "Agen dengan Nomor Rekening yang diinputkan Sudah Terdaftar")->withInput();
+            return Redirect::to('/agen/create/inquiry')->with('error', "Agen dengan Nomor Rekening yang Anda Masukkan Sudah Terdaftar")->withInput();
         }
         else if (isset($responseArray['screen']['title']) && $responseArray['screen']['title'] === 'Gagal') {
+            $errorMessage = '';
+            if (isset($responseArray['screen']['comps']['comp'][0]['comp_values']['comp_value'][0]['value'])) {
+                $errorMessage = $responseArray['screen']['comps']['comp'][0]['comp_values']['comp_value'][0]['value'];
+            } else {
+                $errorMessage = "Terjadi Kesalahan";
+            }
+
             return Redirect::to('/agen/create/inquiry')
-                            ->with('error', "No Rekening Belum Terdaftar")
+                            ->with('error', $errorMessage)
                             ->withInput();
         } else {
             $cekSaldoResult = $this->cek_saldo($norek, $nama_rek);
@@ -486,84 +493,78 @@ class MerchantsController extends Controller
      * @throws \Prettus\Validator\Exceptions\ValidatorException
      */
 
-    public function store(Request $request){
-        $rules = [
-            'jenis_agen' => 'required',
-            'no_perjanjian_kerjasama' => 'required|min:5|max:255',
-            'fullname' => 'required',
-            'jenis_kelamin' => 'required',
-            'no' => 'required',
-            'no_cif' => 'required',
-            'no_ktp' => 'required',
-            'no_npwp' => 'required',
-            'no_telp' => 'required',
-            'phone' => 'required',
-            'email' => 'required',
-            'pekerjaan' => 'required',
-            'address' => 'required',
-            'rt' => 'required',
-            'rw' => 'required',
-            'kelurahan' => 'required',
-            'kecamatan' => 'required',
-            'city' => 'required',
-            'provinsi' => 'required',
-            'kode_pos' => 'required',
-            'file_ktp' => 'required',
-            'file_npwp' => 'required',
-            'foto_lokasi_usaha' => 'required',
-        ];
-
-        $customFields = [
-            'jenis_agen' => 'Jenis Agen',
-            'no_perjanjian_kerjasama' => 'Nomor Perjanjian Kerjasama',
-            'fullname' => 'Nama Pemilik',
-            'jenis_kelamin' => 'Jenis Kelamin',
-            'no' => 'Nomor Rekening',
-            'no_cif' => 'Nomor CIF',
-            'no_ktp' => 'Nomor KTP',
-            'no_npwp' => 'Nomor NPWP',
-            'no_telp' => 'Nomor Telepon',
-            'phone' => 'Nomor Handphone',
-            'email' => 'Email',
-            'pekerjaan' => 'Pekerjaan',
-            'address' => 'Alamat',
-            'rt' => 'RT',
-            'rw' => 'RW',
-            'kelurahan' => 'Kelurahan',
-            'kecamatan' => 'Kecamatan',
-            'city' => 'Kota/Kabupaten',
-            'provinsi' => 'Provinsi',
-            'kode_pos' => 'Kode Pos',
-            'file_ktp' => 'File KTP',
-            'file_npwp' => 'File NPWP',
-            'foto_lokasi_usaha' => 'Foto Lokasi Usaha',
-        ];
-
-        $messages = [];
-        foreach ($customFields as $field => $label) {
-            $messages["{$field}.required"] = "{$label} harus diisi.";
-            $messages["{$field}.min"] = "{$label} harus terdiri dari minimal :min karakter.";
-            $messages["{$field}.max"] = "{$label} harus terdiri dari maksminal :max karakter.";
-        }
-
-        $validator = Validator::make($request->all(), $rules, $messages);
-        if ($validator->fails()) {
-            return Redirect::to('agen/create')
-                ->withErrors($validator) 
-                ->with('error', 'Data yang Anda isi tidak valid, Mohon perbaiki sesuai dengan aturan.')
-                ->withInput();
-        }
-
+    public function store(Request $request)
+    {
         DB::beginTransaction();
-            try {
-                $check = User::where('email',$request->email)
-                                ->first();
-                if($check){
-                    return Redirect::to('agen/create')
-                    ->with('error', 'Email Sudah Terdaftar')
-                    ->withInput();
-                }
+        try {
+            $rules = [
+                'jenis_agen' => 'required',
+                'no_perjanjian_kerjasama' => 'required|min:5|max:50',
+                'fullname' => 'required',
+                'jenis_kelamin' => 'required',
+                'no' => 'required',
+                'no_cif' => 'required',
+                'no_ktp' => 'required',
+                'no_npwp' => 'required',
+                'no_telp' => 'required',
+                'phone' => 'required',
+                'email' => 'required',
+                'pekerjaan' => 'required',
+                'address' => 'required',
+                'rt' => 'required',
+                'rw' => 'required',
+                'kelurahan' => 'required',
+                'kecamatan' => 'required',
+                'city' => 'required',
+                'provinsi' => 'required',
+                'kode_pos' => 'required',
+                'file_ktp' => 'required',
+                'file_npwp' => 'required',
+                'foto_lokasi_usaha' => 'required',
+            ];
 
+            $customFields = [
+                'jenis_agen' => 'Jenis Agen',
+                'no_perjanjian_kerjasama' => 'Nomor Perjanjian Kerjasama',
+                'fullname' => 'Nama Pemilik',
+                'jenis_kelamin' => 'Jenis Kelamin',
+                'no' => 'Nomor Rekening',
+                'no_cif' => 'Nomor CIF',
+                'no_ktp' => 'Nomor KTP',
+                'no_npwp' => 'Nomor NPWP',
+                'no_telp' => 'Nomor Telepon',
+                'phone' => 'Nomor Handphone',
+                'email' => 'Email',
+                'pekerjaan' => 'Pekerjaan',
+                'address' => 'Alamat',
+                'rt' => 'RT',
+                'rw' => 'RW',
+                'kelurahan' => 'Kelurahan',
+                'kecamatan' => 'Kecamatan',
+                'city' => 'Kota/Kabupaten',
+                'provinsi' => 'Provinsi',
+                'kode_pos' => 'Kode Pos',
+                'file_ktp' => 'File KTP',
+                'file_npwp' => 'File NPWP',
+                'foto_lokasi_usaha' => 'Foto Lokasi Usaha',
+            ];
+
+            $messages = [];
+                foreach ($customFields as $field => $label) {
+                $messages["{$field}.required"] = "{$label} harus diisi.";
+                $messages["{$field}.min"] = "{$label} harus terdiri dari minimal :min karakter.";
+                $messages["{$field}.max"] = "{$label} harus terdiri dari maksminal :max karakter.";
+            }
+
+            $validator = Validator::make($request->all(), $rules, $messages);
+            if ($validator->fails()) {
+                dd($request);
+                return Redirect::to('agen/create')
+                    ->withErrors($validator) 
+                    ->with('error', 'Data yang Anda isi tidak valid, Mohon perbaiki sesuai dengan aturan.')
+                    ->withInput();
+            }
+            else{
                 $role = Role::where('name', 'Agen')->first();
                 if ($role) {
                     $role_id = $role->id;
@@ -665,6 +666,7 @@ class MerchantsController extends Controller
                 DB::commit();
                 return Redirect::to('agen')
                                 ->with('success', 'Agen berhasil didaftarkan, Mohon menunggu konfirmasi dari Supervisor Cabang');
+            }
             } catch (Exception $e) {
                 DB::rollBack();
                     return Redirect::to('agen/create')
@@ -992,7 +994,7 @@ class MerchantsController extends Controller
             }
 
             DB::commit();
-            return redirect()->route('agen')->with('success', 'Agent activated successfully.');
+            return redirect()->route('agen')->with('success', 'Agen Berhasil Diaktivasi');
         } catch (\Illuminate\Database\QueryException $e) {
             DB::rollBack();
             Log::error('Database error during agent activation', ['error' => $e->getMessage()]);

@@ -294,7 +294,7 @@ class DataCalonNasabahController extends Controller
             $dateTime = date("YmdHis");
 
             $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL, "http://108.137.154.8:8080/ARRest/api/");
+            curl_setopt($ch, CURLOPT_URL, "http://16.78.84.90:8080/ARRest/api/");
             $data = json_encode([
                 'msg' => [
                     'msg_id' => "$terminal$dateTime",
@@ -432,7 +432,7 @@ private function moveToUsersTable($nasabah)
                 $dateTime = date("YmdHis");
 
                 $ch = curl_init();
-                curl_setopt($ch, CURLOPT_URL, "http://108.137.154.8:8080/ARRest/api/");
+                curl_setopt($ch, CURLOPT_URL, "http://16.78.84.90:8080/ARRest/api/");
                 $data = json_encode([
                     'msg' => [
                         'msg_id' => "$terminal$dateTime",
@@ -443,7 +443,8 @@ private function moveToUsersTable($nasabah)
                 ]);
 
                 curl_setopt($ch, CURLOPT_HTTPHEADER, [
-                    'Content-Type: text/plain'
+                    'Content-Type: text/plain',
+                    'Accept: text/plain'
                 ]);
                 curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
                 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");

@@ -1,11 +1,12 @@
 <?php
 
 namespace App\Entities;
-
+use OwenIt\Auditing\Contracts\Auditable;
 use Illuminate\Database\Eloquent\Model;
 
-class Imei extends Model
+class Imei extends Model implements Auditable
 {
+    use \OwenIt\Auditing\Auditable;
     protected $connection = 'pgsql_billiton';
     protected $primaryKey = 'id';
     public $timestamps = false;

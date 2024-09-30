@@ -35,7 +35,6 @@
                                     <input type="text" class="form-control" value="{{ request('search') }}" name="search" id="search" placeholder="Transaction Code">
                                 </div>
                             </div>
-
                             <div class="custom-separator"></div>
 
                             <div class="form-row">
@@ -52,6 +51,10 @@
                             <div class="custom-separator"></div>
 
                             <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label for="mid" class="ul-form__label">Kode Agen:</label>
+                                    <input type="text" class="form-control" value="{{ request('mid') }}" name="mid" id="mid" placeholder="Kode Agen">
+                                </div>
                                 <div class="form-group col-md-4">
                                     <label for="status" class="ul-form__label">Status:</label>
                                     <select class="form-control" name="status" id="status">
@@ -161,6 +164,7 @@
                             <thead>
                                 <tr>
                                     <th>No</th>
+                                    <th>Kode Agen</th>
                                     <th>Name</th>
                                     <th>Transaction Code</th>
                                     <th>Amount</th>
@@ -169,7 +173,6 @@
                                     <th>Norek Pengirim</th>
                                     <th>Norek Penerima</th>
                                     <th>Tipe Produk</th>
-                                    <th>Kode Agen</th>
                                     <th>Status</th>
                                 </tr>
                             </thead>
@@ -180,6 +183,7 @@
                                 @foreach($data as $item)
                                     <tr>
                                         <td>{{ $no++ }}</td>
+                                        <td>{{ $item->kode_agen ?? '' }}</td>
                                         <td>{{ $item->merchant->name ?? '' }}</td>
                                         <td>{{ $item->transaction_code }}</td>
                                         <td>@currency($item->amount)</td>
@@ -188,7 +192,6 @@
                                         <td>{{ $item->rekening_pengirim }}</td>
                                         <td>{{ $item->rekening_penerima }}</td>
                                         <td>{{ $item->transaction_type }}</td>
-                                        <td>{{ $item->merchant->mid ?? '' }}</td>
                                         <td>
                                             @switch($item->transaction_status_id)
                                                 @case(0)

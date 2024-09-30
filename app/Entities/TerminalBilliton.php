@@ -3,9 +3,11 @@
 namespace App\Entities;
 
 use Illuminate\Database\Eloquent\Model;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class TerminalBilliton extends Model
+class TerminalBilliton extends Model implements Auditable
 {
+    use \OwenIt\Auditing\Auditable;
 
     protected $connection = 'pgsql_billiton';
     protected $primaryKey = 'terminal_id';

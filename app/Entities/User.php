@@ -13,10 +13,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use DateTimeZone;
 use DateTime;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class User extends Authenticatable implements JWTSubject
+class User extends Authenticatable implements JWTSubject, Auditable
 {
     use Notifiable, HasRoles;
+    
+    use \OwenIt\Auditing\Auditable;
 
     // HasFactory;
 

@@ -110,7 +110,7 @@
                             <div class="form-group row">
                                 <label class="col-sm-2 col-form-label">Nama Pemilik</label>
                                 <div class="col-sm-10">
-                                    <input type="text" class="form-control @error('fullname') is-invalid @enderror" name="fullname" value="{{ old('fullname', session('fullname', null)) }}" placeholder="Nama Lengkap" {{ session('name') ? 'readonly' : '' }}>
+                                    <input type="text" class="form-control @error('fullname') is-invalid @enderror" name="fullname" value="{{ old('fullname', session('fullname', null)) }}" placeholder="Nama Lengkap" {{ old('fullname') || session('fullname') ? 'readonly' : '' }}>
                                     @error('fullname')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -135,7 +135,7 @@
                             <div class="form-group row">
                                 <label class="col-sm-2 col-form-label">Nomor Rekening</label>
                                 <div class="col-sm-10">
-                                    <input type="text" class="form-control @error('no') is-invalid @enderror" name="no" value="{{ old('no', session('no', null)) }}" placeholder="Nomor Rekening" {{ session('no') ? 'readonly' : '' }}>
+                                    <input type="text" class="form-control @error('no') is-invalid @enderror" name="no" value="{{ old('no', session('no', null)) }}" placeholder="Nomor Rekening" {{  old('no') || session('no') ? 'readonly' : '' }}>
                                     @error('no')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -144,7 +144,7 @@
                             <div class="form-group row">
                                 <label class="col-sm-2 col-form-label">Nomor CIF</label>
                                 <div class="col-sm-10">
-                                    <input type="text" class="form-control @error('no_cif') is-invalid @enderror" name="no_cif" value="{{ old('no_cif', session('no_cif', null)) }}" placeholder="Nomor CIF" {{ session('no_cif') ? 'readonly' : '' }}>
+                                    <input type="text" class="form-control @error('no_cif') is-invalid @enderror" name="no_cif" value="{{ old('no_cif', session('no_cif', null)) }}" placeholder="Nomor CIF" {{  old('no_cif') || session('no_cif') ? 'readonly' : '' }}>
                                     @error('no_cif')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -153,7 +153,7 @@
                             <div class="form-group row">
                                 <label class="col-sm-2 col-form-label">NIK</label>
                                 <div class="col-sm-10">
-                                    <input type="text" class="form-control @error('no_ktp') is-invalid @enderror" name="no_ktp" value="{{ old('no_ktp', session('no_ktp', null)) }}" placeholder="NIK" {{ session('no_ktp') ? 'readonly' : '' }}>
+                                    <input type="text" class="form-control @error('no_ktp') is-invalid @enderror" name="no_ktp" value="{{ old('no_ktp', session('no_ktp', null)) }}" placeholder="NIK" {{  old('no_ktp') || session('no_ktp') ? 'readonly' : '' }}>
                                     @error('no_ktp')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -162,7 +162,7 @@
                             <div class="form-group row">
                                 <label class="col-sm-2 col-form-label">Nomor NPWP</label>
                                 <div class="col-sm-10">
-                                    <input type="text" class="form-control @error('no_npwp') is-invalid @enderror" name="no_npwp" value="{{ old('no_npwp', session('no_npwp', null)) }}" placeholder="Nomor NPWP" {{ session('no_npwp') ? 'readonly' : '' }}>
+                                    <input type="text" class="form-control @error('no_npwp') is-invalid @enderror" name="no_npwp" value="{{ old('no_npwp', session('no_npwp', null)) }}" placeholder="Nomor NPWP" {{  old('no_npwp') || session('no_npwp') ? 'readonly' : '' }}>
                                     @error('no_npwp')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -171,7 +171,7 @@
                             <div class="form-group row">
                                 <label class="col-sm-2 col-form-label">Nomor Telepon</label>
                                 <div class="col-sm-10">
-                                    <input type="text" class="form-control @error('no_telp') is-invalid @enderror" name="no_telp" value="{{ old('no_telp', session('no_telp', null)) }}" placeholder="Nomor Telepon" {{ session('no_telp') ? 'readonly' : '' }}>
+                                    <input type="text" class="form-control @error('no_telp') is-invalid @enderror" name="no_telp" value="{{ old('no_telp', session('no_telp', null)) }}" placeholder="Nomor Telepon" {{  old('no_telp') || session('no_telp') ? 'readonly' : '' }}>
                                     @error('no_telp')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -180,7 +180,7 @@
                             <div class="form-group row">
                                 <label class="col-sm-2 col-form-label">Nomor Handphone</label>
                                 <div class="col-sm-10">
-                                    <input type="text" class="form-control @error('phone') is-invalid @enderror" name="phone" value="{{ old('phone', session('phone', null)) }}" placeholder="Nomor Handphone" {{ session('phone') ? 'readonly' : '' }}>
+                                    <input type="text" class="form-control @error('phone') is-invalid @enderror" name="phone" value="{{ old('phone', session('phone', null)) }}" placeholder="Nomor Handphone" {{  old('phone') ||  session('phone') ? 'readonly' : '' }}>
                                     @error('phone')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -207,25 +207,86 @@
                             <div class="form-group row">
                                 <label class="col-sm-2 col-form-label">Alamat</label>
                                 <div class="col-sm-10">
-                                    <input type="text" class="form-control @error('address') is-invalid @enderror" name="address" value="{{ old('address', session('address', null)) }}" placeholder="Alamat" {{ session('address') ? 'readonly' : '' }}>
+                                    <input type="text" class="form-control @error('address') is-invalid @enderror" name="address" value="{{ old('address', session('address', null)) }}" placeholder="Alamat" {{  old('address') || session('address') ? 'readonly' : '' }}>
                                     @error('address')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label class="col-sm-2 col-form-label">Kota</label>
+                                <label class="col-sm-2 col-form-label">RT</label>
                                 <div class="col-sm-10">
-                                    <input type="text" class="form-control @error('kota') is-invalid @enderror" name="kota" value="{{ old('kota', session('kota', null)) }}" placeholder="Kota" {{ session('kota') ? 'readonly' : '' }}>
-                                    @error('kota')
+                                    <input type="number" class="form-control @error('rt') is-invalid @enderror" name="rt" value="{{ old('rt', session('rt', null)) }}" placeholder="RT">
+                                    @error('rt')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
                             </div>
                             <div class="form-group row">
+                                <label class="col-sm-2 col-form-label">RW</label>
+                                <div class="col-sm-10">
+                                    <input type="number" class="form-control @error('rw') is-invalid @enderror" name="rw" value="{{ old('rw', session('rw', null)) }}" placeholder="RW">
+                                    @error('rw')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-sm-2 col-form-label">Kelurahan</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control @error('kelurahan') is-invalid @enderror" name="kelurahan" value="{{ old('kelurahan', session('kelurahan', null)) }}" placeholder="Kelurahan">
+                                    @error('kelurahan')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-sm-2 col-form-label">Kecamatan</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control @error('kecamatan') is-invalid @enderror" name="kecamatan" value="{{ old('kecamatan', session('kecamatan', null)) }}" placeholder="Kecamatan">
+                                    @error('kecamatan')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-sm-2 col-form-label">Kota/Kabupaten</label>
+                                <div class="col-sm-10">
+                                    <select class="form-control" name="city">
+                                        <option value="">Pilih Kota/Kabupaten</option>
+                                        @if($kota_kabupaten && count($kota_kabupaten) > 0)
+                                            @foreach($kota_kabupaten as $item)
+                                                <option value="{{ $item->opt_label }}" {{ old('city', session('city', null)) == $item->opt_label ? 'selected' : '' }}>
+                                                    {{ $item->opt_label }}
+                                                </option>
+                                            @endforeach
+                                        @else
+                                            <option value="">Data Kota/Kabupaten tidak tersedia</option>
+                                        @endif
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-sm-2 col-form-label">Provinsi</label>
+                                <div class="col-sm-10">
+                                    <select class="form-control" name="provinsi">
+                                        <option value="">Pilih Provinsi</option>
+                                        @if($provinsi && count($provinsi) > 0)
+                                            @foreach($provinsi as $item)
+                                                <option value="{{ $item->opt_label }}" {{ old('provinsi', session('provinsi', null)) == $item->opt_label ? 'selected' : '' }}>
+                                                    {{ $item->opt_label }}
+                                                </option>
+                                            @endforeach
+                                        @else
+                                            <option value="">Data Provinsi tidak tersedia</option>
+                                        @endif
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
                                 <label class="col-sm-2 col-form-label">Kode Pos</label>
                                 <div class="col-sm-10">
-                                    <input type="text" class="form-control @error('kode_pos') is-invalid @enderror" name="kode_pos" value="{{ old('kode_pos', session('kode_pos', null)) }}" placeholder="Kode Pos" {{ session('kode_pos') ? 'readonly' : '' }}>
+                                    <input type="text" class="form-control @error('kode_pos') is-invalid @enderror" name="kode_pos" value="{{ old('kode_pos', session('kode_pos', null)) }}" placeholder="Kode Pos" {{  old('kode_pos') || session('kode_pos') ? 'readonly' : '' }}>
                                     @error('kode_pos')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -377,6 +438,12 @@
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
     <script>
         document.getElementById('nextBtn').addEventListener('click', function () {
+            const totalPoints = parseInt(document.getElementById('totalPoints').textContent);
+            const requiredPoints = 50; 
+            if (totalPoints < requiredPoints) {
+                alert(`Total poin harus mencapai minimal ${requiredPoints} untuk melanjutkan.`);
+                return;
+            }
             document.getElementById('step1').style.display = 'none';
             document.getElementById('step2').style.display = 'block';
             document.getElementById('step3').style.display = 'none';
