@@ -11,28 +11,23 @@ use Prettus\Repository\Traits\TransformableTrait;
  *
  * @package namespace App\Entities;
  */
-class CompOption extends Model implements Transformable
+class OptionValue extends Model implements Transformable
 {
     use TransformableTrait;
     protected $connection = 'pgsql_billiton';
-    protected $table = 'comp_option';
-    protected $primaryKey = null; 
+    protected $table = 'option_value';
+    protected $primaryKey = null;
+    public $incrementing = false; 
     public $timestamps = false;
 
     protected $fillable = [
         'opt_id',
-        'comp_id',
-        'seq',
-        'opt_label'
+        'meta_id',
+        'default_value'
     ];
-
     public function comp_option()
     {
-        return $this->belongsTo(Component::class,'opt_id','opt_id');
+        return $this->belongsTo(CompOption::class,'opt_id','opt_id');
     }
 
-    public function option_value()
-    {
-        return $this->belongsTo(OptionValue::class,'meta_id','meta_id');
-    }
 }

@@ -17,7 +17,7 @@ class ServiceMetaController extends Controller
     public function index()
     {
         try {
-            $username = auth()->user()->username; // Cara mendapatkan username
+            $username = auth()->user()->username;
             $groups = ServiceMeta::all();
             return view('apps.servicemeta.list', compact('groups', 'username'));
         } catch (Exception $e) {
@@ -114,13 +114,26 @@ class ServiceMetaController extends Controller
         try {
             $username = auth()->user()->username; 
 
-            $groups = ServiceMeta::where('meta_id', 'rek_penerima')
+            $groups = ServiceMeta::whereIn('meta_id', ['rek_penerima', 'buffer', 'fee'])
                 ->whereIn('service_id', ['BPR001'])
-                ->where('influx', 3)
                 ->with('service') 
                 ->orderBy('service_id')
                 ->get();
 
+                // Array untuk menyimpan meta_id yang sudah ditemukan
+                $filteredGroups = [];
+                $seenMetaIds = [];
+
+                foreach ($groups as $group) {
+                    // Gunakan kombinasi beberapa kolom untuk lebih akurat menyaring
+                    $uniqueKey = $group->meta_id . '-' . $group->service_id;
+        
+                    if (!in_array($uniqueKey, $seenMetaIds)) {
+                        $filteredGroups[] = $group; // Simpan hanya satu influx berdasarkan kombinasi unik
+                        $seenMetaIds[] = $uniqueKey; // Tandai kombinasi unik sudah disimpan
+                    }
+                }
+                $groups = $filteredGroups;
             return view('apps.masterdata.list-parameter', compact('groups', 'username'));
         } catch (Exception $e) {
             Log::error('Terjadi kesalahan saat memuat data.', [
@@ -153,10 +166,20 @@ class ServiceMetaController extends Controller
     {
         DB::beginTransaction();
         try {
-            // Validasi data yang masuk
             $validatedData = $request->validate([
                 'meta_default' => 'nullable|string',
             ]);
+
+            $oldMetaDefault = DB::connection('pgsql_billiton')->table('service_meta')
+                ->where('meta_id', '=', $meta_id)
+                ->where('service_id', '=', $service_id)
+                ->where('seq', '=', $seq)
+                ->where('influx', '=', $influx)
+                ->value('meta_default');
+
+            if ($oldMetaDefault === null) {
+                throw new Exception('Nilai meta_default tidak ditemukan.');
+            }
 
             $updated = DB::connection('pgsql_billiton')->table('service_meta')
                 ->where('meta_id', '=', $meta_id)
@@ -168,16 +191,16 @@ class ServiceMetaController extends Controller
                 ]);
 
             if ($updated === 0) {
-                throw new Exception('Tidak ada record yang diperbarui untuk influx 3.');
+                throw new Exception('Tidak ada record yang diperbarui.');
             }
 
             DB::connection('pgsql_billiton')->table('service_meta')
                 ->where('meta_id', '=', $meta_id)
-                ->where('service_id', '=', $service_id)
-                ->where('influx', 5)
+                ->where('meta_default', '=', $oldMetaDefault)
                 ->update([
                     'meta_default' => $request->input('meta_default'),
                 ]);
+
             DB::commit();
             return redirect()->route('list_parameter')->with('success', 'Data berhasil diperbarui.');
         } catch (Exception $e) {

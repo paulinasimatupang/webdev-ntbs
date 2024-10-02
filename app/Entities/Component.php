@@ -43,4 +43,10 @@ class Component extends Model implements Transformable
     {
         return $this->belongsTo(ComponentContentType::class, 'comp_content_type', 'comp_content_type');
     }
+
+    public function comp_option()
+    {
+        return $this->hasMany(CompOption::class, 'comp_id', 'comp_id');
+    }
 }
+

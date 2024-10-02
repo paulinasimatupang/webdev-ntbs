@@ -339,6 +339,13 @@ Route::group(['middleware' => ['auth', 'check.permission']], function () {
     Route::get('/parameter', 'ServiceMetaController@list_parameter')->name('list_parameter');
     Route::get('/parameter/edit/{meta_id}/{service_id}/{seq}/{influx}', 'ServiceMetaController@edit_parameter')->name('edit_parameter');
     Route::post('/parameter/fee/update/{meta_id}/{service_id}/{seq}/{influx}', 'ServiceMetaController@update_parameter')->name('update_parameter');
+
+    Route::get('/produk', 'OptionValueController@list_produk')->name('list_produk');
+    Route::get('/produk/create', 'OptionValueController@create')->name('create_produk');
+    Route::post('/produk/store', 'OptionValueController@store')->name('store_produk');
+    Route::get('/produk/edit/{opt_id}/{meta_id}', 'OptionValueController@edit')->name('edit_produk');
+    Route::post('/produk/update/{opt_id}/{meta_id}', 'OptionValueController@update')->name('update_produk');
+
 });
 
 Route::post('/send-test-notif', 'DataCalonNasabahController@sendTestNotification')->name('send_test_notification');

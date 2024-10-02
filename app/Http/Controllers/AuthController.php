@@ -205,48 +205,19 @@ class AuthController extends Controller
      */
     public function doLogin(Request $request)
     {
-        if (!$request->has('username') && !$request->has('password')) {
-            if ($request->expectsJson()) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Username dan Password harus diisi',
-                ], 400);
-            } else {
-                return Redirect::to('login')
-                    ->with('error', 'Username dan Password harus diisi')
-                    ->withInput();
-            }
-        }
-        else if (!$request->has('username')) {
-            if ($request->expectsJson()) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Username harus diisi',
-                ], 400);
-            } else {
-                return Redirect::to('login')
-                    ->with('error', 'Username harus diisi')
-                    ->withInput();
-            }
-        }
-        if (!$request->has('password')) {
-            if ($request->expectsJson()) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Password harus diisi',
-                ], 400);
-            } else {
-                return Redirect::to('login')
-                    ->with('error', 'Password harus diisi')
-                    ->withInput();
-            }
-        }
-
         $credentials = $request->only('username', 'password');
 
         $rules = [
             'username' => 'required',
             'password' => 'required',
+        ];
+
+        $messages = [
+            'username.required' => 'Username harus diisi.',
+            'password.required' => 'Password harus diisi.',
+            'password.min' => 'Password harus terdiri dari minimal 8 karakter.',
+            'password.max' => 'Password tidak boleh lebih dari 20 karakter.',
+            'password.regex' => 'Password harus mengandung huruf kapital, huruf kecil, serta angka.',
         ];
 
         $validator = Validator::make($credentials, $rules);

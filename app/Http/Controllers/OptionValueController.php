@@ -1,0 +1,196 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Entities\CompOption;
+use App\Entities\Component;
+use App\Entities\OptionValue;
+use DB;
+
+class OptionValueController extends Controller
+{
+    protected $provider = ['PR006', 'PR007', 'PR008', 'PR009', 'PR010'];
+
+    public function list_produk(Request $request)
+    {
+        $data = OptionValue::join('comp_option', 'option_value.opt_id', '=', 'comp_option.opt_id')
+            ->whereIn('comp_option.comp_id', $this->provider)
+            ->select('option_value.*')
+            ->with('comp_option');
+
+        if ($request->has('search')) {
+            $data->whereRaw('lower(option_value.meta_id) like ?', ["%{$request->search}%"]);
+        }
+
+        if ($request->has('order_type') && $request->has('order_by')) {
+            $orderType = $request->get('order_type') == 'asc' ? 'asc' : 'desc';
+            $data->orderBy($request->get('order_by'), $orderType);
+        }
+
+        $data = $data->get();
+
+        return view('apps.masterdata.list-produk')->with('data', $data);
+    }
+
+    public function create()
+    {
+        $component = Component::whereIn('comp_id', $this->provider)
+        ->with('comp_option')
+        ->get();
+
+        return view('apps.masterdata.create-produk', compact('component'));
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'items' => 'required',
+            'meta_id' => 'required',
+            'default_value' => 'required',
+        ]);
+
+        $inputProduk = $request->input('items');
+
+        try {
+            if (strpos($inputProduk, '-') !== false) {
+                list($optId, $optLabel) = explode(' - ', $inputProduk, 2);
+
+                $request->validate([
+                    'opt_id' => 'unique:comp_option,opt_id',
+                ], [
+                    'opt_id.unique' => 'Opt ID sudah terdaftar. Silakan gunakan yang lain.', // Custom error message for unique validation
+                ]);
+
+                $compOption = new CompOption();
+                $compOption->comp_id = $request->input('comp_id');
+                $compOption->opt_id = trim($optId);
+                $compOption->opt_label = trim($optLabel);
+                $compOption->save();
+
+                $request->validate([
+                    'unique_opt_meta' => 'unique:option_value,opt_id,'.$optId.',meta_id,'.$request->input('meta_id'),
+                ], [
+                    'unique_opt_meta.unique' => 'Gabungan opt_id dan meta_id harus unik.',
+                ]);
+
+                $optionValue = new OptionValue();
+                $optionValue->opt_id = trim($optId);
+                $optionValue->meta_id = $request->input('meta_id');
+                $optionValue->default_value = $request->input('default_value');
+                $optionValue->save();
+            } else {
+                $optionValue = new OptionValue();
+                $optionValue->opt_id = $inputProduk;
+                $optionValue->meta_id = $request->input('meta_id');
+
+                $request->validate([
+                    'unique_opt_meta' => 'unique:option_value,opt_id,'.$inputProduk.',meta_id,'.$request->input('meta_id'),
+                ], [
+                    'unique_opt_meta.unique' => 'Gabungan opt_id dan meta_id harus unik.',
+                ]);
+
+                $optionValue->default_value = $request->input('default_value');
+                $optionValue->save();
+            }
+
+            return redirect()->route('list_produk')->with('success', 'Produk berhasil ditambahkan.');
+        } catch (\Illuminate\Database\QueryException $e) {
+            if ($e->getCode() == '42703') {
+                return redirect()->route('create_produk')->with('failed', 'Opt ID sudah terdaftar. Silakan gunakan yang lain.')->withInput();
+            }
+            return redirect()->route('create_produk')->with('failed', 'Gagal menambahkan produk: ' . $e->getMessage())->withInput();
+        } catch (\Exception $e) {
+            return redirect()->route('create_produk')->with('failed', 'Gagal menambahkan produk: ' . $e->getMessage())->withInput();
+        }
+    }
+
+
+
+    public function edit($opt_id, $meta_id)
+    {
+        try {
+            $data = Optionvalue::where('opt_id', $opt_id)
+            ->where('meta_id', $meta_id)
+            ->firstOrFail();
+
+            return view('apps.masterdata.edit-produk', compact('data'));
+        } catch (Exception $e) {
+            return redirect()->route('list_produk')
+                ->with('error', 'Data tidak ditemukan: ' . $e->getMessage());
+        }
+    }
+
+    public function update(Request $request, $opt_id, $meta_id)
+    {
+        $request->validate([
+            'default_value' => 'required',
+        ]);
+
+        try {
+            $updated = DB::connection('pgsql_billiton')->table('option_value')
+            ->where('opt_id', '=', $opt_id)
+            ->where('meta_id', '=', $meta_id)
+            ->update([
+                'default_value' => $request->input('default_value'),
+            ]);
+
+            if ($updated === 0) {
+                throw new Exception('Tidak ada record yang diperbarui');
+            }
+            DB::commit();
+
+            return redirect()->route('list_produk')
+                ->with('success', 'Data berhasil diperbarui.');
+        } catch (ModelNotFoundException $e) {
+            return redirect()->route('list_produk')
+                ->with('error', 'Data tidak ditemukan: ' . $e->getMessage());
+        } catch (Exception $e) {
+            return redirect()->route('list_produk')
+                ->with('error', 'Gagal memperbarui data: ' . $e->getMessage());
+        }
+    }
+
+    public function get_nominal($opt_id) 
+    {
+        try {
+            $fee = 0;
+            $nominal_debit = 0;
+            $buffer = 0;
+
+            $data = OptionValue::where('opt_id', $opt_id)
+            ->get();
+
+            foreach ($data as $item) {
+                if ($item->meta_id === 'nominal_debit') {
+                    $nominal_debit = $item->default_value;
+                }
+                if ($item->meta_id === 'fee') {
+                    $fee = $item->default_value; 
+                }
+    
+                if ($item->meta_id === 'buffer') {
+                    $buffer = $item->default_value;
+                }
+            }
+
+            $total = $nominal_debit + $fee + $buffer;
+            return response()->json([
+                'success' => true,
+                'total' => $total, 
+                'fee' => $fee
+            ], 200);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data not found for the given opt_id.',
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+}
