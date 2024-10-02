@@ -1157,6 +1157,47 @@ class MerchantsController extends Controller
         }
     }
 
+    public function blockAgenLogin(Request $request)
+    {
+        DB::beginTransaction();
+
+        try {
+            $this->validator->with($request->all())->passesOrFail(ValidatorInterface::RULE_UPDATE);
+
+            $user = User::where('username', $request->username)->first();
+            
+            if (!$user) {
+                throw new \Exception("User tidak ditermukan");
+            }
+
+            if ($user->status == 1) {
+                $user->status = 3;
+                $user->save();
+            }
+
+            $merchant = Merchant::where('user_id', $user->id)->first();
+            
+            if ($merchant) {
+                $merchant->status_agen = 3;
+                $merchant->save();
+            }
+
+            DB::commit();
+            return response()->json([
+                'status' => true,
+                'message' => 'Agen Terblokir.'
+            ], 200);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Blokir Agen Gagal', ['error' => $e->getMessage()]);
+            return response()->json([
+                'status' => false,
+                'message' => 'Blokir Gagal: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
     /**
      * Set balance the specified resource from storage.
      *
