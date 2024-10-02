@@ -220,19 +220,16 @@ class AuthController extends Controller
             'password.regex' => 'Password harus mengandung huruf kapital, huruf kecil, serta angka.',
         ];
 
-        $validator = Validator::make($credentials, $rules);
-        if ($validator->fails()) {
             if ($request->expectsJson()) {
-                return response()->json([
-                    'status' => false,
-                    'message' => $validator->messages()->first(),
-                ], 400);
+                
             } else {
+                $validator = Validator::make($credentials, $rules);
+                if ($validator->fails()) {
                 return Redirect::to('login')
                     ->with('error', $validator->messages())
                     ->withInput();
+                }
             }
-        }
 
         $user = User::where('username', $credentials['username'])->first();
         if (!$user) {
