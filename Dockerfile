@@ -2,7 +2,7 @@
 FROM alpine:3.12
 
 # Set direktori kerja
-WORKDIR /var/www/report/web-ntbs
+WORKDIR /var/www/report/web-dev-ntbs
 
 # Set timezone
 RUN echo "UTC" > /etc/timezone
@@ -71,7 +71,7 @@ COPY . .
 
 # Instal dependensi PHP dengan Composer
 RUN composer install --no-dev \
-    && chown -R nobody:nobody /var/www/report/web-ntbs/storage
+    && chown -R nobody:nobody /var/www/report/web-dev-ntbs/storage
 
 # Expose port 80
 EXPOSE 80
