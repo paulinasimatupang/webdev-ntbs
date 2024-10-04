@@ -1,6 +1,6 @@
 FROM alpine:latest
 
-WORKDIR /var/www/html/
+WORKDIR /var/www/report/web-ntbs
 
 # Essentials
 RUN echo "UTC" > /etc/timezone
@@ -11,24 +11,24 @@ RUN apk add bash
 RUN sed -i 's/bin\/ash/bin\/bash/g' /etc/passwd
 
 # Installing PHP 7.2
-RUN apk add --no-cache php7 \
-    php7-fpm \
-    php7-opcache \
-    php7-pdo \
-    php7-pdo_mysql \
-    php7-pdo_sqlite \
-    php7-curl \
-    php7-mbstring \
-    php7-json \
-    php7-xml \
-    php7-iconv \
-    php7-zip \
-    php7-phar \
-    php7-tokenizer \
-    php7-fileinfo \
-    php7-simplexml \
-    php7-dom \
-    php7-pecl-redis
+RUN apk add --no-cache php8 \
+    php8-fpm \
+    php8-opcache \
+    php8-pdo \
+    php8-pdo_mysql \
+    php8-pdo_sqlite \
+    php8-curl \
+    php8-mbstring \
+    php8-json \
+    php8-xml \
+    php8-iconv \
+    php8-zip \
+    php8-phar \
+    php8-tokenizer \
+    php8-fileinfo \
+    php8-simplexml \
+    php8-dom \
+    php8-pecl-redis
 
 RUN ln -s /usr/bin/php7 /usr/bin/php
 
@@ -43,7 +43,7 @@ COPY .docker/supervisord.ini /etc/supervisor.d/supervisord.ini
 
 # Configure PHP
 RUN mkdir -p /run/php/
-RUN touch /run/php/php7-fpm.pid
+RUN touch /run/php/php8-fpm.pid
 
 COPY .docker/php-fpm.conf /etc/php7/php-fpm.conf
 COPY .docker/php.ini-production /etc/php7/php.ini
