@@ -13,7 +13,7 @@ RUN apk add --no-cache zip unzip curl sqlite nginx supervisor bash
 # Install PHP 7.2 dan ekstensi yang diperlukan
 RUN apk add --no-cache php7 php7-fpm php7-opcache php7-pdo php7-pdo_mysql php7-pdo_sqlite \
     php7-curl php7-mbstring php7-json php7-xml php7-iconv php7-zip php7-phar php7-tokenizer \
-    php7-fileinfo php7-simplexml php7-dom php7-pecl-redis
+    php7-fileinfo php7-simplexml php7-dom php7-pecl-redis php7-gd
 
 # Buat symlink ke PHP jika tidak ada
 RUN if [ ! -e /usr/bin/php ]; then ln -s /usr/bin/php7 /usr/bin/php; fi
