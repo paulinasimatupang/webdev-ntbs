@@ -16,7 +16,7 @@ RUN apk add --no-cache php7 php7-fpm php7-opcache php7-pdo php7-pdo_mysql php7-p
     php7-fileinfo php7-simplexml php7-dom php7-pecl-redis
 
 # Buat symlink ke PHP jika tidak ada
-RUN ln -s /usr/bin/php7 /usr/bin/php
+RUN if [ ! -e /usr/bin/php ]; then ln -s /usr/bin/php7 /usr/bin/php; fi
 
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer -o composer-setup.php \
