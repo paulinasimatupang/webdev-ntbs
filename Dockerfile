@@ -45,7 +45,6 @@ RUN ln -sf /dev/stdout /var/log/nginx/access.log \
 
 # Proses pembangunan aplikasi
 COPY . .
-RUN composer update
 RUN composer install --no-dev \
     && chown -R nobody:nobody /var/www/report/web-ntbs/storage
 
