@@ -16,7 +16,8 @@ RUN apk add --no-cache php8 php8-fpm php8-opcache php8-pdo php8-pdo_mysql php8-p
     php8-fileinfo php8-simplexml php8-dom php8-pecl-redis
 
 # Buat symlink ke PHP
-RUN ln -s /usr/bin/php8 /usr/bin/php
+RUN if [ -e /usr/bin/php ]; then rm /usr/bin/php; fi && \
+    ln -s /usr/bin/php8 /usr/bin/php
 
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer -o composer-setup.php
