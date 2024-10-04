@@ -35,7 +35,8 @@ RUN apk add --no-cache \
     php7-dom \
     php7-pecl-redis \
     php7-gd \
-    php7-xmlreader
+    php7-xmlreader \
+    php7-xmlwriter
 
 # Buat symlink ke PHP jika tidak ada
 RUN ln -sf /usr/bin/php7 /usr/bin/php
