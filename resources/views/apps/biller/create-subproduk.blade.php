@@ -30,7 +30,7 @@
                         <p>{{ $message }}</p>
                     </div>
                 @endif
-                    <form action="{{ route('store_produk') }}" method="POST">
+                    <form action="{{ route('store_sub_produk') }}" method="POST">
                         @csrf
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label">Provider</label>
@@ -79,7 +79,7 @@
                         </div>
                         <div class="form-group row">
                             <div class="col-sm-12 text-right">
-                                <a href="{{ route('list_produk') }}">
+                                <a href="{{ route('list_sub_produk') }}">
                                     <button type="button" class="btn btn-primary">Back</button>
                                 </a>
                                 <button type="submit" class="btn btn-primary">Save</button>

@@ -10,9 +10,17 @@ use DB;
 
 class OptionValueController extends Controller
 {
-    protected $provider = ['PR006', 'PR007', 'PR008', 'PR009', 'PR010'];
+    protected $provider;
 
-    public function list_produk(Request $request)
+    public function __construct()
+    {
+        $this->provider = Component::where('comp_id', 'like', 'PR%')
+                                    ->where('component_type_id', 4)
+                                    ->pluck('comp_id')
+                                    ->toArray();
+    }
+
+    public function list(Request $request)
     {
         $data = OptionValue::join('comp_option', 'option_value.opt_id', '=', 'comp_option.opt_id')
             ->whereIn('comp_option.comp_id', $this->provider)
@@ -30,7 +38,7 @@ class OptionValueController extends Controller
 
         $data = $data->get();
 
-        return view('apps.masterdata.list-produk')->with('data', $data);
+        return view('apps.biller.list-subproduk')->with('data', $data);
     }
 
     public function create()
@@ -39,7 +47,7 @@ class OptionValueController extends Controller
         ->with('comp_option')
         ->get();
 
-        return view('apps.masterdata.create-produk', compact('component'));
+        return view('apps.biller.create-subproduk', compact('component'));
     }
 
     public function store(Request $request)
@@ -94,14 +102,14 @@ class OptionValueController extends Controller
                 $optionValue->save();
             }
 
-            return redirect()->route('list_produk')->with('success', 'Produk berhasil ditambahkan.');
+            return redirect()->route('list_sub_produk')->with('success', 'Produk berhasil ditambahkan.');
         } catch (\Illuminate\Database\QueryException $e) {
             if ($e->getCode() == '42703') {
-                return redirect()->route('create_produk')->with('failed', 'Opt ID sudah terdaftar. Silakan gunakan yang lain.')->withInput();
+                return redirect()->route('create_sub_produk')->with('failed', 'Opt ID sudah terdaftar. Silakan gunakan yang lain.')->withInput();
             }
-            return redirect()->route('create_produk')->with('failed', 'Gagal menambahkan produk: ' . $e->getMessage())->withInput();
+            return redirect()->route('create_sub_produk')->with('failed', 'Gagal menambahkan produk: ' . $e->getMessage())->withInput();
         } catch (\Exception $e) {
-            return redirect()->route('create_produk')->with('failed', 'Gagal menambahkan produk: ' . $e->getMessage())->withInput();
+            return redirect()->route('create_sub_produk')->with('failed', 'Gagal menambahkan produk: ' . $e->getMessage())->withInput();
         }
     }
 
@@ -114,9 +122,9 @@ class OptionValueController extends Controller
             ->where('meta_id', $meta_id)
             ->firstOrFail();
 
-            return view('apps.masterdata.edit-produk', compact('data'));
+            return view('apps.biller.edit-subproduk', compact('data'));
         } catch (Exception $e) {
-            return redirect()->route('list_produk')
+            return redirect()->route('list_sub_produk')
                 ->with('error', 'Data tidak ditemukan: ' . $e->getMessage());
         }
     }
@@ -140,13 +148,13 @@ class OptionValueController extends Controller
             }
             DB::commit();
 
-            return redirect()->route('list_produk')
+            return redirect()->route('list_sub_produk')
                 ->with('success', 'Data berhasil diperbarui.');
         } catch (ModelNotFoundException $e) {
-            return redirect()->route('list_produk')
+            return redirect()->route('edit_sub_produk')
                 ->with('error', 'Data tidak ditemukan: ' . $e->getMessage());
         } catch (Exception $e) {
-            return redirect()->route('list_produk')
+            return redirect()->route('edit_sub_produk')
                 ->with('error', 'Gagal memperbarui data: ' . $e->getMessage());
         }
     }

@@ -17,10 +17,10 @@
 </div>
 <div class="separator-breadcrumb border-top"></div>
 <div class="row mb-4">
-    @if (in_array('create_produk', $routes_user))
+    @if (in_array('create_sub_produk', $routes_user))
     <div class="col-lg-12 col-md-12 col-sm-12 d-flex justify-content-center mb-3">
         <div class="input-group">
-            <a href="{{ route('create_produk') }}">
+            <a href="{{ route('create_sub_produk') }}">
                 <button class="btn btn-warning ripple m-1 add-new-btn" type="button">Add New</button>
             </a>
         </div>
@@ -66,8 +66,8 @@
                                     <td>{{ $item->meta_id }}</td>
                                     <td>{{ $item->default_value }}</td>
                                     <td>
-                                        @if (in_array('edit_produk', $routes_user))
-                                        <a href="{{ route('edit_produk', ['opt_id' => $item->opt_id, 'meta_id' => $item->meta_id]) }}">
+                                        @if (in_array('edit_sub_produk', $routes_user))
+                                        <a href="{{ route('edit_sub_produk', ['opt_id' => $item->opt_id, 'meta_id' => $item->meta_id]) }}">
                                             <button class="btn btn-edit ripple btn-sm m-1 edit-btn" type="button">Edit</button>
                                         </a>
                                         @endif

@@ -114,27 +114,25 @@ class ServiceMetaController extends Controller
         try {
             $username = auth()->user()->username; 
 
-            $groups = ServiceMeta::whereIn('meta_id', ['rek_penerima', 'buffer', 'fee'])
+            $groups = ServiceMeta::whereIn('meta_id', ['rek_penerima'])
                 ->whereIn('service_id', ['BPR001'])
                 ->with('service') 
                 ->orderBy('service_id')
                 ->get();
 
-                // Array untuk menyimpan meta_id yang sudah ditemukan
                 $filteredGroups = [];
                 $seenMetaIds = [];
 
                 foreach ($groups as $group) {
-                    // Gunakan kombinasi beberapa kolom untuk lebih akurat menyaring
                     $uniqueKey = $group->meta_id . '-' . $group->service_id;
         
                     if (!in_array($uniqueKey, $seenMetaIds)) {
-                        $filteredGroups[] = $group; // Simpan hanya satu influx berdasarkan kombinasi unik
-                        $seenMetaIds[] = $uniqueKey; // Tandai kombinasi unik sudah disimpan
+                        $filteredGroups[] = $group;
+                        $seenMetaIds[] = $uniqueKey; 
                     }
                 }
                 $groups = $filteredGroups;
-            return view('apps.masterdata.list-parameter', compact('groups', 'username'));
+            return view('apps.biller.list-parameter', compact('groups', 'username'));
         } catch (Exception $e) {
             Log::error('Terjadi kesalahan saat memuat data.', [
                 'error_message' => $e->getMessage(),
@@ -155,7 +153,7 @@ class ServiceMetaController extends Controller
                 ['influx', $influx]
             ])->firstOrFail();
 
-            return view('apps.masterdata.edit-parameter', compact('group'));
+            return view('apps.biller.edit-parameter', compact('group'));
         } catch (Exception $e) {
             return redirect()->route('list_parameter')
                 ->with('error', 'Data tidak ditemukan: ' . $e->getMessage());

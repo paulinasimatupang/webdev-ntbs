@@ -24,6 +24,11 @@ class BillersController extends Controller
         $this->validator  = $validator;
     }
 
+    public function menu()
+    {
+        return view('apps.biller.menu'); 
+    }
+
     public function index(Request $request)
     {
         $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));

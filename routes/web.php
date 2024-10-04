@@ -279,7 +279,6 @@ Route::group(['middleware' => ['auth', 'check.permission']], function () {
     //message log
     Route::get('/message', 'MessageLogController@index')->name('message_log');
     //biller
-    Route::get('/biller', 'BillersController@index')->name('biller');
     Route::get('/billers', 'BillersController@index')->name('billers');
     Route::get('/billers/create', 'BillersController@create')->name('billers_create');
     Route::post('/billers/store', 'BillersController@store')->name('billers_store');
@@ -336,16 +335,24 @@ Route::group(['middleware' => ['auth', 'check.permission']], function () {
 
     Route::get('/audit', 'AuditController@index')->name('audit');
 
+    // BILLER
+    Route::get('/biller', 'BillersController@menu')->name('biller');
+    // Rek Penampung
     Route::get('/parameter', 'ServiceMetaController@list_parameter')->name('list_parameter');
     Route::get('/parameter/edit/{meta_id}/{service_id}/{seq}/{influx}', 'ServiceMetaController@edit_parameter')->name('edit_parameter');
     Route::post('/parameter/fee/update/{meta_id}/{service_id}/{seq}/{influx}', 'ServiceMetaController@update_parameter')->name('update_parameter');
-
-    Route::get('/produk', 'OptionValueController@list_produk')->name('list_produk');
-    Route::get('/produk/create', 'OptionValueController@create')->name('create_produk');
-    Route::post('/produk/store', 'OptionValueController@store')->name('store_produk');
-    Route::get('/produk/edit/{opt_id}/{meta_id}', 'OptionValueController@edit')->name('edit_produk');
-    Route::post('/produk/update/{opt_id}/{meta_id}', 'OptionValueController@update')->name('update_produk');
-
+    // Sub Produk
+    Route::get('/sub-produk', 'OptionValueController@list')->name('list_sub_produk');
+    Route::get('/sub-produk/create', 'OptionValueController@create')->name('create_sub_produk');
+    Route::post('/sub-produk/store', 'OptionValueController@store')->name('store_sub_produk');
+    Route::get('/sub-produk/edit/{opt_id}/{meta_id}', 'OptionValueController@edit')->name('edit_sub_produk');
+    Route::post('/sub-produk/update/{opt_id}/{meta_id}', 'OptionValueController@update')->name('update_sub_produk');
+    //Produk
+    Route::get('/produk', 'ScreenComponentController@list_produk')->name('list_produk');
+    Route::get('/produk/create', 'ScreenComponentController@create_produk')->name('create_produk');
+    Route::post('/produk/store', 'ScreenComponentController@store_produk')->name('store_produk');
+    Route::get('/produk/edit/{opt_id}/{meta_id}', 'ScreenComponentController@edit_produk')->name('edit_produk');
+    Route::post('/produk/update/{opt_id}/{meta_id}', 'ScreenComponentController@update_produk')->name('update_produk');
 });
 
 Route::post('/send-test-notif', 'DataCalonNasabahController@sendTestNotification')->name('send_test_notification');

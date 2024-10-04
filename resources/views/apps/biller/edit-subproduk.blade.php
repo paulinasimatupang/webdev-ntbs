@@ -9,7 +9,7 @@
     <div class="col-md-12">
         <div class="card">
             <div class="card-body">
-                <form action="{{ route('update_produk', ['opt_id' => $data->opt_id, 'meta_id' => $data->meta_id]) }}" method="POST">
+                <form action="{{ route('update_sub_produk', ['opt_id' => $data->opt_id, 'meta_id' => $data->meta_id]) }}" method="POST">
                     @csrf
                     @method('POST') <!-- Change to PUT for updates -->
 
@@ -29,7 +29,7 @@
                     </div>
 
                     <button type="submit" class="btn btn-primary">Update</button>
-                    <a href="{{ route('list_produk') }}" class="btn btn-secondary">Cancel</a>
+                    <a href="{{ route('list_sub_produk') }}" class="btn btn-secondary">Cancel</a>
                 </form>
             </div>
         </div>
