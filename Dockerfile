@@ -15,14 +15,13 @@ RUN apk add --no-cache php8 php8-fpm php8-opcache php8-pdo php8-pdo_mysql php8-p
     php8-curl php8-mbstring php8-json php8-xml php8-iconv php8-zip php8-phar php8-tokenizer \
     php8-fileinfo php8-simplexml php8-dom php8-pecl-redis
 
-# Buat symlink ke PHP
-RUN if [ -e /usr/bin/php ]; then rm /usr/bin/php; fi && \
-    ln -s /usr/bin/php8 /usr/bin/php
+# Buat symlink ke PHP jika tidak ada
+RUN if [ ! -e /usr/bin/php ]; then ln -s /usr/bin/php8 /usr/bin/php; fi
 
 # Install Composer
-RUN curl -sS https://getcomposer.org/installer -o composer-setup.php
-RUN php composer-setup.php --install-dir=/usr/local/bin --filename=composer
-RUN rm -rf composer-setup.php
+RUN curl -sS https://getcomposer.org/installer -o composer-setup.php \
+    && php composer-setup.php --install-dir=/usr/local/bin --filename=composer \
+    && rm -rf composer-setup.php
 
 # Konfigurasi Supervisor
 RUN mkdir -p /etc/supervisor.d/
@@ -41,13 +40,13 @@ COPY .docker/nginx.conf /etc/nginx/
 RUN mkdir -p /run/nginx/
 RUN touch /run/nginx/nginx.pid
 
-RUN ln -sf /dev/stdout /var/log/nginx/access.log
-RUN ln -sf /dev/stderr /var/log/nginx/error.log
+RUN ln -sf /dev/stdout /var/log/nginx/access.log \
+    && ln -sf /dev/stderr /var/log/nginx/error.log
 
 # Proses pembangunan aplikasi
-COPY . .
-RUN composer install --no-dev
-RUN chown -R nobody:nobody /var/www/report/web-ntbs/storage
+COPY . . 
+RUN composer install --no-dev \
+    && chown -R nobody:nobody /var/www/report/web-ntbs/storage
 
 # Expose port 80
 EXPOSE 80
