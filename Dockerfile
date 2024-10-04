@@ -1,5 +1,5 @@
 # Gunakan Alpine versi yang lebih spesifik
-FROM alpine:3.18
+FROM alpine:3.16
 
 # Set direktori kerja
 WORKDIR /var/www/report/web-ntbs
