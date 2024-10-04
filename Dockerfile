@@ -10,13 +10,13 @@ RUN echo "UTC" > /etc/timezone
 # Install paket-paket esensial
 RUN apk add --no-cache zip unzip curl sqlite nginx supervisor bash
 
-# Install PHP dan ekstensi yang diperlukan
-RUN apk add --no-cache php8 php8-fpm php8-opcache php8-pdo php8-pdo_mysql php8-pdo_sqlite \
-    php8-curl php8-mbstring php8-json php8-xml php8-iconv php8-zip php8-phar php8-tokenizer \
-    php8-fileinfo php8-simplexml php8-dom php8-pecl-redis
+# Install PHP dan ekstensi yang diperlukan untuk PHP 7.1
+RUN apk add --no-cache php7 php7-fpm php7-opcache php7-pdo php7-pdo_mysql php7-pdo_sqlite \
+    php7-curl php7-mbstring php7-json php7-xml php7-iconv php7-zip php7-phar php7-tokenizer \
+    php7-fileinfo php7-simplexml php7-dom php7-pecl-redis
 
 # Buat symlink ke PHP jika tidak ada
-RUN if [ ! -e /usr/bin/php ]; then ln -s /usr/bin/php8 /usr/bin/php; fi
+RUN if [ ! -e /usr/bin/php ]; then ln -s /usr/bin/php7 /usr/bin/php; fi
 
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer -o composer-setup.php \
@@ -31,8 +31,8 @@ COPY .docker/supervisord.ini /etc/supervisor.d/supervisord.ini
 RUN mkdir -p /run/php/
 RUN touch /run/php/php-fpm.pid
 
-COPY .docker/php-fpm.conf /etc/php8/php-fpm.conf
-COPY .docker/php.ini-production /etc/php8/php.ini
+COPY .docker/php-fpm.conf /etc/php7/php-fpm.conf
+COPY .docker/php.ini-production /etc/php7/php.ini
 
 # Konfigurasi Nginx
 COPY .docker/nginx.conf /etc/nginx/
@@ -44,7 +44,7 @@ RUN ln -sf /dev/stdout /var/log/nginx/access.log \
     && ln -sf /dev/stderr /var/log/nginx/error.log
 
 # Proses pembangunan aplikasi
-COPY . . 
+COPY . .
 RUN composer install --no-dev \
     && chown -R nobody:nobody /var/www/report/web-ntbs/storage
 
