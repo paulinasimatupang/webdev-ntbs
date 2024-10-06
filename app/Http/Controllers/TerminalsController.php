@@ -349,29 +349,39 @@ class TerminalsController extends Controller
     public function updateBilliton(TerminalUpdateRequest $request, $id)
     {
         DB::beginTransaction();
-        $this->validator->with($request->all())->passesOrFail(ValidatorInterface::RULE_UPDATE);
-
-        $terminal = Terminal::where('id', $id)->first();
-
-        if ($terminal) {
-            $terminalBilliton = new TerminalBilliton();
-            $terminalBilliton->terminal_id = $terminal->tid;
-            $terminalBilliton->terminal_type = '1';
-            $terminalBilliton->terminal_imei = $terminal->imei;
-            $terminalBilliton->terminal_name = $terminal->serial_number;
-            $terminalBilliton->merchant_id = $terminal->merchant_id;
-            $terminalBilliton->terminal_sim_number = $terminal->iccid;
-            $terminalBilliton->save();
-
-            if ($terminalBilliton) {
-                DB::commit();
-                return Redirect::to('terminal')
-                    ->with('success', 'Update Successfully');
-            } else {
-                DB::rollback();
-                return Redirect::to('terminal')
-                    ->with('failed', 'Update Failed');
+        try {
+            // Validasi data
+            $this->validator->with($request->all())->passesOrFail(ValidatorInterface::RULE_UPDATE);
+    
+            // Ambil terminal berdasarkan id
+            $terminal = Terminal::where('id', $id)->first();
+    
+            if ($terminal) {
+                // Buat instance baru TerminalBilliton dan simpan data yang di-update
+                $terminalBilliton = new TerminalBilliton();
+                $terminalBilliton->terminal_id = $terminal->tid;
+                $terminalBilliton->terminal_type = '1';
+                $terminalBilliton->terminal_imei = $terminal->imei;
+                $terminalBilliton->terminal_name = $terminal->serial_number;
+                $terminalBilliton->merchant_id = $terminal->merchant_id;
+                $terminalBilliton->terminal_sim_number = $terminal->iccid;
+                $terminalBilliton->save();
+    
+                if ($terminalBilliton) {
+                    DB::commit();
+                    return true;
+                } else {
+                    DB::rollback();
+                    return false;
+                }
             }
+    
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return false;
+        } catch (\Illuminate\Database\QueryException $e) {
+            DB::rollBack();
+            return false;
         }
     }
 
@@ -478,13 +488,18 @@ class TerminalsController extends Controller
             $terminalBilliton = TerminalBilliton::where('terminal_id', $request->get('tid'))->first();
             if ($terminalBilliton) {
                 $terminalBilliton->update([
-                    'terminal_sim_number' => $request->get('iccid'),
-                    'terminal_name' => $request->get('serial_number'),
                     'terminal_imei' => $request->get('imei'),
                 ]);
             } else {
                 DB::rollBack();
                 return Redirect::to('terminal/' . $id . '/edit')->with('error', 'TerminalBilliton not found for terminal_id: ' . $request->get('tid'));
+            }
+
+            $billitonUpdateSuccess = $this->updateBilliton($request, $id);
+
+            if (!$billitonUpdateSuccess) {
+                DB::rollBack();
+                return Redirect::to('terminal/' . $id . '/edit')->with('error', 'Failed to update Billiton data.');
             }
 
             DB::commit();

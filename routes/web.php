@@ -340,7 +340,7 @@ Route::group(['middleware' => ['auth', 'check.permission']], function () {
     // Rek Penampung
     Route::get('/parameter', 'ServiceMetaController@list_parameter')->name('list_parameter');
     Route::get('/parameter/edit/{meta_id}/{service_id}/{seq}/{influx}', 'ServiceMetaController@edit_parameter')->name('edit_parameter');
-    Route::post('/parameter/fee/update/{meta_id}/{service_id}/{seq}/{influx}', 'ServiceMetaController@update_parameter')->name('update_parameter');
+    Route::post('/parameter/update/{meta_id}/{service_id}/{seq}/{influx}', 'ServiceMetaController@update_parameter')->name('update_parameter');
     // Sub Produk
     Route::get('/sub-produk', 'OptionValueController@list')->name('list_sub_produk');
     Route::get('/sub-produk/create', 'OptionValueController@create')->name('create_sub_produk');
@@ -353,6 +353,11 @@ Route::group(['middleware' => ['auth', 'check.permission']], function () {
     Route::post('/produk/store', 'ScreenComponentController@store_produk')->name('store_produk');
     Route::get('/produk/edit/{opt_id}/{meta_id}', 'ScreenComponentController@edit_produk')->name('edit_produk');
     Route::post('/produk/update/{opt_id}/{meta_id}', 'ScreenComponentController@update_produk')->name('update_produk');
+
+    // PARAMETER MIN MAX (Poin assesment dan kesalahan login, pin)
+    Route::get('/mastredata/parameter', 'ComponentController@list_parameter')->name('masterdata_list_parameter');
+    Route::get('/mastredata/parameter/edit/{id}', 'ComponentController@edit_parameter')->name('masterdata_edit_parameter');
+    Route::post('/mastredata/parameter/update/{id}', 'ComponentController@update_parameter')->name('masterdata_update_parameter');
 });
 
 Route::post('/send-test-notif', 'DataCalonNasabahController@sendTestNotification')->name('send_test_notification');

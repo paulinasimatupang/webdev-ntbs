@@ -55,13 +55,9 @@
                             <tr>
                                 <th scope="col">No</th>
                                 <th scope="col">TID</th>
-                                <th scope="col">MID</th>
-                                <th scope="col">MNAME</th>
-                                <th scope="col">SN</th>
-                                <th scope="col">IMEI</th>
-                                <th scope="col">ICCID</th>
-                                <th scope="col">SID</th>
-                                <th scope="col">Status</th>
+                                <th scope="col">ID Agen</th>
+                                <th scope="col">Nama Agen</th>
+                                <th scope="col">ID Perangkat</th>
                                 <th scope="col">Action</th>
                             </tr>
                         </thead>
@@ -75,11 +71,7 @@
                                                             <td>{{$item->tid}}</td>
                                                             <td>{{$item->merchant_id}}</td>
                                                             <td>{{$item->merchant_name}}</td>
-                                                            <td>{{$item->serial_number}}</td>
                                                             <td>{{$item->imei}}</td>
-                                                            <td>{{$item->iccid}}</td>
-                                                            <td>{{$item->sid}}</td>
-                                                            <td>{{$item->status}}</td>
                                                             <td>
                                                                 @if (in_array('terminal_edit', $routes_user))
                                                                     <a href="{{route('terminal_edit', [$item->id])}}">

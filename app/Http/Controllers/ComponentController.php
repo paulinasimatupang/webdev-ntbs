@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use DB;
 use Redirect;
+use Exception;
 use Prettus\Validator\Contracts\ValidatorInterface;
 use Prettus\Validator\Exceptions\ValidatorException;
 use App\Http\Controllers\Controller;
@@ -185,14 +186,57 @@ class ComponentController extends Controller
             $data = Component::whereIn('comp_lbl', ['max_pin', 'max_password', 'min_poin'])
                 ->get();
 
-            return view('apps.masterdata.list-parameter', compact('data', 'username'));
-        } catch (Exception $e) {
+            return view('apps.component.list-parameter', compact('data', 'username'));
+        } 
+        catch (Exception $e) {
             Log::error('Terjadi kesalahan saat memuat data.', [
                 'error_message' => $e->getMessage(),
                 'stack_trace' => $e->getTraceAsString(),
             ]);
             return redirect()->route('list_parameter')
                 ->with('error', 'Terjadi kesalahan saat memuat data: ' . $e->getMessage());
+        }
+    }
+
+    public function edit_parameter($id)
+    {
+        try {
+            $data = Component::where('comp_id', $id)->firstOrFail();
+
+            return view('apps.component.edit-parameter', compact('data'));
+        } catch (Exception $e) {
+            return redirect()->route('masterdata_list_parameter')
+                ->with('error', 'Data tidak ditemukan: ' . $e->getMessage());
+        }
+    }
+
+    public function update_parameter(Request $request, $id) 
+    {
+        DB::beginTransaction();
+        try {
+            $validatedData = $request->validate([
+                'comp_act' => 'required',
+            ]);
+
+            $component = Component::find($id);
+
+            if (!$component) {
+                DB::rollBack(); 
+                return redirect()->route('masterdata_edit_parameter', $id)
+                    ->with('error', 'Component not found.');
+            }
+
+            $component->update([
+                'comp_act' => $request->comp_act,
+            ]);
+    
+            DB::commit();
+            return redirect()->route('masterdata_list_parameter')->with('success', 'Data berhasil diperbarui.');
+        } catch (Exception $e) {
+            DB::rollBack();
+            return redirect()->route('masterdata_edit_parameter', ['id' => $request->comp_id])
+                ->with('error', 'Terjadi kesalahan saat memperbarui data: ' . $e->getMessage())
+                ->withInput();
         }
     }
 }
