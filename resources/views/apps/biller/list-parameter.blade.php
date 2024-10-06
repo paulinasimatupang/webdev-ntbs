@@ -46,7 +46,7 @@
                                 <th scope="col">Fitur</th>
                                 <th scope="col">Komponen</th>
                                 <th scope="col">Nilai</th>
-                                <th scope="col">Action</th>
+                                <!-- <th scope="col">Action</th> -->
                             </tr>
                         </thead>
                         <tbody>
@@ -64,7 +64,7 @@
                                         @endif
                                     </td>
                                     <td>{{ $group->meta_default }}</td>
-                                    <td>
+                                    <!-- <td>
                                         @if (in_array('edit_parameter', $routes_user))
                                             <a
                                                 href="{{ route('edit_parameter', ['meta_id' => $group->meta_id, 'service_id' => $group->service_id, 'seq' => $group->seq, 'influx' => $group->influx]) }}">
@@ -72,7 +72,7 @@
                                                     type="button">Edit</button>
                                             </a>
                                         @endif
-                                    </td>
+                                    </td> -->
 
                                 </tr>
                                 @php    $no++; @endphp

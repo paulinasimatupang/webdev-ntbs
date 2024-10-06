@@ -52,7 +52,7 @@
                             <tr>
                                 <th scope="col">No</th>
                                 <th scope="col">Produk</th>
-                                <th scope="col">Action</th>
+                                <!-- <th scope="col">Action</th> -->
                             </tr>
                         </thead>
                         <tbody>
@@ -61,13 +61,13 @@
                                 <tr>
                                     <th scope="row">{{ $no }}</th>
                                     <td>{{ $item->comp_lbl }}</td>
-                                    <td>
+                                    <!-- <td>
                                         @if (in_array('edit_produk', $routes_user))
                                         <a href="{{ route('edit_produk', ['opt_id' => $item->opt_id, 'meta_id' => $item->meta_id]) }}">
                                             <button class="btn btn-edit ripple btn-sm m-1 edit-btn" type="button">Edit</button>
                                         </a>
                                         @endif
-                                    </td>
+                                    </td> -->
                                 </tr>
                                 @php $no++; @endphp
                             @endforeach

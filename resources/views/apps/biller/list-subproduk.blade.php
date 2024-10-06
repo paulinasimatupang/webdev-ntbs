@@ -54,7 +54,7 @@
                                 <th scope="col">Produk</th>
                                 <th scope="col">Meta ID</th>
                                 <th scope="col">Default Value</th>
-                                <th scope="col">Action</th>
+                                <!-- <th scope="col">Action</th> -->
                             </tr>
                         </thead>
                         <tbody>
@@ -65,13 +65,13 @@
                                     <td>{{ $item->comp_option->opt_label }}</td>
                                     <td>{{ $item->meta_id }}</td>
                                     <td>{{ $item->default_value }}</td>
-                                    <td>
+                                    <!-- <td>
                                         @if (in_array('edit_sub_produk', $routes_user))
                                         <a href="{{ route('edit_sub_produk', ['opt_id' => $item->opt_id, 'meta_id' => $item->meta_id]) }}">
                                             <button class="btn btn-edit ripple btn-sm m-1 edit-btn" type="button">Edit</button>
                                         </a>
                                         @endif
-                                    </td>
+                                    </td> -->
                                 </tr>
                                 @php $no++; @endphp
                             @endforeach
