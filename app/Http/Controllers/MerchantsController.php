@@ -34,6 +34,7 @@ use App\Entities\Assesment;
 use App\Entities\AssesmentResult;
 use App\Entities\AssesmentResultDetail;
 use App\Entities\CompOption;
+use App\Entities\Component;
 use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade as Pdf;
 
@@ -462,7 +463,10 @@ class MerchantsController extends Controller
     public function create(Request $request)
     {
         $assessments = Assesment::all();
-        
+
+        $min_poin_component = Component::where('comp_lbl', 'min_poin')->first();
+        $min_poin = $min_poin_component ? $min_poin_component->comp_act : 0;
+
         $provinsi = CompOption::where('comp_id', 'CIF14')
                     ->orderBy('opt_label')
                     ->get();
@@ -479,7 +483,7 @@ class MerchantsController extends Controller
             return $item->opt_label === 'Lain-Lain' ? 'zzzz' : $item->opt_label;
         });
 
-        return view('apps.merchants.add', compact('assessments', 'kota_kabupaten', 'provinsi'));
+        return view('apps.merchants.add', compact('assessments', 'kota_kabupaten', 'provinsi', 'min_poin'));
     }
 
 

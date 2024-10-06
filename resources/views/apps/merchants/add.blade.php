@@ -439,7 +439,7 @@
     <script>
         document.getElementById('nextBtn').addEventListener('click', function () {
             const totalPoints = parseInt(document.getElementById('totalPoints').textContent);
-            const requiredPoints = 50; 
+            const requiredPoints =  {{ $min_poin }}; ; 
             if (totalPoints < requiredPoints) {
                 alert(`Total poin harus mencapai minimal ${requiredPoints} untuk melanjutkan.`);
                 return;
