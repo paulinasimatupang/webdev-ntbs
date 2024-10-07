@@ -52,35 +52,38 @@ class OptionValueController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'items' => 'required',
-            'meta_id' => 'required',
-            'default_value' => 'required',
-        ]);
-
-        $inputProduk = $request->input('items');
-
         try {
+            
+            $inputProduk = $request->input('items');
             if (strpos($inputProduk, '-') !== false) {
                 list($optId, $optLabel) = explode(' - ', $inputProduk, 2);
 
-                $request->validate([
-                    'opt_id' => 'unique:comp_option,opt_id',
-                ], [
-                    'opt_id.unique' => 'Opt ID sudah terdaftar. Silakan gunakan yang lain.', // Custom error message for unique validation
-                ]);
+                $existingCompOption = CompOption::where('opt_id', trim($optId))->first();
+                if ($existingCompOption) {
+                    return redirect()->route('create_sub_produk')
+                        ->with('failed', 'Opt ID sudah terdaftar di CompOption. Silakan gunakan yang lain.')
+                        ->withInput();
+                }
+
+                $lastSeq = CompOption::where('comp_id', $request->input('comp_id'))
+                ->max('seq');
 
                 $compOption = new CompOption();
                 $compOption->comp_id = $request->input('comp_id');
                 $compOption->opt_id = trim($optId);
+                $compOption->seq = $lastSeq !== null ? $lastSeq + 1 : 0;
                 $compOption->opt_label = trim($optLabel);
                 $compOption->save();
 
-                $request->validate([
-                    'unique_opt_meta' => 'unique:option_value,opt_id,'.$optId.',meta_id,'.$request->input('meta_id'),
-                ], [
-                    'unique_opt_meta.unique' => 'Gabungan opt_id dan meta_id harus unik.',
-                ]);
+                $existingOptionValue = OptionValue::where('opt_id', trim($optId))
+                    ->where('meta_id', $request->input('meta_id'))
+                    ->first();
+
+                if ($existingOptionValue) {
+                    return redirect()->route('create_sub_produk')
+                        ->with('failed', 'Gabungan opt_id dan meta_id sudah terdaftar. Silakan gunakan yang lain.')
+                        ->withInput();
+                }
 
                 $optionValue = new OptionValue();
                 $optionValue->opt_id = trim($optId);
@@ -88,32 +91,31 @@ class OptionValueController extends Controller
                 $optionValue->default_value = $request->input('default_value');
                 $optionValue->save();
             } else {
+                $inputProduk = $request->input('inputProduk');
+                
+                $existingOptionValue = OptionValue::where('opt_id', $inputProduk)
+                    ->where('meta_id', $request->input('meta_id'))
+                    ->first();
+
+                if ($existingOptionValue) {
+                    return redirect()->route('create_sub_produk')
+                        ->with('failed', 'Gabungan opt_id dan meta_id sudah terdaftar. Silakan gunakan yang lain.')
+                        ->withInput();
+                }
+
                 $optionValue = new OptionValue();
                 $optionValue->opt_id = $inputProduk;
                 $optionValue->meta_id = $request->input('meta_id');
-
-                $request->validate([
-                    'unique_opt_meta' => 'unique:option_value,opt_id,'.$inputProduk.',meta_id,'.$request->input('meta_id'),
-                ], [
-                    'unique_opt_meta.unique' => 'Gabungan opt_id dan meta_id harus unik.',
-                ]);
-
                 $optionValue->default_value = $request->input('default_value');
                 $optionValue->save();
             }
 
             return redirect()->route('list_sub_produk')->with('success', 'Produk berhasil ditambahkan.');
-        } catch (\Illuminate\Database\QueryException $e) {
-            if ($e->getCode() == '42703') {
-                return redirect()->route('create_sub_produk')->with('failed', 'Opt ID sudah terdaftar. Silakan gunakan yang lain.')->withInput();
-            }
-            return redirect()->route('create_sub_produk')->with('failed', 'Gagal menambahkan produk: ' . $e->getMessage())->withInput();
-        } catch (\Exception $e) {
+        } 
+        catch (\Exception $e) {
             return redirect()->route('create_sub_produk')->with('failed', 'Gagal menambahkan produk: ' . $e->getMessage())->withInput();
         }
     }
-
-
 
     public function edit($opt_id, $meta_id)
     {

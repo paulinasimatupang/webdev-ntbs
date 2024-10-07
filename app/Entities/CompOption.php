@@ -18,6 +18,7 @@ class CompOption extends Model implements Transformable
     protected $table = 'comp_option';
     protected $primaryKey = null; 
     public $timestamps = false;
+    public $incrementing = false;
 
     protected $fillable = [
         'opt_id',
