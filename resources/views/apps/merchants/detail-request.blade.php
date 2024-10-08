@@ -228,7 +228,9 @@
                                     @csrf
                                     <input type="hidden" name="agen_id" value="{{ $merchant->id }}">
                                     <input type="hidden" name="action" id="formAction">
-
+                                    <button type="button" id="reject" class="btn btn-danget">
+                                        Reject
+                                    </button>
                                     <button type="button" id="approve" class="btn btn-success">
                                         Approve
                                     </button>
@@ -288,6 +290,12 @@
             if (confirm('Apakah Anda yakin akan mengaktivasi agen ini?')) {
                 document.getElementById('formAction').value = 'activate';
                 document.getElementById('actionForm').action = "{{ route('agen_activate', ['id' => $merchant->id]) }}";
+                document.getElementById('actionForm').submit();
+            }
+        });document.getElementById('reject').addEventListener('click', function() {
+            if (confirm('Apakah Anda yakin akan mengaktivasi agen ini?')) {
+                document.getElementById('formAction').value = 'reject';
+                document.getElementById('actionForm').action = "{{ route('agen_reject', ['id' => $merchant->id]) }}";
                 document.getElementById('actionForm').submit();
             }
         });

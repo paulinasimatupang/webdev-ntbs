@@ -12,7 +12,7 @@ class FirebaseNotificationService
     public function __construct()
     {
         $this->client = new Google_Client();
-        $this->client->setAuthConfig(storage_path('firebase/ntbs-lakupandai-firebase-adminsdk-6o46s-e72605460b.json'));
+        $this->client->setAuthConfig(storage_path('firebase/ntbs-lakupa-firebase-adminsdk-w89ha-b762e4a1fd.json'));
         $this->client->addScope('https://www.googleapis.com/auth/firebase.messaging');
     }
 
