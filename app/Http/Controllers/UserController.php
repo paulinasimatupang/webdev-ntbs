@@ -188,7 +188,7 @@ class UserController extends Controller
 
             $pesan = '<p>Halo ' . htmlspecialchars($user->fullname) . ',</p>';
             $pesan .= '<p>Pendaftaran Anda telah kami setujui, Anda telah terdaftar sebagai ' . htmlspecialchars($role_name) . ' pada Portal NTBS.</p>';
-            $pesan .= '<p>Berikut informasi Anda yang telah terdaftar sebagai ' . htmlspecialchars($user->fullname) . ':</p>';
+            $pesan .= '<p>Berikut informasi Anda yang telah terdaftar sebagai ' . htmlspecialchars($role_name) . ':</p>';
             $pesan .= '<p>Username: ' . htmlspecialchars($user->username) . '</p>';
             $pesan .= '<p>Password: ' . htmlspecialchars($password) . '</p>';
             $pesan .= '<p>Gunakan Username dan Password di atas untuk mengakses halaman Portal.</p>';
