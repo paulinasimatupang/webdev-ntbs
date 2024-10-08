@@ -23,7 +23,13 @@ class UserController extends Controller
     // }
 
     public function menu(){
-        return view('apps.user.menu');
+        $jumlah_request = User::where('status', 0)
+        ->whereHas('role', function($query) {
+            $query->where('name', '!=', 'Agen')
+                ->where('name', '!=', 'Super Admin');
+        })
+        ->count();
+        return view('apps.user.menu', compact('jumlah_request'));
     }
 
     public function index()

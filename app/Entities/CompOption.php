@@ -5,15 +5,17 @@ namespace App\Entities;
 use Illuminate\Database\Eloquent\Model;
 use Prettus\Repository\Contracts\Transformable;
 use Prettus\Repository\Traits\TransformableTrait;
+use OwenIt\Auditing\Contracts\Auditable;
 
 /**
  * Class TerminalType.
  *
  * @package namespace App\Entities;
  */
-class CompOption extends Model implements Transformable
+class CompOption extends Model implements Transformable, Auditable
 {
     use TransformableTrait;
+    use \OwenIt\Auditing\Auditable;
     protected $connection = 'pgsql_billiton';
     protected $table = 'comp_option';
     protected $primaryKey = null; 
