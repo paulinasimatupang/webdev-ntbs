@@ -42,11 +42,11 @@
                         <thead>
                             <tr>
                                 <th scope="col">No</th>
-                                <th scope="col">Service</th>
-                                <th scope="col">Fitur</th>
+                                <!-- <th scope="col">Service</th>
+                                <th scope="col">Fitur</th> -->
                                 <th scope="col">Komponen</th>
                                 <th scope="col">Nilai</th>
-                                <!-- <th scope="col">Action</th> -->
+                                <th scope="col">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -54,8 +54,8 @@
                             @foreach($groups as $group)
                                 <tr>
                                     <th scope="row">{{ $no }}</th>
-                                    <td>{{ $group->service_id  }}</td>
-                                    <td>{{ $group->service->service_name }}</td>
+                                    <!-- <td>{{ $group->service_id  }}</td>
+                                    <td>{{ $group->service->service_name }}</td> -->
                                     <td>
                                         @if($group->meta_id == 'rek_penerima')
                                             Rekening Penampung
@@ -64,7 +64,7 @@
                                         @endif
                                     </td>
                                     <td>{{ $group->meta_default }}</td>
-                                    <!-- <td>
+                                    <td>
                                         @if (in_array('edit_parameter', $routes_user))
                                             <a
                                                 href="{{ route('edit_parameter', ['meta_id' => $group->meta_id, 'service_id' => $group->service_id, 'seq' => $group->seq, 'influx' => $group->influx]) }}">
@@ -72,7 +72,7 @@
                                                     type="button">Edit</button>
                                             </a>
                                         @endif
-                                    </td> -->
+                                    </td>
 
                                 </tr>
                                 @php    $no++; @endphp
