@@ -27,13 +27,6 @@
                 </div>
 
                 <div class="form-group row">
-                    <label class="col-sm-2 col-form-label">Username</label>
-                    <div class="col-sm-10">
-                        <p class="form-control-static">{{ $user->username }}</p>
-                    </div>
-                </div>
-
-                <div class="form-group row">
                     <label class="col-sm-2 col-form-label">Email</label>
                     <div class="col-sm-10">
                         <p class="form-control-static">{{ $user->email }}</p>

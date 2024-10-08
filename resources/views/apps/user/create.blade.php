@@ -28,21 +28,9 @@
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label class="col-sm-2 col-form-label">Username</label>
-                            <div class="col-sm-10">
-                                <input type="text" name="username" class="form-control" placeholder="Username" required />
-                            </div>
-                        </div>
-                        <div class="form-group row">
                             <label class="col-sm-2 col-form-label">Email</label>
                             <div class="col-sm-10">
                                 <input type="email" name="email" class="form-control" placeholder="Email" required />
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <label class="col-sm-2 col-form-label">Password</label>
-                            <div class="col-sm-10">
-                                <input type="password" name="password" class="form-control" placeholder="Password" required />
                             </div>
                         </div>
                         <div class="form-group row">
@@ -62,7 +50,7 @@
                                 <select name="branch_id" id="branch_id" class="form-control" required>
                                     <option value="" disabled selected>Pilih Cabang</option>
                                     @foreach ($branch as $branchid)
-                                        <option value="{{ $branchid->branch_id }}">{{ $branchid->branch_name }}</option>
+                                        <option value="{{ $branchid->branch_code }}">{{ $branchid->branch_name }}</option>
                                     @endforeach
                                 </select>
                             </div>

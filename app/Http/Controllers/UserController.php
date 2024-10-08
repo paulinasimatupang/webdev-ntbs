@@ -8,6 +8,9 @@ use Illuminate\Http\Request;
 use  Spatie\Permission\Models\Role;
 use App\Entities\Branch;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use App\Mail\sendPassword;
+use Illuminate\Support\Facades\Mail;
 
 class UserController extends Controller
 {
@@ -112,9 +115,7 @@ class UserController extends Controller
     {
         $request->validate([
             'fullname' => 'required',
-            'username' => 'required',
             'email' => 'required',
-            'password' => 'required',
             'role_id' => 'required',
         ]);
 
@@ -123,15 +124,12 @@ class UserController extends Controller
 
         $user = User::create([
             'fullname' => $request->fullname,
-            'username' => $request->username,
             'email' => $request->email,
-            'password' => bcrypt($request->password),
             'role_id' => $request->role_id,
             'status' => $status,
+            'branchid' => $request->branch_id,
             'created_at' => now()
         ]);
-
-        // $user->syncRoles([$request->role_id]);
 
         return redirect()->route('users.menu')->with('success', 'User berhasil dibuat.');
     }
@@ -140,21 +138,71 @@ class UserController extends Controller
     {
         DB::beginTransaction();
         try {
-            $user = User::where('id', $id)->first();
+            $user = User::find($id);
             if (!$user) {
-                throw new \Exception("User not found");
+                throw new \Exception("User tidak ditemukan");
             }
 
+            $role_id = $user->role_id;
+            $role_name = Role::where('id', $role_id)->value('name'); 
+            $password = implode('', array_merge(
+                array_map(function() { return chr(mt_rand(65, 90)); }, range(1, 3)),
+                array_map(function() { return chr(mt_rand(97, 122)); }, range(1, 3)),
+                array_map(function() { return mt_rand(0, 9); }, range(1, 2))
+            ));
+            $password = str_shuffle($password);
+            $passwordBcrypt = bcrypt($password);
+
+            Log::info('PasswordGenerate: ' . $password);
+
+            $prefix = 'NTBUS'; 
+            $lastUser = User::where('username', 'LIKE', $prefix . '%')
+                            ->orderBy('created_at', 'desc')
+                            ->first();
+
+            $newUsername = $prefix . '000001'; 
+            if ($lastUser) {
+                $lastUsername = $lastUser->username;
+                $number = substr($lastUsername, strlen($prefix));
+                $newNumber = (int)$number + 1;
+                $newNumberPadded = str_pad($newNumber, 6, '0', STR_PAD_LEFT);
+                $newUsername = $prefix . $newNumberPadded;
+            }
+
+            while (User::where('username', $newUsername)->exists()) {
+                $newNumber = (int)substr($newUsername, strlen($prefix)) + 1;
+                $newUsername = $prefix . str_pad($newNumber, 6, '0', STR_PAD_LEFT);
+            }
+
+            $user->password = $passwordBcrypt;
             $user->status = 1;
+            $user->username = $newUsername;
+            $user->updated_at = now();
             $user->save();
+
+            $pesan = '<p>Halo ' . htmlspecialchars($user->fullname) . ',</p>';
+            $pesan .= '<p>Pendaftaran Anda telah kami setujui, Anda telah terdaftar sebagai ' . htmlspecialchars($role_name) . ' pada Portal NTBS.</p>';
+            $pesan .= '<p>Berikut informasi Anda yang telah terdaftar sebagai ' . htmlspecialchars($user->fullname) . ':</p>';
+            $pesan .= '<p>Username: ' . htmlspecialchars($user->username) . '</p>';
+            $pesan .= '<p>Password: ' . htmlspecialchars($password) . '</p>';
+            $pesan .= '<p>Gunakan Username dan Password di atas untuk mengakses halaman Portal.</p>';
+            $pesan .= '<p>Salam Hangat,</p>';
+            $pesan .= '<p><b>NTBS LAKUPANDAI</b></p>';
+
+            $detail_message = [
+                'sender' => 'administrator@selada.id',
+                'subject' => '[NTBS LAKUPANDAI] Pendaftaran User Portal NTBS Berhasil',
+                'isi' => $pesan
+            ];
+
+            Mail::to($user->email)->send(new sendPassword($detail_message));
 
             DB::commit();
             return redirect()->route('users.menu')->with('success', 'Permintaan Berhasil Diterima.');
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Error : ' . $e->getMessage());
-            return Redirect::to('user')
-                ->with('error', $e->getMessage());
+            return redirect()->route('users.detail', $id)->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
 

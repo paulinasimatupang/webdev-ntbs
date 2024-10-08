@@ -32,7 +32,6 @@
                             <tr>
                                 <th>No</th>
                                 <th>Fullname</th>
-                                <th>Username</th>
                                 <th>Email</th>
                                 <th>Role</th> 
                                 <th>Action</th>
@@ -46,7 +45,6 @@
                             <tr>
                                 <th scope="row">{{ $no }}</th>
                                 <td>{{ $user->fullname }}</td>
-                                <td>{{ $user->username }}</td>
                                 <td>{{ $user->email }}</td>
                                 <td>{{ $user->role->name }}</td>
                                 <td>
