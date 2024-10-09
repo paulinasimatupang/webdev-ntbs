@@ -403,7 +403,7 @@ class MerchantsController extends Controller
         
                                 case 'Nomor Rekening':
                                     $norek = $value;
-                                    // $match = Merchant::where('no', $norek)->exists();
+                                    $match = Merchant::where('no', $norek)->exists();
                                     break;
         
                                 case 'Nomor Handphone':
