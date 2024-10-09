@@ -562,7 +562,7 @@ class MerchantsController extends Controller
 
             $validator = Validator::make($request->all(), $rules, $messages);
             if ($validator->fails()) {
-                dd($request);
+                // dd($request);
                 return Redirect::to('agen/create')
                     ->withErrors($validator) 
                     ->with('error', 'Data yang Anda isi tidak valid, Mohon perbaiki sesuai dengan aturan.')
