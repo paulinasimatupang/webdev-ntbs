@@ -19,7 +19,7 @@
     </style>
 
     <div class="breadcrumb">
-        <h1>Transaction</h1>
+        <h1>Transaksi</h1>
     </div>
     <div class="separator-breadcrumb border-top"></div>
 
@@ -40,11 +40,11 @@
                             <div class="form-row">
                                 <div class="form-group col-md-6">
                                     <label for="start_date" class="ul-form__label">Start Date:</label>
-                                    <input type="text" readonly="readonly" class="form-control start_date" value="{{ request('start_date') }}" name="start_date" id="start_date" placeholder="Start Date">
+                                    <input type="date" class="form-control" value="{{ request('start_date') }}" name="start_date" id="start_date" placeholder="Start Date">
                                 </div>
                                 <div class="form-group col-md-6">
                                     <label for="end_date" class="ul-form__label">End Date:</label>
-                                    <input type="text" readonly="readonly" class="form-control end_date" value="{{ request('end_date') }}" name="end_date" id="end_date" placeholder="End Date">
+                                    <input type="date" class="form-control" value="{{ request('end_date') }}" name="end_date" id="end_date" placeholder="End Date">
                                 </div>
                             </div>
 
@@ -55,7 +55,7 @@
                                     <label for="mid" class="ul-form__label">Kode Agen:</label>
                                     <input type="text" class="form-control" value="{{ request('mid') }}" name="mid" id="mid" placeholder="Kode Agen">
                                 </div>
-                                <div class="form-group col-md-4">
+                                <div class="form-group col-md-6">
                                     <label for="status" class="ul-form__label">Status:</label>
                                     <select class="form-control" name="status" id="status">
                                         <option value="">Select Status</option>
@@ -137,18 +137,18 @@
             <div class="card text-left">
                 <div class="card-body">
                     <div class="row">
-                        <h4 class="col-sm-9 col-md-6 card-title mb-3" style="line-height: 2.1rem;">List Transaction</h4>
+                        <h4 class="col-sm-9 col-md-6 card-title mb-3" style="line-height: 2.1rem;">Daftar Transaksi Agen</h4>
                         <div class="col-sm-3 col-md-12 mb-3">
                             <div class="export-button-wrapper" style="float: right;">
                                 <!-- @if($username == 'selada_produktif')
                                     <a id="btn-sale-bjb" href="#" class="btn btn-outline-secondary">Ubah Status Transaksi</a>
                                 @endif -->
-                                <a id="export-fee-to-csv" href="{{ route('transactions.excel') }}" class="btn btn-outline-secondary">Export to CSV</a>
-                                <a id="export-fee-to-txt" href="{{ route('transactions.txt') }}" class="btn btn-outline-secondary">Export to Text</a>
-                                <a id="export-fee-to-excel" href="{{ route('transactions.csvFeeOnly') }}" class="btn btn-outline-secondary">Export to Excel (Only Fee)</a>
+                                <!-- <a id="export-fee-to-csv" href="{{ route('transactions.excel') }}" class="btn btn-outline-secondary">Export to CSV</a> -->
+                                <!-- <a id="export-fee-to-txt" href="{{ route('transactions.txt') }}" class="btn btn-outline-secondary">Export to Text</a> -->
+                                <!-- <a id="export-fee-to-excel" href="{{ route('transactions.csvFeeOnly') }}" class="btn btn-outline-secondary">Export to Excel (Only Fee)</a> -->
                                 <a id="export-to-excel" href="{{ route('transactions.csv') }}" class="btn btn-outline-secondary">Export to Excel</a>
-                                <a id="export-to-pdf" href="{{ route('transactions.pdf') }}" class="btn btn-outline-secondary">Export to PDF</a>
-                                <a id="export-payment-to-excel" href="{{ route('transactions.csvPaymentOnly') }}" class="btn btn-outline-secondary">Export to Excel (Payment Only)</a>
+                                <!-- <a id="export-to-pdf" href="{{ route('transactions.pdf') }}" class="btn btn-outline-secondary">Export to PDF</a> -->
+                                <!-- <a id="export-payment-to-excel" href="{{ route('transactions.csvPaymentOnly') }}" class="btn btn-outline-secondary">Export to Excel (Payment Only)</a> -->
                             </div>
                         </div>
                     </div>
@@ -163,58 +163,50 @@
                         <table id="default_ordering_table" class="display table table-striped table-bordered" style="width: 100%;">
                             <thead>
                                 <tr>
-                                    <th>No</th>
-                                    <th>Kode Agen</th>
-                                    <th>Name</th>
-                                    <th>Transaction Code</th>
-                                    <th>Amount</th>
-                                    <th>Fee</th>
-                                    <th>Date</th>
-                                    <th>Norek Pengirim</th>
-                                    <th>Norek Penerima</th>
-                                    <th>Tipe Produk</th>
-                                    <th>Status</th>
+                                     <th scope="col">No</th>
+                                     <th scope="col">Kode Transaksi</th>
+                                     <th scope="col">Tanggal</th>
+                                     <th scope="col">Kode Agen</th>
+                                     <th scope="col">Kode Cabang</th>
+                                     <th scope="col">Tipe Transaksi</th>
+                                     <th scope="col">Tipe Produk</th>
+                                     <th scope="col">Nominal</th>
+                                     <th scope="col">Fee</th>
+                                     <th scope="col">Nomor Rekening Pengirim</th>
+                                     <th scope="col">Nomor Rekening Penerima</th>
+                                     <th scope="col">Status</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @php
-                                    $no = ($data->perPage() * ($data->currentPage() - 1)) + 1;
+                                    $no = 1;
                                 @endphp
                                 @foreach($data as $item)
                                     <tr>
-                                        <td>{{ $no++ }}</td>
-                                        <td>{{ $item->kode_agen ?? '' }}</td>
-                                        <td>{{ $item->merchant->name ?? '' }}</td>
+                                    <th scope="row">{{ $no }}</td>
                                         <td>{{ $item->transaction_code }}</td>
+                                        <td>{{ $item->transaction_time }}</td>
+                                        <td>{{ $item->kode_agen}}</td>
+                                        <td>{{ optional(optional($item->merchant)->user)->branchid ?? '' }}</td>
+                                        <td>
+                                            {{ ucwords(preg_replace('/\b(form|review|otp|bayar)\b/i', '', $item->service->service_name ?? '')) }}
+                                        </td>
+                                        <td>{{ $item->transaction_type}}</td>
                                         <td>@currency($item->amount)</td>
                                         <td>@currency($item->fee)</td>
-                                        <td>{{ $item->transaction_time }}</td>
                                         <td>{{ $item->rekening_pengirim }}</td>
                                         <td>{{ $item->rekening_penerima }}</td>
-                                        <td>{{ $item->transaction_type }}</td>
-                                        <td>
-                                            @switch($item->transaction_status_id)
-                                                @case(0)
-                                                    Success
-                                                    @break
-                                                @case(1)
-                                                    Failed
-                                                    @break
-                                                @case(2)
-                                                    Pending
-                                                    @break
-                                                @default
-                                                    Unknown
-                                            @endswitch
-                                        </td>
+                                        <td>{{$item->transactionStatus->transaction_status_desc ?? '' }}</td>
                                     </tr>
+                                    @php
+                                            $no++;
+                                        @endphp
                                 @endforeach
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
-            <div class="mt-4 text-center">{{ $data->appends(request()->input())->links() }}</div>
         </div>
     </div>
 @endsection
@@ -222,13 +214,22 @@
 @section('page-js')
     <script src="{{ asset('assets/js/vendor/echarts.min.js') }}"></script>
     <script src="{{ asset('assets/js/es5/echart.options.min.js') }}"></script>
-    <!-- <script src="{{ asset('assets/js/vendor/datatables.min.js') }}"></script> -->
-    <!-- <script src="{{ asset('assets/js/datatables.script.js') }}"></script> -->
+    <script src="{{ asset('assets/js/vendor/datatables.min.js') }}"></script>
+    <script src="{{ asset('assets/js/datatables.script.js') }}"></script>
     <script src="{{ asset('assets/js/es5/dashboard.v4.script.js') }}"></script>
     <script src="{{ asset('assets/js/vendor/pickadate/picker.js') }}"></script>
     <script src="{{ asset('assets/js/vendor/pickadate/picker.date.js') }}"></script>
 
     <script>
+        $(document).ready(function() {
+            $('#default_ordering_table').DataTable({
+                "paging": true,
+                "searching": true,
+                "ordering": true,
+                "order": [], 
+            });
+        });
+
         var $dateFrom = $('.start_date').pickadate({format: 'yyyy-mm-dd'}),
             dateFromPicker = $dateFrom.pickadate('picker');
 
@@ -250,7 +251,6 @@
                     console.log('User left start_date empty. Not popping end_date');
                 }
                 console.log('Close start_date');
-                // workaround for github issue #160
                 $(document.activeElement).blur();
             }
         });
@@ -267,7 +267,6 @@
                     console.log('User left end_date empty. Not popping start_date or end_date');
                 }
                 console.log('Close end_date');
-                // workaround for github issue #160
                 $(document.activeElement).blur();
             }
         });

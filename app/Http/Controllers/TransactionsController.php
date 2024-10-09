@@ -141,7 +141,7 @@ class TransactionsController extends Controller
         $orderBy = $request->get('order_by', 'transaction_time');
         $query->orderBy($orderBy, $orderType);
 
-        $data = $query->paginate(10);
+        $data = $query->with('merchant.user', 'service', 'transactionStatus')->get();
 
         $totalAmount = $query->sum('amount');
         $transactionCodes = $query->pluck('transaction_code')->unique();
@@ -168,16 +168,8 @@ class TransactionsController extends Controller
     
     public function getStatusText($statusId)
     {
-        switch ($statusId) {
-            case 0:
-                return 'Success';
-            case 1:
-                return 'Failed';
-            case 2:
-                return 'Pending';
-            default:
-                return 'Unknown';
-        }
+        $transaction_status = TransactionStatus::where('transaction_status_id', $statusId)->get('transaction_status_desc');
+        return $transaction_status;
     }
 
 
@@ -229,15 +221,16 @@ class TransactionsController extends Controller
 
     public function exportCSV(Request $request)
     {
-        $query = Transaction::query(); 
-        $choice = 1; // Menampilkan semua data
-        return Excel::download(new TransactionsExport($query, $choice), 'transactions_all.xlsx');
+        set_time_limit(120); 
+        $query = Transaction::query()->orderBy('transaction_code'); 
+        $choice = 1;
+        return Excel::download(new TransactionsExport($query, $choice), 'Data Transaksi.xlsx');
     }
     
     public function exportCSVFeeOnly(Request $request)
     {
         $query = Transaction::query(); 
-        $choice = 2; // Menampilkan fee, nama, dan status
+        $choice = 2;
         return Excel::download(new TransactionsExport($query, $choice), 'transactions_fee.xlsx');
     }
     
@@ -260,10 +253,6 @@ class TransactionsController extends Controller
         return $pdf->download('transactions.pdf');
     }
 
-    public function excel()
-    {
-        return Excel::download(new TransactionsExport(Transaction::query(), 1), 'Transaction.csv');
-    }
 
     public function exportTxt()
     {
@@ -273,7 +262,6 @@ class TransactionsController extends Controller
     
         // Loop untuk setiap transaksi
         foreach ($transactions as $transaction) {
-            // Gunakan null coalescing operator (??) untuk menghindari error jika data tidak ada
             $txtData .= "No: " . ($transaction->No ?? 'N/A') . ", ";
             $txtData .= "Name: " . ($transaction->merchant->name ?? 'N/A') . ", ";
             $txtData .= "Transaksi Code: " . ($transaction->transaction_code ?? 'N/A') . ", ";

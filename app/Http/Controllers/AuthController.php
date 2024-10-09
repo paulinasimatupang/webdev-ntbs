@@ -12,7 +12,9 @@ use Redirect;
 use Auth;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Carbon\Carbon;
+use App\Mail\sendPassword;
 use Illuminate\Support\Facades\Password;
 use App\Http\Requests;
 use Tymon\JWTAuth\Exceptions\JWTException;
@@ -595,57 +597,89 @@ class AuthController extends Controller
 
      // Fungsi untuk menyimpan atau memperbarui FCM Token
      public function updateFCMToken(Request $request)
-{
-    $validator = Validator::make($request->all(), [
-        'user_id' => 'required|string',  // Pastikan user_id diterima sebagai string atau integer
-        'fcm_token' => 'required|string', // FCM Token yang dikirim dari MyFirebaseMessagingService.kt
-    ]);
-    Log::info("Received data: user_id => " . $request->user_id . ", fcm_token => " . $request->fcm_token);
+    {
+        $validator = Validator::make($request->all(), [
+            'user_id' => 'required|string',  // Pastikan user_id diterima sebagai string atau integer
+            'fcm_token' => 'required|string', // FCM Token yang dikirim dari MyFirebaseMessagingService.kt
+        ]);
+        Log::info("Received data: user_id => " . $request->user_id . ", fcm_token => " . $request->fcm_token);
 
 
-    if ($validator->fails()) {
-        return response()->json([
-            'status' => false,
-            'message' => $validator->messages()->first(),
-        ], 400);
-    }
-
-    try {
-        // Cari user berdasarkan ID yang dikirim
-        $user = User::find($request->user_id);
-
-        if (!$user) {
+        if ($validator->fails()) {
             return response()->json([
                 'status' => false,
-                'message' => 'User not found',
-            ], 404);
+                'message' => $validator->messages()->first(),
+            ], 400);
         }
 
-        // Simpan atau perbarui FCM token di database
-        $user->fcm_token = $request->fcm_token;
-        $user->save();
+        try {
+            // Cari user berdasarkan ID yang dikirim
+            $user = User::find($request->user_id);
 
-        // Simpan FCM token juga di merchant jika user memiliki merchant
-        if ($user->merchant) {
-            $merchant = $user->merchant;
-            $merchant->fcm_token = $request->fcm_token;
-            $merchant->save();
+            if (!$user) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'User not found',
+                ], 404);
+            }
+
+            // Simpan atau perbarui FCM token di database
+            $user->fcm_token = $request->fcm_token;
+            $user->save();
+
+            // Simpan FCM token juga di merchant jika user memiliki merchant
+            if ($user->merchant) {
+                $merchant = $user->merchant;
+                $merchant->fcm_token = $request->fcm_token;
+                $merchant->save();
+            }
+
+            Log::info("FCM token updated for user: " . $user->id);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'FCM token updated successfully',
+            ], 200);
+
+        } catch (\Exception $e) {
+            Log::error("Failed to update FCM token: " . $e->getMessage());
+
+            return response()->json([
+                'status' => false,
+                'message' => 'Failed to update FCM token',
+            ], 500);
         }
-
-        Log::info("FCM token updated for user: " . $user->id);
-
-        return response()->json([
-            'status' => true,
-            'message' => 'FCM token updated successfully',
-        ], 200);
-
-    } catch (\Exception $e) {
-        Log::error("Failed to update FCM token: " . $e->getMessage());
-
-        return response()->json([
-            'status' => false,
-            'message' => 'Failed to update FCM token',
-        ], 500);
     }
-}
+
+    public function forgot_pin(Request $request)
+    {
+        $merchant = Merchant::where('mid', $request->mid)->first();
+
+        if (!$merchant) {
+            return response()->json(['error' => 'Merchant tidak ditemukan.'], 404);
+        }
+
+        $generatePin = implode('', array_map(function () {
+            return mt_rand(0, 9);
+        }, range(1, 6)));
+
+        $merchant->pin = $generatePin;
+        $merchant->save();
+
+        $pesan = '<p>Halo ' . htmlspecialchars($merchant->name) . ',</p>';
+        $pesan .= '<p>Berikut adalah PIN baru Anda untuk melakukan transaksi pada Aplikasi Agen LAKUPANDAI:</p>';
+        $pesan .= '<p>Pin Transaksi: ' . htmlspecialchars($merchant->pin) . '</p>';
+        $pesan .= '<p>Salam Hangat,</p>';
+        $pesan .= '<p><b>NTBS LAKUPANDAI</b></p>';
+
+        $detail_message = [
+            'sender' => 'administrator@selada.id',
+            'subject' => '[NTBS LAKUPANDAI] Pembaruan PIN Berhasil',
+            'isi' => $pesan
+        ];
+
+        Mail::to($merchant->email)->send(new sendPassword($detail_message));
+
+        return response()->json(['success' => 'PIN baru telah dikirim ke email Anda.']);
+    }
 }

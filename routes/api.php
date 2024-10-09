@@ -218,3 +218,4 @@ Route::middleware('auth:api')->get('pengaduan/history', 'PengaduanController@his
 Route::middleware('auth:api')->get('/service/param2/{service_id}', 'ServiceBillerController@getParam2');
 
 Route::middleware('auth:api')->get('/get/nominal/{opt_id}', 'OptionValueController@get_nominal');
+Route::middleware('auth:api')->post('/auth/forgot_pin', 'AuthController@forgot_pin');

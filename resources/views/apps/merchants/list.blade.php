@@ -49,7 +49,7 @@
                             <a id="export-fee-to-excel" class="btn btn-outline-secondary" href="{{ route('merchants.excel') }}">
                                 Export to Excel
                             </a>
-                            <a id="export-fee-to-pdf" class="btn btn-outline-secondary" href="{{ route('merchants.pdf') }}">
+                            <!-- <a id="export-fee-to-pdf" class="btn btn-outline-secondary" href="{{ route('merchants.pdf') }}">
                                 Export to PDF
                             </a>
                             <a id="export-fee-to-csv" class="btn btn-outline-secondary" href="{{ route('merchants.csv') }}">
@@ -57,7 +57,7 @@
                             </a>
                             <a id="export-fee-to-txt" class="btn btn-outline-secondary" href="{{ route('merchants.txt') }}">
                                 Export to Txt
-                            </a>
+                            </a> -->
                             </div> 
                             <div class="table-responsive">
                             <table id="deafult_ordering_table" class="display table table-striped table-bordered" style="width:100%">

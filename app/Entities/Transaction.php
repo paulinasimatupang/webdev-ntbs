@@ -66,7 +66,5 @@ class Transaction extends Model implements Transformable
     public function merchant()
     {
         return $this->belongsTo(Merchant::class, 'kode_agen', 'mid');
-    }
-
-    
+    } 
 }

@@ -39,7 +39,7 @@
             @if(isset($features['terminal']))
                         <li class="nav-item {{ (request()->is('terminal') || request()->is('terminal/*')) ? 'active' : '' }}" @php
                             if (session()->get('user')->role_id == 2)
-                        echo 'id="b1"'; @endphp>
+                            echo 'id="b1"'; @endphp>
                             <a class="nav-item-hold" href="{{route('terminal')}}">
 
                                 <img class="img_bintang_sidebar" src="{{asset('/assets/images/sidebar_icon/terminal.png')}}" alt="">
