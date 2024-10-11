@@ -9,8 +9,6 @@ class MessageLog extends Model
     protected $connection = 'pgsql_billiton';
     protected $primaryKey = 'log_id';
     
-    protected $quotes = '"';
-    //
     protected $fillable = [
         'message_id',
         'terminal_id',
@@ -25,4 +23,9 @@ class MessageLog extends Model
     ];
 
     protected $table = "messagelog";
+
+    public function service()
+    {
+        return $this->belongsTo(Service::class, 'service_id', 'service_id');
+    }
 }

@@ -37,15 +37,12 @@ class MessageLogController extends Controller
             $data->where('service_id', '=', $request->get('service_id'));
         }
 
-        // Apply sorting
         $orderBy = $request->input('order_by', 'request_time');
         $orderType = $request->input('order_type', 'desc');
         $data->orderBy($orderBy, $orderType);
 
-        // Paginate data
         $data = $data->paginate(10);
 
-        // Return the view with the data
         return view('apps.messagelog.list')->with('data', $data);
     }
 
@@ -63,15 +60,17 @@ class MessageLogController extends Controller
             ], 422);
         }
 
-        $serviceIds = ['T00002', 'OTT001', 'OT0001'];
+        $serviceIds = ['T00002', 'OTT001', 'OT0001', 'BPR002', 'PLN003'];
 
         try {
-            $logs = MessageLog::where('terminal_id', $request->terminal_id)
-                ->whereIn('service_id', $serviceIds)
-                ->whereNotNull('response_message')
-                ->where('reply_time', '>=', Carbon::today())
-                ->orderBy('reply_time', 'desc')
-                ->get();
+            $logs = MessageLog::select('messagelog.*', 'service.service_name as service_name')
+            ->join('service', 'messagelog.service_id', '=', 'service.service_id') // Join dengan tabel service
+            ->where('messagelog.terminal_id', $request->terminal_id)
+            ->whereIn('messagelog.service_id', $serviceIds)
+            ->whereNotNull('messagelog.response_message')
+            ->where('messagelog.reply_time', '>=', Carbon::today())
+            ->orderBy('messagelog.reply_time', 'desc')
+            ->get();
 
             if ($logs->isEmpty()) {
                 return response()->json([
@@ -81,60 +80,32 @@ class MessageLogController extends Controller
             }
 
             $processedLogs = $logs->map(function ($log) {
-                $requestMessage = json_decode($log->request_message, true);
-                
-                if (!isset($requestMessage['msg']['msg_dt'])) {
-                    return null;
-                }
-                
-                $msgDtArray = explode('|', $requestMessage['msg']['msg_dt']);
-                switch ($log->service_id) {
-                    case 'T00002':
-                    case 'OTT001':
-                        $indices = [1, 2, 5];
-                        break;
-                    case 'OT0001':
-                        $indices = [1, 3, 4];
-                        break;
-                    default:
-                        $indices = [];
-                }
-
-                $fee = 0;
-                $keterangan = null;
-
+                $serviceName =$log->service_name;
+                $serviceName = preg_replace('/\b(bayar|review|otp|bl|wa|sms)\b/i', '', $serviceName);
+                $serviceName = ucwords(trim($serviceName));
+                $nominal = null;
+                $fee = null;
                 $responseMessage = json_decode($log->response_message, true);
                 if (isset($responseMessage['screen']['comps']['comp'])) {
                     foreach ($responseMessage['screen']['comps']['comp'] as $comp) {
-                        if (strpos($comp['comp_lbl'], 'Keterangan') !== false) {
-                            $keterangan = $comp['comp_values']['comp_value'][0]['value'];
+                        if (strpos($comp['comp_lbl'], 'Nominal') !== false) {
+                            $nominal = floatval($comp['comp_values']['comp_value'][0]['value']);
                         }
-                        if (strpos($comp['comp_lbl'], 'Fee') !== false) {
+                        else if (strpos($comp['comp_lbl'], 'Fee') !== false) {
                             $fee = floatval($comp['comp_values']['comp_value'][0]['value']);
                         }
                     }
                 }
-                
-                $noRek = isset($msgDtArray[$indices[0]]) ? $msgDtArray[$indices[0]] : null;
-                $namaRek = isset($msgDtArray[$indices[1]]) ? $msgDtArray[$indices[1]] : null;
-                $nominal = isset($msgDtArray[$indices[2]]) ? floatval($msgDtArray[$indices[2]]) : null;
-                // $keterangan = isset($msgDtArray[$indices[3]]) ? $msgDtArray[$indices[3]] : null;
 
-                // Reformat the log with extracted values
                 return [
-                    'id' => $log->id,
+                    'id' => $log->message_id,
                     'terminal_id' => $log->terminal_id,
-                    'service_id' => $log->service_id,
-                    'no_rek' => $noRek,
-                    'nama_rek' => $namaRek,
-                    'nominal' => $nominal + $fee,
-                    'keterangan' => $keterangan,
+                    'fitur' => $serviceName,
+                    'nominal' => $nominal+$fee,
                     'status' => $log->message_status,
-                    'request_message' => $log->request_message,
-                    'response_message' => $log->response_message,
                     'reply_time' => $log->reply_time,
                 ];
-            })->filter();
+            })->filter(); 
 
             return response()->json([
                 'status' => true,
@@ -154,8 +125,8 @@ class MessageLogController extends Controller
     {
         try {
             $this->validate($request, [
-                'terminal_id' => 'required|string',
-                'message_id' => 'required|string',
+                'terminal_id' => 'required',
+                'message_id' => 'required',
             ]);
 
             $responseMessage =MessageLog::where('terminal_id', $request->terminal_id)

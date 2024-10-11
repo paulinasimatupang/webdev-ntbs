@@ -40,5 +40,9 @@ class Service extends Model implements Transformable
     {
         return $this->hasMany(ServiceMeta::class, 'service_id', 'service_id');
     }
-
+    
+    public function messageLogs()
+    {
+        return $this->hasMany(MessageLog::class, 'service_id', 'id');
+    }
 }

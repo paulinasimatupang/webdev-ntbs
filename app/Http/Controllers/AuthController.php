@@ -570,16 +570,16 @@ class AuthController extends Controller
 
     public function resetPassword(Request $request)
     {
-        // Validasi input
         $request->validate([
-            'username' => 'required|string',
-            'new_password' => 'required|string',
+            'username' => 'required',
+            'new_password' => 'required',
+            'uid' => 'required',
         ]);
 
-        // Cari user berdasarkan username
         $user = User::where('username', $request->username)->first();
 
-        // Jika user tidak ditemukan
+        $terminal = Terminal::where('imei', $request->uid)->first();
+
         if (!$user) {
             return response()->json([
                 'status' => 'error',
@@ -587,7 +587,13 @@ class AuthController extends Controller
             ], 404);
         }
 
-        // Ubah password user
+        if (!$terminal) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Terminal tidak ditemukan.',
+            ], 404);
+        }
+
         $user->password = Hash::make($request->new_password);
         $user->save();
 
@@ -597,8 +603,7 @@ class AuthController extends Controller
         ], 200);
     }
 
-     // Fungsi untuk menyimpan atau memperbarui FCM Token
-     public function updateFCMToken(Request $request)
+    public function updateFCMToken(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'user_id' => 'required|string',  // Pastikan user_id diterima sebagai string atau integer
