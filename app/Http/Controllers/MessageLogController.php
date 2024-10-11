@@ -75,7 +75,7 @@ class MessageLogController extends Controller
             if ($logs->isEmpty()) {
                 return response()->json([
                     'status' => false,
-                    'message' => 'No logs found for the given terminal ID.',
+                    'message' => 'Tidak Ada Transaksi Hari Ini',
                 ], 404);
             }
 
