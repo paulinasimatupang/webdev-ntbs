@@ -14,8 +14,6 @@
 @section('main-content')
             <div class="breadcrumb">
                 <h1>List Nasabah</h1>
-                <!-- <ul>
-                    <li><a href="">Selada</a></li> -->
             </div>
             <div class="separator-breadcrumb border-top"></div>
             <div class="row mb-4">
@@ -24,6 +22,12 @@
                         <div class="card-body">
                             <div class="row">
                                 <h4 class=" col-sm-12 col-md-6 card-title mb-3">List Nasabah</h4>
+                                <div class="col-sm-3 col-md-12 mb-3">
+                                    <div class="export-button-wrapper" style="float: right;">
+                                        <a id="export-to-excel" href="{{ route('nasabah.excel') }}" class="btn btn-outline-secondary">Export to Excel</a>
+                                        <a id="export-to-pdf" href="{{ route('nasabah.pdf') }}" class="btn btn-outline-secondary">Export to PDF</a>
+                                    </div>
+                                </div>
                             </div>
                             @if ($message = Session::get('success'))
                                 <div class="alert alert-success">
@@ -44,7 +48,7 @@
                                             <th scope="col">NIK</th>
                                             <th scope="col">Nama</th>
                                             <th scope="col">Alamat</th>
-                                            <th scope="col">No HP</th>
+                                            <th scope="col">Nomor HP</th>
                                             <th scope="col">Request Time</th>
                                             <th scope="col">Reply Time</th>
                                             <th scope="col">Status</th>

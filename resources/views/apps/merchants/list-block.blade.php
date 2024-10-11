@@ -41,9 +41,9 @@
                                     <thead>
                                         <tr>
                                             <th scope="col">No</th>
-                                            <th scope="col">Id</th>
-                                            <th scope="col">Name</th>
-                                            <th scope="col">Action</th>
+                                            <th scope="col">Kode Agen</th>
+                                            <th scope="col">Nama</th>
+                                            <th scope="col">Detail</th>
                                         </tr>
                                     </thead>
                                     <tbody>

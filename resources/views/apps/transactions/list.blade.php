@@ -140,15 +140,8 @@
                         <h4 class="col-sm-9 col-md-6 card-title mb-3" style="line-height: 2.1rem;">Daftar Transaksi Agen</h4>
                         <div class="col-sm-3 col-md-12 mb-3">
                             <div class="export-button-wrapper" style="float: right;">
-                                <!-- @if($username == 'selada_produktif')
-                                    <a id="btn-sale-bjb" href="#" class="btn btn-outline-secondary">Ubah Status Transaksi</a>
-                                @endif -->
-                                <!-- <a id="export-fee-to-csv" href="{{ route('transactions.excel') }}" class="btn btn-outline-secondary">Export to CSV</a> -->
-                                <!-- <a id="export-fee-to-txt" href="{{ route('transactions.txt') }}" class="btn btn-outline-secondary">Export to Text</a> -->
-                                <!-- <a id="export-fee-to-excel" href="{{ route('transactions.csvFeeOnly') }}" class="btn btn-outline-secondary">Export to Excel (Only Fee)</a> -->
                                 <a id="export-to-excel" href="{{ route('transactions.csv') }}" class="btn btn-outline-secondary">Export to Excel</a>
-                                <!-- <a id="export-to-pdf" href="{{ route('transactions.pdf') }}" class="btn btn-outline-secondary">Export to PDF</a> -->
-                                <!-- <a id="export-payment-to-excel" href="{{ route('transactions.csvPaymentOnly') }}" class="btn btn-outline-secondary">Export to Excel (Payment Only)</a> -->
+                                <a id="export-to-pdf" href="{{ route('transactions.pdf') }}" class="btn btn-outline-secondary">Export to PDF</a>
                             </div>
                         </div>
                     </div>

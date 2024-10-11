@@ -3,7 +3,7 @@
 <head>
     <style>
         @page {
-            size: A4;
+            size: A4 landscape;
             margin: 10mm;
         }
         body {
@@ -15,7 +15,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            table-layout: fixed;
+            table-layout: fixed; 
         }
         table, th, td {
             border: 1px solid black;
@@ -24,8 +24,8 @@
             padding: 4px;
             text-align: left;
             overflow: hidden;
-            word-wrap: break-word;
-            overflow-wrap: break-word;
+            word-wrap: break-word; 
+            overflow-wrap: break-word; 
             white-space: normal;
         }
         th {
@@ -37,45 +37,56 @@
             text-align: center;
             margin-bottom: 10px;
         }
-        th {
-            white-space: nowrap;
-        }
     </style>
 </head>
 <body>
-    <h1>Merchants Report</h1>
+    <h1>Data Agen Laku Pandai</h1>
     <table>
         <thead>
             <tr>
-                <th style="width: 5%;">No</th>
-                <th style="width: 7%;">Id</th>
-                <th style="width: 15%;">Account No</th>
-                <th style="width: 17%;">Name</th>
-                <th style="width: 22%;">Email</th>
-                <th style="width: 15%;">Address</th>
-                <th style="width: 10%;">City</th>
-                <th style="width: 15%;">Phone</th>
-                <th style="width: 8%;">TID</th>
-                <th style="width: 18%;">Status Agen</th>
-                <th style="width: 18%;">Activate Date</th>
-                <th style="width: 15%;">Resign Date</th>
+                <th style="width: 7%;">Kode Agen</th>
+                <th style="width: 12%;">Nama</th>
+                <th style="width: 12%;">No Telepon Rumah</th>
+                <th style="width: 12%;">No Telepon HP</th>
+                <th style="width: 15%;">Email</th>
+                <th style="width: 10%;">NIK</th>
+                <th style="width: 10%;">NPWP</th>
+                <th style="width: 12%;">Pekerjaan</th>
+                <th style="width: 10%;">Alamat</th>
+                <th style="width: 5%;">RT</th>
+                <th style="width: 5%;">RW</th>
+                <th style="width: 10%;">Kecamatan</th>
+                <th style="width: 10%;">Kelurahan</th>
+                <th style="width: 10%;">Kota/Kabupaten</th>
+                <th style="width: 10%;">Provinsi</th>
+                <th style="width: 8%;">Kode Pos</th>
+                <th style="width: 10%;">Jenis Agen</th>
+                <th style="width: 12%;">No Rekening</th>
+                <th style="width: 12%;">Tanggal Approve</th>
             </tr>
         </thead>
         <tbody>
             @foreach($merchants as $index => $merchant)
                 <tr>
-                    <td>{{ $index + 1 }}</td>
-                    <td>{{ $merchant->id }}</td>
-                    <td>{{ $merchant->account_no ?? 'N/A' }}</td>
-                    <td>{{ $merchant->name ?? 'N/A' }}</td>
-                    <td>{{ $merchant->email ?? 'N/A' }}</td>
-                    <td>{{ $merchant->address ?? 'N/A' }}</td>
-                    <td>{{ $merchant->city ?? 'N/A' }}</td>
-                    <td>{{ $merchant->phone ?? 'N/A' }}</td>
-                    <td>{{ $merchant->tid ?? 'N/A' }}</td>
-                    <td>{{ $merchant->status_agen ?? 'N/A' }}</td>
-                    <td>{{ $merchant->active_at ?? 'N/A' }}</td>
-                    <td>{{ $merchant->resign_at ??'N/A' }}</td>
+                    <td>{{ $merchant->mid }}</td>
+                    <td>{{ $merchant->name }}</td>
+                    <td>{{ $merchant->no_telp }}</td>
+                    <td>{{ $merchant->phone }}</td>
+                    <td>{{ $merchant->email }}</td>
+                    <td>{{ $merchant->no_ktp }}</td>
+                    <td>{{ $merchant->no_npwp }}</td>
+                    <td>{{ $merchant->pekerjaan }}</td>
+                    <td>{{ $merchant->address }}</td>
+                    <td>{{ $merchant->rt }}</td>
+                    <td>{{ $merchant->rw }}</td>
+                    <td>{{ $merchant->kecamatan }}</td>
+                    <td>{{ $merchant->kelurahan }}</td>
+                    <td>{{ $merchant->city }}</td>
+                    <td>{{ $merchant->provinsi }}</td>
+                    <td>{{ $merchant->kode_pos }}</td>
+                    <td>{{ $merchant->jenis_agen }}</td>
+                    <td>{{ $merchant->no }}</td>
+                    <td>{{ $merchant->active_at }}</td>
                 </tr>
             @endforeach
         </tbody>

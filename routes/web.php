@@ -305,6 +305,8 @@ Route::group(['middleware' => ['auth', 'check.permission']], function () {
     Route::put('/roles/{role}/give-permissions', 'RoleController@givePermissionToRole')->name('roles.givePermissionToRole');
 
     Route::get('/agen', 'MerchantsController@menu')->name('agen');
+    Route::get('/getKotaKabupaten/{provinsi_id}','MerchantsController@getKotaKabupaten')->name('get_kota_kabupaten');;
+
     Route::post('/agen/{id}/activate', 'MerchantsController@activateMerchant')->name('agen_activate');
     Route::get('/agen/blocked', 'MerchantsController@list_block')->name('agen_blocked');
     Route::get('/agen/blocked/{id}', 'MerchantsController@detail_blocked')->name('agen_blocked_detail');

@@ -232,6 +232,33 @@
                                 </div>
                             </div>
                             <div class="form-group row">
+                                <label class="col-sm-2 col-form-label">Provinsi</label>
+                                <div class="col-sm-10">
+                                    <select class="form-control" id="provinsi" name="provinsi">
+                                        <option value="">Pilih Provinsi</option>
+                                        @if($provinsi && count($provinsi) > 0)
+                                            @foreach($provinsi as $item)
+                                                <option value="{{ $item->opt_id }}" {{ old('provinsi', session('provinsi', null)) == $item->opt_id ? 'selected' : '' }}>
+                                                    {{ $item->opt_label }}
+                                                </option>
+                                            @endforeach
+                                        @else
+                                            <option value="">Data Provinsi tidak tersedia</option>
+                                        @endif
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-sm-2 col-form-label">Kota/Kabupaten</label>
+                                <div class="col-sm-10">
+                                    <select class="form-control" id="city" name="city">
+                                        <option value="">Pilih Kota/Kabupaten</option>
+                                        <!-- Data kota akan diisi lewat AJAX -->
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
                                 <label class="col-sm-2 col-form-label">Kelurahan</label>
                                 <div class="col-sm-10">
                                     <input type="text" class="form-control @error('kelurahan') is-invalid @enderror" name="kelurahan" value="{{ old('kelurahan', session('kelurahan', null)) }}" placeholder="Kelurahan">
@@ -247,40 +274,6 @@
                                     @error('kecamatan')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-sm-2 col-form-label">Kota/Kabupaten</label>
-                                <div class="col-sm-10">
-                                    <select class="form-control" name="city">
-                                        <option value="">Pilih Kota/Kabupaten</option>
-                                        @if($kota_kabupaten && count($kota_kabupaten) > 0)
-                                            @foreach($kota_kabupaten as $item)
-                                                <option value="{{ $item->opt_label }}" {{ old('city', session('city', null)) == $item->opt_label ? 'selected' : '' }}>
-                                                    {{ $item->opt_label }}
-                                                </option>
-                                            @endforeach
-                                        @else
-                                            <option value="">Data Kota/Kabupaten tidak tersedia</option>
-                                        @endif
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-sm-2 col-form-label">Provinsi</label>
-                                <div class="col-sm-10">
-                                    <select class="form-control" name="provinsi">
-                                        <option value="">Pilih Provinsi</option>
-                                        @if($provinsi && count($provinsi) > 0)
-                                            @foreach($provinsi as $item)
-                                                <option value="{{ $item->opt_label }}" {{ old('provinsi', session('provinsi', null)) == $item->opt_label ? 'selected' : '' }}>
-                                                    {{ $item->opt_label }}
-                                                </option>
-                                            @endforeach
-                                        @else
-                                            <option value="">Data Provinsi tidak tersedia</option>
-                                        @endif
-                                    </select>
                                 </div>
                             </div>
                             <div class="form-group row">
@@ -437,6 +430,32 @@
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
     <script>
+        $(document).ready(function() {
+            $('#provinsi').on('change', function() {
+                var provinsiID = $(this).val();
+                
+                if(provinsiID) {
+                    $.ajax({
+                        url: '/getKotaKabupaten/'+provinsiID,  
+                        type: "GET",
+                        dataType: "json",
+                        success:function(data) {
+                            $('#city').empty(); 
+                            $('#city').append('<option value="">Pilih Kota/Kabupaten</option>'); 
+                            
+                            $.each(data, function(key, value) {
+                                $('#city').append('<option value="'+ value.opt_id +'">'+ value.opt_label +'</option>');
+                            });
+                        }
+                    });
+                } 
+                else {
+                    $('#city').empty(); 
+                    $('#city').append('<option value="">Pilih Kota/Kabupaten</option>');
+                }
+            });
+        });
+
         document.getElementById('nextBtn').addEventListener('click', function () {
             const totalPoints = parseInt(document.getElementById('totalPoints').textContent);
             const requiredPoints =  {{ $min_poin }}; ; 

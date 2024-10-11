@@ -3,7 +3,7 @@
 <head>
     <style>
         @page {
-            size: A4;
+            size: A4 landscape; /* Mengatur ukuran kertas A4 horizontal */
             margin: 10mm;
         }
         body {
@@ -37,43 +37,32 @@
             text-align: center;
             margin-bottom: 10px;
         }
-        th {
-            white-space: nowrap;
-        }
     </style>
 </head>
 <body>
-    <h1>Transactions Report</h1>
+    <h1>Data Transaksi Agen Laku Pandai</h1>
     <table>
         <thead>
             <tr>
-                <th>No</th>
-                <th>Name</th>
-                <th>Transaction Code</th>
-                <th>Amount</th>
-                <th>Fee</th>
-                <th>Date</th>
-                <th>Norek Pengirim</th>
-                <th>Norek Penerima</th>
-                <th>Tipe Produk</th>
-                <th>Kode Agen</th>
-                <th>Status</th>
+                @foreach(['Kode Transaksi', 'Tanggal', 'Kode Agen', 'Cabang', 'Tipe Transaksi', 'Tipe Produk', 'Nominal', 'Fee', 'Nomor Rekening Penerima', 'Nomor Rekening Pengirim', 'Status'] as $header)
+                    <th>{{ $header }}</th>
+                @endforeach
             </tr>
         </thead>
         <tbody>
             @foreach($transactions as $transaction)
                 <tr>
-                    <td>{{ $transaction[0] }}</td>
-                    <td>{{ $transaction[1] }}</td>
-                    <td>{{ $transaction[2] }}</td>
-                    <td>{{ $transaction[3] }}</td>
-                    <td>{{ $transaction[4] }}</td>
-                    <td>{{ $transaction[5] }}</td>
-                    <td>{{ $transaction[6] }}</td>
-                    <td>{{ $transaction[7] }}</td>
-                    <td>{{ $transaction[8] }}</td>
-                    <td>{{ $transaction[9] }}</td>
-                    <td>{{ $transaction[10] }}</td>
+                    <td>{{ $transaction->transaction_code ?? 'N/A' }}</td>
+                    <td>{{ $transaction->transaction_time ?? 'N/A' }}</td>
+                    <td>{{ $transaction->kode_agen ?? 'N/A' }}</td>
+                    <td>{{ $transaction->kode_agen ?? 'N/A' }}</td>
+                    <td>{{ $transaction->transaction_type ?? 'N/A' }}</td>
+                    <td>{{ $transaction->service_id ?? 'N/A' }}</td>
+                    <td>{{ number_format($transaction->amount ?? 0, 2, ',', '.') }}</td>
+                    <td>{{ number_format($transaction->fee ?? 0, 2, ',', '.') }}</td>
+                    <td>{{ $transaction->rekening_penerima ?? 'N/A' }}</td>
+                    <td>{{ $transaction->rekening_pengirim ?? 'N/A' }}</td>
+                    <td>{{ $transaction->transaction_status_id ?? 'N/A' }}</td>
                 </tr>
             @endforeach
         </tbody>

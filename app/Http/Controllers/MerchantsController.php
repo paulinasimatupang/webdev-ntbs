@@ -141,11 +141,11 @@ class MerchantsController extends Controller
 
         foreach($data as $merchant) {
             if ($merchant->status_agen == 1){
-                $merchant->status_text = 'Active';
+                $merchant->status_text = 'Aktif';
             } else if ($merchant->status_agen == 2){ 
-                $merchant->status_text = 'Deactive';
+                $merchant->status_text = 'Tidak Aktif';
             } else if ($merchant->status_agen == 3){ 
-                $merchant->status_text = 'Blocked';
+                $merchant->status_text = 'Terblokir';
             }
 
             if($merchant->active_at == null || $merchant->active_at == ''){
@@ -265,72 +265,6 @@ class MerchantsController extends Controller
         return view('apps.merchants.inquiry-rek');
     }
 
-    public function cek_saldo($norek, $nama){
-        $terminal = '353471045058692';
-        $dateTime = date("YmdHms");
-
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, "http://108.137.154.8:8080/ARRest/api/");
-        $data = json_encode([
-            'msg'=>([
-            'msg_id' =>  "$terminal$dateTime",
-            'msg_ui' => "$terminal",
-            'msg_si' => 'N00001',
-            'msg_dt' => 'admin|'. $norek .'|'. $nama .'|null'
-            ])
-        ]);
-       
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'Content-Type: text/plain'
-        ]);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-
-        $output = curl_exec($ch);
-        $err = curl_error($ch);
-        $info = curl_getinfo($ch);
-        curl_close($ch);
-
-        Log::info('cURL Request URL: '  . $info['url']);
-        Log::info('cURL Request Data: ' . $data);
-        Log::info('cURL Response: ' . $output);
-
-        $match = false;
-
-        $responseArray = json_decode($output, true);
-        
-        $prodId = null;
-
-        if ($err) {
-            Log::error('cURL Error: ' . $err);
-        } else {
-            if (isset($responseArray['screen']['comps']['comp'])) {
-                foreach ($responseArray['screen']['comps']['comp'] as $comp) {
-                    if (isset($comp['comp_values']['comp_value'][0]['value'])) {
-                        $value = $comp['comp_values']['comp_value'][0]['value'];
-                        if ($value !== 'null' && $value !== null) {
-                            switch ($comp['comp_lbl']) {
-                                case 'ProdID':
-                                    $prodId = $value;
-                                    break;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        if ($prodId === '36'){
-            return "Nomor Rekening yang Anda Masukkan Tidak Dapat Didaftarkan Sebagai Agen";
-        }
-        else if (isset($responseArray['screen']['title']) && $responseArray['screen']['title'] === 'Gagal') {
-            return  "Pengecekan Rekening Gagal";
-        }
-        else {
-            return true;
-        }
-    }
 
     public function store_inquiry_rek(Request $request)
     {
@@ -379,6 +313,7 @@ class MerchantsController extends Controller
         $no_telp = null;
         $no_npwp = null;
         $no_ktp = null;
+        $prod_id= null;
 
         if ($err) {
             Log::error('cURL Error: ' . $err);
@@ -421,6 +356,9 @@ class MerchantsController extends Controller
                                 case 'No Telepon':
                                     $no_telp = $value;
                                     break;
+                                case 'ProdID':
+                                    $prod_id = $value;
+                                    break;
                             }
                         }
                     }
@@ -442,12 +380,14 @@ class MerchantsController extends Controller
             return Redirect::to('/agen/create/inquiry')
                             ->with('error', $errorMessage)
                             ->withInput();
-        } else {
-            $cekSaldoResult = $this->cek_saldo($norek, $nama_rek);
-            if ($cekSaldoResult !== true) {
-                return Redirect::to('/agen/create/inquiry')->with('error', $cekSaldoResult)->withInput();
-            }
-
+        } 
+        else if ($prod_id === 36)
+        {
+            return Redirect::to('/agen/create/inquiry')
+            ->with('error', "Nomor Rekening yang Anda Masukkan Tidak Dapat Didaftarkan Sebagai Agen")
+            ->withInput();
+        }
+        else {
             return Redirect::to('/agen/create')
             ->with('no_cif', $cifid)
             ->with('fullname', $nama_rek)
@@ -468,24 +408,40 @@ class MerchantsController extends Controller
         $min_poin = $min_poin_component ? $min_poin_component->comp_act : 0;
 
         $provinsi = CompOption::where('comp_id', 'CIF14')
-                    ->orderBy('opt_label')
+                    ->orderBy('seq')
                     ->get();
                     
         $kota_kabupaten = CompOption::where('comp_id', 'CIF13')
-                    ->orderBy('opt_label')
+                    ->orderBy('seq')
                     ->get();
 
-        $provinsi = $provinsi->sortBy(function($item) {
-            return $item->opt_label === 'Lain-Lain' ? 'zzzz' : $item->opt_label;
-        });
+        $kecamatan = CompOption::where('comp_id', 'CIF11')
+        ->orderBy('seq')
+        ->get();
 
-        $kota_kabupaten = $kota_kabupaten->sortBy(function($item) {
-            return $item->opt_label === 'Lain-Lain' ? 'zzzz' : $item->opt_label;
-        });
+        $kelurahan = CompOption::where('comp_id', 'CIF12')
+        ->orderBy('seq')
+        ->get();
 
-        return view('apps.merchants.add', compact('assessments', 'kota_kabupaten', 'provinsi', 'min_poin'));
+        return view('apps.merchants.add', compact('assessments', 'kelurahan', 'kecamatan', 'kota_kabupaten', 'provinsi', 'min_poin'));
     }
 
+    public function getKotaKabupaten($provinsi_id)
+    {
+        if (strpos($provinsi_id, 'CIF') === 0) {
+            $kode_provinsi = substr($provinsi_id, 3, 2);
+
+            $kota_kabupaten = CompOption::where('comp_id', 'CIF13')
+                        ->where('opt_id', 'like', $kode_provinsi.'%')
+                        ->where('opt_id', '9999')
+                        ->get();
+        } 
+        else {
+            $kota_kabupaten = CompOption::where('comp_id', 'CIF13')->get();
+        }
+
+        return response()->json($kota_kabupaten);
+    }
 
     /**
      * Store a newly created resource in storage.
@@ -503,7 +459,7 @@ class MerchantsController extends Controller
         try {
             $rules = [
                 'jenis_agen' => 'required',
-                'no_perjanjian_kerjasama' => 'required|min:5|max:50',
+                'no_perjanjian_kerjasama' => 'required',
                 'fullname' => 'required',
                 'jenis_kelamin' => 'required',
                 'no' => 'required',
@@ -1097,7 +1053,6 @@ class MerchantsController extends Controller
             }
             
         } catch (Exception $e) {
-            // For rollback data if one data is error
             DB::rollBack();
 
             return response()->json([
@@ -1106,7 +1061,6 @@ class MerchantsController extends Controller
                 'exception' => $e
             ], 500);
         } catch (\Illuminate\Database\QueryException $e) {
-            // For rollback data if one data is error
             DB::rollBack();
 
             return response()->json([
@@ -1143,7 +1097,6 @@ class MerchantsController extends Controller
             }
 
             DB::commit();
-            // Returning a JSON response instead of redirecting
             return response()->json([
                 'status' => true,
                 'message' => 'Agen Terblokir.'
@@ -1152,7 +1105,6 @@ class MerchantsController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Blokir Agen Gagal', ['error' => $e->getMessage()]);
-            // Returning a JSON response on failure
             return response()->json([
                 'status' => false,
                 'message' => 'Blokir Gagal: ' . $e->getMessage()
@@ -1201,45 +1153,6 @@ class MerchantsController extends Controller
         }
     }
 
-    /**
-     * Set balance the specified resource from storage.
-     *
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function updateBalance(Request $request)
-    {
-        try {
-            $merchant = Merchant::where('no',$request->no)->first();
-            if($merchant){
-                $merchant->balance = $request->balance;
-                $merchant->save();
-
-                DB::commit();
-                return response()->json([
-                    'status' => true
-                ], 200);
-            }else{
-                DB::rollBack();
-                return response()->json([
-                    'status' => false
-                ], 200);
-            }
-        } catch (Exception $e) {
-            // For rollback data if one data is error
-            DB::rollBack();
-            return response()->json([
-                'status' => false
-            ], 200);
-        } catch (\Illuminate\Database\QueryException $e) {
-            // For rollback data if one data is error
-            DB::rollBack();
-            return response()->json([
-                'status' => false
-            ], 200);
-        }
-    }
-
     public function getMerchant(Request $request){
         $data = Merchant::where('no',$request->no)->first();
         
@@ -1265,69 +1178,14 @@ class MerchantsController extends Controller
     {
         ini_set('memory_limit', '512M');
         set_time_limit(300);
-        $merchants = Merchant::all();
-        $pdf = Pdf::loadView('pdf.merchants', ['merchants' => $merchants]);
-        return $pdf->download('merchants.pdf');
-    }
-
-    public function exportCSV()
-    {
-        return Excel::download(new MerchantsExport(Merchant::query(), 1), 'merchants.csv');
+        $merchants = Merchant::where('status_agen', '!=', 0)->get();
+        $pdf = Pdf::loadView('pdf.merchants', ['merchants' => $merchants])
+                ->setPaper('a4', 'landscape');
+        return $pdf->download('Data Agen.pdf');
     }
 
     public function exportExcel()
     {
         return Excel::download(new MerchantsExport(Merchant::query(), 1), 'Data Agen.xlsx');
-    }
-    
-    public function exportTxt()
-    {
-        $merchants = Merchant::all();
-        $txtData = '';
-
-        foreach ($merchants as $merchant) {
-            $txtData .= "ID: {$merchant->mid}, Name: {$merchant->name}, Email: {$merchant->email}\n";
-        }
-
-        $fileName = "merchants.txt";
-        $headers = [
-            'Content-type' => 'text/plain',
-            'Content-Disposition' => "attachment; filename=\"$fileName\"",
-        ];
-
-        return response($txtData, 200, $headers);
-    }
- 
-    // public function sendNotification($fcm_token, $title, $message) {
-    //     $fcmUrl = 'https://fcm.googleapis.com/fcm/send';
-    
-    //     $notification = [
-    //         'title' => $title,
-    //         'body' => $message,
-    //         'sound' => 'default'
-    //     ];
-    
-    //     $fcmNotification = [
-    //         'to' => $fcm_token, // Token agen
-    //         'notification' => $notification,
-    //     ];
-    
-    //     $headers = [
-    //         'Authorization: key=YOUR_SERVER_KEY', // Server key dari Firebase
-    //         'Content-Type: application/json'
-    //     ];
-    
-    //     $ch = curl_init();
-    //     curl_setopt($ch, CURLOPT_URL, $fcmUrl);
-    //     curl_setopt($ch, CURLOPT_POST, true);
-    //     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-    //     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    //     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-    //     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($fcmNotification));
-    //     $result = curl_exec($ch);
-    //     curl_close($ch);
-    
-    //     return $result;
-    // }
-    
+    }    
 }

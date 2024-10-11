@@ -14,24 +14,22 @@
 @section('main-content')
             <div class="breadcrumb">
                 <h1>Agen</h1>
-                <!-- <ul>
-                    <li><a href="">Selada</a></li> -->
             </div>
             <div class="separator-breadcrumb border-top"></div>
             <div class="row mb-4">
-                <!-- <div class="col-lg-12 col-md-12 col-sm-12 d-flex justify-content-center mb-3">
-                    <div class="input-group">
-                        <a href="{{route('agen_inquiry_rek')}}">
-                            <button class="btn btn-warning ripple m-1 add-new-btn" type="button">Add New</button>
-                        </a>
-                    </div>
-                </div> -->
                 <div class="col-md-12 mb-3">
                     <div class="card text-left">
                         <div class="card-body">
                             <div class="row">
-                                <h4 class=" col-sm-12 col-md-6 card-title mb-3">List Agen </h4>
+                                <h4 class=" col-sm-9 col-md-6 card-title mb-3">List Agen </h4>
+                                <div class="col-sm-3 col-md-12 mb-3">
+                                    <div class="export-button-wrapper" style="float: right;">
+                                        <a id="export-to-excel" href="{{ route('merchants.excel') }}" class="btn btn-outline-secondary">Export to Excel</a>
+                                        <a id="export-to-pdf" href="{{ route('merchants.pdf') }}" class="btn btn-outline-secondary">Export to PDF</a>
+                                    </div>
+                                </div>
                             </div>
+                            
                             @if ($message = Session::get('success'))
                                 <div class="alert alert-success">
                                     <p>{{ $message }}</p>
@@ -43,34 +41,19 @@
                                     <p>{{ $message }}</p>
                                 </div>
                             @endif
-                            
-                            <div style="display: inline-block;     float: right;" class="export-button-wrapper">
 
-                            <a id="export-fee-to-excel" class="btn btn-outline-secondary" href="{{ route('merchants.excel') }}">
-                                Export to Excel
-                            </a>
-                            <!-- <a id="export-fee-to-pdf" class="btn btn-outline-secondary" href="{{ route('merchants.pdf') }}">
-                                Export to PDF
-                            </a>
-                            <a id="export-fee-to-csv" class="btn btn-outline-secondary" href="{{ route('merchants.csv') }}">
-                                Export to CSV
-                            </a>
-                            <a id="export-fee-to-txt" class="btn btn-outline-secondary" href="{{ route('merchants.txt') }}">
-                                Export to Txt
-                            </a> -->
-                            </div> 
                             <div class="table-responsive">
                             <table id="deafult_ordering_table" class="display table table-striped table-bordered" style="width:100%">
                                     <thead>
                                         <tr>
                                             <th scope="col">No</th>
-                                            <th scope="col">Id</th>
-					                        <th scope="col">Account No</th>
-                                            <th scope="col">Name</th>
+                                            <th scope="col">Kode Agen</th>
+					                        <th scope="col">No Rekening</th>
+                                            <th scope="col">Nama</th>
                                             <th scope="col">Email</th>
-                                            <th scope="col">Address</th>
-                                            <th scope="col">City</th>
-                                            <th scope="col">Phone</th>
+                                            <th scope="col">Alamat</th>
+                                            <th scope="col">Kota</th>
+                                            <th scope="col">No Telepon HP</th>
                                             <th scope="col">TID</th>
                                             <th scope="col">Status Agen</th>
                                             <th scope="col">Active Date</th>

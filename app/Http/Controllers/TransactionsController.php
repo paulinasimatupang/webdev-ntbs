@@ -243,16 +243,18 @@ class TransactionsController extends Controller
     
     public function exportPDF(Request $request)
     {
-        ini_set('memory_limit', '512M');
         set_time_limit(1000);
+        
         $query = Transaction::query();
         $viewType = 1; 
         $transactionsExport = new TransactionsExport($query, $viewType);
+        
         $transactions = $transactionsExport->collection(); 
-        $pdf = Pdf::loadView('pdf.transactions', ['transactions' => $transactions]);
-        return $pdf->download('transactions.pdf');
+        
+        $pdf = Pdf::loadView('pdf.transactions', ['transactions' => $transactions])
+                ->setPaper('A4', 'landscape'); 
+        return $pdf->download('Data Transaksi.pdf');
     }
-
 
     public function exportTxt()
     {

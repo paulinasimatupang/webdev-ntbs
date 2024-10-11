@@ -9,7 +9,7 @@ use Validator;
 
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Hash; // Untuk melakukan hashing pada password
+use Illuminate\Support\Facades\Hash;
 use App\Http\Requests;
 use Prettus\Validator\Contracts\ValidatorInterface;
 use Prettus\Validator\Exceptions\ValidatorException;
@@ -28,6 +28,7 @@ use App\Entities\User;
 use App\Entities\Role;
 use App\Entities\Merchant;
 use App\Entities\CompOption;
+use App\Entities\ServiceMeta;
 
 class DataCalonNasabahController extends Controller
 {
@@ -76,7 +77,7 @@ class DataCalonNasabahController extends Controller
         $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
 
         $data = DataCalonNasabah::select('*');
-        $data = $data->whereIn('status', [2, 3]);
+        $data = $data->whereIn('status', [2]);
 
         $user = session()->get('user');
 
@@ -241,155 +242,149 @@ class DataCalonNasabahController extends Controller
     }
 
     public function store_cif($id)
-{
-    DB::beginTransaction();
-    try {
-        $nasabah = DataCalonNasabah::find($id);
-        if ($nasabah) {
-            $nama_lengkap = $nasabah->nama_lengkap;
-            $nama_alias = $nasabah->nama_alias;
-            $ibu_kandung = $nasabah->ibu_kandung;
-            $tempat_lahir = $nasabah->tempat_lahir;
-            $tgl_lahir = $nasabah->tgl_lahir;
-            $jenis_kelamin = $nasabah->jenis_kelamin;
-            $agama = $nasabah->agama;
-            $status_nikah = $nasabah->status_nikah;
-            $alamat = $nasabah->alamat;
-            $rt = $nasabah->rt;
-            $rw = $nasabah->rw;
-            $kecamatan = $nasabah->kecamatan;
-            $kelurahan = $nasabah->kelurahan;
-            $kab_kota = $nasabah->kab_kota;
-            $provinsi = $nasabah->provinsi;
-            $kode_pos = $nasabah->kode_pos;
-            $status_penduduk = $nasabah->status_penduduk;
-            $kewarganegaraan = $nasabah->kewarganegaraan;
-            $no_telp = $nasabah->no_telp;
-            $no_hp = $nasabah->no_hp;
-            $npwp = $nasabah->npwp;
-            $jenis_identitas = $nasabah->jenis_identitas;
-            $no_identitas = $nasabah->no_identitas;
-            $golongan_darah = $nasabah->golongan_darah;
-            $expired_identitas = $nasabah->expired_identitas;
-            $pendidikan_terakhir = $nasabah->pendidikan_terakhir;
-            $email = $nasabah->email;
-            $branchid = $nasabah->branchid;
+    {
+        DB::beginTransaction();
+        try {
+            $nasabah = DataCalonNasabah::find($id);
 
             if (!$nasabah) {
                 throw new \Exception("Nasabah dengan ID $id tidak ditemukan.");
             }
 
-            // Memvalidasi Branch ID sebelum membuat CIF
             if (empty($nasabah->branchid)) {
                 throw new \Exception("Branch ID tidak ditemukan untuk nasabah dengan ID $id. Gagal membuat CIF.");
             }
 
-            // Jika nasabah sudah memiliki CIF, batalkan pembuatan CIF baru
             if (!is_null($nasabah->no_cif)) {
                 Log::info("Nasabah dengan ID {$nasabah->id} sudah memiliki CIF: {$nasabah->no_cif}");
-                return true; // CIF sudah ada, tidak perlu buat lagi
+                return true; 
             }
 
-            $terminal = '89b2c0aa8e0ac7c2';
-            $dateTime = date("YmdHis");
+            if ($nasabah) {
+                
+                $nasabahData = $nasabah->only([
+                    'nama_lengkap', 'nama_alias', 'ibu_kandung', 'tempat_lahir', 'tgl_lahir', 
+                    'jenis_kelamin', 'agama', 'status_nikah', 'alamat', 'rt', 'rw', 
+                    'kecamatan', 'kelurahan', 'kab_kota', 'provinsi', 'kode_pos', 
+                    'status_penduduk', 'kewarganegaraan', 'no_telp', 'no_hp', 'npwp', 
+                    'jenis_identitas', 'no_identitas', 'golongan_darah', 'expired_identitas', 
+                    'pendidikan_terakhir', 'email', 'branchid'
+                ]);
 
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL, "http://16.78.84.90:8080/ARRest/api/");
-            $data = json_encode([
-                'msg' => [
-                    'msg_id' => "$terminal$dateTime",
-                    'msg_ui' => "$terminal",
-                    'msg_si' => 'CC0004',
-                    'msg_dt' => 'lakupandai|' . $no_identitas . '|' . $nama_lengkap . '|' . $nama_alias . '|' . $ibu_kandung . '|' . $tempat_lahir . '|' . $tgl_lahir . '|' . $jenis_kelamin . '|' .
-                        $agama . '|' . $status_nikah . '|' . $alamat . '|' . $rt . '|' . $rw . '|' . $kecamatan . '|' . $kelurahan . '|' . $kab_kota . '|' . $provinsi . '|' . $kode_pos .
-                        '|' . $status_penduduk . '|' . $kewarganegaraan . '|' . $no_telp . '|' . $no_hp . '|' . $npwp . '|' . $jenis_identitas . '|' . $golongan_darah . '|' . $expired_identitas .
-                        '|' . $pendidikan_terakhir . '|' . $email . '|' . $branchid
-                ]
-            ]);
+                $serviceMeta = ServiceMeta::where('service_id', 'CC0004')
+                    ->where('influx', 1)
+                    ->orderBy('seq', 'asc')
+                    ->get();
 
-            curl_setopt($ch, CURLOPT_HTTPHEADER, [
-                'Content-Type: text/plain'
-            ]);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+                    $msgValues = [];
+                    $usernameValue = '';
 
-            $output = curl_exec($ch);
-            $err = curl_error($ch);
-            $info = curl_getinfo($ch);
-            curl_close($ch);
+                    foreach ($serviceMeta as $meta) {
+                        $metaKey = $meta->meta_id;
+                    
+                        if ($metaKey === 'username') {
+                            $usernameValue = $meta->meta_default; 
+                        } elseif (array_key_exists($metaKey, $nasabahData)) {
+                            $msgValues[] = $nasabahData[$metaKey];
+                        } else {
+                            $msgValues[] = ''; 
+                        }
+                    }
+            
+                    $msgData = $usernameValue . '|' . implode('|', $msgValues); 
 
-            Log::info('cURL Request URL: ' . $info['url']);
-            Log::info('cURL Request Data: ' . $data);
-            Log::info('cURL Response: ' . $output);
+                $terminal = '89b2c0aa8e0ac7c2';
+                $dateTime = date("YmdHis");
 
-            // Memproses respons dari API
-            $responseArray = json_decode($output, true);
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL, "http://16.78.84.90:8080/ARRest/api/");
+                $data = json_encode([
+                    'msg' => [
+                        'msg_id' => "$terminal$dateTime",
+                        'msg_ui' => "$terminal",
+                        'msg_si' => 'CC0004',
+                        'msg_dt' => 'lakupandai|' . $no_identitas . '|' . $nama_lengkap . '|' . $nama_alias . '|' . $ibu_kandung . '|' . $tempat_lahir . '|' . $tgl_lahir . '|' . $jenis_kelamin . '|' .
+                            $agama . '|' . $status_nikah . '|' . $alamat . '|' . $rt . '|' . $rw . '|' . $kecamatan . '|' . $kelurahan . '|' . $kab_kota . '|' . $provinsi . '|' . $kode_pos .
+                            '|' . $status_penduduk . '|' . $kewarganegaraan . '|' . $no_telp . '|' . $no_hp . '|' . $npwp . '|' . $jenis_identitas . '|' . $golongan_darah . '|' . $expired_identitas .
+                            '|' . $pendidikan_terakhir . '|' . $email . '|' . $branchid
+                    ]
+                ]);
 
-            if ($err) {
-                Log::error('cURL Error: ' . $err);
-                throw new \Exception('Gagal terhubung ke API CIF: ' . $err);
+                curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                    'Content-Type: text/plain'
+                ]);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+
+                $output = curl_exec($ch);
+                $err = curl_error($ch);
+                $info = curl_getinfo($ch);
+                curl_close($ch);
+
+                Log::info('cURL Request URL: ' . $info['url']);
+                Log::info('cURL Request Data: ' . $data);
+                Log::info('cURL Response: ' . $output);
+
+                $responseArray = json_decode($output, true);
+
+                if ($err) {
+                    Log::error('cURL Error: ' . $err);
+                    throw new \Exception('Gagal terhubung ke API CIF: ' . $err);
+                }
+
+            if (isset($responseArray['screen']['title']) && $responseArray['screen']['title'] === 'Gagal') {
+                Log::warning("Gagal membuat CIF untuk nasabah ID: {$nasabah->id}, Pesan: " . $responseArray['screen']['comps']['comp'][0]['comp_values']['comp_value'][0]['value']);
+                return false;
             }
 
-           // Mengecek apakah ada error dalam respon API
-        if (isset($responseArray['screen']['title']) && $responseArray['screen']['title'] === 'Gagal') {
-            Log::warning("Gagal membuat CIF untuk nasabah ID: {$nasabah->id}, Pesan: " . $responseArray['screen']['comps']['comp'][0]['comp_values']['comp_value'][0]['value']);
-            return false;
-        }
+            if (isset($responseArray['screen']['comps']['comp'])) {
+                foreach ($responseArray['screen']['comps']['comp'] as $comp) {
+                    if ($comp['comp_lbl'] === 'No CIF') {
+                        $nasabah->no_cif = $comp['comp_values']['comp_value'][0]['value'];
+                        $nasabah->save();
 
-        // Jika berhasil, menyimpan CIF ke dalam database dan pindahkan ke tabel users
-        if (isset($responseArray['screen']['comps']['comp'])) {
-            foreach ($responseArray['screen']['comps']['comp'] as $comp) {
-                if ($comp['comp_lbl'] === 'No CIF') {
-                    $nasabah->no_cif = $comp['comp_values']['comp_value'][0]['value'];
-                    $nasabah->save();
-
-                    // Pindahkan ke tabel users setelah CIF disimpan
-                    $this->moveToUsersTable($nasabah);
+                        $this->moveToUsersTable($nasabah);
+                    }
                 }
             }
+
+            DB::commit();
+            return true;
+
+        }
+    } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error in store_cif: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    private function moveToUsersTable($nasabah)
+    {
+        if (!filter_var($nasabah->email, FILTER_VALIDATE_EMAIL)) {
+            Log::error("Invalid email format for nasabah ID {$nasabah->id}: {$nasabah->email}");
+            return;
         }
 
-        DB::commit();
-        return true;
+        $existingUser = User::where('email', $nasabah->email)->first();
+        if ($existingUser) {
+            Log::info("Nasabah dengan email {$nasabah->email} sudah terdaftar di tabel users.");
+            return;
+        }
 
+        $user = new User();
+        $user->fullname = $nasabah->nama_lengkap;
+        $user->email = $nasabah->email;
+        $user->password = Hash::make('default_password'); 
+        $user->branchid = $nasabah->branchid;
+        $user->save();
+
+        $nasabah->delete();
+
+        Log::info("Nasabah dengan ID {$nasabah->id} telah dipindahkan ke tabel users.");
     }
- } catch (\Exception $e) {
-        DB::rollBack();
-        Log::error('Error in store_cif: ' . $e->getMessage());
-        return false;
-    }
-}
-
-private function moveToUsersTable($nasabah)
-{
-    // Validasi email sebelum menyimpan
-    if (!filter_var($nasabah->email, FILTER_VALIDATE_EMAIL)) {
-        Log::error("Invalid email format for nasabah ID {$nasabah->id}: {$nasabah->email}");
-        return;
-    }
-
-    // Cek apakah user sudah ada di tabel users berdasarkan email
-    $existingUser = User::where('email', $nasabah->email)->first();
-    if ($existingUser) {
-        Log::info("Nasabah dengan email {$nasabah->email} sudah terdaftar di tabel users.");
-        return;
-    }
-
-    // Membuat user baru di tabel users
-    $user = new User();
-    $user->fullname = $nasabah->nama_lengkap; // Menggunakan fullname, bukan name
-    $user->email = $nasabah->email;
-    $user->password = Hash::make('default_password'); // Gunakan password default atau sesuai kebutuhan
-    $user->branchid = $nasabah->branchid;
-    $user->save();
-
-    // Hapus nasabah dari tabel DataCalonNasabah
-    $nasabah->delete();
-
-    Log::info("Nasabah dengan ID {$nasabah->id} telah dipindahkan ke tabel users.");
-}
 
 
 
@@ -502,38 +497,30 @@ private function moveToUsersTable($nasabah)
                     ->with('error', "Data nasabah tidak ditemukan");
             }
     
-            // Proses pembuatan nomor registrasi
             if (!$this->registration_code($id)) {
                 DB::rollBack();
                 return Redirect::to('/nasabah/approve')
                     ->with('error', "Gagal menghasilkan nomor registrasi.");
             }
     
-            // Proses pembuatan CIF
             if (!$this->store_cif($id)) {
                 DB::rollBack();
                 return Redirect::to('/nasabah/approve')
                     ->with('error', "Gagal membuat CIF.");
             }
     
-            // Proses pembuatan rekening
             if (!$this->store_rekening($id)) {
                 DB::rollBack();
                 return Redirect::to('/nasabah/approve')
                     ->with('error', "Gagal membuat rekening.");
             }
-    
-            // Menyimpan status nasabah setelah CIF dan rekening berhasil dibuat
-            $nasabah->status = 2; // Status 2 = Accepted
+            $nasabah->status = 2;
             $nasabah->reply_time = now();
             $nasabah->save();
     
-            // Ambil FCM token dari tabel data_calon_nasabah
             $fcmToken = $nasabah->fcm_token;
     
-            // Validasi token FCM
             if ($this->isValidFcmToken($fcmToken)) {
-                // Jika FCM token tersedia, kirim notifikasi
                 $notificationService = new SendPushNotification();
                 $notificationService->sendNotificationToToken($fcmToken, [
                     'title' => 'Pengajuan Disetujui',
@@ -560,43 +547,39 @@ private function moveToUsersTable($nasabah)
     }
     
     public function rejectNasabah($id)
-{
-    DB::beginTransaction();
-    try {
-        $nasabah = DataCalonNasabah::where('id', $id)->first();
-        if (!$nasabah) {
-            throw new \Exception("Nasabah not found");
+    {
+        DB::beginTransaction();
+        try {
+            $nasabah = DataCalonNasabah::where('id', $id)->first();
+            if (!$nasabah) {
+                throw new \Exception("Nasabah not found");
+            }
+
+            $nasabah->status = 3;
+            $nasabah->reply_time = now();
+            $nasabah->save();
+
+            $fcmToken = $nasabah->fcm_token;
+
+            if ($this->isValidFcmToken($fcmToken)) {
+                $notificationService = new SendPushNotification();
+                $notificationService->sendNotificationToToken($fcmToken, [
+                    'title' => 'Pengajuan Ditolak',
+                    'message' => "Pengajuan nasabah atas nama {$nasabah->nama_lengkap} telah ditolak oleh supervisor.",
+                ]);
+            } else {
+                Log::warning("FCM token tidak valid atau tidak ditemukan untuk nasabah ID: {$nasabah->id}");
+            }
+
+            DB::commit();
+            return redirect()->route('nasabah')->with('success', 'Permintaan Berhasil Ditolak.');
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::error('Error in rejectNasabah: ' . $e->getMessage());
+            return Redirect::to('nasabah')
+                ->with('error', $e->getMessage());
         }
-
-        // Mengubah status nasabah menjadi "rejected" (status 3)
-        $nasabah->status = 3;
-        $nasabah->reply_time = now();
-        $nasabah->save();
-
-        // Ambil FCM token dari tabel data_calon_nasabah
-        $fcmToken = $nasabah->fcm_token;
-
-        // Validasi token FCM
-        if ($this->isValidFcmToken($fcmToken)) {
-            // Jika FCM token tersedia, kirim notifikasi
-            $notificationService = new SendPushNotification();
-            $notificationService->sendNotificationToToken($fcmToken, [
-                'title' => 'Pengajuan Ditolak',
-                'message' => "Pengajuan nasabah atas nama {$nasabah->nama_lengkap} telah ditolak oleh supervisor.",
-            ]);
-        } else {
-            Log::warning("FCM token tidak valid atau tidak ditemukan untuk nasabah ID: {$nasabah->id}");
-        }
-
-        DB::commit();
-        return redirect()->route('nasabah')->with('success', 'Permintaan Berhasil Ditolak.');
-    } catch (Exception $e) {
-        DB::rollBack();
-        Log::error('Error in rejectNasabah: ' . $e->getMessage());
-        return Redirect::to('nasabah')
-            ->with('error', $e->getMessage());
     }
-}
 
     public function acceptNasabah($id)
     {
@@ -821,14 +804,13 @@ private function moveToUsersTable($nasabah)
     }
 
     public function sendTestNotification(Request $request)
-{
-    try {
-        // Gunakan token FCM manual yang sudah di-set default di service
-        $notificationService = new SendPushNotification();
-        $notificationService->sendNotification();
-        return response()->json(['status' => 'success', 'message' => 'Notifikasi berhasil dikirim']);
-    } catch (\Exception $e) {
-        return response()->json(['status' => 'error', 'message' => 'Gagal mengirim notifikasi'], 500);
+    {
+        try {
+            $notificationService = new SendPushNotification();
+            $notificationService->sendNotification();
+            return response()->json(['status' => 'success', 'message' => 'Notifikasi berhasil dikirim']);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => 'Gagal mengirim notifikasi'], 500);
+        }
     }
-}
 }
