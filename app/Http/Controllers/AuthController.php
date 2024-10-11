@@ -576,10 +576,7 @@ class AuthController extends Controller
             'uid' => 'required',
         ]);
 
-        $user = User::where('username', $request->username)->first();
-
-        $terminal = Terminal::where('imei', $request->uid)->first();
-
+        $user = User::with('merchant')->where('username', $request->username)->first();
         if (!$user) {
             return response()->json([
                 'status' => 'error',
@@ -587,7 +584,9 @@ class AuthController extends Controller
             ], 404);
         }
 
-        if (!$terminal) {
+        $terminal = Terminal::where('mid', $user->merchant->mid)->first();
+
+        if($terminal->imei === $uid){
             return response()->json([
                 'status' => 'error',
                 'message' => 'Terminal tidak ditemukan.',
