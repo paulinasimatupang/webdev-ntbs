@@ -93,27 +93,21 @@
                                         <input class="form-check-input" type="radio" name="jenis_agen" id="option2" value="Agen Badan Hukum" {{ old('jenis_agen') == 'Agen Badan Hukum' ? 'checked' : '' }}>
                                         <label class="form-check-label" for="option2">Agen Badan Hukum</label>
                                     </div>
-                                    @error('jenis_agen')
-                                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                                    @enderror
+                                    <div class="invalid-feedback"></div>
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label class="col-sm-2 col-form-label">Nomor Perjanjian Kerjasama</label>
                                 <div class="col-sm-10">
                                     <input type="text" class="form-control @error('no_perjanjian_kerjasama') is-invalid @enderror" name="no_perjanjian_kerjasama" value="{{ old('no_perjanjian_kerjasama', session('no_perjanjian_kerjasama', null)) }}" placeholder="Nomor Perjanjian Kerjasama">
-                                    @error('no_perjanjian_kerjasama')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
+                                    <div class="invalid-feedback"></div>
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label class="col-sm-2 col-form-label">Nama Pemilik</label>
                                 <div class="col-sm-10">
                                     <input type="text" class="form-control @error('fullname') is-invalid @enderror" name="fullname" value="{{ old('fullname', session('fullname', null)) }}" placeholder="Nama Lengkap" {{ old('fullname') || session('fullname') ? 'readonly' : '' }}>
-                                    @error('fullname')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
+                                    <div class="invalid-feedback"></div>
                                 </div>
                             </div>
                             <div class="form-group row">
@@ -127,108 +121,84 @@
                                         <input class="form-check-input" type="radio" name="jenis_kelamin" id="gender2" value="Perempuan" {{ old('jenis_kelamin') == 'Perempuan' ? 'checked' : '' }}>
                                         <label class="form-check-label" for="gender2">Perempuan</label>
                                     </div>
-                                    @error('jenis_kelamin')
-                                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                                    @enderror
+                                    <div class="invalid-feedback"></div>
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label class="col-sm-2 col-form-label">Nomor Rekening</label>
                                 <div class="col-sm-10">
                                     <input type="text" class="form-control @error('no') is-invalid @enderror" name="no" value="{{ old('no', session('no', null)) }}" placeholder="Nomor Rekening" {{  old('no') || session('no') ? 'readonly' : '' }}>
-                                    @error('no')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
+                                    <div class="invalid-feedback"></div>
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label class="col-sm-2 col-form-label">Nomor CIF</label>
                                 <div class="col-sm-10">
                                     <input type="text" class="form-control @error('no_cif') is-invalid @enderror" name="no_cif" value="{{ old('no_cif', session('no_cif', null)) }}" placeholder="Nomor CIF" {{  old('no_cif') || session('no_cif') ? 'readonly' : '' }}>
-                                    @error('no_cif')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
+                                    <div class="invalid-feedback"></div>
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label class="col-sm-2 col-form-label">NIK</label>
                                 <div class="col-sm-10">
                                     <input type="text" class="form-control @error('no_ktp') is-invalid @enderror" name="no_ktp" value="{{ old('no_ktp', session('no_ktp', null)) }}" placeholder="NIK" {{  old('no_ktp') || session('no_ktp') ? 'readonly' : '' }}>
-                                    @error('no_ktp')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
+                                    <div class="invalid-feedback"></div>
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label class="col-sm-2 col-form-label">Nomor NPWP</label>
                                 <div class="col-sm-10">
                                     <input type="text" class="form-control @error('no_npwp') is-invalid @enderror" name="no_npwp" value="{{ old('no_npwp', session('no_npwp', null)) }}" placeholder="Nomor NPWP" {{  old('no_npwp') || session('no_npwp') ? 'readonly' : '' }}>
-                                    @error('no_npwp')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
+                                    <div class="invalid-feedback"></div>
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label class="col-sm-2 col-form-label">Nomor Telepon</label>
                                 <div class="col-sm-10">
                                     <input type="text" class="form-control @error('no_telp') is-invalid @enderror" name="no_telp" value="{{ old('no_telp', session('no_telp', null)) }}" placeholder="Nomor Telepon" {{  old('no_telp') || session('no_telp') ? 'readonly' : '' }}>
-                                    @error('no_telp')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
+                                    <div class="invalid-feedback"></div>
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label class="col-sm-2 col-form-label">Nomor Handphone</label>
                                 <div class="col-sm-10">
                                     <input type="text" class="form-control @error('phone') is-invalid @enderror" name="phone" value="{{ old('phone', session('phone', null)) }}" placeholder="Nomor Handphone" {{  old('phone') ||  session('phone') ? 'readonly' : '' }}>
-                                    @error('phone')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
+                                    <div class="invalid-feedback"></div>
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label class="col-sm-2 col-form-label">Email</label>
                                 <div class="col-sm-10">
                                     <input type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email', session('email', null)) }}" placeholder="Email">
-                                    @error('email')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
+                                    <div class="invalid-feedback"></div>
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label class="col-sm-2 col-form-label">Jenis Pekerjaan</label>
                                 <div class="col-sm-10">
                                     <input type="text" class="form-control @error('pekerjaan') is-invalid @enderror" name="pekerjaan" value="{{ old('pekerjaan', session('pekerjaan', null)) }}" placeholder="Jenis Pekerjaan">
-                                    @error('pekerjaan')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
+                                    <div class="invalid-feedback"></div>
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label class="col-sm-2 col-form-label">Alamat</label>
                                 <div class="col-sm-10">
                                     <input type="text" class="form-control @error('address') is-invalid @enderror" name="address" value="{{ old('address', session('address', null)) }}" placeholder="Alamat" {{  old('address') || session('address') ? 'readonly' : '' }}>
-                                    @error('address')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
+                                    <div class="invalid-feedback"></div>
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label class="col-sm-2 col-form-label">RT</label>
                                 <div class="col-sm-10">
                                     <input type="number" class="form-control @error('rt') is-invalid @enderror" name="rt" value="{{ old('rt', session('rt', null)) }}" placeholder="RT">
-                                    @error('rt')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
+                                    <div class="invalid-feedback"></div>
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label class="col-sm-2 col-form-label">RW</label>
                                 <div class="col-sm-10">
                                     <input type="number" class="form-control @error('rw') is-invalid @enderror" name="rw" value="{{ old('rw', session('rw', null)) }}" placeholder="RW">
-                                    @error('rw')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
+                                    <div class="invalid-feedback"></div>
                                 </div>
                             </div>
                             <div class="form-group row">
@@ -246,6 +216,7 @@
                                             <option value="">Data Provinsi tidak tersedia</option>
                                         @endif
                                     </select>
+                                    <div class="invalid-feedback"></div>
                                 </div>
                             </div>
 
@@ -254,35 +225,29 @@
                                 <div class="col-sm-10">
                                     <select class="form-control" id="city" name="city">
                                         <option value="">Pilih Kota/Kabupaten</option>
-                                        <!-- Data kota akan diisi lewat AJAX -->
                                     </select>
+                                    <div class="invalid-feedback"></div>
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label class="col-sm-2 col-form-label">Kelurahan</label>
                                 <div class="col-sm-10">
                                     <input type="text" class="form-control @error('kelurahan') is-invalid @enderror" name="kelurahan" value="{{ old('kelurahan', session('kelurahan', null)) }}" placeholder="Kelurahan">
-                                    @error('kelurahan')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
+                                    <div class="invalid-feedback"></div>
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label class="col-sm-2 col-form-label">Kecamatan</label>
                                 <div class="col-sm-10">
                                     <input type="text" class="form-control @error('kecamatan') is-invalid @enderror" name="kecamatan" value="{{ old('kecamatan', session('kecamatan', null)) }}" placeholder="Kecamatan">
-                                    @error('kecamatan')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
+                                    <div class="invalid-feedback"></div>
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label class="col-sm-2 col-form-label">Kode Pos</label>
                                 <div class="col-sm-10">
                                     <input type="text" class="form-control @error('kode_pos') is-invalid @enderror" name="kode_pos" value="{{ old('kode_pos', session('kode_pos', null)) }}" placeholder="Kode Pos" {{  old('kode_pos') || session('kode_pos') ? 'readonly' : '' }}>
-                                    @error('kode_pos')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
+                                    <div class="invalid-feedback"></div>
                                 </div>
                             </div>
                             <div class="form-group row">
@@ -318,11 +283,7 @@
                                 <label class="col-sm-2 col-form-label" for="file_ktp">Upload KTP</label>
                                 <div class="col-sm-10">
                                     <input type="file" class="form-control @error('file_ktp') is-invalid @enderror" name="file_ktp" id="file_ktp">
-                                    @error('file_ktp')
-                                        <div class="invalid-feedback">
-                                            {{ $message }}
-                                        </div>
-                                    @enderror
+                                    <div class="invalid-feedback"></div>
                                 </div>
                             </div>
 
@@ -330,11 +291,7 @@
                                 <label class="col-sm-2 col-form-label" for="file_npwp">Upload NPWP</label>
                                 <div class="col-sm-10">
                                     <input type="file" class="form-control @error('file_npwp') is-invalid @enderror" name="file_npwp" id="file_npwp">
-                                    @error('file_npwp')
-                                        <div class="invalid-feedback">
-                                            {{ $message }}
-                                        </div>
-                                    @enderror
+                                    <div class="invalid-feedback"></div>
                                 </div>
                             </div>
 
@@ -342,18 +299,14 @@
                                 <label class="col-sm-2 col-form-label" for="foto_lokasi_usaha">Upload Foto Lokasi Usaha</label>
                                 <div class="col-sm-10">
                                     <input type="file" class="form-control @error('foto_lokasi_usaha') is-invalid @enderror" name="foto_lokasi_usaha" id="foto_lokasi_usaha">
-                                    @error('foto_lokasi_usaha')
-                                        <div class="invalid-feedback">
-                                            {{ $message }}
-                                        </div>
-                                    @enderror
+                                    <div class="invalid-feedback"></div>
                                 </div>
                             </div>
 
                             <div class="form-group row">
                                 <div class="col-sm-12 text-right">
                                     <button type="button" class="btn btn-secondary" id="prevBtn2">Previous</button>
-                                    <button type="submit" class="btn btn-success">Save</button>
+                                    <button type="submit" class="btn btn-success"  id="saveBtn">Save</button>
                                 </div>
                             </div>
                         </div>
@@ -423,6 +376,15 @@
         background-color: #007bff;
         color: white;
     }
+    .invalid-feedback {
+        display: block;
+        color: red;
+        margin-top: 0.5rem;
+    }
+
+    .is-invalid + .invalid-feedback {
+        display: block;
+    }
     </style>
 @endsection
 
@@ -430,6 +392,58 @@
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
     <script>
+        const customFields = {
+                'jenis_agen':'Jenis Agen',
+                'no_perjanjian_kerjasama':'Nomor Perjanjian Kerjasama',
+                'fullname':'Nama Pemilik',
+                'jenis_kelamin':'Jenis Kelamin',
+                'no':'Nomor Rekening',
+                'no_cif':'Nomor CIF',
+                'no_ktp':'Nomor KTP',
+                'no_npwp':'Nomor NPWP',
+                'no_telp':'Nomor Telepon',
+                'phone':'Nomor Handphone',
+                'email':'Email',
+                'pekerjaan':'Pekerjaan',
+                'address':'Alamat',
+                'rt':'RT',
+                'rw':'RW',
+                'kelurahan':'Kelurahan',
+                'kecamatan':'Kecamatan',
+                'city':'Kota/Kabupaten',
+                'provinsi':'Provinsi',
+                'kode_pos':'Kode Pos',
+                'file_ktp':'File KTP',
+                'file_npwp':'File NPWP',
+                'foto_lokasi_usaha':'Foto Lokasi Usaha',
+        };
+
+        const validationRules = {
+            'jenis_agen': { required: true, radio: true },
+            'no_perjanjian_kerjasama': { required: true},
+            'fullname': { required: true},
+            'jenis_kelamin': { required: true, radio: true },
+            'no': { required: true },
+            'no_cif': { required: true },
+            'no_ktp': { required: true }, 
+            'no_npwp': { required: true }, 
+            'no_telp': { required: true },
+            'phone': { required: true },
+            'email': { required: true },
+            'pekerjaan': { required: true },
+            'address': { required: true },
+            'rt': { required: true },
+            'rw': { required: true },
+            'kelurahan': { required: true },
+            'kecamatan': { required: true },
+            'city': { required: true },
+            'provinsi': { required: true },
+            'kode_pos': { required: true},
+            'file_ktp': { required: true },
+            'file_npwp': { required: true },
+            'foto_lokasi_usaha': { required: true },
+        };
+
         $(document).ready(function() {
             $('#provinsi').on('change', function() {
                 var provinsiID = $(this).val();
@@ -458,11 +472,24 @@
 
         document.getElementById('nextBtn').addEventListener('click', function () {
             const totalPoints = parseInt(document.getElementById('totalPoints').textContent);
-            const requiredPoints =  {{ $min_poin }}; ; 
+            const requiredPoints =  {{ $min_poin }};
+            let allFilled = true;
+
+            @foreach($assessments as $assessment)
+                const answer{{ $assessment->id }} = document.querySelector('input[name="answer[{{ $assessment->id }}]"]:checked');
+                if (!answer{{ $assessment->id }}) {
+                    allFilled = false;
+                }
+            @endforeach
             if (totalPoints < requiredPoints) {
                 alert(`Total poin harus mencapai minimal ${requiredPoints} untuk melanjutkan.`);
                 return;
             }
+            else if (!allFilled) {
+                alert("Semua pertanyaan harus diisi");
+                return;
+            }
+            
             document.getElementById('step1').style.display = 'none';
             document.getElementById('step2').style.display = 'block';
             document.getElementById('step3').style.display = 'none';
@@ -472,12 +499,22 @@
         });
 
         document.getElementById('nextBtn2').addEventListener('click', function () {
+            if (!validateForm()) {
+                return;
+            }
             document.getElementById('step1').style.display = 'none';
             document.getElementById('step2').style.display = 'none';
             document.getElementById('step3').style.display = 'block';
             document.getElementById('stepIndicator1').classList.remove('active');
             document.getElementById('stepIndicator2').classList.remove('active');
             document.getElementById('stepIndicator3').classList.add('active');
+        });
+
+        document.getElementById('saveBtn').addEventListener('click', function(event) {
+            event.preventDefault();
+            if (validateForm()) {
+                document.querySelector('form').submit();
+            }
         });
 
         document.getElementById('prevBtn').addEventListener('click', function () {
@@ -503,6 +540,100 @@
             });
         });
 
+
+        function validateForm() {
+            let isValid = true;
+            const errorElements = document.querySelectorAll('.invalid-feedback');
+            errorElements.forEach(el => el.textContent = '');
+            
+            const inputs = document.querySelectorAll('.form-control, .form-check-input');
+            inputs.forEach(input => input.classList.remove('is-invalid'));
+
+            const inputFile = document.getElementsByName('fileInput')[0];
+            if (inputFile && inputFile.files.length === 0) {
+                isValid = false;
+                inputFile.classList.add('is-invalid');
+                const feedbackElement = inputFile.closest('.form-group').querySelector('.invalid-feedback');
+                if (feedbackElement) {
+                    feedbackElement.textContent = 'File harus diunggah.';
+                }
+            }
+
+            Object.keys(validationRules).forEach(field => {
+                const rules = validationRules[field];
+                const label = customFields[field];
+                const input = document.getElementsByName(field);
+
+                if (rules.radio) {
+                    const isChecked = Array.from(input).some(rb => rb.checked);
+                    if (rules.required && !isChecked) {
+                        isValid = false;
+                        input.forEach(i => i.classList.add('is-invalid'));
+                        const feedbackElement = input[0].closest('.form-group').querySelector('.invalid-feedback');
+                        if (feedbackElement) {
+                            feedbackElement.textContent = `${label} harus dipilih.`;
+                        }
+                    }
+                }
+                
+                if (rules.required) {
+                    const isInputEmpty = Array.from(input).every(i => i.type === 'radio' ? !i.checked : !i.value.trim());
+                    if (isInputEmpty) {
+                        isValid = false;
+                        Array.from(input).forEach(i => i.classList.add('is-invalid'));
+                        const feedbackElement = input[0].closest('.form-group').querySelector('.invalid-feedback');
+                        if (feedbackElement) {
+                            feedbackElement.textContent = `${label} harus diisi.`;
+                        }
+                    }
+                }
+
+                if (rules.radio) {
+                    const isChecked = Array.from(input).some(rb => rb.checked);
+                    if (rules.required && !isChecked) {
+                        isValid = false;
+                        input[0].classList.add('is-invalid');
+                        const feedbackElement = input[0].closest('.form-group').querySelector('.invalid-feedback');
+                        if (feedbackElement) {
+                            feedbackElement.textContent = `${label} harus dipilih.`;
+                        }
+                    }
+                }
+
+                if (input[0] && input[0].type !== 'radio') {
+                    const inputValue = input[0].value;
+                    if (rules.min && inputValue.length < rules.min) {
+                        isValid = false;
+                        input[0].classList.add('is-invalid');
+                        const feedbackElement = input[0].closest('.form-group').querySelector('.invalid-feedback');
+                        if (feedbackElement) {
+                            feedbackElement.textContent = `${label} harus terdiri dari minimal ${rules.min} karakter.`;
+                        }
+                    }
+
+                    if (rules.max && inputValue.length > rules.max) {
+                        isValid = false;
+                        input[0].classList.add('is-invalid');
+                        const feedbackElement = input[0].closest('.form-group').querySelector('.invalid-feedback');
+                        if (feedbackElement) {
+                            feedbackElement.textContent = `${label} harus terdiri dari maksimal ${rules.max} karakter.`;
+                        }
+                    }
+
+                    if (rules.regex && !rules.regex.test(inputValue)) {
+                        isValid = false;
+                        input[0].classList.add('is-invalid');
+                        const feedbackElement = input[0].closest('.form-group').querySelector('.invalid-feedback');
+                        if (feedbackElement) {
+                            feedbackElement.textContent = `${label} tidak valid.`;
+                        }
+                    }
+                }
+            });
+
+            return isValid;
+        }
+        
         function updateScore() {
             let totalPoints = 0;
 
@@ -565,16 +696,13 @@
                 var lat = e.latlng.lat;
                 var lng = e.latlng.lng;
                 
-                // Menyimpan koordinat ke input
                 document.getElementById('latitude').value = lat;
                 document.getElementById('longitude').value = lng;
 
-                // Jika marker sudah ada, hapus yang lama
                 if (marker) {
                     map.removeLayer(marker);
                 }
 
-                // Menambahkan marker baru di lokasi yang diklik
                 marker = L.marker([lat, lng]).addTo(map);
             });
 

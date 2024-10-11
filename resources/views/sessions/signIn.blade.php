@@ -24,6 +24,16 @@
         background-color: #efaf32;
         color: white; /* Warna teks saat dihover atau diaktifkan */
     }
+    .invalid-feedback {
+        display: block; /* Ensures each error message is on a new line */
+        margin-top: 0.25rem; /* Adds a small margin for spacing */
+        font-size: 0.875em; /* Adjust font size if necessary */
+        color: #dc3545; /* Bootstrap's default danger color for errors */
+    }
+
+    .form-group {
+        max-width: 350px; /* Adjust as needed to match your layout */
+    }
 </style>
     <body>
         <div class="auth-layout-wrap align-items-md-end" style="background-image: url({{asset('assets/images/icon_bintang/bg-ntbs.png')}})">
@@ -49,9 +59,9 @@
                                     <div class="form-group">
                                         <label for="username">Username</label>
                                         <input id="username"
-                                        class="form-control form-control-rounded @error('username') is-invalid error @enderror"
-                                        name="username" value="{{ old('username') }}" required autocomplete="username"
-                                        autofocus>
+                                            class="form-control form-control-rounded @error('username') is-invalid error @enderror"
+                                            name="username" value="{{ old('username') }}" autocomplete="username"
+                                            autofocus>
                                         @error('username')
                                         <span class="invalid-feedback" role="alert">
                                             <strong>{{ $message }}</strong>
@@ -62,7 +72,7 @@
                                         <label for="password">Password</label>
                                         <input id="password" type="password"
                                             class="form-control form-control-rounded @error('password') is-invalid @enderror"
-                                            name="password" required autocomplete="current-password">
+                                            name="password" autocomplete="current-password">
                                         @error('password')
                                         <span class="invalid-feedback" role="alert">
                                             <strong>{{ $message }}</strong>

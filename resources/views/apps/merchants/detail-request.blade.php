@@ -16,11 +16,20 @@
         <div class="col-md-12">
             <div class="card mb-5">
                 <div class="card-body">
-                    <div class="step-indicator">
+                <div class="step-indicator">
+                    <div class="step-container">
                         <div class="step active" id="stepIndicator1">1</div>
-                        <div class="step" id="stepIndicator2">2</div>
-                        <div class="step" id="stepIndicator3">3</div>
+                        <div class="step-description">Assesment Due Diligence</div>
                     </div>
+                    <div class="step-container">
+                        <div class="step" id="stepIndicator2">2</div>
+                        <div class="step-description">Profil Agen</div>
+                    </div>
+                    <div class="step-container">
+                        <div class="step" id="stepIndicator3">3</div>
+                        <div class="step-description">Upload File</div>
+                    </div>
+                </div>
                     <br>
 
                     <div id="step1">

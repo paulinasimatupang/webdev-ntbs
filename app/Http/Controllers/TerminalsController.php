@@ -530,6 +530,7 @@ class TerminalsController extends Controller
         DB::beginTransaction();
         try {
             $data = Terminal::find($id);
+            
             if ($data) {
                 if ($data->merchant_id != null) {
                     $merchant = Merchant::where('mid', $data->merchant_id)->first();
@@ -538,37 +539,26 @@ class TerminalsController extends Controller
                         $merchant->save();
                     }
                 }
-            }
-            $deleted = $this->repository->delete($id);
 
-            if ($deleted) {
-                $response = [
-                    'status' => true,
-                    'message' => 'Terminal deleted.'
-                ];
+                TerminalBilliton::where('terminal_id', $id)->delete();
 
-                DB::commit();
-                return response()->json($response, 200);
+                $deleted = $this->repository->delete($id);
+
+                if ($deleted) {
+                    DB::commit();
+                    return redirect()->route('terminal')->with('success', 'Terminal berhasil dihapus.');
+                }
             }
+
+            
+            return redirect()->route('terminal')->with('failed', 'Terminal tidak ditemukan.');
 
         } catch (Exception $e) {
-            // For rollback data if one data is error
-            DB::rollBack();
-
-            return response()->json([
-                'status' => false,
-                'error' => 'Something wrong!',
-                'exception' => $e
-            ], 500);
+            DB::rollBack(); 
+            return redirect()->route('terminal')->with('failed', 'Terjadi kesalahan', $e->getMessage());
         } catch (\Illuminate\Database\QueryException $e) {
-            // For rollback data if one data is error
-            DB::rollBack();
-
-            return response()->json([
-                'status' => false,
-                'error' => 'Something wrong!',
-                'exception' => $e
-            ], 500);
+            DB::rollBack(); 
+            return redirect()->route('terminal')->with('failed', 'Terjadi kesalahan', $e->getMessage());
         }
     }
 

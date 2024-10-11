@@ -141,7 +141,7 @@
                         <div class="col-sm-3 col-md-12 mb-3">
                             <div class="export-button-wrapper" style="float: right;">
                                 <a id="export-to-excel" href="{{ route('transactions.csv') }}" class="btn btn-outline-secondary">Export to Excel</a>
-                                <a id="export-to-pdf" href="{{ route('transactions.pdf') }}" class="btn btn-outline-secondary">Export to PDF</a>
+                                <!-- <a id="export-to-pdf" href="{{ route('transactions.pdf') }}" class="btn btn-outline-secondary">Export to PDF</a> -->
                             </div>
                         </div>
                     </div>

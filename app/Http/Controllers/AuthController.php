@@ -63,7 +63,6 @@ class AuthController extends Controller
                 'data' => $user
             ], 200);
         } catch (Exception $e) {
-            // For rollback data if one data is error
             DB::rollBack();
 
             return response()->json([
@@ -71,7 +70,6 @@ class AuthController extends Controller
                 'error' => 'Something wrong!'
             ], 500);
         } catch (\Illuminate\Database\QueryException $ex) {
-            // For rollback data if one data is error
             DB::rollBack();
 
             return response()->json([
@@ -191,7 +189,6 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $user = $request->session()->get('user');
-        // return response()->json($user,200);
         if ($user) {
             return Redirect::to('landing');
         } else {
@@ -211,25 +208,31 @@ class AuthController extends Controller
 
         $rules = [
             'username' => 'required',
-            'password' => 'required',
+            'password' => [
+                'required',
+                // 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,20}$/',
+            ],
         ];
 
         $messages = [
             'username.required' => 'Username harus diisi.',
             'password.required' => 'Password harus diisi.',
-            'password.min' => 'Password harus terdiri dari minimal 8 karakter.',
-            'password.max' => 'Password tidak boleh lebih dari 20 karakter.',
-            'password.regex' => 'Password harus mengandung huruf kapital, huruf kecil, serta angka.',
+            // 'password.regex' => 'Password harus terdiri dari 8 - 20 karakter dan mengandung huruf kapital, huruf kecil, serta angka.',
         ];
 
             if ($request->expectsJson()) {
                 
             } else {
-                $validator = Validator::make($credentials, $rules);
-                if ($validator->fails()) {
-                return Redirect::to('login')
-                    ->with('error', $validator->messages())
-                    ->withInput();
+                $validator = Validator::make($request->all(), $rules, $messages);
+                if (empty($credentials['username']) && empty($credentials['password'])) {
+                    return redirect('login')
+                        ->with('error', 'Username dan Password harus diisi.') 
+                        ->withInput();
+                }
+                else if ($validator->fails()) {
+                    return redirect('login')
+                        ->withErrors($validator)
+                        ->withInput();
                 }
             }
 
@@ -242,7 +245,7 @@ class AuthController extends Controller
                 ], 404);
             } else {
                 return Redirect::to('login')
-                    ->with('error', 'Username not found.')
+                    ->withErrors(['username' => 'Username Tidak Terdaftar.']) 
                     ->withInput();
             }
         }
@@ -263,7 +266,6 @@ class AuthController extends Controller
 
             $token = JWTAuth::attempt($credentials);
 
-            // Log the token
             Log::info('Generated Token: ' . $token);
         } catch (JWTException $e) {
             if ($request->expectsJson()) {

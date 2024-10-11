@@ -34,26 +34,14 @@
                     <div class="card mb-5">
                         <div class="card-body">
                             <form action="{{route('terminal_update',[$terminal->id])}}" method="POST">
+                                
                                 <div class="form-group row">
-                                    <label class="col-sm-2 col-form-label">Merchant</label>
-                                    <div class="col-sm-8">
-                                        <select id="selectMerchant" name="merchant_id" class="form-control" readonly>
-                                            <option value="">Select Merchant</option>
-                                            @foreach($merchant as $item)
-                                                <option @if($item->mid == $terminal->merchant_id) selected @endif value="{{$item->mid}}">{{$item->name}} ( {{$item->mid }} )</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <!-- <div class="col-sm-2 text-left">
-                                        <button id="buttonDelete" onClick="deleteConfirm()" type="button" class="btn btn-danger">Delete</button>
-                                    </div> -->
+                                    <label class="col-sm-2 col-form-label">Terminal ID</label>
+                                    <label class="col-sm-2 col-form-label">{{ $terminal->merchant->name }}</label>
                                 </div>
                                 <div class="form-group row">
-                                    <input name="_token" type="hidden" value="{{ csrf_token() }}"/>
                                     <label class="col-sm-2 col-form-label">Terminal ID</label>
-                                    <div class="col-sm-10">
-                                        <input type="text" class="form-control" value="{{ $terminal->tid }}" name="tid" placeholder="Terminal ID" readonly>
-                                    </div>
+                                    <label class="col-sm-2 col-form-label">{{ $terminal->tid }}</label>
                                 </div>
                                 <div class="form-group row">
                                     <label class="col-sm-2 col-form-label">ID Perangkat</label>

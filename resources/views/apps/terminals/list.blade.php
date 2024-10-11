@@ -73,15 +73,15 @@
                                                             <td>{{$item->merchant_name}}</td>
                                                             <td>{{$item->imei}}</td>
                                                             <td>
-                                                                @if (in_array('terminal_edit', $routes_user))
+                                                                <!-- @if (in_array('terminal_edit', $routes_user))
                                                                     <a href="{{route('terminal_edit', [$item->id])}}">
                                                                         <button class="btn btn-warning ripple btn-sm m-1 edit-btn"
                                                                             type="button">Edit</button>
                                                                     </a>
-                                                                @endif
+                                                                @endif -->
                                                                 @if (in_array('terminal_destroy', $routes_user))
                                                                     <button onClick="deleteConfirm({{$item->id}})"
-                                                                        class="btn btn-danger ripple btn-sm m-1" type="button" disabled>Delete</button>
+                                                                        class="btn btn-danger ripple btn-sm m-1" type="button">Delete</button>
                                                                 @endif
                                                             </td>
                                                         </tr>
@@ -112,7 +112,7 @@
 <script src="{{asset('assets/js/form.basic.script.js')}}"></script>
 <script>
     function deleteConfirm(id) {
-        var r = confirm("Are you sure?");
+        var r = confirm("Apakah Anda yakin ingin menghapus terminal ini?");
         if (r == true) {
             var url = '{{route("terminal_destroy", [":id"])}}';
             url = url.replace(':id', id);

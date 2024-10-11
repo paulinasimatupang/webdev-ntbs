@@ -457,73 +457,6 @@ class MerchantsController extends Controller
     {
         DB::beginTransaction();
         try {
-            $rules = [
-                'jenis_agen' => 'required',
-                'no_perjanjian_kerjasama' => 'required',
-                'fullname' => 'required',
-                'jenis_kelamin' => 'required',
-                'no' => 'required',
-                'no_cif' => 'required',
-                'no_ktp' => 'required',
-                'no_npwp' => 'required',
-                'no_telp' => 'required',
-                'phone' => 'required',
-                'email' => 'required',
-                'pekerjaan' => 'required',
-                'address' => 'required',
-                'rt' => 'required',
-                'rw' => 'required',
-                'kelurahan' => 'required',
-                'kecamatan' => 'required',
-                'city' => 'required',
-                'provinsi' => 'required',
-                'kode_pos' => 'required',
-                'file_ktp' => 'required',
-                'file_npwp' => 'required',
-                'foto_lokasi_usaha' => 'required',
-            ];
-
-            $customFields = [
-                'jenis_agen' => 'Jenis Agen',
-                'no_perjanjian_kerjasama' => 'Nomor Perjanjian Kerjasama',
-                'fullname' => 'Nama Pemilik',
-                'jenis_kelamin' => 'Jenis Kelamin',
-                'no' => 'Nomor Rekening',
-                'no_cif' => 'Nomor CIF',
-                'no_ktp' => 'Nomor KTP',
-                'no_npwp' => 'Nomor NPWP',
-                'no_telp' => 'Nomor Telepon',
-                'phone' => 'Nomor Handphone',
-                'email' => 'Email',
-                'pekerjaan' => 'Pekerjaan',
-                'address' => 'Alamat',
-                'rt' => 'RT',
-                'rw' => 'RW',
-                'kelurahan' => 'Kelurahan',
-                'kecamatan' => 'Kecamatan',
-                'city' => 'Kota/Kabupaten',
-                'provinsi' => 'Provinsi',
-                'kode_pos' => 'Kode Pos',
-                'file_ktp' => 'File KTP',
-                'file_npwp' => 'File NPWP',
-                'foto_lokasi_usaha' => 'Foto Lokasi Usaha',
-            ];
-
-            $messages = [];
-                foreach ($customFields as $field => $label) {
-                $messages["{$field}.required"] = "{$label} harus diisi.";
-                $messages["{$field}.min"] = "{$label} harus terdiri dari minimal :min karakter.";
-                $messages["{$field}.max"] = "{$label} harus terdiri dari maksminal :max karakter.";
-            }
-
-            $validator = Validator::make($request->all(), $rules, $messages);
-            if ($validator->fails()) {
-                return Redirect::to('agen/create')
-                    ->withErrors($validator) 
-                    ->with('error', 'Data yang Anda isi tidak valid, Mohon perbaiki sesuai dengan aturan.')
-                    ->withInput();
-            }
-            else{
                 $role = Role::where('name', 'Agen')->first();
                 if ($role) {
                     $role_id = $role->id;
@@ -625,7 +558,6 @@ class MerchantsController extends Controller
                 DB::commit();
                 return Redirect::to('agen')
                                 ->with('success', 'Agen berhasil didaftarkan, Mohon menunggu konfirmasi dari Supervisor Cabang');
-            }
             } catch (Exception $e) {
                 DB::rollBack();
                     return Redirect::to('agen/create')
