@@ -67,6 +67,9 @@
                                                 <a href="{{route('cabang_edit',[$item->id])}}">
                                                     <button class="btn btn-success ripple btn-sm m-1 edit-btn" type="button">Detail</button>
                                                 </a>
+                                                <a href="{{route('cabang_edit',[$item->id])}}">
+                                                    <button class="btn btn-danger ripple btn-sm m-1 edit-btn" type="button">Hapus</button>
+                                                </a>
                                             @endif
                                             </td>
                                         </tr>

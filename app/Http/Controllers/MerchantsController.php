@@ -273,7 +273,9 @@ class MerchantsController extends Controller
         $dateTime = date("YmdHms");
 
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, "http://16.78.84.90:8080/ARRest/api/");
+                $urlArrest = config('app.url_arrest');
+                curl_setopt($ch, CURLOPT_URL,$urlArrest);
+
         $data = json_encode([
             'msg'=>([
             'msg_id' =>  "$terminal$dateTime",
@@ -381,7 +383,7 @@ class MerchantsController extends Controller
                             ->with('error', $errorMessage)
                             ->withInput();
         } 
-        else if ($prod_id === 36)
+        else if ($prod_id === '36')
         {
             return Redirect::to('/agen/create/inquiry')
             ->with('error', "Nomor Rekening yang Anda Masukkan Tidak Dapat Didaftarkan Sebagai Agen")
@@ -433,7 +435,6 @@ class MerchantsController extends Controller
 
             $kota_kabupaten = CompOption::where('comp_id', 'CIF13')
                         ->where('opt_id', 'like', $kode_provinsi.'%')
-                        ->where('opt_id', '9999')
                         ->get();
         } 
         else {
@@ -442,6 +443,7 @@ class MerchantsController extends Controller
 
         return response()->json($kota_kabupaten);
     }
+
 
     /**
      * Store a newly created resource in storage.

@@ -3,9 +3,9 @@
 return [
 
 
-    // URL Mireta
-    'url_mireta' => 'http://36.94.58.180/api/pos/public/index.php/api/auth/regBusiness',
-    'url_reversal' => 'http://36.94.58.182:8080/ARRest/api',
+    // URL Arrest
+    'url_arrest' => 'http://16.78.84.90:8080/ARRest/api/',
+    'get_image' => 'http://16.78.84.90:8080/document/image/',
 
     /*
     |--------------------------------------------------------------------------

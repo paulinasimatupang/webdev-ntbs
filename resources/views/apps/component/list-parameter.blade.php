@@ -37,8 +37,7 @@
                 @endif
 
                 <div class="table-responsive">
-                    <table id="deafult_ordering_table" class="display table table-striped table-bordered"
-                        style="width:100%">
+                <table id="default_ordering_table" class="display table table-striped table-bordered" style="width: 100%;">
                         <thead>
                             <tr>
                                 <th scope="col">No</th>
@@ -91,8 +90,13 @@
 @section('bottom-js')
 <script src="{{ asset('assets/js/form.basic.script.js') }}"></script>
 <script>
+    $(document).ready(function() {
+        $('#deafult_ordering_table').DataTable({
+            "searching": false
+        });
+    });
     function deleteConfirm(meta_id, service_id, seq) {
-        var r = confirm("Are you sure?");
+        var r = confirm("Apakah Anda yakin akan menghapus ini?");
         if (r == true) {
             var url = '{{ route("fee_destroy", ["meta_id" => ":meta_id", "service_id" => ":service_id", "seq" => ":seq"]) }}';
             url = url.replace(':meta_id', meta_id).replace(':service_id', service_id).replace(':seq', seq);

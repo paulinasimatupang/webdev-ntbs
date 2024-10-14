@@ -24,13 +24,6 @@
                 <div class="card-body">
                 <form action="{{ route('persen_fee_store') }}" method="POST">
                     @csrf
-                    
-                    <div class="form-group row">
-                        <label class="col-sm-2 col-form-label">ID</label>
-                        <div class="col-sm-10">
-                            <input type="text" class="form-control" value="{{ old('id') }}" name="id" placeholder="ID" required>
-                        </div>
-                    </div>
                     <div class="form-group row">
                         <label class="col-sm-2 col-form-label">Penerima</label>
                         <div class="col-sm-10">
@@ -40,7 +33,7 @@
                     <div class="form-group row">
                         <label class="col-sm-2 col-form-label">Persentase</label>
                         <div class="col-sm-10">
-                            <input type="text" class="form-control" value="{{ old('persentase') }}" name="persentase" placeholder="Persentase" required>
+                            <input type="number" class="form-control" value="{{ old('persentase') }}" name="persentase" placeholder="Persentase" required>
                         </div>
                     </div>
                     <div class="form-group row">

@@ -13,7 +13,7 @@
 
 @section('main-content')
 <div class="breadcrumb">
-    <h1>Produk Biller</h1>
+    <h1>Sub Produk Biller</h1>
 </div>
 <div class="separator-breadcrumb border-top"></div>
 <div class="row mb-4">
@@ -30,7 +30,7 @@
         <div class="card text-left">
             <div class="card-body">
                 <div class="row">
-                    <h4 class="col-sm-12 col-md-6 card-title mb-3">List Produk</h4>
+                    <h4 class="col-sm-12 col-md-6 card-title mb-3">List Sub Produk Biller</h4>
                 </div>
 
                 @if ($message = Session::get('success'))

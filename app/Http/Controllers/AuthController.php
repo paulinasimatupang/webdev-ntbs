@@ -210,14 +210,12 @@ class AuthController extends Controller
             'username' => 'required',
             'password' => [
                 'required',
-                // 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,20}$/',
             ],
         ];
 
         $messages = [
             'username.required' => 'Username harus diisi.',
             'password.required' => 'Password harus diisi.',
-            // 'password.regex' => 'Password harus terdiri dari 8 - 20 karakter dan mengandung huruf kapital, huruf kecil, serta angka.',
         ];
 
             if ($request->expectsJson()) {

@@ -14,7 +14,7 @@
 
 @section('main-content')
 <div class="breadcrumb">
-    <h1>Persen Fee</h1>
+    <h1>Persentase Fee</h1>
 </div>
 <div class="separator-breadcrumb border-top"></div>
 <div class="row mb-4">
@@ -22,7 +22,7 @@
         <div class="col-lg-12 col-md-12 col-sm-12 d-flex justify-content-center mb-3">
             <div class="input-group">
                 <a href="{{ route('persen_fee_create') }}">
-                    <button class="btn btn-warning ripple m-1 add-new-btn" type="button">Add New</button>
+                    <button class="btn btn-warning ripple m-1 add-new-btn" type="button">Tambah</button>
                 </a>
             </div>
         </div>
@@ -31,7 +31,7 @@
         <div class="card text-left">
             <div class="card-body">
                 <div class="row">
-                    <h4 class="col-sm-12 col-md-6 card-title mb-3">Persen Fee List</h4>
+                    <h4 class="col-sm-12 col-md-6 card-title mb-3">Daftar Persentase Fee</h4>
                 </div>
 
                 @if ($message = Session::get('success'))
@@ -51,17 +51,17 @@
                         style="width:100%">
                         <thead>
                             <tr>
-                                <th>ID</th>
+                                <th>No</th>
                                 <th>Penerima</th>
                                 <th>Persentase</th>
-                                <th>Actions</th>
+                                <th>Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
                             @php $no = 1; @endphp
                             @foreach($persenFees as $persenFee)
                                 <tr>
-                                    <td>{{ $persenFee->id }}</td>
+                                    <th scope="row">{{ $no }}</th>
                                     <td>{{ $persenFee->penerima }}</td>
                                     <td>{{ $persenFee->persentase }}%</td>
                                     <td>
@@ -72,7 +72,7 @@
                                         @endif
                                         @if (in_array('persen_fee_destroy', $routes_user))
                                             <a href="#" onclick="deleteConfirm('{{ $persenFee->id }}'); return false;"
-                                                class="btn btn-danger ripple btn-sm m-1">Delete</a>
+                                                class="btn btn-danger ripple btn-sm m-1">Hapus</a>
                                         @endif
                                     </td>
                                 </tr>
@@ -101,7 +101,7 @@
 <script src="{{ asset('assets/js/form.basic.script.js') }}"></script>
 <script>
     function deleteConfirm(id) {
-        var r = confirm("Are you sure?");
+        var r = confirm("Apakah Anda yakin akan menghapus data ini?");
         if (r == true) {
             var url = '{{ route("persen_fee_destroy", ":id") }}';
             url = url.replace(':id', id);

@@ -29,23 +29,21 @@ class PersenFeeController extends Controller
     {
         DB::beginTransaction();
         try {
-            $idExists = DB::connection('pgsql_billiton')
-                ->table('persen_fee')
-                ->where('id', $request->input('id'))
-                ->exists();
-    
-            if ($idExists) {
-                return redirect()->route('persen_fee_create')
-                    ->with('error', 'ID sudah ada, silakan gunakan ID lain.')
-                    ->withInput();
-            }
-    
             $validatedData = $request->validate([
-                'id' => 'required|integer',
-                'penerima' => 'required|string|max:50',
-                'persentase' => 'required|integer',
-            ]);
-    
+                'penerima' => 'required',
+                'persentase' => 'required',
+            ]); 
+            
+            $totalPersentase = PersenFee::sum('persentase');
+
+            $sisaPersentase = 100 - $totalPersentase;
+        
+            if ($request->persentase > $sisaPersentase) {
+                return redirect()->route('persen_fee_create')
+                    ->with('error', 'Total persentase tidak boleh melebihi 100%. Persentase yang masih bisa diinput: ' . $sisaPersentase . '%.')
+                    ->withInput();
+            }            
+        
             $persenFee = PersenFee::create($validatedData);
     
             DB::commit();
@@ -74,11 +72,22 @@ class PersenFeeController extends Controller
         DB::beginTransaction();
         try {
             $validatedData = $request->validate([
-                'penerima' => 'required|string|max:255',
-                'persentase' => 'required|numeric',
+                'penerima' => 'required',
+                'persentase' => 'required',
             ]);
 
             $group = PersenFee::findOrFail($id);
+
+            $totalPersentase = PersenFee::where('id', '!=', $id)->sum('persentase');
+
+            $sisaPersentase = 100 - $totalPersentase;
+
+            if ($request->persentase > $sisaPersentase) {
+                return redirect()->route('persen_fee_edit', ['id' => $id])
+                    ->with('error', 'Total persentase tidak boleh melebihi 100%. Persentase yang masih bisa diinput: ' . $sisaPersentase . '%.')
+                    ->withInput();
+            }
+
             $group->update([
                 'penerima' => $validatedData['penerima'],
                 'persentase' => $validatedData['persentase'],

@@ -248,95 +248,90 @@ class DataCalonNasabahController extends Controller
             $nasabah = DataCalonNasabah::find($id);
 
             if (!$nasabah) {
-                throw new \Exception("Nasabah dengan ID $id tidak ditemukan.");
+                return Redirect::to("/nasabah/approve/$id")
+                    ->with('error', "Data nasabah tidak ditemukan");
             }
 
             if (empty($nasabah->branchid)) {
-                throw new \Exception("Branch ID tidak ditemukan untuk nasabah dengan ID $id. Gagal membuat CIF.");
+                return Redirect::to("/nasabah/approve/$id")
+                    ->with('error', "Gagal Membuat CIF: Kode Cabang Tidak Ditemukan");
             }
 
-            if (!is_null($nasabah->no_cif)) {
-                Log::info("Nasabah dengan ID {$nasabah->id} sudah memiliki CIF: {$nasabah->no_cif}");
-                return true; 
-            }
+            // If nasabah exists and branch ID is present
+            $nasabahData = $nasabah->only([
+                'nama_lengkap', 'nama_alias', 'ibu_kandung', 'tempat_lahir', 'tgl_lahir', 
+                'jenis_kelamin', 'agama', 'status_nikah', 'alamat', 'rt', 'rw', 
+                'kecamatan', 'kelurahan', 'kab_kota', 'provinsi', 'kode_pos', 
+                'status_penduduk', 'kewarganegaraan', 'no_telp', 'no_hp', 'npwp', 
+                'jenis_identitas', 'no_identitas', 'golongan_darah', 'expired_identitas', 
+                'pendidikan_terakhir', 'email', 'branchid'
+            ]);
 
-            if ($nasabah) {
-                
-                $nasabahData = $nasabah->only([
-                    'nama_lengkap', 'nama_alias', 'ibu_kandung', 'tempat_lahir', 'tgl_lahir', 
-                    'jenis_kelamin', 'agama', 'status_nikah', 'alamat', 'rt', 'rw', 
-                    'kecamatan', 'kelurahan', 'kab_kota', 'provinsi', 'kode_pos', 
-                    'status_penduduk', 'kewarganegaraan', 'no_telp', 'no_hp', 'npwp', 
-                    'jenis_identitas', 'no_identitas', 'golongan_darah', 'expired_identitas', 
-                    'pendidikan_terakhir', 'email', 'branchid'
-                ]);
+            $serviceMeta = ServiceMeta::where('service_id', 'CC0004')
+                ->where('influx', 1)
+                ->orderBy('seq', 'asc')
+                ->get();
 
-                $serviceMeta = ServiceMeta::where('service_id', 'CC0004')
-                    ->where('influx', 1)
-                    ->orderBy('seq', 'asc')
-                    ->get();
+            $msgValues = [];
+            $usernameValue = '';
 
-                    $msgValues = [];
-                    $usernameValue = '';
+            foreach ($serviceMeta as $meta) {
+                $metaKey = $meta->meta_id;
 
-                    foreach ($serviceMeta as $meta) {
-                        $metaKey = $meta->meta_id;
-                    
-                        if ($metaKey === 'username') {
-                            $usernameValue = $meta->meta_default; 
-                        } elseif (array_key_exists($metaKey, $nasabahData)) {
-                            $msgValues[] = $nasabahData[$metaKey];
-                        } else {
-                            $msgValues[] = ''; 
-                        }
-                    }
-            
-                    $msgData = $usernameValue . '|' . implode('|', $msgValues); 
-
-                $terminal = '89b2c0aa8e0ac7c2';
-                $dateTime = date("YmdHis");
-
-                $ch = curl_init();
-                curl_setopt($ch, CURLOPT_URL, "http://16.78.84.90:8080/ARRest/api/");
-                $data = json_encode([
-                    'msg' => [
-                        'msg_id' => "$terminal$dateTime",
-                        'msg_ui' => "$terminal",
-                        'msg_si' => 'CC0004',
-                        'msg_dt' => 'lakupandai|' . $no_identitas . '|' . $nama_lengkap . '|' . $nama_alias . '|' . $ibu_kandung . '|' . $tempat_lahir . '|' . $tgl_lahir . '|' . $jenis_kelamin . '|' .
-                            $agama . '|' . $status_nikah . '|' . $alamat . '|' . $rt . '|' . $rw . '|' . $kecamatan . '|' . $kelurahan . '|' . $kab_kota . '|' . $provinsi . '|' . $kode_pos .
-                            '|' . $status_penduduk . '|' . $kewarganegaraan . '|' . $no_telp . '|' . $no_hp . '|' . $npwp . '|' . $jenis_identitas . '|' . $golongan_darah . '|' . $expired_identitas .
-                            '|' . $pendidikan_terakhir . '|' . $email . '|' . $branchid
-                    ]
-                ]);
-
-                curl_setopt($ch, CURLOPT_HTTPHEADER, [
-                    'Content-Type: text/plain'
-                ]);
-                curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-
-                $output = curl_exec($ch);
-                $err = curl_error($ch);
-                $info = curl_getinfo($ch);
-                curl_close($ch);
-
-                Log::info('cURL Request URL: ' . $info['url']);
-                Log::info('cURL Request Data: ' . $data);
-                Log::info('cURL Response: ' . $output);
-
-                $responseArray = json_decode($output, true);
-
-                if ($err) {
-                    Log::error('cURL Error: ' . $err);
-                    throw new \Exception('Gagal terhubung ke API CIF: ' . $err);
+                if ($metaKey === 'username') {
+                    $usernameValue = $meta->meta_default; 
+                } elseif (array_key_exists($metaKey, $nasabahData)) {
+                    $msgValues[] = $nasabahData[$metaKey];
+                } else {
+                    $msgValues[] = ''; 
                 }
+            }
+
+            $msgData = $usernameValue . '|' . implode('|', $msgValues); 
+
+            $terminal = '89b2c0aa8e0ac7c2';
+            $dateTime = date("YmdHis");
+
+            $ch = curl_init();
+            $urlArrest = config('app.url_arrest');
+            curl_setopt($ch, CURLOPT_URL, $urlArrest);
+            $data = json_encode([
+                'msg' => [
+                    'msg_id' => "$terminal$dateTime",
+                    'msg_ui' => "$terminal",
+                    'msg_si' => 'CC0004',
+                    'msg_dt' => $msgData 
+                ]
+            ]);
+
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                'Content-Type: text/plain'
+            ]);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+
+            $output = curl_exec($ch);
+            $err = curl_error($ch);
+            $info = curl_getinfo($ch);
+            curl_close($ch);
+
+            Log::info('cURL Request URL: ' . $info['url']);
+            Log::info('cURL Request Data: ' . $data);
+            Log::info('cURL Response: ' . $output);
+
+            $responseArray = json_decode($output, true);
+
+            if ($err) {
+                Log::error('cURL Error: ' . $err);
+                return Redirect::to("/nasabah/approve/$id")
+                    ->with('error', 'Gagal terhubung ke API CIF: ' . $err);
+            }
 
             if (isset($responseArray['screen']['title']) && $responseArray['screen']['title'] === 'Gagal') {
-                Log::warning("Gagal membuat CIF untuk nasabah ID: {$nasabah->id}, Pesan: " . $responseArray['screen']['comps']['comp'][0]['comp_values']['comp_value'][0]['value']);
-                return false;
+                return Redirect::to("/nasabah/approve/$id")
+                    ->with('error', "Gagal membuat CIF: " . $responseArray['screen']['comps']['comp'][0]['comp_values']['comp_value'][0]['value']);
             }
 
             if (isset($responseArray['screen']['comps']['comp'])) {
@@ -344,7 +339,6 @@ class DataCalonNasabahController extends Controller
                     if ($comp['comp_lbl'] === 'No CIF') {
                         $nasabah->no_cif = $comp['comp_values']['comp_value'][0]['value'];
                         $nasabah->save();
-
                         $this->moveToUsersTable($nasabah);
                     }
                 }
@@ -353,13 +347,14 @@ class DataCalonNasabahController extends Controller
             DB::commit();
             return true;
 
-        }
-    } catch (\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Error in store_cif: ' . $e->getMessage());
-            return false;
+            return Redirect::to("/nasabah/approve/$id")
+                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
+
 
     private function moveToUsersTable($nasabah)
     {
@@ -427,7 +422,8 @@ class DataCalonNasabahController extends Controller
                 $dateTime = date("YmdHis");
 
                 $ch = curl_init();
-                curl_setopt($ch, CURLOPT_URL, "http://16.78.84.90:8080/ARRest/api/");
+                $urlArrest = config('app.url_arrest');
+                curl_setopt($ch, CURLOPT_URL,$urlArrest);
                 $data = json_encode([
                     'msg' => [
                         'msg_id' => "$terminal$dateTime",
@@ -458,9 +454,10 @@ class DataCalonNasabahController extends Controller
                 $responseArray = json_decode($output, true);
 
                 if ($err) {
-                    Log::error('cURL Error: ' . $err);
-                } else {
-                    $noRekening = null;
+                    return Redirect::to("/nasabah/approve/$id")
+                    ->with('error', 'Gagal terhubung ke API CIF: ' . $err);
+                }else {
+                        $noRekening = null;
                     if (isset($responseArray['screen']['comps']['comp'])) {
                         foreach ($responseArray['screen']['comps']['comp'] as $comp) {
                             if ($comp['comp_lbl'] === 'No Rekening') {
@@ -473,7 +470,8 @@ class DataCalonNasabahController extends Controller
                 }
 
                 if (isset($responseArray['screen']['title']) && $responseArray['screen']['title'] === 'Gagal') {
-                    return false;
+                    return Redirect::to("/nasabah/approve/$id")
+                    ->with('error', "Gagal membuat CIF: " . $responseArray['screen']['comps']['comp'][0]['comp_values']['comp_value'][0]['value']);
                 } else {
                     DB::commit();
                     return true;
@@ -493,27 +491,12 @@ class DataCalonNasabahController extends Controller
             $nasabah = DataCalonNasabah::find($id);
     
             if (!$nasabah) {
-                return Redirect::to('/nasabah/approve')
+                return Redirect::to("/nasabah/approve/$id")
                     ->with('error', "Data nasabah tidak ditemukan");
             }
-    
-            if (!$this->registration_code($id)) {
-                DB::rollBack();
-                return Redirect::to('/nasabah/approve')
-                    ->with('error', "Gagal menghasilkan nomor registrasi.");
-            }
-    
-            if (!$this->store_cif($id)) {
-                DB::rollBack();
-                return Redirect::to('/nasabah/approve')
-                    ->with('error', "Gagal membuat CIF.");
-            }
-    
-            if (!$this->store_rekening($id)) {
-                DB::rollBack();
-                return Redirect::to('/nasabah/approve')
-                    ->with('error', "Gagal membuat rekening.");
-            }
+            $this->registration_code($id);
+            $this->store_cif($id);
+            $this->store_rekening($id);
             $nasabah->status = 2;
             $nasabah->reply_time = now();
             $nasabah->save();
@@ -741,7 +724,8 @@ class DataCalonNasabahController extends Controller
                 $dateTime = date("YmdHis");
 
                 $ch = curl_init();
-                curl_setopt($ch, CURLOPT_URL, "http://108.137.154.8:8080/ARRest/api/");
+                $urlArrest = config('app.url_arrest');
+                curl_setopt($ch, CURLOPT_URL,$urlArrest);
                 $data = json_encode([
                     'msg' => [
                         'msg_id' => "$terminal$dateTime",

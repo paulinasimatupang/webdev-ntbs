@@ -16,14 +16,13 @@ use OwenIt\Auditing\Contracts\Auditable;
 class PersenFee extends Model implements Auditable
 {
     use \OwenIt\Auditing\Auditable;
+
     protected $connection = 'pgsql_billiton';
     protected $table = 'persen_fee';
     public $incrementing = false;
-    protected $keyType = 'int';
     public $timestamps = false;
 
     protected $fillable = [
-        'id',
         'penerima',
         'persentase'
     ];

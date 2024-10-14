@@ -5,6 +5,14 @@
     <h1>Edit Fee</h1>
 </div>
 <div class="separator-breadcrumb border-top"></div>
+@if(Session('error'))
+        <div class="alert alert-danger" role="alert">
+            <strong class="text-capitalize">Error: </strong> {{ Session('error') }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    @endif
 <div class="row">
     <div class="col-md-12">
         <div class="card">
@@ -12,11 +20,6 @@
                 <form action="{{ route('persen_fee_update', ['id' => $group->id, 'penerima' => $group->penerima, 'persentase' => $group->persentase]) }}" method="POST">
                     @csrf
                     @method('post')
-                    <div class="form-group">
-                        <label for="service_id">ID</label>
-                        <input type="text" class="form-control" id="id" name="id" value="{{ $group->id }}">
-                    </div>
-
                     <div class="form-group">
                         <label for="meta_id">Peneriman</label>
                         <input type="text" class="form-control" id="penerima" name="penerima" value="{{ $group->penerima }}">
