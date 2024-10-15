@@ -206,7 +206,7 @@ Route::middleware('auth:api')->post('auth/changePassword', 'AuthController@chang
 Route::middleware('auth:api')->post('auth/changePin', 'AuthController@changePin');
 Route::middleware('auth:api')->post('agen/block', 'MerchantsController@blockAgen');
 Route::post('agen/block/login', 'MerchantsController@blockAgenLogin');
-Route::middleware('auth:api')->post('terminal/create/{imei}/{mid}', 'TerminalsController@store');
+Route::middleware('auth:api')->post('terminal/create', 'TerminalsController@store');
 Route::middleware('auth:api')->post('imei/store', 'TerminalsController@storeImei');
 Route::middleware('auth:api')->get('terminal/checkStatus', 'TerminalsController@checkStatus');
 Route::middleware('auth:api')->put('imei/update', 'TerminalsController@updateImei');

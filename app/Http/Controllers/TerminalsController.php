@@ -148,39 +148,42 @@ class TerminalsController extends Controller
      *
      * @throws \Prettus\Validator\Exceptions\ValidatorException
      */
-    public function store($imei, $merchantId)
+    public function store(Request $request)
     {
         DB::beginTransaction();
         try {
+            $imei = $request->input('imei');
+            $merchantId = $request->input('merchant_id');
+
+            // Validasi merchant
             $merchant = Merchant::where('mid', $merchantId)->first();
             if (!$merchant) {
                 throw new \Exception('Merchant not found');
             }
 
+            // Membuat TID baru
             $prefix = 'TID';
             $lastTid = Terminal::where('tid', 'LIKE', $prefix . '%')
                 ->orderBy('created_at', 'desc')
                 ->first();
 
             if ($lastTid) {
-                $lastTid = $lastTid->tid;
-                $number = substr($lastTid, strlen($prefix));
-                $newNumber = (int) $number + 1;
-                $newNumberPadded = str_pad($newNumber, 6, '0', STR_PAD_LEFT);
-                $tid = $prefix . $newNumberPadded;
+                $newNumber = (int) substr($lastTid->tid, strlen($prefix)) + 1;
+                $tid = $prefix . str_pad($newNumber, 6, '0', STR_PAD_LEFT);
 
                 while (Terminal::where('tid', $tid)->exists()) {
-                    $newNumber = (int) substr($tid, strlen($prefix)) + 1;
+                    $newNumber++;
                     $tid = $prefix . str_pad($newNumber, 6, '0', STR_PAD_LEFT);
                 }
             } else {
                 $tid = $prefix . '000001';
             }
 
+            // Simpan data terminal
             $terminalData = [
                 'tid' => $tid,
                 'imei' => $imei,
-                'merchant_id' => $merchantId
+                'merchant_id' => $merchantId,
             ];
 
             $data = $this->repository->create($terminalData);
@@ -193,12 +196,12 @@ class TerminalsController extends Controller
                 $data->merchant_name = $merchant->name;
                 $data->merchant_address = $merchant->address;
                 $data->merchant_account_number = $merchant->no;
-
                 $data->save();
 
+                // Aktivasi terminal
                 $activated = $this->activateBilliton(new TerminalUpdateRequest([
                     'merchant_id' => $merchantId,
-                    'tid' => $tid
+                    'tid' => $tid,
                 ]), $data->id);
 
                 if ($activated) {
@@ -206,35 +209,27 @@ class TerminalsController extends Controller
                     return response()->json([
                         'success' => true,
                         'message' => 'Terminal created and activated',
-                        'data' => $data
+                        'data' => $data,
                     ], 201);
                 } else {
-                    // Jika aktivasi gagal, rollback transaksi dan beri pesan kesalahan
                     DB::rollBack();
                     return response()->json([
                         'success' => false,
-                        'message' => 'Terminal created but activation failed'
+                        'message' => 'Terminal created but activation failed',
                     ], 500);
                 }
             } else {
-                // Jika penyimpanan gagal, rollback transaksi
                 DB::rollBack();
                 return response()->json([
                     'success' => false,
-                    'message' => 'Failed to create terminal'
+                    'message' => 'Failed to create terminal',
                 ], 500);
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
-            ], 500);
-        } catch (\Illuminate\Database\QueryException $e) {
-            DB::rollBack();
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 500);
         }
     }
@@ -352,10 +347,10 @@ class TerminalsController extends Controller
         try {
             // Validasi data
             $this->validator->with($request->all())->passesOrFail(ValidatorInterface::RULE_UPDATE);
-    
+
             // Ambil terminal berdasarkan id
             $terminal = Terminal::where('id', $id)->first();
-    
+
             if ($terminal) {
                 // Buat instance baru TerminalBilliton dan simpan data yang di-update
                 $terminalBilliton = new TerminalBilliton();
@@ -366,7 +361,7 @@ class TerminalsController extends Controller
                 $terminalBilliton->merchant_id = $terminal->merchant_id;
                 $terminalBilliton->terminal_sim_number = $terminal->iccid;
                 $terminalBilliton->save();
-    
+
                 if ($terminalBilliton) {
                     DB::commit();
                     return true;
@@ -375,7 +370,7 @@ class TerminalsController extends Controller
                     return false;
                 }
             }
-    
+
         } catch (\Exception $e) {
             DB::rollBack();
             return false;
@@ -530,7 +525,7 @@ class TerminalsController extends Controller
         DB::beginTransaction();
         try {
             $data = Terminal::find($id);
-            
+
             if ($data) {
                 if ($data->merchant_id != null) {
                     $merchant = Merchant::where('mid', $data->merchant_id)->first();
@@ -550,14 +545,14 @@ class TerminalsController extends Controller
                 }
             }
 
-            
+
             return redirect()->route('terminal')->with('failed', 'Terminal tidak ditemukan.');
 
         } catch (Exception $e) {
-            DB::rollBack(); 
+            DB::rollBack();
             return redirect()->route('terminal')->with('failed', 'Terjadi kesalahan', $e->getMessage());
         } catch (\Illuminate\Database\QueryException $e) {
-            DB::rollBack(); 
+            DB::rollBack();
             return redirect()->route('terminal')->with('failed', 'Terjadi kesalahan', $e->getMessage());
         }
     }
@@ -601,109 +596,109 @@ class TerminalsController extends Controller
     }
 
     public function acceptChangeImei($id)
-{
-    DB::beginTransaction();
-    try {
-        // Ambil data IMEI berdasarkan ID
-        $imeiRequest = Imei::where('id', $id)->first();
-        if (!$imeiRequest) {
-            throw new \Exception("Request IMEI not found");
+    {
+        DB::beginTransaction();
+        try {
+            // Ambil data IMEI berdasarkan ID
+            $imeiRequest = Imei::where('id', $id)->first();
+            if (!$imeiRequest) {
+                throw new \Exception("Request IMEI not found");
+            }
+
+            $terminal = Terminal::where('tid', $imeiRequest->tid)->first();
+            if (!$terminal) {
+                throw new \Exception("Terminal not found");
+            }
+
+            $pengaduan = Pengaduan::find($imeiRequest->id_pengaduan);
+            if ($pengaduan) {
+                $pengaduan->status = 2; // Update status pengaduan
+                $pengaduan->save();
+            }
+
+            $imeiRequest->status = true; // Set IMEI request as approved
+            $imeiRequest->save();
+
+            // Cari Merchant berdasarkan MID atau TID yang ada pada IMEI
+            $merchant = Merchant::where('mid', $imeiRequest->mid)->first();
+            if (!$merchant) {
+                throw new \Exception("Merchant not found");
+            }
+
+            // Ambil FCM token dari Merchant
+            $fcmToken = $merchant->fcm_token;
+
+            // Validasi token FCM
+            if ($this->isValidFcmToken($fcmToken)) {
+                // Jika FCM token tersedia, kirim notifikasi
+                $notificationService = new SendPushNotification();
+                $notificationService->sendNotificationToToken($fcmToken, [
+                    'title' => 'IMEI Request Approved',
+                    'message' => "Your IMEI change request for terminal {$terminal->tid} has been approved.",
+                ]);
+            } else {
+                Log::warning("FCM token tidak valid atau tidak ditemukan untuk merchant MID: {$merchant->mid}");
+            }
+
+            DB::commit();
+            return redirect()->route('imei_request')->with('success', 'IMEI request approved successfully.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error in acceptChangeImei: ' . $e->getMessage());
+            return redirect()->route('imei_request')->with('error', $e->getMessage());
         }
-
-        $terminal = Terminal::where('tid', $imeiRequest->tid)->first();
-        if (!$terminal) {
-            throw new \Exception("Terminal not found");
-        }
-
-        $pengaduan = Pengaduan::find($imeiRequest->id_pengaduan); 
-        if ($pengaduan) {
-            $pengaduan->status = 2; // Update status pengaduan
-            $pengaduan->save();
-        }
-
-        $imeiRequest->status = true; // Set IMEI request as approved
-        $imeiRequest->save();
-
-        // Cari Merchant berdasarkan MID atau TID yang ada pada IMEI
-        $merchant = Merchant::where('mid', $imeiRequest->mid)->first();
-        if (!$merchant) {
-            throw new \Exception("Merchant not found");
-        }
-
-        // Ambil FCM token dari Merchant
-        $fcmToken = $merchant->fcm_token;
-
-        // Validasi token FCM
-        if ($this->isValidFcmToken($fcmToken)) {
-            // Jika FCM token tersedia, kirim notifikasi
-            $notificationService = new SendPushNotification();
-            $notificationService->sendNotificationToToken($fcmToken, [
-                'title' => 'IMEI Request Approved',
-                'message' => "Your IMEI change request for terminal {$terminal->tid} has been approved.",
-            ]);
-        } else {
-            Log::warning("FCM token tidak valid atau tidak ditemukan untuk merchant MID: {$merchant->mid}");
-        }
-
-        DB::commit();
-        return redirect()->route('imei_request')->with('success', 'IMEI request approved successfully.');
-
-    } catch (\Exception $e) {
-        DB::rollBack();
-        Log::error('Error in acceptChangeImei: ' . $e->getMessage());
-        return redirect()->route('imei_request')->with('error', $e->getMessage());
     }
-}
 
-public function rejectChangeImei($id)
-{
-    DB::beginTransaction();
-    try {
-        Log::info('Rejecting IMEI request with ID: ' . $id); // Tambahkan logging
+    public function rejectChangeImei($id)
+    {
+        DB::beginTransaction();
+        try {
+            Log::info('Rejecting IMEI request with ID: ' . $id); // Tambahkan logging
 
-        // Ambil data IMEI berdasarkan ID
-        $imeiRequest = Imei::where('id', $id)->first();
-        if (!$imeiRequest) {
-            throw new \Exception("Request IMEI not found");
+            // Ambil data IMEI berdasarkan ID
+            $imeiRequest = Imei::where('id', $id)->first();
+            if (!$imeiRequest) {
+                throw new \Exception("Request IMEI not found");
+            }
+
+            // Log data imeiRequest untuk debugging
+            Log::info('IMEI Request found: ' . json_encode($imeiRequest));
+
+            $pengaduan = Pengaduan::find($imeiRequest->id_pengaduan);
+            if ($pengaduan) {
+                $pengaduan->status = 3;
+                $pengaduan->save();
+            }
+
+            $imeiRequest->status = false;
+            $imeiRequest->delete();
+
+            // Cari Merchant berdasarkan MID atau TID yang ada pada IMEI
+            $merchant = Merchant::where('mid', $imeiRequest->mid)->first();
+            if (!$merchant) {
+                throw new \Exception("Merchant not found");
+            }
+
+            // Ambil FCM token dari Merchant
+            $fcmToken = $merchant->fcm_token;
+
+            if ($this->isValidFcmToken($fcmToken)) {
+                $notificationService = new SendPushNotification();
+                $notificationService->sendNotificationToToken($fcmToken, [
+                    'title' => 'IMEI Request Rejected',
+                    'message' => "Your IMEI change request for terminal {$imeiRequest->tid} has been rejected.",
+                ]);
+            }
+
+            DB::commit();
+            return redirect()->route('imei_request')->with('success', 'IMEI request rejected successfully.');
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::error('Error in rejectChangeImei: ' . $e->getMessage());
+            return redirect()->route('imei_request')->with('error', $e->getMessage());
         }
-
-        // Log data imeiRequest untuk debugging
-        Log::info('IMEI Request found: ' . json_encode($imeiRequest));
-
-        $pengaduan = Pengaduan::find($imeiRequest->id_pengaduan);
-        if ($pengaduan) {
-            $pengaduan->status = 3;
-            $pengaduan->save();
-        }
-
-        $imeiRequest->status = false;
-        $imeiRequest->delete();
-
-        // Cari Merchant berdasarkan MID atau TID yang ada pada IMEI
-        $merchant = Merchant::where('mid', $imeiRequest->mid)->first();
-        if (!$merchant) {
-            throw new \Exception("Merchant not found");
-        }
-
-        // Ambil FCM token dari Merchant
-        $fcmToken = $merchant->fcm_token;
-
-        if ($this->isValidFcmToken($fcmToken)) {
-            $notificationService = new SendPushNotification();
-            $notificationService->sendNotificationToToken($fcmToken, [
-                'title' => 'IMEI Request Rejected',
-                'message' => "Your IMEI change request for terminal {$imeiRequest->tid} has been rejected.",
-            ]);
-        }
-
-        DB::commit();
-        return redirect()->route('imei_request')->with('success', 'IMEI request rejected successfully.');
-    } catch (Exception $e) {
-        DB::rollBack();
-        Log::error('Error in rejectChangeImei: ' . $e->getMessage());
-        return redirect()->route('imei_request')->with('error', $e->getMessage());
     }
-}
 
 
     public function storeImei(Request $request)
@@ -762,8 +757,8 @@ public function rejectChangeImei($id)
     {
         // Validasi sederhana untuk FCM token. Ini dapat disesuaikan dengan aturan validasi yang diperlukan.
         return !empty($fcmToken) && preg_match('/^[a-zA-Z0-9\-_:.]+$/', $fcmToken);
-    }    
-    
+    }
+
     public function checkStatus(Request $request)
     {
 
