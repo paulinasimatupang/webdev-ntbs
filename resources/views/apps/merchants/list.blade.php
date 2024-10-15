@@ -21,11 +21,21 @@
                     <div class="card text-left">
                         <div class="card-body">
                             <div class="row">
-                                <h4 class=" col-sm-9 col-md-6 card-title mb-3">List Agen </h4>
+                                <h4 class=" col-sm-9 col-md-6 card-title mb-3">Daftar Agen </h4>
                                 <div class="col-sm-3 col-md-12 mb-3">
                                     <div class="export-button-wrapper" style="float: right;">
-                                        <a id="export-to-excel" href="{{ route('merchants.excel') }}" class="btn btn-outline-secondary">Export to Excel</a>
-                                        <a id="export-to-pdf" href="{{ route('merchants.pdf') }}" class="btn btn-outline-secondary">Export to PDF</a>
+                                    <a id="export-to-excel" href="{{ route('merchants.excel') }}" 
+                                    class="btn" 
+                                    style="background-color: #4CAF50; color: white; border-color: #4CAF50;">
+                                        <img src="{{ asset('assets/images/new_features/xls.png') }}" alt="Excel Icon" style="width: 20px; height: 20px; margin-right: 5px;">
+                                        Ekspor Excel
+                                    </a>
+                                    <a id="export-to-excel" href="{{ route('merchants.pdf') }}" 
+                                    class="btn" 
+                                    style="background-color: #ff2429; color: white; border-color: #ff2429;">
+                                        <img src="{{ asset('assets/images/new_features/pdf.png') }}" alt="Pdf Icon" style="width: 20px; height: 20px; margin-right: 5px;">
+                                        Ekspor Pdf
+                                    </a>
                                     </div>
                                 </div>
                             </div>
@@ -52,12 +62,10 @@
                                             <th scope="col">Nama</th>
                                             <th scope="col">Email</th>
                                             <th scope="col">Alamat</th>
-                                            <th scope="col">Kota</th>
                                             <th scope="col">No Telepon HP</th>
-                                            <th scope="col">TID</th>
                                             <th scope="col">Status Agen</th>
-                                            <th scope="col">Active Date</th>
-                                            <th scope="col">Resign Date</th>
+                                            <th scope="col">Tanggal Aktif</th>
+                                            <th scope="col">Tanggal Nonaktif</th>
                                             <th scope="col" {{ session()->get('user')->role_id == 2 ? 'id=b1' : '' }}>Action</th>
                                         </tr>
                                     </thead>
@@ -74,9 +82,7 @@
                                             <td>{{$item->name}}</td>
                                             <td>{{$item->email}}</td>
                                             <td>{{$item->address}}</td>
-                                            <td>{{$item->city}}</td>
                                             <td>{{$item->phone}}</td>
-                                            <td>{{$item->terminal_id}}</td>
                                             <td>{{$item->status_text}}</td>
                                             <td>{{$item->active_at}}</td>
                                             <td>{{$item->resign_at}}</td>

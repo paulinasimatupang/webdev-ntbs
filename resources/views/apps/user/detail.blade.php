@@ -2,7 +2,7 @@
 
 @section('main-content')
 <div class="breadcrumb">
-    <h1>Detail User</h1>
+    <h1>Detail Permintaan User</h1>
 </div>
 <div class="separator-breadcrumb border-top"></div>
 
@@ -56,9 +56,8 @@
                             <input type="hidden" name="action" id="formAction">
 
                             <button type="button" id="accept" class="btn btn-success">
-                                Accept
+                                Approve
                             </button>
-
                             <button type="button" id="reject" class="btn btn-danger">
                                 Reject
                             </button>
@@ -82,7 +81,7 @@ document.getElementById('accept').addEventListener('click', function() {
 });
 
 document.getElementById('reject').addEventListener('click', function() {
-    if (confirm('Apakah Anda yakin akan menolak agen ini?')) {
+    if (confirm('Apakah Anda yakin akan menolak user ini?')) {
         document.getElementById('formAction').value = 'reject';
         document.getElementById('actionForm').action = "{{ route('users.reject', ['id' => $user->id]) }}";
         document.getElementById('actionForm').submit();

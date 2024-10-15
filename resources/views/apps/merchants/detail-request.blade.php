@@ -2,7 +2,7 @@
 
 @section('main-content')
     <div class="breadcrumb">
-        <h1>Detail Request</h1>
+        <h1>Detail Permintaan Agen</h1>
     </div>
     <div class="separator-breadcrumb border-top"></div>
 
@@ -63,7 +63,7 @@
                         </div>
                         <div class="form-group row">
                             <div class="col-sm-12 text-right">
-                                <button type="button" class="btn btn-primary" id="nextBtn">Next</button>
+                                <button type="button" class="btn btn-primary" id="nextBtn">Selanjutnya</button>
                             </div>
                         </div>
                     </div>
@@ -193,11 +193,17 @@
                                 <p class="form-control-static">{{ $merchant->kode_pos }}</p>
                             </div>
                         </div>
-                        <div id="map" style="height: 400px;"></div>
+                        <div class="form-group row">
+                                <div class="col-sm-12">
+                                    <div id="map-container">
+                                        <div id="map"></div>
+                                    </div>
+                                </div>
+                            </div>
                         <div class="form-group row">
                             <div class="col-sm-12 text-right">
-                                <button type="button" class="btn btn-secondary" id="prevBtn">Previous</button>
-                                <button type="button" class="btn btn-primary" id="nextBtn2">Next</button>
+                                <button type="button" class="btn btn-secondary" id="prevBtn">Sebelumnya</button>
+                                <button type="button" class="btn btn-primary" id="nextBtn2">Selanjutnya</button>
                             </div>
                         </div>
                     </div>
@@ -209,6 +215,10 @@
                             <div class="mb-2">
                                 <a href="{{ asset('uploads/' . $merchant->file_ktp) }}" target="_blank">Lihat File KTP</a>
                             </div>
+                            @else
+                            <div class="mb-2">
+                                <p>File Tidak Ditemukan</a>
+                            </div>
                             @endif
                         </div>
 
@@ -217,6 +227,10 @@
                             @if(isset($merchant) && $merchant->file_npwp)
                             <div class="mb-2">
                                 <a href="{{ asset('uploads/' . $merchant->file_npwp) }}" target="_blank">Lihat File NPWP</a>
+                            </div>
+                            @else
+                            <div class="mb-2">
+                                <p>File Tidak Ditemukan</a>
                             </div>
                             @endif
                         </div>
@@ -227,21 +241,25 @@
                             <div class="mb-2">
                                 <a href="{{ asset('uploads/' . $merchant->foto_lokasi_usaha) }}" target="_blank">Lihat Foto Lokasi Usaha</a>
                             </div>
+                            @else
+                            <div class="mb-2">
+                                <p>File Tidak Ditemukan</a>
+                            </div>
                             @endif
                         </div>
 
                         <div class="form-group row">
                             <div class="col-sm-12 text-right">
-                                <button type="button" class="btn btn-secondary" id="prevBtn2">Previous</button>
+                                <button type="button" class="btn btn-secondary" id="prevBtn2">Sebelumnya</button>
                                 <form id="actionForm" method="POST" class="d-inline">
                                     @csrf
                                     <input type="hidden" name="agen_id" value="{{ $merchant->id }}">
                                     <input type="hidden" name="action" id="formAction">
-                                    <button type="button" id="reject" class="btn btn-danget">
-                                        Reject
+                                    <button type="button" id="reject" class="btn btn-danger">
+                                        Tolak
                                     </button>
                                     <button type="button" id="approve" class="btn btn-success">
-                                        Approve
+                                        Terima
                                     </button>
                                 </form>
                             </div>
@@ -254,33 +272,78 @@
 @endsection
 @section('page-css')
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
     <style>
-        .step-indicator {
-            display: flex;
-            justify-content: space-around;
+        #map-container {
+            width: 100%;
+            height: 500px;
+            position: relative;
             margin-bottom: 20px;
         }
-        .step {
-            width: 40px;
-            height: 40px;
-            line-height: 40px;
-            background-color: #f1f1f1;
-            border: 1px solid #ddd;
-            border-radius: 50%;
-            text-align: center;
-            font-weight: bold;
-            font-size: 18px;
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
         }
-        .step.active {
-            background-color: #007bff;
-            color: white;
+        .leaflet-control-geocoder {
+            width: 100%;
+            max-width: none;
+            margin-top: 10px;
         }
-    </style>
+        .leaflet-control-geocoder-form input {
+            width: calc(100% - 30px);
+        }
+
+        .step-indicator {
+        display: flex;
+        justify-content: space-around;
+        margin-bottom: 20px;
+    }
+    .step-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .step {
+        width: 40px;
+        height: 40px;
+        line-height: 40px;
+        background-color: #f1f1f1;
+        border: 1px solid #ddd;
+        border-radius: 50%;
+        text-align: center;
+        font-weight: bold;
+        font-size: 18px;
+    }
+    .step-description {
+        width: 100px;
+        text-align: center;
+        margin-top: 5px;
+        font-size: 12px;
+        color: #666;
+    }
+    .step.active {
+        background-color: #007bff;
+        color: white;
+    }
+    .invalid-feedback {
+        display: block;
+        color: red;
+        margin-top: 0.5rem;
+    }
+
+    .is-invalid + .invalid-feedback {
+        display: block;
+    }
+</style>
 @endsection
 
 @section('bottom-js')
-<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-<script>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+    <script>
     var latitude = {{ $merchant->latitude }};
     var longitude = {{ $merchant->longitude }};
 

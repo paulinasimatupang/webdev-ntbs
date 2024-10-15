@@ -312,18 +312,16 @@
                     </div>
 
                     <div class="col-sm-12 d-flex justify-content-end">
-                        <a href="{{ route('nasabah_request') }}" class="btn btn-primary mr-2">Back</a>
+                        <a href="{{ route('nasabah_request') }}" class="btn btn-primary">Kembali</a>
                         <form id="actionForm" method="POST" class="d-inline">
                             @csrf
                             <input type="hidden" name="nasabah_id" value="{{ $nasabah->id }}">
                             <input type="hidden" name="action" id="formAction">
-
-                            <button type="button" id="approve" class="btn btn-success">
-                                Approve
-                            </button>
-
                             <button type="button" id="reject" class="btn btn-danger ml-2">
-                                Reject
+                                Tolak
+                            </button>
+                            <button type="button" id="approve" class="btn btn-success ml-2">
+                                Terima
                             </button>
                         </form>
                     </div>

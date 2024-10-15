@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+
 
 class RoleController extends Controller
 {
@@ -42,7 +44,7 @@ class RoleController extends Controller
             'name' => $request->name
         ]);
 
-        return redirect()->route('roles.list')->with('status', 'Role Created Successfully');
+        return redirect()->route('roles.list')->with('success', 'Role berhasil ditambahkan.');
     }
 
     public function edit(Role $role)
@@ -54,27 +56,35 @@ class RoleController extends Controller
 
     public function update(Request $request, Role $role)
     {
-        $request->validate([
-            'name' => [
-                'required',
-                'string',
-                'unique:roles,name,' . $role->id
-            ]
-        ]);
+        $messages = [
+            'name.required' => 'Role name harus diisi.',
+            'name.regex' => 'Role name harus mengandung huruf.',
+        ];
+        
+        $rules = [
+            'name' => 'required|regex:/[a-zA-Z]/',
+        ];
+        
+        $validator = Validator::make($request->all(), $rules, $messages);
+        
+        if ($validator->fails()) {
+            return redirect()->route('roles.edit', ['role' => $role->id]) 
+                ->withErrors($validator)
+                ->withInput();
+        }
 
         $role->update([
             'name' => $request->name
         ]);
 
-        return redirect()->route('roles.list')->with('status', 'Role Updated Successfully');
+        return redirect()->route('roles.list')->with('success', 'Nama role berhasil di update.');
     }
 
     public function destroy(Role $role)
     {
         $role->delete();
-        return redirect()->route('roles.list')->with('status', 'Role Deleted Successfully');
+        return redirect()->route('roles.list')->with('success', 'Data berhasil dihapus');
     }
-
 
     public function addPermissionToRole(Role $role)
     {
@@ -121,6 +131,6 @@ class RoleController extends Controller
 
         $role->syncPermissions($request->permission);
 
-        return redirect()->back()->with('status', 'Permissions added to role');
+        return redirect()->route('roles.list')->with('success', 'Permission berhasil di edit.');
     }
 }

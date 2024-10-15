@@ -717,7 +717,6 @@ class MerchantsController extends Controller
                             $merchant->active_at = date("Y-m-d H:m:s");
                         } else if($request->status_agen == 2){
                             $merchant->resign_at = date("Y-m-d H:m:s");
-
                             if($terminal){
                                 $terminalBilliton = TerminalBilliton::where('terminal_imei', $terminal->imei)->first();
                                 if($terminalBilliton){
@@ -869,11 +868,14 @@ class MerchantsController extends Controller
                 ];
 
                 Mail::to($user->email)->send(new sendPassword($detail_message));
+                DB::commit();
+                return redirect()->route('agen')->with('success', 'Agen Berhasil Diaktifkan');
             }
 
-            else if ($merchant->status_agen == 2 || $merchant->status_agen == 3) {
+            else if ($merchant->status_agen == 2) {
                 $merchant->status_agen = 1;
                 $merchant->resign_at = null;
+                $merchant->active_at = now();
                 $merchant->save();
 
                 $user = User::where('id', $merchant->user_id)->first();
@@ -883,19 +885,35 @@ class MerchantsController extends Controller
                 }
 
                 $user->status = 1;
-                $user->save();
+                $user->save(); 
+                DB::commit();
+                return redirect()->route('agen_list')->with('success', 'Agen Berhasil Diaktifkan');
             }
+            else if ($merchant->status_agen == 3) {
+                $merchant->status_agen = 1;
+                $merchant->resign_at = null;
+                $merchant->active_at = now();
+                $merchant->save();
 
-            DB::commit();
-            return redirect()->route('agen')->with('success', 'Agen Berhasil Diaktivasi');
+                $user = User::where('id', $merchant->user_id)->first();
+                
+                if (!$user) {
+                    throw new \Exception("User not found");
+                }
+
+                $user->status = 1;
+                $user->save(); 
+                DB::commit();
+                return redirect()->route('agen')->with('success', 'Agen Berhasil Diaktifkan');
+            }
         } catch (\Illuminate\Database\QueryException $e) {
             DB::rollBack();
             Log::error('Database error during agent activation', ['error' => $e->getMessage()]);
-            return redirect()->route('agen')->with('failed', 'Activation failed: ' . $e->getMessage());
+            return redirect()->route('agen')->with('failed', 'Gagal Mengaktifkan Agen:' . $e->getMessage());
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Agent activation failed', ['error' => $e->getMessage()]);
-            return redirect()->route('agen')->with('failed', 'Activation failed: ' . $e->getMessage());
+            return redirect()->route('agen')->with('failed', 'Gagal Mengaktifkan Agen:' . $e->getMessage());
         }
     }
 
@@ -910,6 +928,20 @@ class MerchantsController extends Controller
                 return redirect()->back()->with('error', 'Agen tidak ditemukan');
             }
 
+            $pesan = '<p>Halo ' . htmlspecialchars($user->fullname) . ',</p>';
+            $pesan .= '<p>Pendaftaran Anda kami tolak karena tidak memenuhi persyaratan sebagai Agen.</p>';
+            $pesan .= '<p>Anda dapat melakukan pendaftaran kembali dengan mengunjungi cabang terdekat kami:</p>';
+            $pesan .= '<p>Salam Hangat,</p>';
+            $pesan .= '<p><b>NTBS LAKUPANDAI</b></p>';
+
+            $detail_message = [
+                'sender' => 'administrator@selada.id',
+                'subject' => '[NTBS LAKUPANDAI] Pendaftaran Agen LAKUPANDAI Gagal',
+                'isi' => $pesan
+            ];
+
+            Mail::to($user->email)->send(new sendPassword($detail_message));
+
             $user = User::find($merchant->user_id);
             if ($user) {
                 $user->delete();
@@ -918,13 +950,12 @@ class MerchantsController extends Controller
             $merchant->delete();
 
             DB::commit();
-            return redirect()->route('agen/request')->with('message', 'Agen berhasil di-reject dan dihapus');
+            return redirect()->route('agen_request')->with('message', 'Penolakan Agen berhasil');
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->route('agen/request')->with('error', 'Gagal menghapus agen: ' . $e->getMessage());
+            return redirect()->route('agen_request')->with('error', 'Gagal menghapus agen: ' . $e->getMessage());
         }
     }
-
 
     public function deactivateMerchant(Request $request, $id)
     {
@@ -953,11 +984,11 @@ class MerchantsController extends Controller
             }
 
             DB::commit();
-            return redirect()->route('agen/list')->with('success', 'Agen deactivated successfully.');
+            return redirect()->route('agen_list')->with('success', 'Agen deactivated successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Agent deactivation failed', ['error' => $e->getMessage()]);
-            return redirect()->route('agen/list')->with('failed', 'Deactivation failed: ' . $e->getMessage());
+            return redirect()->route('agen_list')->with('failed', 'Deactivation failed: ' . $e->getMessage());
         }
     }
 

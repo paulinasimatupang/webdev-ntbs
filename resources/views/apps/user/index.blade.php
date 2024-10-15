@@ -13,7 +13,7 @@
 
 @section('main-content')
 <div class="breadcrumb">
-    <h1>Users Management</h1>
+    <h1>User</h1>
 </div>
 <div class="separator-breadcrumb border-top"></div>
 
@@ -31,11 +31,15 @@
         <div class="card text-left">
             <div class="card-body">
                 <div class="row">
-                    <h4 class="col-sm-12 col-md-6 card-title mb-3">List of Users</h4>
+                    <h4 class="col-sm-12 col-md-6 card-title mb-3">Daftar User</h4>
                 </div>
 
-                @if (session('status'))
-                    <div class="alert alert-success mt-2">{{ session('status') }}</div>
+                @if (session('success'))
+                    <div class="alert alert-success mt-2">{{ session('success') }}</div>
+                @endif
+
+                @if (session('error'))
+                    <div class="alert alert-danger mt-2">{{ session('error') }}</div>
                 @endif
 
                 <div class="table-responsive">
@@ -67,17 +71,13 @@
                                     <td>
                                         @if (in_array('users.edit', $routes_user))
                                             <a href="{{ route('users.edit', $user->id) }}">
-                                                <button class="btn btn-warning ripple btn-sm m-1 edit-btn"
+                                                <button class="btn btn-primary ripple btn-sm m-1 edit-btn"
                                                     type="button">Edit</button>
                                             </a>
                                         @endif
                                         @if (in_array('users.destroy', $routes_user))
-                                        <form action="{{ route('users.destroy', $user) }}" method="POST"
-                                            style="display:inline;">
-                                            @csrf
-                                            @method('POST')
-                                            <button type="submit" class="btn btn-danger">Delete</button>
-                                        </form>
+                                        <a href="#" onclick="deleteConfirm('{{ $user->id }}'); return false;"
+                                            class="btn btn-danger ripple btn-sm m-1">Hapus</a>
                                         @endif
                                     </td>
                                 </tr>
@@ -117,19 +117,19 @@
     });
 
     function deleteConfirm(id) {
-        if (confirm("Are you sure you want to delete this user?")) {
-            $.ajax({
-                url: '{{ url("users") }}/' + id + '/delete',
-                type: 'POST',
-                data: {
-                    _token: "{{ csrf_token() }}",
-                },
-                success: function (response) {
-                    location.reload(true);
-                },
-                error: function (response) {
-                    alert("Error, Please try again later!");
-                }
+        var r = confirm("Apakah Anda yakin akan menghapus data user?");
+        if (r == true) {
+            var url = '{{ route("users.destroy", ":id") }}';
+            url = url.replace(':id', id);
+
+            $.post(url, {
+                _token: "{{ csrf_token() }}",
+            })
+            .done(function (data) {
+                window.location.href = '{{ route("users.index") }}';
+            })
+            .fail(function () {
+                alert("Error, Please try again later!");
             });
         }
     }

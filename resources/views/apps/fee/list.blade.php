@@ -49,7 +49,7 @@
                         <thead>
                             <tr>
                                 <th scope="col">No</th>
-                                <th scope="col">Service</th>
+                                <th scope="col">Service ID</th>
                                 <th scope="col">Fitur</th>
                                 <th scope="col">Nominal</th>
                                 <th scope="col">Influx</th>

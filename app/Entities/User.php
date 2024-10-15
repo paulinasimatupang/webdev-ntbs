@@ -74,11 +74,6 @@ class User extends Authenticatable implements JWTSubject, Auditable
     {
         return $this->hasOne(Merchant::class, 'user_id', 'id');
     }
-    public function roles()
-    {
-        return $this->belongsTo(Role::class, 'role_id');
-    }
-
     public function role()
     {
         return $this->belongsTo(Role::class, 'role_id');

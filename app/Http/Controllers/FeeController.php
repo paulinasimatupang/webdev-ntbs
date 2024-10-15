@@ -19,16 +19,9 @@ class FeeController extends Controller
             $username = auth()->user()->username; 
 
             $groups = ServiceMeta::where('meta_id', 'fee')
-                ->whereIn('influx', [3])
                 ->with('service') 
                 ->orderBy('service_id') 
                 ->get();
-
-            Log::info('Data ServiceMeta berhasil diambil.', [
-                'meta_id' => 'fee',
-                'influx_values' => [3],
-                'total_groups' => $groups->count(),
-            ]);
 
             return view('apps.fee.list', compact('groups', 'username'));
         } catch (Exception $e) {

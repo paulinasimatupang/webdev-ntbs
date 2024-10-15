@@ -23,6 +23,11 @@
                             <label class="col-sm-2 col-form-label">Pertanyaan</label>
                             <div class="col-sm-10">
                                 <input type="text" class="form-control" value="{{ $data->pertanyaan }}" name="pertanyaan" placeholder="Pertanyaan" required>
+                            @if ($errors->has('pertanyaan'))
+                                <div class="text-danger mt-2">
+                                    {{ $errors->first('pertanyaan') }}
+                                </div>
+                            @endif
                             </div>
                         </div>
 

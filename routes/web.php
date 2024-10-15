@@ -174,7 +174,7 @@ Route::group(['middleware' => ['auth', 'check.permission']], function () {
     Route::get('/users/create', 'UserController@create')->name('users.create');
     Route::post('/users', 'UserController@store')->name('users.store');
     Route::get('/users/{user}/edit', 'UserController@edit')->name('users.edit');
-    Route::put('/users/{user}', 'UserController@update')->name('users.update');
+    Route::post('/users/{user}', 'UserController@update')->name('users.update');
     Route::post('/users/{user}/destroy', 'UserController@destroy')->name('users.destroy');
 
     Route::get('/users/request', 'UserController@request_list')->name('users.list-request');
@@ -327,8 +327,8 @@ Route::group(['middleware' => ['auth', 'check.permission']], function () {
 
     Route::get('/pengaduan', 'PengaduanController@menu')->name('pengaduan');
     Route::get('/pengaduan/pending', 'PengaduanController@list_pending')->name('pengaduan_pending');
-    Route::get('/pengaduan/process', 'PengaduanController@list_process')->name('pengaduan_process');
-    Route::get('/pengaduan/resolved', 'PengaduanController@list_resolved')->name('pengaduan_resolved');
+    Route::get('/pengaduan/process', 'PengaduanController@list_process')->name('pengaduan_process_list');
+    Route::get('/pengaduan/resolved', 'PengaduanController@list_resolved')->name('pengaduan_resolved_list');
     Route::get('/pengaduan/detail/pending/{id}', 'PengaduanController@detail_pending')->name('pengaduan_detail_pending');
     Route::get('/pengaduan/detail/process/{id}', 'PengaduanController@detail_process')->name('pengaduan_detail_process');
     Route::get('/pengaduan/detail/resolved/{id}', 'PengaduanController@detail_resolved')->name('pengaduan_detail_resolved');
@@ -357,9 +357,9 @@ Route::group(['middleware' => ['auth', 'check.permission']], function () {
     Route::post('/produk/update/{opt_id}/{meta_id}', 'ScreenComponentController@update_produk')->name('update_produk');
 
     // PARAMETER MIN MAX (Poin assesment dan kesalahan login, pin)
-    Route::get('/mastredata/parameter', 'ComponentController@list_parameter')->name('masterdata_list_parameter');
-    Route::get('/mastredata/parameter/edit/{id}', 'ComponentController@edit_parameter')->name('masterdata_edit_parameter');
-    Route::post('/mastredata/parameter/update/{id}', 'ComponentController@update_parameter')->name('masterdata_update_parameter');
+    Route::get('/masterdata/parameter', 'ComponentController@list_parameter')->name('masterdata_list_parameter');
+    Route::get('/masterdata/parameter/edit/{id}', 'ComponentController@edit_parameter')->name('masterdata_edit_parameter');
+    Route::post('/masterdata/parameter/update/{id}', 'ComponentController@update_parameter')->name('masterdata_update_parameter');
 });
 
 Route::post('/send-test-notif', 'DataCalonNasabahController@sendTestNotification')->name('send_test_notification');

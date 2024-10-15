@@ -20,7 +20,7 @@
             <div class="card-body">
                 <form action="{{ route('users.update', $user->id) }}" method="POST">
                     @csrf
-                    @method('PUT') 
+                    @method('POST') 
 
                     <div class="form-group row">
                         <label class="col-sm-2 col-form-label">Name</label>
@@ -31,19 +31,13 @@
                     <div class="form-group row">
                         <label class="col-sm-2 col-form-label">Username</label>
                         <div class="col-sm-10">
-                            <input type="text" name="username" class="form-control" value="{{ old('username', $user->username) }}" placeholder="Username" required />
+                            <input type="text" name="username" class="form-control" value="{{ old('username', $user->username) }}" placeholder="Username" readonly />
                         </div>
                     </div>
                     <div class="form-group row">
                         <label class="col-sm-2 col-form-label">Email</label>
                         <div class="col-sm-10">
                             <input type="email" name="email" class="form-control" value="{{ old('email', $user->email) }}" placeholder="Email" required />
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-sm-2 col-form-label">Password</label>
-                        <div class="col-sm-10">
-                            <input type="password" name="password" class="form-control" placeholder="Leave blank to keep current password" />
                         </div>
                     </div>
                     <div class="form-group row">
@@ -57,6 +51,19 @@
                                 </option>
                                 @endforeach
                             </select>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Status</label>
+                        <div class="col-sm-10">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="status" value="1" id="activate-radio" {{ $user->status == 1 ? 'checked' : '' }}>
+                                <label class="form-check-label" for="activate-radio">Aktivasi</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="status" value="2" id="deactivate-radio" {{ $user->status == 2 ? 'checked' : '' }}>
+                                <label class="form-check-label" for="deactivate-radio">Nonaktif</label>
+                            </div>
                         </div>
                     </div>
                     <div class="form-group row">

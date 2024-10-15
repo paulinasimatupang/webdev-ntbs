@@ -2,7 +2,7 @@
 
 @section('main-content')
     <div class="breadcrumb">
-        <h1>Add Agen</h1>
+        <h1>Tambah Agen</h1>
     </div>
     <div class="separator-breadcrumb border-top"></div>
 
@@ -76,7 +76,7 @@
                             </div>
                             <div class="form-group row">
                                 <div class="col-sm-12 text-right">
-                                    <button type="button" class="btn btn-primary" id="nextBtn">Next</button>
+                                    <button type="button" class="btn btn-primary" id="nextBtn">Selanjutnya</button>
                                 </div>
                             </div>
                         </div>
@@ -271,8 +271,8 @@
 
                             <div class="form-group row">
                                 <div class="col-sm-12 text-right">
-                                    <button type="button" class="btn btn-secondary" id="prevBtn">Previous</button>
-                                    <button type="button" class="btn btn-primary" id="nextBtn2">Next</button>
+                                    <button type="button" class="btn btn-secondary" id="prevBtn">Sebelumnya</button>
+                                    <button type="button" class="btn btn-primary" id="nextBtn2">Selanjutnya</button>
                                 </div>
                             </div>
                         </div>
@@ -305,8 +305,8 @@
 
                             <div class="form-group row">
                                 <div class="col-sm-12 text-right">
-                                    <button type="button" class="btn btn-secondary" id="prevBtn2">Previous</button>
-                                    <button type="submit" class="btn btn-success"  id="saveBtn">Save</button>
+                                    <button type="button" class="btn btn-secondary" id="prevBtn2">Sebelumnya</button>
+                                    <button type="submit" class="btn btn-success"  id="saveBtn">Kirim</button>
                                 </div>
                             </div>
                         </div>

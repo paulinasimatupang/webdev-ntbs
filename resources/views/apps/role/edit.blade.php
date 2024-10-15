@@ -18,14 +18,6 @@
         @endforeach
     @endif
 
-    @if ($errors->any())
-        <ul class="alert alert-warning">
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    @endif
-
     <div class="row">
         <div class="col-md-12">
             <div class="card mb-5">
@@ -37,9 +29,12 @@
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label">Role Name</label>
                             <div class="col-sm-10">
-                                <input type="text" name="name" value="{{ $role->name }}" class="form-control" placeholder="Role Name" required>
+                                <input type="text" name="name" value="{{ old('name', $role->name) }}" class="form-control" placeholder="Role Name" required>
+                                @if ($errors->has('name'))
+                                    <span class="text-danger">{{ $errors->first('name') }}</span>
+                                @endif  
                             </div>
-                        </div>
+                        </div>    
 
                         <div class="form-group row">
                             <div class="col-sm-12 text-right">

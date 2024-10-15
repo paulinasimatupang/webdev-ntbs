@@ -13,7 +13,7 @@
 
 @section('main-content')
             <div class="breadcrumb">
-                <h1>List Nasabah</h1>
+                <h1>Daftar Nasabah Rekening BSA</h1>
             </div>
             <div class="separator-breadcrumb border-top"></div>
             <div class="row mb-4">
@@ -21,11 +21,9 @@
                     <div class="card text-left">
                         <div class="card-body">
                             <div class="row">
-                                <h4 class=" col-sm-12 col-md-6 card-title mb-3">List Nasabah</h4>
+                                <h4 class=" col-sm-12 col-md-6 card-title mb-3">Daftar Nasabah</h4>
                                 <div class="col-sm-3 col-md-12 mb-3">
                                     <div class="export-button-wrapper" style="float: right;">
-                                        <a id="export-to-excel" href="{{ route('nasabah.excel') }}" class="btn btn-outline-secondary">Export to Excel</a>
-                                        <a id="export-to-pdf" href="{{ route('nasabah.pdf') }}" class="btn btn-outline-secondary">Export to PDF</a>
                                     </div>
                                 </div>
                             </div>
@@ -49,10 +47,10 @@
                                             <th scope="col">Nama</th>
                                             <th scope="col">Alamat</th>
                                             <th scope="col">Nomor HP</th>
-                                            <th scope="col">Request Time</th>
-                                            <th scope="col">Reply Time</th>
+                                            <th scope="col">Waktu Permintaan</th>
+                                            <th scope="col">Waktu Penerimaan</th>
                                             <th scope="col">Status</th>
-                                            <th scope="col">Action</th>
+                                            <th scope="col">Aksi</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -72,7 +70,7 @@
                                             <td>
                                                 @if (in_array('nasabah_detail', $routes_user))
                                                     <a href="{{route('nasabah_detail',[$item->id])}}">
-                                                        <button class="btn btn-success ripple btn-sm m-1 edit-btn" type="button">Detail</button>
+                                                        <button class="btn btn-primary ripple btn-sm m-1 edit-btn" type="button">Detail</button>
                                                     </a>
                                                 @endif
                                             </td>

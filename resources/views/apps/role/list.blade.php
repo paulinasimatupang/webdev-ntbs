@@ -15,6 +15,18 @@
 </div>
 <div class="separator-breadcrumb border-top"></div>
 
+@if ($message = Session::get('success'))
+    <div class="alert alert-success">
+        <p>{{ $message }}</p>
+    </div>
+@endif
+
+@if ($message = Session::get('failed'))
+    <div class="alert alert-failed">
+        <p>{{ $message }}</p>
+    </div>
+@endif
+
 <div class="row mb-4">
     <div class="col-lg-12 col-md-12 col-sm-12 d-flex justify-content-center mb-3">
         <div class="input-group">
@@ -42,8 +54,8 @@
                         <thead>
                             <tr>
                                 <th>No</th>
-                                <th>Name</th>
-                                <th>Action</th>
+                                <th>Nama</th>
+                                <th>Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -57,7 +69,7 @@
                                     <td>
                                         @if (in_array('roles.addPermissionToRole', $routes_user))
                                             <a href="{{ route('roles.addPermissionToRole', $role) }}">
-                                                <button class="btn btn-primary" type="button">Add/Edit Role</button>
+                                                <button class="btn btn-primary" type="button">Add/Edit Permission</button>
                                             </a>
                                         @endif
 
@@ -68,13 +80,8 @@
                                         @endif
 
                                         @if (in_array('roles.destroy', $routes_user))
-                                            <!-- Check if delete permission exists -->
-                                            <form action="{{ route('roles.destroy', $role) }}" method="POST"
-                                                style="display:inline;">
-                                                @csrf
-                                                @method('POST')
-                                                <button type="submit" class="btn btn-danger">Delete</button>
-                                            </form>
+                                            <a href="#" onclick="deleteConfirm('{{ $role->id }}'); return false;"
+                                            class="btn btn-danger ripple btn-sm m-1">Hapus</a>
                                         @endif
                                     </td>
                                 </tr>
@@ -92,11 +99,37 @@
 @endsection
 
 @section('page-js')
+<script src="{{ asset('assets/js/vendor/echarts.min.js') }}"></script>
+<script src="{{ asset('assets/js/es5/echart.options.min.js') }}"></script>
 <script src="{{ asset('assets/js/vendor/datatables.min.js') }}"></script>
 <script src="{{ asset('assets/js/datatables.script.js') }}"></script>
+<script src="{{ asset('assets/js/es5/dashboard.v4.script.js') }}"></script>
+<script src="{{ asset('assets/js/vendor/pickadate/picker.js') }}"></script>
+<script src="{{ asset('assets/js/vendor/pickadate/picker.date.js') }}"></script>
 @endsection
 
 @section('bottom-js')
+<script src="{{ asset('assets/js/form.basic.script.js') }}"></script>
+<script>
+    function deleteConfirm(id) {
+        var r = confirm("Apakah Anda yakin akan menghapus data role?");
+        if (r == true) {
+            var url = '{{ route("roles.destroy", ":id") }}';
+            url = url.replace(':id', id);
+
+            $.post(url, {
+                _token: "{{ csrf_token() }}",
+            })
+            .done(function (data) {
+                window.location.href = '{{ route("roles.list") }}';
+            })
+            .fail(function () {
+                alert("Error, Please try again later!");
+            });
+        }
+    }
+</script>
+
 <style>
     .add-new-btn {
         background-color: #0a6e44;

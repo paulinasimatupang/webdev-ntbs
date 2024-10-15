@@ -326,7 +326,7 @@
                     </div>
 
                     <div class="col-sm-12 d-flex justify-content-end">
-                        <a href="{{ route('nasabah_list') }}" class="btn btn-primary mr-2">Back</a>
+                        <a href="{{ route('nasabah_list') }}" class="btn btn-primary mr-2">Kembali</a>
                     </div>
             </div>
         </div>

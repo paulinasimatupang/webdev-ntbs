@@ -88,8 +88,8 @@ class TransactionsController extends Controller
     public function index(Request $request)
     {
         $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
+        $query = Transaction::whereNotIn('service_id', ['N00001', 'E81120', 'CRS001', 'T00005']);
 
-        $query = Transaction::query();
 
         $user = session()->get('user');
 
@@ -146,9 +146,8 @@ class TransactionsController extends Controller
         $totalAmount = $query->sum('amount');
         $transactionCodes = $query->pluck('transaction_code')->unique();
         if ($role && $role->name == 'Agen') {
-            // Jika role adalah 'Agen', ambil fee dari tabel TransactionFee dengan penerima 'Agent'
             $totalFee = TransactionFee::whereIn('transaction_code', $transactionCodes)
-                                    ->where('penerima', 'Agent')
+                                    ->where('penerima', 'Agen')
                                     ->sum('fee');
         } else {
             $totalFee = $query->sum('fee');

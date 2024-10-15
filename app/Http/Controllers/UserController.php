@@ -41,12 +41,15 @@ class UserController extends Controller
             
             if ($role && $role->name == 'Operator Pusat'||$role->name == 'Supervisor Pusat') {
                 $users = User::with('role')->whereHas('role', function($query) {
-                    $query->where('name', '!=', 'Agen')->where('name', '!=', 'Super Admin');
+                    $query->where('name', '!=', 'Agen')->where('name', '!=', 'Super Admin')
+                    ->whereIn('status', [1, 2]);
                 })->get();
             }
             else if ($role && $role->name == 'Super Admin') {
-                $users = User::with('role')->whereHas('role', function($query) {
-                    $query->where('name', '!=', 'Agen');
+                $users = User::with('role')
+                ->whereHas('role', function($query) {
+                    $query->where('name', '!=', 'Agen')
+                    ->whereIn('status', [1, 2]);
                 })->get();
             }
 
@@ -244,27 +247,23 @@ class UserController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'fullname' => 'required|string|max:255',
-            'username' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $id,
-            'password' => 'nullable|string|min:8',
-            'role_id' => 'required|exists:roles,id', 
+            'fullname' => 'required',
+            'role_id' => 'required', 
         ]);
-
+        
         $user = User::findOrFail($id);
         $user->fullname = $request->fullname;
-        $user->username = $request->username;
+        $user->role_id = $request->role_id;
         $user->email = $request->email;
-
-        if ($request->filled('password')) {
-            $user->password = bcrypt($request->password);
-        }
-
+        $user->status = $request->status;
         $user->save();
-
+        
         $user->syncRoles([$request->role_id]);
+        
+        $role_id = $user->role_id;
+        $role_name = Role::where('id', $role_id)->value('name');
 
-        return redirect()->route('users.index')->with('success', 'User berhasil diperbarui.');
+        return redirect()->route('users.index')->with('success', 'Data user behasil di edit');
     }
 
 

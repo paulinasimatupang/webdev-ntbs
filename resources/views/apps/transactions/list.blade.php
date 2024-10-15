@@ -31,7 +31,7 @@
                         <div class="card-body">
                             <div class="form-row">
                                 <div class="form-group col-md-12">
-                                    <label for="search" class="ul-form__label">Transaction Code:</label>
+                                    <label for="search" class="ul-form__label">Kode Transaksi:</label>
                                     <input type="text" class="form-control" value="{{ request('search') }}" name="search" id="search" placeholder="Transaction Code">
                                 </div>
                             </div>
@@ -39,11 +39,11 @@
 
                             <div class="form-row">
                                 <div class="form-group col-md-6">
-                                    <label for="start_date" class="ul-form__label">Start Date:</label>
+                                    <label for="start_date" class="ul-form__label">Tanggal Awal:</label>
                                     <input type="date" class="form-control" value="{{ request('start_date') }}" name="start_date" id="start_date" placeholder="Start Date">
                                 </div>
                                 <div class="form-group col-md-6">
-                                    <label for="end_date" class="ul-form__label">End Date:</label>
+                                    <label for="end_date" class="ul-form__label">Tanggal Akhir:</label>
                                     <input type="date" class="form-control" value="{{ request('end_date') }}" name="end_date" id="end_date" placeholder="End Date">
                                 </div>
                             </div>
@@ -72,8 +72,8 @@
                             <div class="mc-footer">
                                 <div class="row">
                                     <div class="col-lg-12 text-center">
-                                        <button type="submit" class="btn btn-success m-1">Save</button>
-                                        <a href="{{ route('transaction') }}" class="btn btn-outline-secondary m-1">Clear</a>
+                                        <button type="submit" class="btn btn-success m-1">Simpan</button>
+                                        <a href="{{ route('transaction') }}" class="btn btn-outline-secondary m-1">Hapus Filter</a>
                                     </div>
                                 </div>
                             </div>
@@ -91,7 +91,7 @@
                     <div class="d-flex align-items-center">
                         <img src="{{ asset('assets/images/transaction/total_transaction.png') }}" alt="Total Fee Agent" class="mr-3" style="width: 50px">
                         <div class="text-left">
-                            <p class="text-muted mt-2 mb-0">Total Transaction</p>
+                            <p class="text-muted mt-2 mb-0">Jumlah Transaksi</p>
                             <p class="text-primary text-24 line-height-1 mb-2">{{ $dataRevenue['total_trx'] }}</p>
                         </div>
                     </div>
@@ -105,7 +105,7 @@
                     <div class="d-flex align-items-center">
                         <img src="{{ asset('assets/images/transaction/amount_transaction.png') }}" alt="Total Fee Agent" class="mr-3" style="width: 60px">
                         <div class="text-left">
-                            <p class="text-muted mt-2 mb-0">Amount Transaction</p>
+                            <p class="text-muted mt-2 mb-0">Total Transaksi</p>
                             <p class="text-primary text-24 line-height-1 mb-2">@currency($dataRevenue['amount_trx'])</p>
                         </div>
                     </div>
@@ -140,7 +140,12 @@
                         <h4 class="col-sm-9 col-md-6 card-title mb-3" style="line-height: 2.1rem;">Daftar Transaksi Agen</h4>
                         <div class="col-sm-3 col-md-12 mb-3">
                             <div class="export-button-wrapper" style="float: right;">
-                                <a id="export-to-excel" href="{{ route('transactions.csv') }}" class="btn btn-outline-secondary">Export to Excel</a>
+                                <a id="export-to-excel" href="{{ route('transactions.csv') }}" 
+                                    class="btn" 
+                                    style="background-color: #4CAF50; color: white; border-color: #4CAF50;">
+                                        <img src="{{ asset('assets/images/new_features/xls.png') }}" alt="Excel Icon" style="width: 20px; height: 20px; margin-right: 5px;">
+                                        Ekspor Excel
+                                    </a>
                                 <!-- <a id="export-to-pdf" href="{{ route('transactions.pdf') }}" class="btn btn-outline-secondary">Export to PDF</a> -->
                             </div>
                         </div>

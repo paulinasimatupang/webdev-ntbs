@@ -47,7 +47,7 @@
                     </div>
 
                     <div class="col-sm-12 d-flex justify-content-end">
-                        <a href="{{ route('pengaduan_resolved') }}" class="btn btn-primary mr-2">Back</a>
+                        <a href="{{ route('pengaduan_resolved_list') }}" class="btn btn-primary mr-2">Back</a>
                     </div>
             </div>
         </div>

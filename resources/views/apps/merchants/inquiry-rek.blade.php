@@ -26,7 +26,7 @@
                                 <div class="form-group row">
                                     <div class="col-sm-12 text-right">
                                         <a href="{{route('agen')}}">
-                                            <button type="button" class="btn btn-primary">Back</button>
+                                            <button type="button" class="btn btn-primary">Kembali</button>
                                         </a>
                                         <button type="submit" class="btn btn-primary">Inquiry</button>
                                     </div>

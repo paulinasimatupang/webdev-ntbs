@@ -20,11 +20,14 @@
 
                     <div class="form-group">
                         <label for="comp_act">Nilai</label>
-                        <input type="text" class="form-control" id="comp_act" name="comp_act" value="{{ old('comp_act', $data->comp_act) }}">
+                        <input type="text" class="form-control" id="comp_act" name="comp_act" value="{{ old('comp_act', $data->comp_act) }}" placeholder="Nilai" required>
+                        
+                        @error('comp_act')
+                            <div class="text-danger">{{ $message }}</div>
+                        @enderror
                     </div>
-
-                    <button type="submit" class="btn btn-primary">Update</button>
                     <a href="{{ route('masterdata_list_parameter') }}" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary">Update</button>
                 </form>
             </div>
         </div>

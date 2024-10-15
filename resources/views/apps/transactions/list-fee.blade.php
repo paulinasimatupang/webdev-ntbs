@@ -15,7 +15,7 @@
                     <div class="card text-left">
                         <div class="card-body">
                             <div class="row">
-                                <h4 class=" col-sm-12 col-md-6 card-title mb-3">List Penerima Fee</h4>
+                                <h4 class=" col-sm-12 col-md-6 card-title mb-3">Daftar Penerima Fee</h4>
                             </div>
                             @if ($message = Session::get('success'))
                                 <div class="alert alert-success">

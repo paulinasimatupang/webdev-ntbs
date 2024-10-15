@@ -33,7 +33,7 @@
         <div class="card text-left">
             <div class="card-body">
                 <div class="row">
-                    <h4 class=" col-sm-12 col-md-6 card-title mb-3">List Terminal </h4>
+                    <h4 class=" col-sm-12 col-md-6 card-title mb-3">Daftar Terminal </h4>
                 </div>
 
                 @if ($message = Session::get('success'))
@@ -54,11 +54,11 @@
                         <thead>
                             <tr>
                                 <th scope="col">No</th>
-                                <th scope="col">TID</th>
+                                <th scope="col">ID Terminal</th>
                                 <th scope="col">ID Agen</th>
                                 <th scope="col">Nama Agen</th>
-                                <th scope="col">ID Perangkat</th>
-                                <th scope="col">Action</th>
+                                <th scope="col">UUID</th>
+                                <th scope="col">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>

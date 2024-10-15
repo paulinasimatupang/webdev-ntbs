@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Entities\Assesment;
+use Illuminate\Support\Facades\Validator;
 
 class AssesmentController extends Controller
 {
@@ -24,10 +25,23 @@ class AssesmentController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'pertanyaan' => 'required',
+        $messages = [
+            'pertanyaan.required' => 'Pertanyaan harus diisi.',
+            'pertanyaan.regex' => 'Pertanyaan harus mengandung huruf.',
+        ];
+        
+        $rules = [
+            'pertanyaan' => 'required|regex:/[a-zA-Z]/',
             'poin' => 'required',
-        ]);
+        ];
+        
+        $validator = Validator::make($request->all(), $rules, $messages);
+        
+        if ($validator->fails()) {
+            return redirect()->route('assesment_create') 
+                ->withErrors($validator)
+                ->withInput();
+        }
 
         Assesment::create([
             'pertanyaan' => $request->pertanyaan,
@@ -51,10 +65,24 @@ class AssesmentController extends Controller
 
     public function update(Request $request, $id)
     {
-        $request->validate([
-            'pertanyaan' => 'required',
+        
+        $messages = [
+            'pertanyaan.required' => 'Pertanyaan harus diisi.',
+            'pertanyaan.regex' => 'Pertanyaan harus mengandung huruf.',
+        ];
+        
+        $rules = [
+            'pertanyaan' => 'required|regex:/[a-zA-Z]/',
             'poin' => 'required',
-        ]);
+        ];
+        
+        $validator = Validator::make($request->all(), $rules, $messages);
+        
+        if ($validator->fails()) {
+            return redirect()->route('assesment_update', ['id' => $id]) 
+                ->withErrors($validator)
+                ->withInput();
+        }
 
         $data = Assesment::find($id);
 

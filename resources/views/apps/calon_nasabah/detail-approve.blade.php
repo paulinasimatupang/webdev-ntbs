@@ -312,18 +312,16 @@
                     </div>
 
                     <div class="col-sm-12 d-flex justify-content-end">
-                        <a href="{{ route('list_approve') }}" class="btn btn-primary mr-2">Back</a>
+                        <a href="{{ route('list_approve') }}" class="btn btn-primary mr-2">Kembali</a>
                         <form id="actionForm" method="POST" class="d-inline">
                             @csrf
                             <input type="hidden" name="nasabah_id" value="{{ $nasabah->id }}">
                             <input type="hidden" name="action" id="formAction">
-
-                            <button type="button" id="approve" class="btn btn-success">
-                                Approve
-                            </button>
-
                             <button type="button" id="reject" class="btn btn-danger ml-2">
-                                Reject
+                                Tolak
+                            </button>
+                            <button type="button" id="approve" class="btn btn-success ml-2">
+                                Terima
                             </button>
                         </form>
                     </div>
@@ -339,14 +337,6 @@ document.getElementById('approve').addEventListener('click', function() {
     if (confirm('Apakah Anda yakin akan menerima nasabah ini?')) {
         document.getElementById('formAction').value = 'activate';
         document.getElementById('actionForm').action = "{{ route('nasabah_approve', ['id' => $nasabah->id]) }}";
-        document.getElementById('actionForm').submit();
-    }
-});
-
-document.getElementById('reject').addEventListener('click', function() {
-    if (confirm('Apakah Anda yakin akan menolak nasabah ini?')) {
-        document.getElementById('formAction').value = 'reject';
-        document.getElementById('actionForm').action = "{{ route('nasabah_reject', ['id' => $nasabah->id]) }}";
         document.getElementById('actionForm').submit();
     }
 });

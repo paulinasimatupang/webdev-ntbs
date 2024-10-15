@@ -101,7 +101,7 @@
 <script src="{{ asset('assets/js/form.basic.script.js') }}"></script>
 <script>
     function deleteConfirm(id) {
-        var r = confirm("Apakah Anda yakin akan menghapus data ini?");
+        var r = confirm("Apakah Anda yakin akan menghapus data persen fee?");
         if (r == true) {
             var url = '{{ route("persen_fee_destroy", ":id") }}';
             url = url.replace(':id', id);

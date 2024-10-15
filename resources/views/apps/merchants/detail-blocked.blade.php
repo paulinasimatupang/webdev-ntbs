@@ -2,7 +2,7 @@
 
 @section('main-content')
 <div class="breadcrumb">
-    <h1>Detail Merchant</h1>
+    <h1>Detail Agen Terblokir</h1>
 </div>
 <div class="separator-breadcrumb border-top"></div>
 
@@ -21,7 +21,6 @@
     <div class="col-md-12">
         <div class="card mb-5">
             <div class="card-body">
-                <!-- Konten detail merchant -->
                 @csrf
                 <div class="form-group row">
                             <label class="col-sm-2 col-form-label">Jenis Agen</label>
@@ -153,6 +152,10 @@
                             <div class="mb-2">
                                 <a href="{{ asset('uploads/' . $merchant->file_ktp) }}" target="_blank">Lihat File KTP</a>
                             </div>
+                            @else
+                            <div class="mb-2">
+                                <p>File Tidak Ditemukan</a>
+                            </div>
                             @endif
                         </div>
 
@@ -161,6 +164,10 @@
                             @if(isset($merchant) && $merchant->file_npwp)
                             <div class="mb-2">
                                 <a href="{{ asset('uploads/' . $merchant->file_npwp) }}" target="_blank">Lihat File NPWP</a>
+                            </div>
+                            @else
+                            <div class="mb-2">
+                                <p>File Tidak Ditemukan</a>
                             </div>
                             @endif
                         </div>
@@ -171,18 +178,21 @@
                             <div class="mb-2">
                                 <a href="{{ asset('uploads/' . $merchant->foto_lokasi_usaha) }}" target="_blank">Lihat Foto Lokasi Usaha</a>
                             </div>
+                            @else
+                            <div class="mb-2">
+                                <p>File Tidak Ditemukan</a>
+                            </div>
                             @endif
                         </div>
                 <div class="form-group row">
                     <div class="col-sm-12 text-right">
-                        <a href="{{ route('agen_blocked') }}" class="btn btn-primary">Back</a>
+                        <a href="{{ route('agen_blocked') }}" class="btn btn-primary">Kembali</a>
                         <form id="actionForm" method="POST" class="d-inline">
                             @csrf
                             <input type="hidden" name="agen_id" value="{{ $merchant->id }}">
                             <input type="hidden" name="action" id="formAction">
-
                             <button type="button" id="approve" class="btn btn-success">
-                                Approve
+                                Aktifkan
                             </button>
                         </form>
                     </div>
@@ -197,7 +207,7 @@
 @section('page-js')
 <script>
 document.getElementById('approve').addEventListener('click', function() {
-    if (confirm('Apakah Anda yakin akan mengaktivasi agen ini?')) {
+    if (confirm('Apakah Anda yakin akan mengaktifkan agen ini?')) {
         document.getElementById('formAction').value = 'activate';
         document.getElementById('actionForm').action = "{{ route('agen_activate', ['id' => $merchant->id]) }}";
         document.getElementById('actionForm').submit();

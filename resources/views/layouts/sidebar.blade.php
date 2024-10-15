@@ -4,7 +4,25 @@
     #b3 {
         display: none;
     }
+
+    .nav-item.active {
+        position: relative;
+        z-index: 1; 
+    }
+
+    .nav-item.active::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        border-radius: 5px; 
+        z-index: -1; 
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+    }
 </style>
+
 
 @php
     $sidebarService = new \App\Services\SidebarService();
@@ -16,24 +34,21 @@
     <div class="sidebar-left open rtl-ps-none" data-perfect-scrollbar data-suppress-scroll-x="true">
         <ul class="navigation-left">
             @if(isset($features['dashboard']))
-                <li class="nav-item {{ (request()->is('dashboard') || request()->is('dashboard/*')) ? 'active' : '' }}">
-                    <a class="nav-item-hold" href="{{route('dashboard')}}">
+                <li class="nav-item {{ (request()->is('landing') || request()->is('landing/*')) ? 'active' : '' }}">
+                    <a class="nav-item-hold" href="{{route('landing')}}">
                         <img class="img_bintang_sidebar" src="{{asset('/assets/images/sidebar_icon/dashboard.png')}}"
                             alt="">
                         <span class="nav-text">Dashboard</span>
                     </a>
-                    <div class="triangle"></div>
                 </li>
             @endif
             @if(isset($features['transaction']))
                 <li class="nav-item {{ (request()->is('transaction') || request()->is('transaction/*')) ? 'active' : '' }}">
                     <a class="nav-item-hold" href="{{route('transaction')}}">
-
                         <img class="img_bintang_sidebar" src="{{asset('/assets/images/sidebar_icon/transaction.png')}}"
                             alt="">
                         <span class="nav-text">Transaksi</span>
                     </a>
-                    <div class="triangle"></div>
                 </li>
             @endif
             @if(isset($features['terminal']))
@@ -45,7 +60,6 @@
                                 <img class="img_bintang_sidebar" src="{{asset('/assets/images/sidebar_icon/terminal.png')}}" alt="">
                                 <span class="nav-text">Terminal</span>
                             </a>
-                            <div class="triangle"></div>
                         </li>
             @endif
             @if(isset($features['agen']))
@@ -55,7 +69,6 @@
                         <img class="img_bintang_sidebar" src="{{asset('/assets/images/sidebar_icon/agent.png')}}" alt="">
                         <span class="nav-text">Agen</span>
                     </a>
-                    <div class="triangle"></div>
                 </li>
             @endif
             @if(isset($features['nasabah']))
@@ -65,18 +78,19 @@
                         <img class="img_bintang_sidebar" src="{{asset('/assets/images/sidebar_icon/nasabah.png')}}" alt="">
                         <span class="nav-text">Nasabah</span>
                     </a>
-                    <div class="triangle"></div>
                 </li>
             @endif
             @if(isset($features['masterdata']))
-                <li class="nav-item {{ (request()->is('masterdata') || request()->is('masterdata/*')) ? 'active' : '' }}">
+                <li class="nav-item {{ (request()->is('masterdata') || request()->is('masterdata/*')) || (request()->is('fee') || request()->is('*/fee/*')) || 
+                (request()->is('persen_fee') || request()->is('persen_fee/*')) || (request()->is('roles') || request()->is('roles/*')) || (request()->is('users') || 
+                request()->is('users/*')) || (request()->is('branch') || request()->is('branch/*')) || (request()->is('assesment') || request()->is('assesment/*'))
+                ? 'active' : '' }}">
                     <a class="nav-item-hold" href="{{route('masterdata')}}">
 
                         <img class="img_bintang_sidebar" src="{{asset('/assets/images/sidebar_icon/masterdata.png')}}"
                             alt="">
                         <span class="nav-text">Master Data</span>
                     </a>
-                    <div class="triangle"></div>
                 </li>
             @endif
             @if(isset($features['pengaduan']))
@@ -85,10 +99,9 @@
                         echo 'id="b1"'; @endphp>
                             <a class="nav-item-hold" href="{{route('pengaduan')}}">
 
-                                <img class="img_bintang_sidebar" src="{{asset('/assets/images/sidebar_icon/log.png')}}" alt="">
+                                <img class="img_bintang_sidebar" src="{{asset('/assets/images/sidebar_icon/pengaduan.png')}}" alt="">
                                 <span class="nav-text">Pengaduan</span>
                             </a>
-                            <div class="triangle"></div>
                         </li>
             @endif
             @if(isset($features['audit']))
@@ -97,10 +110,9 @@
                         echo 'id="b1"'; @endphp>
                             <a class="nav-item-hold" href="{{route('audit')}}">
 
-                                <img class="img_bintang_sidebar" src="{{asset('/assets/images/sidebar_icon/log.png')}}" alt="">
+                                <img class="img_bintang_sidebar" src="{{asset('/assets/images/sidebar_icon/audit.png')}}" alt="">
                                 <span class="nav-text">Audit</span>
                             </a>
-                            <div class="triangle"></div>
                         </li>
             @endif
             @if(isset($features['message log']))
@@ -112,11 +124,11 @@
                                 <img class="img_bintang_sidebar" src="{{asset('/assets/images/sidebar_icon/log.png')}}" alt="">
                                 <span class="nav-text">Message Log</span>
                             </a>
-                            <div class="triangle"></div>
                         </li>
             @endif
             @if(isset($features['biller']))
-                        <li class="nav-item {{ (request()->is('biller') || request()->is('biller/*')) ? 'active' : '' }}" @php
+                        <li class="nav-item {{ (request()->is('biller') || request()->is('biller/*')) || (request()->is('parameter') || request()->is('parameter/*'))
+                        || (request()->is('produk') || request()->is('produk/*')) || (request()->is('sub-produk') || request()->is('sub-produk/*'))? 'active' : '' }}" @php
                             if (session()->get('user')->role_id == 2)
                         echo 'id="b1"'; @endphp>
                             <a class="nav-item-hold" href="{{route('biller')}}">
@@ -124,17 +136,16 @@
                                 <img class="img_bintang_sidebar" src="{{asset('/assets/images/sidebar_icon/biller.png')}}" alt="">
                                 <span class="nav-text">Biller</span>
                             </a>
-                            <div class="triangle"></div>
                         </li>
             @endif
-            <li class="nav-item {{ request()->is('extrakits/*') ? 'active' : '' }}">
+            <!-- <li class="nav-item {{ request()->is('extrakits/*') ? 'active' : '' }}">
                 <a class="nav-item-hold" href="{{route('dashboard_version_11')}}">
 
                     <img class="img_bintang_sidebar" src="{{asset('/assets/images/sidebar_icon/version.png')}}" alt="">
                     <span class="nav-text">Version</span>
                 </a>
                 <div class="triangle"></div>
-            </li>
+            </li> -->
 
         </ul>
     </div>

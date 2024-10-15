@@ -61,7 +61,7 @@
                         <div class="d-flex align-items-center">
                             <img src="{{ asset('assets/images/new_features/add.png') }}" alt="Add Agen" class="mr-3" style="width: 50px;">
                             <div class="text-left">
-                                <p class="text-muted mt-2 mb-0">Add Agen</p>
+                                <p class="text-muted mt-2 mb-0">Tambah Agen</p>
                             </div>
                         </div>
                     </div>
@@ -77,7 +77,7 @@
                     <div class="card-body d-flex align-items-center">
                         <img src="{{ asset('assets/images/new_features/request.png') }}" alt="Request Agen" class="mr-3" style="width: 50px;">
                         <div class="flex-grow-1">
-                            <p class="text-muted mt-2 mb-0">Request Agen</p>
+                            <p class="text-muted mt-2 mb-0">Permintaan Agen</p>
                         </div>
                         <div class="text-right">
                             <h3 class="mb-0" style="font-size: 30px; color: #0a6e44;">{{ $jumlah_request }}</h3>
@@ -97,7 +97,7 @@
                         <div class="d-flex align-items-center">
                             <img src="{{ asset('assets/images/new_features/list.png') }}" alt="List Agen" class="mr-3" style="width: 50px;">
                             <div class="text-left">
-                                <p class="text-muted mt-2 mb-0">List Agen</p>
+                                <p class="text-muted mt-2 mb-0">Data Agen</p>
                             </div>
                         </div>
                     </div>
@@ -113,9 +113,9 @@
             <a href="/agen/blocked" class="card-link">
                 <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-2">
                     <div class="card-body d-flex align-items-center">
-                        <img src="{{ asset('assets/images/new_features/request.png') }}" alt="List Block Agen" class="mr-3" style="width: 50px;">
+                        <img src="{{ asset('assets/images/new_features/block.png') }}" alt="List Block Agen" class="mr-3" style="width: 50px;">
                         <div class="flex-grow-1">
-                            <p class="text-muted mt-2 mb-0">List Block Agen</p>
+                            <p class="text-muted mt-2 mb-0">Agen Terblokir</p>
                         </div>
                         <div class="text-right">
                             <h3 class="mb-0" style="font-size: 30px; color: #0a6e44;">{{ $jumlah_blocked }}</h3>
