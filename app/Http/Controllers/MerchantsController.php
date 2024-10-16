@@ -928,9 +928,9 @@ class MerchantsController extends Controller
                 return redirect()->back()->with('error', 'Agen tidak ditemukan');
             }
 
-            $pesan = '<p>Halo ' . htmlspecialchars($user->fullname) . ',</p>';
+            $pesan = '<p>Halo ' . htmlspecialchars($merchant->name) . ',</p>';
             $pesan .= '<p>Pendaftaran Anda kami tolak karena tidak memenuhi persyaratan sebagai Agen.</p>';
-            $pesan .= '<p>Anda dapat melakukan pendaftaran kembali dengan mengunjungi cabang terdekat kami:</p>';
+            $pesan .= '<p>Anda dapat melakukan pendaftaran kembali dengan mengunjungi cabang terdekat kami.</p>';
             $pesan .= '<p>Salam Hangat,</p>';
             $pesan .= '<p><b>NTBS LAKUPANDAI</b></p>';
 
@@ -940,7 +940,7 @@ class MerchantsController extends Controller
                 'isi' => $pesan
             ];
 
-            Mail::to($user->email)->send(new sendPassword($detail_message));
+            Mail::to($merchant->email)->send(new sendPassword($detail_message));
 
             $user = User::find($merchant->user_id);
             if ($user) {
@@ -950,7 +950,7 @@ class MerchantsController extends Controller
             $merchant->delete();
 
             DB::commit();
-            return redirect()->route('agen_request')->with('message', 'Penolakan Agen berhasil');
+            return redirect()->route('agen_request')->with('success', 'Penolakan Agen berhasil');
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->route('agen_request')->with('error', 'Gagal menghapus agen: ' . $e->getMessage());

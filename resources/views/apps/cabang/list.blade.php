@@ -13,15 +13,15 @@
 @endsection
 @section('main-content')
             <div class="breadcrumb">
-                <h1>List Cabang</h1>
+                <h1>Daftar Cabang</h1>
             </div>
             <div class="separator-breadcrumb border-top"></div>
             <div class="row mb-4">
-                @if (in_array('cabang_create', $routes_user))
+                @if (in_array('branch_create', $routes_user))
                 <div class="col-lg-12 col-md-12 col-sm-12 d-flex justify-content-center mb-3">
                     <div class="input-group">
-                        <a href="{{route('cabang_create')}}">
-                            <button class="btn btn-success ripple m-1 add-new-btn" type="button">Add +</button>
+                        <a href="{{route('branch_create')}}">
+                            <button class="btn btn-success ripple m-1 add-new-btn" type="button">Tambah</button>
                         </a>
                     </div>
                 </div>
@@ -30,7 +30,7 @@
                     <div class="card text-left">
                         <div class="card-body">
                             <div class="row">
-                                <h4 class=" col-sm-12 col-md-6 card-title mb-3">List Nasabah</h4>
+                                <h4 class=" col-sm-12 col-md-6 card-title mb-3">Daftar Cabang</h4>
                             </div>
                             @if ($message = Session::get('success'))
                                 <div class="alert alert-success">
@@ -50,7 +50,7 @@
                                             <th scope="col">No</th>
                                             <th scope="col">Kode Cabang</th>
                                             <th scope="col">Nama Cabang</th>
-                                            <th scope="col">Action</th>
+                                            <th scope="col">Aksi</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -63,14 +63,17 @@
                                             <td>{{$item->branch_code}}</td>
                                             <td>{{$item->branch_name}}</td>
                                             <td>
-                                            @if (in_array('cabang_edit', $routes_user))
-                                                <a href="{{route('cabang_edit',[$item->id])}}">
-                                                    <button class="btn btn-success ripple btn-sm m-1 edit-btn" type="button">Detail</button>
-                                                </a>
-                                                <a href="{{route('cabang_edit',[$item->id])}}">
-                                                    <button class="btn btn-danger ripple btn-sm m-1 edit-btn" type="button">Hapus</button>
+                                            @if (in_array('branch_edit', $routes_user))
+                                                <a href="{{route('branch_edit',[$item->branch_id])}}">
+                                                    <button class="btn btn-success ripple btn-sm m-1 edit-btn" type="button">Edit</button>
                                                 </a>
                                             @endif
+                                            @if (in_array('branch_destroy', $routes_user))
+                                                    <form action="{{route('branch_destroy',[$item->branch_id])}}" method="POST" style="display:inline-block;" class="delete-form">
+                                                        @csrf
+                                                        <button class="btn btn-danger ripple btn-sm m-1 delete-btn" type="button" onclick="confirmDelete(this)">Hapus</button>
+                                                    </form>
+                                                @endif
                                             </td>
                                         </tr>
                                         @php
@@ -110,6 +113,14 @@
         border: none;
         color: white;
     }
-
-
+</style>
+<script>
+function confirmDelete(button) {
+            if (confirm('Apakah Anda yakin ingin menghapus cabang ini?')) {
+                button.closest('form').submit();
+            } else {
+                return false;
+            }
+        }
+        </script>
 @endsection

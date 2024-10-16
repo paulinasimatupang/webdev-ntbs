@@ -590,16 +590,55 @@ class DataCalonNasabahController extends Controller
     {
         $nasabah = DataCalonNasabah::find($id);
         if ($nasabah) {
-            $jenis_kelamin = CompOption::where('comp_id', 'CIF05')->get();
-            $agama = CompOption::where('comp_id', 'CIF06')->get();
-            $status_nikah = CompOption::where('comp_id', 'CIF07')->get();
-            $status_penduduk = CompOption::where('comp_id', 'CIF16')->get();
-            $kewarganegaraan = CompOption::where('comp_id', 'CIF17')->get();
-            $jenis_identitas = CompOption::where('comp_id', 'CIF21')->get();
-            $pendidikan_terakhir = CompOption::where('comp_id', 'CIF25')->get();
-            $kab_kota = CompOption::where('comp_id', 'CIF13')->get();
-            $provinsi = CompOption::where('comp_id', 'CIF14')->get();
-            $golongan_darah = CompOption::where('comp_id', 'CIF23')->get();
+            $jenis_kelamin = CompOption::where('comp_id', 'CIF05')
+                ->join('option_value', 'option_value.opt_id', '=', 'comp_option.opt_id')
+                ->select('comp_option.*', 'option_value.default_value')
+                ->get();
+
+            $agama = CompOption::where('comp_id', 'CIF06')
+                ->join('option_value', 'option_value.opt_id', '=', 'comp_option.opt_id')
+                ->select('comp_option.*', 'option_value.default_value')
+                ->get();
+    
+            $status_nikah = CompOption::where('comp_id', 'CIF07')
+                        ->join('option_value', 'option_value.opt_id', '=', 'comp_option.opt_id')
+                        ->select('comp_option.*', 'option_value.default_value')
+                        ->get();
+            
+            $status_penduduk = CompOption::where('comp_id', 'CIF16')
+                        ->join('option_value', 'option_value.opt_id', '=', 'comp_option.opt_id')
+                        ->select('comp_option.*', 'option_value.default_value')
+                        ->get();
+            
+            $kewarganegaraan = CompOption::where('comp_id', 'CIF17')
+                        ->join('option_value', 'option_value.opt_id', '=', 'comp_option.opt_id')
+                        ->select('comp_option.*', 'option_value.default_value')
+                        ->get();
+            
+            $jenis_identitas = CompOption::where('comp_id', 'CIF21')
+                        ->join('option_value', 'option_value.opt_id', '=', 'comp_option.opt_id')
+                        ->select('comp_option.*', 'option_value.default_value')
+                        ->get();
+            
+            $pendidikan_terakhir = CompOption::where('comp_id', 'CIF25')
+                        ->join('option_value', 'option_value.opt_id', '=', 'comp_option.opt_id')
+                        ->select('comp_option.*', 'option_value.default_value')
+                        ->get();
+            
+            $kab_kota = CompOption::where('comp_id', 'CIF13')
+                        ->join('option_value', 'option_value.opt_id', '=', 'comp_option.opt_id')
+                        ->select('comp_option.*', 'option_value.default_value')
+                        ->get();
+            
+            $provinsi = CompOption::where('comp_id', 'CIF14')
+                        ->join('option_value', 'option_value.opt_id', '=', 'comp_option.opt_id')
+                        ->select('comp_option.*', 'option_value.default_value')
+                        ->get();
+            
+            $golongan_darah = CompOption::where('comp_option.comp_id', 'CIF23')
+                        ->join('option_value', 'option_value.opt_id', '=', 'comp_option.opt_id')
+                        ->select('comp_option.*', 'option_value.default_value')
+                        ->get();                    
 
             return view('apps.calon_nasabah.detail-request')
                 ->with('nasabah', $nasabah)
@@ -622,16 +661,55 @@ class DataCalonNasabahController extends Controller
     {
         $nasabah = DataCalonNasabah::find($id);
         if ($nasabah) {
-            $jenis_kelamin = CompOption::where('comp_id', 'CIF05')->get();
-            $agama = CompOption::where('comp_id', 'CIF06')->get();
-            $status_nikah = CompOption::where('comp_id', 'CIF07')->get();
-            $status_penduduk = CompOption::where('comp_id', 'CIF16')->get();
-            $kewarganegaraan = CompOption::where('comp_id', 'CIF17')->get();
-            $jenis_identitas = CompOption::where('comp_id', 'CIF21')->get();
-            $pendidikan_terakhir = CompOption::where('comp_id', 'CIF25')->get();
-            $kab_kota = CompOption::where('comp_id', 'CIF13')->get();
-            $provinsi = CompOption::where('comp_id', 'CIF14')->get();
-            $golongan_darah = CompOption::where('comp_id', 'CIF23')->get();
+            $$jenis_kelamin = CompOption::where('comp_id', 'CIF05')
+            ->join('option_value', 'option_value.opt_id', '=', 'comp_option.opt_id')
+            ->select('comp_option.*', 'option_value.default_value')
+            ->get();
+
+        $agama = CompOption::where('comp_id', 'CIF06')
+            ->join('option_value', 'option_value.opt_id', '=', 'comp_option.opt_id')
+            ->select('comp_option.*', 'option_value.default_value')
+            ->get();
+
+        $status_nikah = CompOption::where('comp_id', 'CIF07')
+                    ->join('option_value', 'option_value.opt_id', '=', 'comp_option.opt_id')
+                    ->select('comp_option.*', 'option_value.default_value')
+                    ->get();
+        
+        $status_penduduk = CompOption::where('comp_id', 'CIF16')
+                    ->join('option_value', 'option_value.opt_id', '=', 'comp_option.opt_id')
+                    ->select('comp_option.*', 'option_value.default_value')
+                    ->get();
+        
+        $kewarganegaraan = CompOption::where('comp_id', 'CIF17')
+                    ->join('option_value', 'option_value.opt_id', '=', 'comp_option.opt_id')
+                    ->select('comp_option.*', 'option_value.default_value')
+                    ->get();
+        
+        $jenis_identitas = CompOption::where('comp_id', 'CIF21')
+                    ->join('option_value', 'option_value.opt_id', '=', 'comp_option.opt_id')
+                    ->select('comp_option.*', 'option_value.default_value')
+                    ->get();
+        
+        $pendidikan_terakhir = CompOption::where('comp_id', 'CIF25')
+                    ->join('option_value', 'option_value.opt_id', '=', 'comp_option.opt_id')
+                    ->select('comp_option.*', 'option_value.default_value')
+                    ->get();
+        
+        $kab_kota = CompOption::where('comp_id', 'CIF13')
+                    ->join('option_value', 'option_value.opt_id', '=', 'comp_option.opt_id')
+                    ->select('comp_option.*', 'option_value.default_value')
+                    ->get();
+        
+        $provinsi = CompOption::where('comp_id', 'CIF14')
+                    ->join('option_value', 'option_value.opt_id', '=', 'comp_option.opt_id')
+                    ->select('comp_option.*', 'option_value.default_value')
+                    ->get();
+        
+        $golongan_darah = CompOption::where('comp_option.comp_id', 'CIF23')
+                    ->join('option_value', 'option_value.opt_id', '=', 'comp_option.opt_id')
+                    ->select('comp_option.*', 'option_value.default_value')
+                    ->get();  
 
             return view('apps.calon_nasabah.detail-approve')
                 ->with('nasabah', $nasabah)
@@ -655,16 +733,55 @@ class DataCalonNasabahController extends Controller
     {
         $nasabah = DataCalonNasabah::find($id);
         if ($nasabah) {
-            $jenis_kelamin = CompOption::where('comp_id', 'CIF05')->get();
-            $agama = CompOption::where('comp_id', 'CIF06')->get();
-            $status_nikah = CompOption::where('comp_id', 'CIF07')->get();
-            $status_penduduk = CompOption::where('comp_id', 'CIF16')->get();
-            $kewarganegaraan = CompOption::where('comp_id', 'CIF17')->get();
-            $jenis_identitas = CompOption::where('comp_id', 'CIF21')->get();
-            $pendidikan_terakhir = CompOption::where('comp_id', 'CIF25')->get();
-            $kab_kota = CompOption::where('comp_id', 'CIF13')->get();
-            $provinsi = CompOption::where('comp_id', 'CIF14')->get();
-            $golongan_darah = CompOption::where('comp_id', 'CIF23')->get();
+            $jenis_kelamin = CompOption::where('comp_id', 'CIF05')
+                ->join('option_value', 'option_value.opt_id', '=', 'comp_option.opt_id')
+                ->select('comp_option.*', 'option_value.default_value')
+                ->get();
+
+            $agama = CompOption::where('comp_id', 'CIF06')
+                ->join('option_value', 'option_value.opt_id', '=', 'comp_option.opt_id')
+                ->select('comp_option.*', 'option_value.default_value')
+                ->get();
+    
+            $status_nikah = CompOption::where('comp_id', 'CIF07')
+                        ->join('option_value', 'option_value.opt_id', '=', 'comp_option.opt_id')
+                        ->select('comp_option.*', 'option_value.default_value')
+                        ->get();
+            
+            $status_penduduk = CompOption::where('comp_id', 'CIF16')
+                        ->join('option_value', 'option_value.opt_id', '=', 'comp_option.opt_id')
+                        ->select('comp_option.*', 'option_value.default_value')
+                        ->get();
+            
+            $kewarganegaraan = CompOption::where('comp_id', 'CIF17')
+                        ->join('option_value', 'option_value.opt_id', '=', 'comp_option.opt_id')
+                        ->select('comp_option.*', 'option_value.default_value')
+                        ->get();
+            
+            $jenis_identitas = CompOption::where('comp_id', 'CIF21')
+                        ->join('option_value', 'option_value.opt_id', '=', 'comp_option.opt_id')
+                        ->select('comp_option.*', 'option_value.default_value')
+                        ->get();
+            
+            $pendidikan_terakhir = CompOption::where('comp_id', 'CIF25')
+                        ->join('option_value', 'option_value.opt_id', '=', 'comp_option.opt_id')
+                        ->select('comp_option.*', 'option_value.default_value')
+                        ->get();
+            
+            $kab_kota = CompOption::where('comp_id', 'CIF13')
+                        ->join('option_value', 'option_value.opt_id', '=', 'comp_option.opt_id')
+                        ->select('comp_option.*', 'option_value.default_value')
+                        ->get();
+            
+            $provinsi = CompOption::where('comp_id', 'CIF14')
+                        ->join('option_value', 'option_value.opt_id', '=', 'comp_option.opt_id')
+                        ->select('comp_option.*', 'option_value.default_value')
+                        ->get();
+            
+            $golongan_darah = CompOption::where('comp_option.comp_id', 'CIF23')
+                        ->join('option_value', 'option_value.opt_id', '=', 'comp_option.opt_id')
+                        ->select('comp_option.*', 'option_value.default_value')
+                        ->get();  
 
             return view('apps.calon_nasabah.detail')
                 ->with('nasabah', $nasabah)

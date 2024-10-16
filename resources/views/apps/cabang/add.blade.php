@@ -2,7 +2,7 @@
 
 @section('main-content')
     <div class="breadcrumb">
-        <h1>Add Cabang</h1>
+        <h1>Tambah Cabang</h1>
         <!-- <ul>
             <li><a href="#">Selada</a></li>
         </ul> -->
@@ -36,9 +36,9 @@
                         <div class="form-group row">
                             <div class="col-sm-12 text-right">
                                 <a href="{{ route('branch') }}">
-                                    <button type="button" class="btn btn-danger">Back</button>
+                                    <button type="button" class="btn btn-danger">Kembali</button>
                                 </a>
-                                <button type="submit" class="btn btn-primary">Save</button>
+                                <button type="submit" class="btn btn-primary">Simpan</button>
                             </div>
                         </div>
                     </form>

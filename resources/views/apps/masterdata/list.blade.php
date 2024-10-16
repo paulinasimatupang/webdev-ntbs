@@ -51,7 +51,7 @@
                     <div class="d-flex align-items-center">
                         <img src="{{ asset('assets/images/new_features/fee.png') }}" alt="Service Meta" class="mr-3" style="width: 50px">
                         <div class="text-left">
-                            <p class="text-muted mt-2 mb-0">Fee</p>
+                            <p class="text-muted mt-2 mb-0">Fee Fitur Transaksi</p>
                         </div>
                     </div>
                 </div>
@@ -68,7 +68,7 @@
                     <div class="d-flex align-items-center">
                         <img src="{{ asset('assets/images/new_features/fee_persen.png') }}" alt="Service Meta" class="mr-3" style="width: 50px">
                         <div class="text-left">
-                            <p class="text-muted mt-2 mb-0">Persen Fee</p>
+                            <p class="text-muted mt-2 mb-0">Persentase Fee</p>
                         </div>
                     </div>
                 </div>
@@ -83,7 +83,7 @@
             <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-2">
                 <div class="card-body text-center">
                     <div class="d-flex align-items-center">
-                        <img src="{{ asset('assets/images/new_features/role.png') }}" alt="Service Meta" class="mr-3" style="width: 50px">
+                        <img src="{{ asset('assets/images/new_features/parameter.png') }}" alt="Service Meta" class="mr-3" style="width: 50px">
                         <div class="text-left">
                             <p class="text-muted mt-2 mb-0">Parameter Nilai</p>
                         </div>
@@ -102,7 +102,7 @@
                     <div class="d-flex align-items-center">
                         <img src="{{ asset('assets/images/new_features/permission.png') }}" alt="Service Meta" class="mr-3" style="width: 50px">
                         <div class="text-left">
-                            <p class="text-muted mt-2 mb-0">Role Permission</p>
+                            <p class="text-muted mt-2 mb-0">Role Akses</p>
                         </div>
                     </div>
                 </div>
@@ -119,7 +119,7 @@
                     <div class="d-flex align-items-center">
                         <img src="{{ asset('assets/images/new_features/user.png') }}" alt="Service Meta" class="mr-3" style="width: 50px">
                         <div class="text-left">
-                            <p class="text-muted mt-2 mb-0">User</p>
+                            <p class="text-muted mt-2 mb-0">User Portal</p>
                         </div>
                     </div>
                 </div>
@@ -136,7 +136,7 @@
                     <div class="d-flex align-items-center">
                         <img src="{{ asset('assets/images/new_features/branch.png') }}" alt="Service" class="mr-3" style="width: 50px">
                         <div class="text-left">
-                            <p class="text-muted mt-2 mb-0">Daftar Cabang</p>
+                            <p class="text-muted mt-2 mb-0">Cabang Bank</p>
                         </div>
                     </div>
                 </div>
@@ -151,9 +151,9 @@
             <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-2">
                 <div class="card-body text-center">
                     <div class="d-flex align-items-center">
-                        <img src="{{ asset('assets/images/new_features/user.png') }}" alt="Service Meta" class="mr-3" style="width: 50px">
+                        <img src="{{ asset('assets/images/new_features/assesment.png') }}" alt="Service Meta" class="mr-3" style="width: 50px">
                         <div class="text-left">
-                            <p class="text-muted mt-2 mb-0">Assesment</p>
+                            <p class="text-muted mt-2 mb-0">Assesment Due Diligence</p>
                         </div>
                     </div>
                 </div>

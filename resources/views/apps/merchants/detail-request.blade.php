@@ -359,13 +359,13 @@
 </script>
     <script>
         document.getElementById('approve').addEventListener('click', function() {
-            if (confirm('Apakah Anda yakin akan mengaktivasi agen ini?')) {
+            if (confirm('Apakah Anda yakin akan menerima agen ini?')) {
                 document.getElementById('formAction').value = 'activate';
                 document.getElementById('actionForm').action = "{{ route('agen_activate', ['id' => $merchant->id]) }}";
                 document.getElementById('actionForm').submit();
             }
         });document.getElementById('reject').addEventListener('click', function() {
-            if (confirm('Apakah Anda yakin akan mengaktivasi agen ini?')) {
+            if (confirm('Apakah Anda yakin akan menolak agen ini?')) {
                 document.getElementById('formAction').value = 'reject';
                 document.getElementById('actionForm').action = "{{ route('agen_reject', ['id' => $merchant->id]) }}";
                 document.getElementById('actionForm').submit();

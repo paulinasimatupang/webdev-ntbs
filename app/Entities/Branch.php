@@ -18,14 +18,13 @@ class Branch extends Model implements Transformable, Auditable
     use \OwenIt\Auditing\Auditable;
     protected $connection = 'pgsql_billiton';
     protected $table = 'branch';
+    protected $primaryKey = 'branch_id';
+
     public $incrementing = false;
     public $timestamps = false;
 
     protected $fillable = [
         'branch_code',
-        'branch_name',
-        'address',
-        'city',
-        'office_type'
+        'branch_name'
     ];
 }

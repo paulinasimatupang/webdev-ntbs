@@ -66,7 +66,7 @@
                         <div class="col-sm-10">
                             <p class="form-control-static">
                                 @foreach($jenis_kelamin as $option)
-                                    @if($nasabah->jenis_kelamin == $option->seq)
+                                    @if($nasabah->jenis_kelamin == $option->default_value)
                                         {{ $option->opt_label }}
                                     @endif
                                 @endforeach
@@ -79,7 +79,7 @@
                         <div class="col-sm-10">
                             <p class="form-control-static">
                                 @foreach($agama as $option)
-                                    @if($nasabah->agama == $option->seq)
+                                    @if($nasabah->agama == $option->default_value)
                                         {{ $option->opt_label }}
                                     @endif
                                 @endforeach
@@ -131,7 +131,7 @@
                                 @endphp
                                 
                                 @foreach($kab_kota as $option)
-                                    @if($nasabah->kab_kota == $option->seq)
+                                    @if($nasabah->kab_kota == $option->default_value)
                                         {{ $option->opt_label }}
                                         @php
                                             $labelFound = true;
@@ -151,7 +151,7 @@
                         <div class="col-sm-10">
                             <p class="form-control-static">
                                 @foreach($provinsi as $option)
-                                    @if($nasabah->provinsi == $option->seq)
+                                    @if($nasabah->provinsi == $option->default_value)
                                         {{ $option->opt_label }}
                                     @endif
                                 @endforeach
@@ -185,7 +185,7 @@
                         <div class="col-sm-10">
                             <p class="form-control-static">
                                 @foreach($status_penduduk as $option)
-                                    @if($nasabah->status_penduduk == $option->seq)
+                                    @if($nasabah->status_penduduk == $option->default_value)
                                         {{ $option->opt_label }}
                                     @endif
                                 @endforeach
@@ -198,7 +198,7 @@
                         <div class="col-sm-10">
                             <p class="form-control-static">
                                 @foreach($kewarganegaraan as $option)
-                                    @if($nasabah->kewarganegaraan == $option->seq)
+                                @if($nasabah->kewarganegaraan == $option->default_value)
                                         {{ $option->opt_label }}
                                     @endif
                                 @endforeach
@@ -218,7 +218,7 @@
                         <div class="col-sm-10">
                             <p class="form-control-static">
                                 @foreach($jenis_identitas as $option)
-                                    @if($nasabah->jenis_identitas == $option->seq)
+                                    @if($nasabah->jenis_identitas == $option->default_value)
                                         {{ $option->opt_label }}
                                     @endif
                                 @endforeach
@@ -251,7 +251,7 @@
                         <div class="col-sm-10">
                             <p class="form-control-static">
                                 @foreach($pendidikan_terakhir as $option)
-                                    @if($nasabah->pendidikan_terakhir == $option->seq)
+                                @if($nasabah->pendidikan_terakhir == $option->default_value)
                                         {{ $option->opt_label }}
                                     @endif
                                 @endforeach
