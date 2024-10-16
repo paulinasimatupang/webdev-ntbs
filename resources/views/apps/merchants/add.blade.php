@@ -282,7 +282,7 @@
                         <div class="form-group row">
                                 <label class="col-sm-2 col-form-label" for="file_ktp">Upload KTP</label>
                                 <div class="col-sm-10">
-                                    <input type="file" class="form-control @error('file_ktp') is-invalid @enderror" name="file_ktp" id="file_ktp">
+                                    <input type="file" class="form-control @error('file_ktp') is-invalid @enderror" name="file_ktp" id="file_ktp" required>
                                     <div class="invalid-feedback"></div>
                                 </div>
                             </div>
@@ -290,7 +290,7 @@
                             <div class="form-group row">
                                 <label class="col-sm-2 col-form-label" for="file_npwp">Upload NPWP</label>
                                 <div class="col-sm-10">
-                                    <input type="file" class="form-control @error('file_npwp') is-invalid @enderror" name="file_npwp" id="file_npwp">
+                                    <input type="file" class="form-control @error('file_npwp') is-invalid @enderror" name="file_npwp" id="file_npwp" required>
                                     <div class="invalid-feedback"></div>
                                 </div>
                             </div>
@@ -298,7 +298,7 @@
                             <div class="form-group row">
                                 <label class="col-sm-2 col-form-label" for="foto_lokasi_usaha">Upload Foto Lokasi Usaha</label>
                                 <div class="col-sm-10">
-                                    <input type="file" class="form-control @error('foto_lokasi_usaha') is-invalid @enderror" name="foto_lokasi_usaha" id="foto_lokasi_usaha">
+                                    <input type="file" class="form-control @error('foto_lokasi_usaha') is-invalid @enderror" name="foto_lokasi_usaha" id="foto_lokasi_usaha" required>
                                     <div class="invalid-feedback"></div>
                                 </div>
                             </div>
@@ -499,7 +499,7 @@
         });
 
         document.getElementById('nextBtn2').addEventListener('click', function () {
-            if (!validateForm()) {
+            if (!validateForm(2)) {
                 return;
             }
             document.getElementById('step1').style.display = 'none';
@@ -511,8 +511,9 @@
         });
 
         document.getElementById('saveBtn').addEventListener('click', function(event) {
-            event.preventDefault();
-            if (validateForm()) {
+            if (!validateForm(3)) {
+                event.preventDefault();
+            } else {
                 document.querySelector('form').submit();
             }
         });
@@ -541,24 +542,30 @@
         });
 
 
-        function validateForm() {
+        function validateForm(step) {
             let isValid = true;
-            const errorElements = document.querySelectorAll('.invalid-feedback');
-            errorElements.forEach(el => el.textContent = '');
-            
-            const inputs = document.querySelectorAll('.form-control, .form-check-input');
-            inputs.forEach(input => input.classList.remove('is-invalid'));
 
-            const inputFile = document.getElementsByName('fileInput')[0];
-            if (inputFile && inputFile.files.length === 0) {
+            document.querySelectorAll('.invalid-feedback').forEach(el => el.textContent = '');
+            document.querySelectorAll('.form-control, .form-check-input').forEach(input => input.classList.remove('is-invalid'));
+            if (step === 3) {
+        // Validasi upload file
+        const fileInputs = [
+            document.getElementById('file_ktp'),
+            document.getElementById('file_npwp'),
+            document.getElementById('foto_lokasi_usaha')
+        ];
+
+        fileInputs.forEach(input => {
+            if (!input.files.length) {
                 isValid = false;
-                inputFile.classList.add('is-invalid');
-                const feedbackElement = inputFile.closest('.form-group').querySelector('.invalid-feedback');
+                input.classList.add('is-invalid');
+                const feedbackElement = input.closest('.form-group').querySelector('.invalid-feedback');
                 if (feedbackElement) {
                     feedbackElement.textContent = 'File harus diunggah.';
                 }
             }
-
+        });
+    }
             Object.keys(validationRules).forEach(field => {
                 const rules = validationRules[field];
                 const label = customFields[field];
@@ -575,33 +582,18 @@
                         }
                     }
                 }
-                
-                if (rules.required) {
-                    const isInputEmpty = Array.from(input).every(i => i.type === 'radio' ? !i.checked : !i.value.trim());
-                    if (isInputEmpty) {
+
+                if (input[0] && input[0].type !== 'radio' && input[0].type !== 'file') {
+                    const inputValue = input[0].value.trim();
+                    if (rules.required && !inputValue) {
                         isValid = false;
-                        Array.from(input).forEach(i => i.classList.add('is-invalid'));
+                        input[0].classList.add('is-invalid');
                         const feedbackElement = input[0].closest('.form-group').querySelector('.invalid-feedback');
                         if (feedbackElement) {
                             feedbackElement.textContent = `${label} harus diisi.`;
                         }
                     }
-                }
 
-                if (rules.radio) {
-                    const isChecked = Array.from(input).some(rb => rb.checked);
-                    if (rules.required && !isChecked) {
-                        isValid = false;
-                        input[0].classList.add('is-invalid');
-                        const feedbackElement = input[0].closest('.form-group').querySelector('.invalid-feedback');
-                        if (feedbackElement) {
-                            feedbackElement.textContent = `${label} harus dipilih.`;
-                        }
-                    }
-                }
-
-                if (input[0] && input[0].type !== 'radio') {
-                    const inputValue = input[0].value;
                     if (rules.min && inputValue.length < rules.min) {
                         isValid = false;
                         input[0].classList.add('is-invalid');
@@ -630,9 +622,9 @@
                     }
                 }
             });
-
             return isValid;
         }
+
         
         function updateScore() {
             let totalPoints = 0;
