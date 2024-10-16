@@ -36,7 +36,7 @@
     }
 </style>
     <body>
-        <div class="auth-layout-wrap align-items-md-end" style="background-image: url({{asset('assets/images/icon_bintang/bg-ntbs.png')}})">
+        <div class="auth-layout-wrap align-items-md-end mr-10" style="background-image: url({{asset('assets/images/icon_bintang/bg-ntbs.png')}})">
             <div class="auth-content width_signin m-0">
                 <div style=" border-radius: 0px;" class="card o-hidden h-100vh border_radius_0 justify-content-center">
                     <div class="row">
@@ -53,7 +53,7 @@
                                         </button>
                                     </div>
                                 @endif
-                                <h1 class="mb-3 text-18">Sign In</h1>
+                                <!-- <h1 class="mb-3 text-18">Sign In</h1> -->
                                 <form method="POST" action="{{ route('login') }}">
                                     @csrf
                                     <div class="form-group">
@@ -92,7 +92,7 @@
                                         </div>
                                     </div> -->
 
-                                    <button class="btn btn-rounded btn-warning btn_selada btn-block mt-4 mb-3 p-2">Sign In</button>
+                                    <button class="btn btn-rounded btn-warning btn_selada btn-block mt-4 mb-3 p-2">Masuk</button>
 
 
                                 </form>

@@ -548,24 +548,23 @@
             document.querySelectorAll('.invalid-feedback').forEach(el => el.textContent = '');
             document.querySelectorAll('.form-control, .form-check-input').forEach(input => input.classList.remove('is-invalid'));
             if (step === 3) {
-        // Validasi upload file
-        const fileInputs = [
-            document.getElementById('file_ktp'),
-            document.getElementById('file_npwp'),
-            document.getElementById('foto_lokasi_usaha')
-        ];
+                const fileInputs = [
+                    document.getElementById('file_ktp'),
+                    document.getElementById('file_npwp'),
+                    document.getElementById('foto_lokasi_usaha')
+                ];
 
-        fileInputs.forEach(input => {
-            if (!input.files.length) {
-                isValid = false;
-                input.classList.add('is-invalid');
-                const feedbackElement = input.closest('.form-group').querySelector('.invalid-feedback');
-                if (feedbackElement) {
-                    feedbackElement.textContent = 'File harus diunggah.';
-                }
+                fileInputs.forEach(input => {
+                    if (!input.files.length) {
+                        isValid = false;
+                        input.classList.add('is-invalid');
+                        const feedbackElement = input.closest('.form-group').querySelector('.invalid-feedback');
+                        if (feedbackElement) {
+                            feedbackElement.textContent = 'File harus diunggah.';
+                        }
+                    }
+                });
             }
-        });
-    }
             Object.keys(validationRules).forEach(field => {
                 const rules = validationRules[field];
                 const label = customFields[field];
