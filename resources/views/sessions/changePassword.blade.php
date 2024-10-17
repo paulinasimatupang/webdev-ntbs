@@ -27,9 +27,9 @@
 
                         <!-- Password Lama dengan Ikon Mata -->
                         <div class="form-group row">
-                            <label class="col-sm-2 col-form-label">Password Lama</label>
+                            <label class="col-sm-2 col-form-label">Password Saat Ini</label>
                             <div class="col-sm-10 input-group">
-                                <input type="password" class="form-control @error('current_password') is-invalid @enderror" id="current_password" name="current_password" placeholder="Masukkan password lama" value="{{ old('current_password') }}">
+                                <input type="password" class="form-control @error('current_password') is-invalid @enderror" id="current_password" name="current_password" placeholder="Masukkan password saat ini" value="{{ old('current_password') }}">
                                 <div class="input-group-append">
                                     <span class="input-group-text" onclick="togglePassword('current_password', 'current_password_eye')">
                                         <i class="fa fa-eye-slash" id="current_password_eye"></i>
