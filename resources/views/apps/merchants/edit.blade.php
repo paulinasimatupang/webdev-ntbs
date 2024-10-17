@@ -1,7 +1,7 @@
 @extends('layouts.master')
 @section('main-content')
 <div class="breadcrumb">
-    <h1>Edit Agen</h1>
+    <h1>Detail Agen</h1>
     <!-- <ul>
         <li><a href="">Selada</a></li>
     </ul> -->
@@ -292,6 +292,20 @@
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
     <script>
+        var latitude = {{ $merchant->latitude }};
+        var longitude = {{ $merchant->longitude }};
+
+        var map = L.map('map').setView([latitude, longitude], 13);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        L.marker([latitude, longitude]).addTo(map)
+            .bindPopup('Agen')
+            .openPopup();
+    </script>
+    <script>
         document.getElementById('activate').addEventListener('click', function() {
             if (confirm('Apakah Anda yakin akan mengaktifkan agen ini?')) {
                 document.getElementById('formAction').value = 'activate';
@@ -304,66 +318,6 @@
                 document.getElementById('actionForm').action = "{{ route('agen_deactivate', ['id' => $merchant->id]) }}";
                 document.getElementById('actionForm').submit();
             }
-        });
-        document.addEventListener('DOMContentLoaded', function() {
-            var map = L.map('map', {
-                center: [-2.5489, 118.0149],
-                zoom: 8,
-                minZoom: 5,
-                maxBounds: [
-                    [-11.0, 94.0], 
-                    [6.0, 141.0] 
-                ],
-                maxBoundsViscosity: 1.0
-            });
-
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 19,
-                attribution: '© OpenStreetMap contributors'
-            }).addTo(map);
-
-            var marker;
-
-            var geocoder = L.Control.geocoder({
-                defaultMarkGeocode: false,
-                placeholder: 'Cari lokasi...',
-                errorMessage: 'Tidak ditemukan.',
-                suggestMinLength: 3,
-                suggestTimeout: 250,
-                queryMinLength: 1
-            })
-            .on('markgeocode', function(e) {
-                var latlng = e.geocode.center;
-                setMarkerAndView(latlng);
-            })
-            .addTo(map);
-
-            function setMarkerAndView(latlng) {
-                if (marker) {
-                    map.removeLayer(marker);
-                }
-                marker = L.marker(latlng).addTo(map);
-                map.setView(latlng, 14);
-                
-                document.getElementById('latitude').value = latlng.lat.toFixed(6);
-                document.getElementById('longitude').value = latlng.lng.toFixed(6);
-            }
-
-            map.on('click', function(e) {
-                setMarkerAndView(e.latlng);
-            });
-
-            setTimeout(function() {
-                map.invalidateSize();
-            }, 100);
-
-            document.addEventListener('visibilitychange', function() {
-                if (!document.hidden) {
-                    setTimeout(function() {
-                        map.invalidateSize();
-                    }, 100);
-                }
-            });
         });
     </script>
 @endsection

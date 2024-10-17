@@ -661,7 +661,7 @@ class DataCalonNasabahController extends Controller
     {
         $nasabah = DataCalonNasabah::find($id);
         if ($nasabah) {
-            $$jenis_kelamin = CompOption::where('comp_id', 'CIF05')
+            $jenis_kelamin = CompOption::where('comp_id', 'CIF05')
             ->join('option_value', 'option_value.opt_id', '=', 'comp_option.opt_id')
             ->select('comp_option.*', 'option_value.default_value')
             ->get();
