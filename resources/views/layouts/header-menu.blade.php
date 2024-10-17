@@ -30,6 +30,9 @@
                         <div class="dropdown-header" style="font-size: 16px; line-height: 1.5;">
                             {{ Auth::user()->fullname }}
                         </div>
+                        <a class="dropdown-item" href="{{ route('change_password') }}" style="font-size: 16px; line-height: 1.5;">
+                            Ganti Password
+                        </a>
                         <a class="dropdown-item" href="{{ route('logout') }}" style="font-size: 16px; line-height: 1.5;">
                             Logout
                         </a>

@@ -70,9 +70,16 @@
                                     </div>
                                     <div class="form-group">
                                         <label for="password">Password</label>
-                                        <input id="password" type="password"
-                                            class="form-control form-control-rounded @error('password') is-invalid @enderror"
-                                            name="password" autocomplete="current-password">
+                                        <div class="input-group">
+                                            <input id="password" type="password"
+                                                class="form-control form-control-rounded @error('password') is-invalid @enderror"
+                                                name="password" autocomplete="current-password">
+                                            <div class="input-group-append">
+                                                <span class="input-group-text" id="togglePassword" style="cursor: pointer;">
+                                                    <i class="fa fa-eye-slash" id="eyeIcon"></i>
+                                                </span>
+                                            </div>
+                                        </div>
                                         @error('password')
                                         <span class="invalid-feedback" role="alert">
                                             <strong>{{ $message }}</strong>
@@ -114,5 +121,22 @@
         <script src="{{asset('assets/js/common-bundle-script.js')}}"></script>
         <script src="{{asset('assets/js/script.js')}}"></script>
     </body>
-
 </html>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<script>
+    document.getElementById('togglePassword').addEventListener('click', function () {
+        const passwordInput = document.getElementById('password');
+        const eyeIcon = document.getElementById('eyeIcon');
+
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            eyeIcon.classList.add('fa-eye');
+            eyeIcon.classList.remove('fa-eye-slash');
+        } else {
+            passwordInput.type = 'password';
+            eyeIcon.classList.add('fa-eye-slash');
+            eyeIcon.classList.remove('fa-eye');
+        }
+    });
+</script>
+

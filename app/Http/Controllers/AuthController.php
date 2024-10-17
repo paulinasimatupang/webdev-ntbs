@@ -257,7 +257,7 @@ class AuthController extends Controller
                     ], 401);
                 } else {
                     return Redirect::to('login')
-                        ->with('error', 'Incorrect password.')
+                        ->with('error', 'Password Salah')
                         ->withInput();
                 }
             }
@@ -416,6 +416,61 @@ class AuthController extends Controller
             ];
             return response()->json($response, 500);
         }
+    }
+
+    public function change_password(Request $request)
+    {
+        $user = $request->session()->get('user');
+        if ($user) {
+            return view('sessions.changePassword');
+        } else {
+            return view('sessions.signIn');
+        }
+    }
+
+    public function storeChangePassword(Request $request)
+    {
+        $rules = [
+            'current_password' => 'required', 
+            'new_password' => [
+                'required',
+                'min:8',
+                'max:8',
+                'confirmed',
+                'regex:/[a-z]/',
+                'regex:/[A-Z]/',
+                'regex:/[0-9]/',
+            ],
+            'new_password_confirmation' => 'required',
+        ];
+
+        $messages = [
+            'current_password.required' => 'Password saat ini harus diisi.',
+            'new_password.required' => 'Password baru harus diisi.',
+            'new_password.min' => 'Password harus 8 karakter dan terdiri dari huruf kapital, huruf kecil, serta angka.',
+            'new_password.max' => 'Password harus 8 karakter dan terdiri dari huruf kapital, huruf kecil, serta angka.',
+            'new_password.regex' => 'Password harus minimal 8 karakter dan terdiri dari huruf kapital, huruf kecil, serta angka.',
+            'new_password.confirmed' => 'Konfirmasi password baru tidak cocok.',
+            'new_password_confirmation.required' => 'Konfirmasi Password baru harus diisi.',
+        ];
+
+        $validator = Validator::make($request->all(), $rules, $messages);
+        if ($validator->fails()) {
+            return redirect('change_password')
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        $user = Auth::user();
+
+        if (!Hash::check($request->current_password, $user->password)) {
+            return back()->with('error', 'Password lama tidak cocok.');
+        }
+
+        $user->password = bcrypt($request->new_password);
+        $user->save();
+
+        return redirect()->back()->with('success', 'Password berhasil diubah.');
     }
 
     public function changePin(Request $request)

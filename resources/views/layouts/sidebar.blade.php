@@ -138,14 +138,14 @@
                             </a>
                         </li>
             @endif
-            <!-- <li class="nav-item {{ request()->is('extrakits/*') ? 'active' : '' }}">
+            <li class="nav-item {{ request()->is('extrakits/*') ? 'active' : '' }}">
                 <a class="nav-item-hold" href="{{route('dashboard_version_11')}}">
 
                     <img class="img_bintang_sidebar" src="{{asset('/assets/images/sidebar_icon/version.png')}}" alt="">
                     <span class="nav-text">Version</span>
                 </a>
                 <div class="triangle"></div>
-            </li> -->
+            </li>
 
         </ul>
     </div>

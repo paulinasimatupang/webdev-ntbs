@@ -166,6 +166,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/home', 'HomeController@index')->name('home');
 
     Route::get('/users/menu', 'UserController@menu')->name('users.menu');
+    
+    Route::get('/change_password', 'AuthController@change_password')->name('change_password');
+    Route::post('/change_password/store', 'AuthController@storeChangePassword')->name('change_password_store');
 });
 
 Route::group(['middleware' => ['auth', 'check.permission']], function () {
