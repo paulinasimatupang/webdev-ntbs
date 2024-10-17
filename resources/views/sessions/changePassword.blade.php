@@ -82,7 +82,7 @@
                         <!-- Tombol Simpan -->
                         <div class="form-group row">
                             <div class="col-sm-12 text-right">
-                                <a href="{{ route('branch') }}">
+                                <a href="{{ route('landing') }}">
                                     <button type="button" class="btn btn-danger">Kembali</button>
                                 </a>
                                 <button type="submit" class="btn btn-primary">Simpan</button>
