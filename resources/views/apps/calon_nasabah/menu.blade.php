@@ -59,7 +59,7 @@
                     <div class="card-body d-flex align-items-center">
                         <img src="{{ asset('assets/images/new_features/request.png') }}" alt="Request Nasabah" class="mr-3" style="width: 50px;">
                         <div class="flex-grow-1">
-                            <p class="text-muted mt-2 mb-0">Permintaan Pembukaan Rekening BSA</p>
+                            <p class="text-muted mt-2 mb-0">Permintaan Pembukaan Rekening BSA Tahap 1</p>
                         </div>
                         <div class="text-right">
                             <h3 class="mb-0" style="font-size: 30px; color: #0a6e44;">{{ $jumlah_request }}</h3>
@@ -77,7 +77,7 @@
                     <div class="card-body d-flex align-items-center">
                         <img src="{{ asset('assets/images/new_features/request.png') }}" alt="Request Nasabah" class="mr-3" style="width: 50px;">
                         <div class="flex-grow-1">
-                            <p class="text-muted mt-2 mb-0">Permintaan Pembukaan Rekening BSA</p>
+                            <p class="text-muted mt-2 mb-0">Permintaan Pembukaan Rekening BSA Tahap 2</p>
                         </div>
                         <div class="text-right">
                             <h3 class="mb-0" style="font-size: 30px; color: #0a6e44;">{{ $jumlah_approve }}</h3>

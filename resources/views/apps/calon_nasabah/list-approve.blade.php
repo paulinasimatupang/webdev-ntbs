@@ -13,7 +13,7 @@
 @endsection
 @section('main-content')
             <div class="breadcrumb">
-                <h1>Permintaan Pembukaan Nasabah Rekening BSA</h1>
+                <h1>Permintaan Pembukaan Nasabah Rekening BSA Tahap 2</h1>
             </div>
             <div class="separator-breadcrumb border-top"></div>
             <div class="row mb-4">

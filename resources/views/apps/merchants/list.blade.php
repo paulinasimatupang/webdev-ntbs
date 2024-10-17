@@ -66,7 +66,7 @@
                                             <th scope="col">Status Agen</th>
                                             <th scope="col">Tanggal Aktif</th>
                                             <th scope="col">Tanggal Nonaktif</th>
-                                            <th scope="col" {{ session()->get('user')->role_id == 2 ? 'id=b1' : '' }}>Action</th>
+                                            <th scope="col" {{ session()->get('user')->role_id == 2 ? 'id=b1' : '' }}>Aksi</th>
                                         </tr>
                                     </thead>
                                     <tbody>

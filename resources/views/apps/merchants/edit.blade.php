@@ -1,7 +1,7 @@
 @extends('layouts.master')
 @section('main-content')
 <div class="breadcrumb">
-    <h1>Edit Merchant</h1>
+    <h1>Edit Agen</h1>
     <!-- <ul>
         <li><a href="">Selada</a></li>
     </ul> -->
