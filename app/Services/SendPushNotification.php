@@ -20,8 +20,8 @@ class SendPushNotification
 
             Log::info('Sending notification to FCM token: ' . $fcmToken);
 
-            // Path to the Firebase Service Account JSON file
-            $serviceAccountFile = storage_path('firebase/ntbs-lakupa-firebase-adminsdk-w89ha-b54092da9b.json');
+            // Path to the new Firebase Service Account JSON file
+            $serviceAccountFile = storage_path('firebase/mobilelakupandaintbs-firebase-adminsdk-cxmgx-2c621fa513.json');
 
             // Initialize Google Client
             $client = new Google_Client();
@@ -60,8 +60,8 @@ class SendPushNotification
 
             Log::info('Sending Message: ' . json_encode($message));
 
-            // Send POST request to FCM API
-            $response = $httpClient->post('v1/projects/ntbs-lakupa/messages:send', [
+            // Send POST request to FCM API with the new project ID
+            $response = $httpClient->post('v1/projects/mobilelakupandaintbs/messages:send', [
                 'json' => $message,
             ]);
 
