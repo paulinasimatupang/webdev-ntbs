@@ -20,10 +20,10 @@
 
                     <div class="form-group">
                         <label for="meta_default">Nominal</label>
-                        <input type="number" class="form-control" id="meta_default" name="meta_default" value="{{ old('meta_default', $group->meta_default) }}">
+                        <input type="number" class="form-control" id="meta_default" name="meta_default" value="{{ old('meta_default', $group->meta_default) }}" placeholder="Nominal">
                     </div>
-                    <a href="{{ route('fee') }}" class="btn btn-secondary">Cancel</a>
-                    <button type="submit" class="btn btn-primary">Update</button>
+                    <a href="{{ route('fee') }}" class="btn btn-secondary">Kembali</a>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
                 </form>
             </div>
         </div>

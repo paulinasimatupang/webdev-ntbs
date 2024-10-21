@@ -23,7 +23,7 @@
                     <div class="card text-left">
                         <div class="card-body">
                             <div class="row">
-                                <h4 class=" col-sm-12 col-md-6 card-title mb-3">List Pengaduan</h4>
+                                <h4 class=" col-sm-12 col-md-6 card-title mb-3">Daftar Pengaduan</h4>
                             </div>
                             @if ($message = Session::get('success'))
                                 <div class="alert alert-success">
@@ -46,7 +46,7 @@
                                             <th scope="col">Judul</th>
                                             <th scope="col">Request Time</th>
                                             <th scope="col">Reply Time</th>
-                                            <th scope="col">Action</th>
+                                            <th scope="col">Aksi</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -64,7 +64,7 @@
                                             <td>
                                                 @if (in_array('pengaduan_detail_resolved', $routes_user))
                                                     <a href="{{route('pengaduan_detail_resolved',[$item->id])}}">
-                                                        <button class="btn btn-warning ripple btn-sm m-1 edit-btn" type="button">Detail</button>
+                                                        <button class="btn btn-primary ripple btn-sm m-1 edit-btn" type="button">Detail</button>
                                                     </a>
                                                 @endif
                                             </td>
@@ -94,18 +94,5 @@
 @endsection
 @section('bottom-js')
 <script src="{{asset('assets/js/form.basic.script.js')}}"></script>
-<style>
-    .add-new-btn {
-        background-color: #0a6e44;
-        border: none;
-        color: white;
-    }
-
-    .edit-btn {
-        background-color: #0182bd;
-        border: none;
-        color: white;
-    }
-
 
 @endsection

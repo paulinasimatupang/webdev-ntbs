@@ -22,7 +22,7 @@
         <div class="col-lg-12 col-md-12 col-sm-12 d-flex justify-content-center mb-3">
             <div class="input-group">
                 <a href="{{ route('persen_fee_create') }}">
-                    <button class="btn btn-warning ripple m-1 add-new-btn" type="button">Tambah</button>
+                    <button class="btn btn-success ripple m-1 add-new-btn" type="button">Tambah</button>
                 </a>
             </div>
         </div>
@@ -67,7 +67,7 @@
                                     <td>
                                         @if (in_array('persen_fee_edit', $routes_user))
                                             <a href="{{ route('persen_fee_edit', $persenFee->id) }}">
-                                                <button class="btn btn-edit ripple btn-sm m-1" type="button">Edit</button>
+                                                <button class="btn btn-primary ripple btn-sm m-1" type="button">Edit</button>
                                             </a>
                                         @endif
                                         @if (in_array('persen_fee_destroy', $routes_user))
@@ -119,23 +119,4 @@
         }
     }
 </script>
-<style>
-    .add-new-btn {
-        background-color: #0a6e44;
-        border: none;
-        color: white;
-    }
-
-    .btn-edit {
-        background-color: #0182bd;
-        border: none;
-        color: white;
-    }
-
-    .btn-danger {
-        background-color: #dc3545;
-        border: none;
-        color: white;
-    }
-</style>
 @endsection

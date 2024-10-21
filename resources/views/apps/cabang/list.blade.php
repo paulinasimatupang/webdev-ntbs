@@ -65,7 +65,7 @@
                                             <td>
                                             @if (in_array('branch_edit', $routes_user))
                                                 <a href="{{route('branch_edit',[$item->branch_id])}}">
-                                                    <button class="btn btn-success ripple btn-sm m-1 edit-btn" type="button">Edit</button>
+                                                    <button class="btn btn-primary ripple btn-sm m-1 edit-btn" type="button">Edit</button>
                                                 </a>
                                             @endif
                                             @if (in_array('branch_destroy', $routes_user))
@@ -73,7 +73,7 @@
                                                         @csrf
                                                         <button class="btn btn-danger ripple btn-sm m-1 delete-btn" type="button" onclick="confirmDelete(this)">Hapus</button>
                                                     </form>
-                                                @endif
+                                            @endif
                                             </td>
                                         </tr>
                                         @php
@@ -101,19 +101,6 @@
 @endsection
 @section('bottom-js')
 <script src="{{asset('assets/js/form.basic.script.js')}}"></script>
-<style>
-    .add-new-btn {
-        background-color: #0a6e44;
-        border: none;
-        color: white;
-    }
-
-    .edit-btn {
-        background-color: #0182bd;
-        border: none;
-        color: white;
-    }
-</style>
 <script>
 function confirmDelete(button) {
             if (confirm('Apakah Anda yakin ingin menghapus cabang ini?')) {

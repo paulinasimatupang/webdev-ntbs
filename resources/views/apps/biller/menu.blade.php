@@ -57,7 +57,7 @@
             <a href="/parameter" class="card-link">
                 <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-2">
                     <div class="card-body d-flex align-items-center">
-                        <img src="{{ asset('assets/images/new_features/request.png') }}" alt="Request Nasabah" class="mr-3" style="width: 50px;">
+                        <img src="{{ asset('assets/images/new_features/card.png') }}" alt="Request Nasabah" class="mr-3" style="width: 50px;">
                         <div class="flex-grow-1">
                             <p class="text-muted mt-2 mb-0">Rekening Penampung</p>
                         </div>
@@ -72,7 +72,7 @@
             <a href="/sub-produk" class="card-link">
                 <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-2">
                     <div class="card-body d-flex align-items-center">
-                        <img src="{{ asset('assets/images/new_features/request.png') }}" alt="Request Nasabah" class="mr-3" style="width: 50px;">
+                        <img src="{{ asset('assets/images/new_features/sub-produk.png') }}" alt="Request Nasabah" class="mr-3" style="width: 50px;">
                         <div class="flex-grow-1">
                             <p class="text-muted mt-2 mb-0">Sub Produk Biller</p>
                         </div>
@@ -88,7 +88,7 @@
                 <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-2">
                     <div class="card-body text-center">
                         <div class="d-flex align-items-center">
-                            <img src="{{ asset('assets/images/new_features/list.png') }}" alt="Total Transaction"
+                            <img src="{{ asset('assets/images/new_features/produk.png') }}" alt="Total Transaction"
                                 class="mr-3" style="width: 50px">
                             <div class="text-left">
                                 <p class="text-muted mt-2 mb-0">Produk Biller</p>

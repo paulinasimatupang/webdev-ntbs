@@ -13,9 +13,7 @@
 
 @section('main-content')
             <div class="breadcrumb">
-                <h1>Permintaan Agen</h1>
-                <!-- <ul>
-                    <li><a href="">Selada</a></li> -->
+                <h1>Permintaan Pendaftaran Agen</h1>
             </div>
             <div class="separator-breadcrumb border-top"></div>
             <div class="row mb-4">
@@ -23,7 +21,7 @@
                     <div class="card text-left">
                         <div class="card-body">
                             <div class="row">
-                                <h4 class=" col-sm-12 col-md-6 card-title mb-3">Daftar Permintaan Agen</h4>
+                                <h4 class=" col-sm-12 col-md-6 card-title mb-3">Daftar Calon Agen</h4>
                             </div>
                             @if ($message = Session::get('success'))
                                 <div class="alert alert-success">
@@ -43,7 +41,7 @@
                                             <th scope="col">No</th>
                                             <th scope="col">Nomor Rekening</th>
                                             <th scope="col">Nama</th>
-                                            <th scope="col">Detail</th>
+                                            <th scope="col">Aksi</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -58,7 +56,7 @@
                                             <td>
                                                 @if (in_array('agen_request_detail', $routes_user))
                                                     <a href="{{route('agen_request_detail',[$item->id])}}">
-                                                        <button class="btn btn-warning ripple btn-sm m-1 edit-btn" type="button">Detail</button>
+                                                        <button class="btn btn-primary ripple btn-sm m-1 edit-btn" type="button">Detail</button>
                                                     </a>
                                                 @endif
                                             </td>
@@ -88,18 +86,4 @@
 @endsection
 @section('bottom-js')
 <script src="{{asset('assets/js/form.basic.script.js')}}"></script>
-<style>
-    .add-new-btn {
-        background-color: #0a6e44;
-        border: none;
-        color: white;
-    }
-
-    .edit-btn {
-        background-color: #0182bd;
-        border: none;
-        color: white;
-    }
-
-
 @endsection

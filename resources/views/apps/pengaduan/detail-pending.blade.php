@@ -48,13 +48,13 @@
                     </div>
 
                     <div class="col-sm-12 d-flex justify-content-end">
-                        <a href="{{ route('pengaduan_pending') }}" class="btn btn-primary mr-2">Back</a>
+                        <a href="{{ route('pengaduan_pending') }}" class="btn btn-secondary mr-2">Kembali</a>
                         <form id="actionForm" method="POST" class="d-inline">
                             @csrf
                             <input type="hidden" name="data_id" value="{{ $data->id }}">
                             <input type="hidden" name="action" id="formAction">
                             <button type="button" id="approve" class="btn btn-success">
-                                Process
+                                Proses
                             </button>
                         </form>
                     </div>

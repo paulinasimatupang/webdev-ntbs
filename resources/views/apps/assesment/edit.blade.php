@@ -40,8 +40,8 @@
 
                         <div class="form-group row">
                             <div class="col-sm-12 text-right">
-                                <a href="{{ route('assesment') }}" class="btn btn-secondary">Back</a>
-                                <button type="submit" class="btn btn-primary">Save</button>
+                                <a href="{{ route('assesment') }}" class="btn btn-secondary">Kembali</a>
+                                <button type="submit" class="btn btn-primary">Simpan</button>
                             </div>
                         </div>
                     </form>

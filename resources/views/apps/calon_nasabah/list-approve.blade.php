@@ -13,7 +13,7 @@
 @endsection
 @section('main-content')
             <div class="breadcrumb">
-                <h1>Permintaan Pembukaan Nasabah Rekening BSA Tahap 2</h1>
+                <h1>Permintaan Pembukaan Rekening BSA Tahap 2</h1>
             </div>
             <div class="separator-breadcrumb border-top"></div>
             <div class="row mb-4">
@@ -92,17 +92,5 @@
 
 @endsection
 @section('bottom-js')
-<style>
-    .add-new-btn {
-        background-color: #0a6e44;
-        border: none;
-        color: white;
-    }
 
-    .edit-btn {
-        background-color: #0182bd;
-        border: none;
-        color: white;
-    }
-</style>
 @endsection

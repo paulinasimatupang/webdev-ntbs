@@ -51,7 +51,7 @@
                     <div class="d-flex align-items-center">
                         <img src="{{ asset('assets/images/new_features/fee.png') }}" alt="Service Meta" class="mr-3" style="width: 50px">
                         <div class="text-left">
-                            <p class="text-muted mt-2 mb-0">Fee Fitur Transaksi</p>
+                            <p class="text-muted mt-2 mb-0">Fee Transaksi</p>
                         </div>
                     </div>
                 </div>

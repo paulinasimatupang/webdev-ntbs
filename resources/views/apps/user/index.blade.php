@@ -13,7 +13,7 @@
 
 @section('main-content')
 <div class="breadcrumb">
-    <h1>User</h1>
+    <h1>Data User</h1>
 </div>
 <div class="separator-breadcrumb border-top"></div>
 
@@ -48,12 +48,12 @@
                         <thead>
                             <tr>
                                 <th>No</th>
-                                <th>Nama Lengkap</th>
+                                <th>Nama</th>
                                 <th>Username</th>
                                 <th>Email</th>
                                 <th>Role</th> 
                                 <th>Status</th>
-                                <th>Action</th>
+                                <th>Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -134,18 +134,4 @@
         }
     }
 </script>
-<style>
-    .add-new-btn {
-        background-color: #0a6e44;
-        border: none;
-        color: white;
-    }
-
-    .edit-btn,
-    .delete-btn {
-        background-color: #0182bd;
-        border: none;
-        color: white;
-    }
-</style>
 @endsection

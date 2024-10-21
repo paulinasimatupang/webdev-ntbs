@@ -58,7 +58,7 @@
                             <div class="d-flex align-items-center">
                                 <img src="{{ asset('assets/images/new_features/add.png') }}" alt="Add User" class="mr-3" style="width: 50px">
                                 <div class="text-left">
-                                    <p class="text-muted mt-2 mb-0">Add User</p>
+                                    <p class="text-muted mt-2 mb-0">Tambah User</p>
                                 </div>
                             </div>
                         </div>
@@ -74,7 +74,7 @@
                             <div class="card-body d-flex align-items-center">
                                 <img src="{{ asset('assets/images/new_features/request.png') }}" alt="Request Agen" class="mr-3" style="width: 50px;">
                                 <div class="flex-grow-1">
-                                    <p class="text-muted mt-2 mb-0">Request User</p>
+                                    <p class="text-muted mt-2 mb-0">Permintaan Pendaftaran User</p>
                                 </div>
                                 <div class="text-right">
                                     <h3 class="mb-0" style="font-size: 30px; color: #0a6e44;">{{ $jumlah_request }}</h3>
@@ -93,7 +93,7 @@
                             <div class="d-flex align-items-center">
                                 <img src="{{ asset('assets/images/new_features/list.png') }}" alt="List User" class="mr-3" style="width: 50px">
                                 <div class="text-left">
-                                    <p class="text-muted mt-2 mb-0">List User</p>
+                                    <p class="text-muted mt-2 mb-0">Data User</p>
                                 </div>
                             </div>
                         </div>

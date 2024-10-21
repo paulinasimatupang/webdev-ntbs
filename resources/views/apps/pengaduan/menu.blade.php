@@ -58,7 +58,7 @@
             <a href="/pengaduan/pending" class="card-link">
                 <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-2">
                     <div class="card-body d-flex align-items-center">
-                        <img src="{{ asset('assets/images/new_features/request.png') }}" alt="Request Pengaduan" class="mr-3" style="width: 50px;">
+                        <img src="{{ asset('assets/images/new_features/pending.png') }}" alt="Request Pengaduan" class="mr-3" style="width: 50px;">
                         <div class="flex-grow-1">
                             <p class="text-muted mt-2 mb-0">Pending</p>
                         </div>
@@ -76,7 +76,7 @@
             <a href="/pengaduan/process" class="card-link">
                 <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-2">
                     <div class="card-body d-flex align-items-center">
-                        <img src="{{ asset('assets/images/new_features/request.png') }}" alt="Request Pengaduan" class="mr-3" style="width: 50px;">
+                        <img src="{{ asset('assets/images/new_features/on-process.png') }}" alt="Request Pengaduan" class="mr-3" style="width: 50px;">
                         <div class="flex-grow-1">
                             <p class="text-muted mt-2 mb-0">On Process</p>
                         </div>
@@ -95,7 +95,7 @@
                 <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-2">
                     <div class="card-body text-center">
                         <div class="d-flex align-items-center">
-                            <img src="{{ asset('assets/images/new_features/list.png') }}" alt="List Pengaduan" class="mr-3" style="width: 50px;">
+                            <img src="{{ asset('assets/images/new_features/success.png') }}" alt="List Pengaduan" class="mr-3" style="width: 50px;">
                             <div class="text-left">
                                 <p class="text-muted mt-2 mb-0">Resolved</p>
                             </div>
@@ -111,7 +111,7 @@
             <a href="/terminal/request" class="card-link">
                 <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-2">
                     <div class="card-body d-flex align-items-center">
-                        <img src="{{ asset('assets/images/new_features/request.png') }}" alt="Request Pengaduan" class="mr-3" style="width: 50px;">
+                        <img src="{{ asset('assets/images/new_features/on-process.png') }}" alt="Request Pengaduan" class="mr-3" style="width: 50px;">
                         <div class="flex-grow-1">
                             <p class="text-muted mt-2 mb-0">Request Imei</p>
                         </div>

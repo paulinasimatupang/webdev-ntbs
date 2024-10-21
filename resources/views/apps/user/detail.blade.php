@@ -2,7 +2,7 @@
 
 @section('main-content')
 <div class="breadcrumb">
-    <h1>Detail Permintaan User</h1>
+    <h1>Detail Calon User</h1>
 </div>
 <div class="separator-breadcrumb border-top"></div>
 
@@ -49,17 +49,17 @@
 
                 <div class="form-group row">
                     <div class="col-sm-12 text-right">
-                        <a href="{{ route('users.list-request') }}" class="btn btn-primary">Back</a>
+                        <a href="{{ route('users.list-request') }}" class="btn btn-primary">Kembali</a>
                         <form id="actionForm" method="POST" class="d-inline">
                             @csrf
                             <input type="hidden" name="agen_id" value="{{ $user->id }}">
                             <input type="hidden" name="action" id="formAction">
 
                             <button type="button" id="accept" class="btn btn-success">
-                                Approve
+                                Terima
                             </button>
                             <button type="button" id="reject" class="btn btn-danger">
-                                Reject
+                                Tolak
                             </button>
                         </form>
                     </div>

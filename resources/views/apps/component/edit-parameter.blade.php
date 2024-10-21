@@ -26,8 +26,8 @@
                             <div class="text-danger">{{ $message }}</div>
                         @enderror
                     </div>
-                    <a href="{{ route('masterdata_list_parameter') }}" class="btn btn-secondary">Cancel</a>
-                    <button type="submit" class="btn btn-primary">Update</button>
+                    <a href="{{ route('masterdata_list_parameter') }}" class="btn btn-secondary">Kembali</a>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
                 </form>
             </div>
         </div>

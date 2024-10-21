@@ -14,8 +14,6 @@
 @section('main-content')
             <div class="breadcrumb">
                 <h1>Agen Terblokir</h1>
-                <!-- <ul>
-                    <li><a href="">Selada</a></li> -->
             </div>
             <div class="separator-breadcrumb border-top"></div>
             <div class="row mb-4">
@@ -30,7 +28,6 @@
                                     <p>{{ $message }}</p>
                                 </div>
                             @endif
-
                             @if ($message = Session::get('failed'))
                                 <div class="alert alert-danger">
                                     <p>{{ $message }}</p>
@@ -43,7 +40,7 @@
                                             <th scope="col">No</th>
                                             <th scope="col">Kode Agen</th>
                                             <th scope="col">Nama</th>
-                                            <th scope="col">Detail</th>
+                                            <th scope="col">Aksi</th>
                                         </tr>
                                     </thead>
                                     <tbody>

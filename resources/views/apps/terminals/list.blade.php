@@ -81,7 +81,7 @@
                                                                 @endif -->
                                                                 @if (in_array('terminal_destroy', $routes_user))
                                                                     <button onClick="deleteConfirm({{$item->id}})"
-                                                                        class="btn btn-danger ripple btn-sm m-1" type="button">Delete</button>
+                                                                        class="btn btn-danger ripple btn-sm m-1" type="button">Hapus</button>
                                                                 @endif
                                                             </td>
                                                         </tr>

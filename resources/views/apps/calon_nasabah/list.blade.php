@@ -100,18 +100,4 @@
 @endsection
 @section('bottom-js')
 <script src="{{asset('assets/js/form.basic.script.js')}}"></script>
-<style>
-    .add-new-btn {
-        background-color: #0a6e44;
-        border: none;
-        color: white;
-    }
-
-    .edit-btn {
-        background-color: #0182bd;
-        border: none;
-        color: white;
-    }
-
-
 @endsection

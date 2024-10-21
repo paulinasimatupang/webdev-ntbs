@@ -2,7 +2,7 @@
 
 @section('main-content')
 <div class="breadcrumb">
-    <h1>Edit Parameterized</h1>
+    <h1>Edit Rekening Penampung</h1>
 </div>
 <div class="separator-breadcrumb border-top"></div>
 <div class="row">
@@ -22,9 +22,8 @@
                         <label for="meta_default">Nilai</label>
                         <input type="text" class="form-control" id="meta_default" name="meta_default" value="{{ old('meta_default', $group->meta_default) }}">
                     </div>
-
-                    <button type="submit" class="btn btn-primary">Update</button>
-                    <a href="{{ route('list_parameter') }}" class="btn btn-secondary">Cancel</a>
+                    <a href="{{ route('list_parameter') }}" class="btn btn-secondary">Kembali</a>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
                 </form>
             </div>
         </div>

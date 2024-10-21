@@ -73,7 +73,7 @@
                                 <div class="row">
                                     <div class="col-lg-12 text-center">
                                         <button type="submit" class="btn btn-success m-1">Simpan</button>
-                                        <a href="{{ route('transaction') }}" class="btn btn-outline-secondary m-1">Hapus Filter</a>
+                                        <a href="{{ route('transaction') }}" class="btn btn-danger m-1">Hapus Filter</a>
                                     </div>
                                 </div>
                             </div>

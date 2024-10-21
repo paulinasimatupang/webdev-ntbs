@@ -97,7 +97,7 @@
                             <img src="{{ asset('assets/images/new_features/list.png') }}" alt="Total Transaction"
                                 class="mr-3" style="width: 50px">
                             <div class="text-left">
-                                <p class="text-muted mt-2 mb-0">Daftar Nasabah</p>
+                                <p class="text-muted mt-2 mb-0">Data Nasabah</p>
                             </div>
                         </div>
                     </div>

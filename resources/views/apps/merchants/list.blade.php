@@ -89,7 +89,7 @@
                                             <td>
                                                 @if (in_array('agen_edit', $routes_user))
                                                     <a href="{{route('agen_edit',[$item->id])}}">
-                                                        <button class="btn btn-warning ripple btn-sm m-1 edit-btn" type="button"  @php if(session()->get('user')->role_id == 2) echo 'id="b1"'; @endphp>Edit</button>
+                                                        <button class="btn btn-primary ripple btn-sm m-1 edit-btn" type="button"  @php if(session()->get('user')->role_id == 2) echo 'id="b1"'; @endphp>Edit</button>
                                                     </a>
                                                 @endif
                                             </td>
@@ -119,18 +119,4 @@
 @endsection
 @section('bottom-js')
 <script src="{{asset('assets/js/form.basic.script.js')}}"></script>
-<style>
-    .add-new-btn {
-        background-color: #0a6e44;
-        border: none;
-        color: white;
-    }
-
-    .edit-btn {
-        background-color: #0182bd;
-        border: none;
-        color: white;
-    }
-
-
 @endsection

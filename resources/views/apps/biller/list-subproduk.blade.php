@@ -21,7 +21,7 @@
     <div class="col-lg-12 col-md-12 col-sm-12 d-flex justify-content-center mb-3">
         <div class="input-group">
             <a href="{{ route('create_sub_produk') }}">
-                <button class="btn btn-warning ripple m-1 add-new-btn" type="button">Add New</button>
+                <button class="btn btn-success ripple m-1 add-new-btn" type="button">Tambah</button>
             </a>
         </div>
     </div>
@@ -30,7 +30,7 @@
         <div class="card text-left">
             <div class="card-body">
                 <div class="row">
-                    <h4 class="col-sm-12 col-md-6 card-title mb-3">List Sub Produk Biller</h4>
+                    <h4 class="col-sm-12 col-md-6 card-title mb-3">Daftar Sub Produk Biller</h4>
                 </div>
 
                 @if ($message = Session::get('success'))
@@ -116,17 +116,5 @@
         }
     }
 </script>
-<style>
-    .add-new-btn {
-        background-color: #0a6e44;
-        border: none;
-        color: white;
-    }
 
-    .edit-btn {
-        background-color: #0182bd;
-        border: none;
-        color: white;
-    }
-</style>
 @endsection

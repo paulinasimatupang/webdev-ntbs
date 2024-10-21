@@ -5,16 +5,11 @@
 </div>
 <div class="separator-breadcrumb border-top"></div>
 
-@if(Session::has('error'))
-@foreach (Session::get('error') as $key => $item)
-<div class="alert alert-danger" role="alert">
-    <strong class="text-capitalize">Error: </strong> {{ $item[0] }}
-    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-    </button>
-</div>
-@endforeach
-@endif
+@if ($message = Session::get('error'))
+                                <div class="alert alert-danger">
+                                    <p>{{ $message }}</p>
+                                </div>
+                            @endif
 
 <div class="row">
     <div class="col-md-12">

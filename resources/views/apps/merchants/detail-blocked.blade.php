@@ -191,7 +191,7 @@
                             @csrf
                             <input type="hidden" name="agen_id" value="{{ $merchant->id }}">
                             <input type="hidden" name="action" id="formAction">
-                            <button type="button" id="approve" class="btn btn-success">
+                            <button type="button" id="approve" class="btn btn-primary">
                                 Aktifkan
                             </button>
                         </form>

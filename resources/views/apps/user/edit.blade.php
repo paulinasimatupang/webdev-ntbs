@@ -23,7 +23,7 @@
                     @method('POST') 
 
                     <div class="form-group row">
-                        <label class="col-sm-2 col-form-label">Name</label>
+                        <label class="col-sm-2 col-form-label">Nama</label>
                         <div class="col-sm-10">
                             <input type="text" name="fullname" class="form-control" value="{{ old('fullname', $user->fullname) }}" placeholder="Name" required />
                         </div>
@@ -69,9 +69,9 @@
                     <div class="form-group row">
                         <div class="col-sm-12 text-right">
                             <a href="{{ url('users') }}">
-                                <button type="button" class="btn btn-danger">Back</button>
+                                <button type="button" class="btn btn-secondary">Kembali</button>
                             </a>
-                            <button type="submit" class="btn btn-primary">Update</button>
+                            <button type="submit" class="btn btn-primary">Simpan</button>
                         </div>
                     </div>
                 </form>

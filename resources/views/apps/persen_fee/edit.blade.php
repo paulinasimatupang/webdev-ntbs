@@ -29,9 +29,8 @@
                         <label for="meta_default">Persentase</label>
                         <input type="text" class="form-control" id="persentase" name="persentase" value="{{ $group->persentase }}">
                     </div>
-
-                    <button type="submit" class="btn btn-primary">Update</button>
-                    <a href="{{ route('persen_fee') }}" class="btn btn-secondary">Cancel</a>
+                    <a href="{{ route('persen_fee') }}" class="btn btn-secondary">Kembali</a>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
                 </form>
             </div>
         </div>

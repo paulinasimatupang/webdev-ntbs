@@ -2,7 +2,7 @@
 
 @section('main-content')
     <div class="breadcrumb">
-        <h1>Add New Produk Biller</h1>
+        <h1>Tambah Produk Biller</h1>
     </div>
     <div class="separator-breadcrumb border-top"></div>
 
@@ -54,9 +54,9 @@
                         <div class="form-group row">
                             <div class="col-sm-12 text-right">
                                 <a href="{{ route('list_produk') }}">
-                                    <button type="button" class="btn btn-primary">Back</button>
+                                    <button type="button" class="btn btn-secondary">Kembali</button>
                                 </a>
-                                <button type="submit" class="btn btn-primary">Save</button>
+                                <button type="submit" class="btn btn-primary">Simpan</button>
                             </div>
                         </div>
                     </form>

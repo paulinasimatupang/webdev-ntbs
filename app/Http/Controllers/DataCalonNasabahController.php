@@ -248,16 +248,15 @@ class DataCalonNasabahController extends Controller
             $nasabah = DataCalonNasabah::find($id);
 
             if (!$nasabah) {
-                return Redirect::to("/nasabah/approve/$id")
+                return Redirect::to("/nasabah/approve/detail/$id")
                     ->with('error', "Data nasabah tidak ditemukan");
             }
 
             if (empty($nasabah->branchid)) {
-                return Redirect::to("/nasabah/approve/$id")
+                return Redirect::to("/nasabah/approve/detail/$id")
                     ->with('error', "Gagal Membuat CIF: Kode Cabang Tidak Ditemukan");
             }
 
-            // If nasabah exists and branch ID is present
             $nasabahData = $nasabah->only([
                 'nama_lengkap', 'nama_alias', 'ibu_kandung', 'tempat_lahir', 'tgl_lahir', 
                 'jenis_kelamin', 'agama', 'status_nikah', 'alamat', 'rt', 'rw', 
@@ -325,12 +324,12 @@ class DataCalonNasabahController extends Controller
 
             if ($err) {
                 Log::error('cURL Error: ' . $err);
-                return Redirect::to("/nasabah/approve/$id")
-                    ->with('error', 'Gagal terhubung ke API CIF: ' . $err);
+                return Redirect::to("/nasabah/approve/detail/$id")
+                ->with('error', 'Gagal terhubung ke API CIF: ' . $err);
             }
 
             if (isset($responseArray['screen']['title']) && $responseArray['screen']['title'] === 'Gagal') {
-                return Redirect::to("/nasabah/approve/$id")
+                return Redirect::to("/nasabah/approve/detail/$id")
                     ->with('error', "Gagal membuat CIF: " . $responseArray['screen']['comps']['comp'][0]['comp_values']['comp_value'][0]['value']);
             }
 
@@ -350,7 +349,7 @@ class DataCalonNasabahController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Error in store_cif: ' . $e->getMessage());
-            return Redirect::to("/nasabah/approve/$id")
+            return Redirect::to("/nasabah/approve/detail/$id")
                 ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
@@ -454,7 +453,7 @@ class DataCalonNasabahController extends Controller
                 $responseArray = json_decode($output, true);
 
                 if ($err) {
-                    return Redirect::to("/nasabah/approve/$id")
+                    return Redirect::to("/nasabah/approve/detail/$id")
                     ->with('error', 'Gagal terhubung ke API CIF: ' . $err);
                 }else {
                         $noRekening = null;
@@ -470,7 +469,7 @@ class DataCalonNasabahController extends Controller
                 }
 
                 if (isset($responseArray['screen']['title']) && $responseArray['screen']['title'] === 'Gagal') {
-                    return Redirect::to("/nasabah/approve/$id")
+                    return Redirect::to("/nasabah/approve/detail/$id")
                     ->with('error', "Gagal membuat CIF: " . $responseArray['screen']['comps']['comp'][0]['comp_values']['comp_value'][0]['value']);
                 } else {
                     DB::commit();
@@ -480,7 +479,8 @@ class DataCalonNasabahController extends Controller
         } catch (Exception $e) {
             DB::rollBack();
             Log::error('Error in store_cif: ' . $e->getMessage());
-            return false;
+            return Redirect::to("/nasabah/approve/detail/$id")
+                    ->with('error', "Gagal membuat CIF: " . $e->getMessage());
         }
     }
 
@@ -494,9 +494,22 @@ class DataCalonNasabahController extends Controller
                 return Redirect::to("/nasabah/approve/$id")
                     ->with('error', "Data nasabah tidak ditemukan");
             }
-            $this->registration_code($id);
-            $this->store_cif($id);
-            $this->store_rekening($id);
+            
+            $registrationCodeResult = $this->registration_code($id);
+            if ($registrationCodeResult instanceof \Illuminate\Http\RedirectResponse) {
+                return $registrationCodeResult;
+            }
+
+            $cifResult = $this->store_cif($id);
+            if ($cifResult instanceof \Illuminate\Http\RedirectResponse) {
+                return $cifResult;
+            }
+
+            $rekeningResult = $this->store_rekening($id);
+            if ($rekeningResult instanceof \Illuminate\Http\RedirectResponse) {
+                return $rekeningResult;
+            }
+
             $nasabah->status = 2;
             $nasabah->reply_time = now();
             $nasabah->save();

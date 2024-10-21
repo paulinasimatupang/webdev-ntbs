@@ -8,7 +8,7 @@
 
 @section('main-content')
 <div class="breadcrumb">
-    <h1>Pemintaan Pengguna</h1>
+    <h1>Pemintaan Pendaftaran User</h1>
 </div>
 <div class="separator-breadcrumb border-top"></div>
 
@@ -19,7 +19,7 @@
         <div class="card text-left">
             <div class="card-body">
                 <div class="row">
-                    <h4 class="col-sm-12 col-md-6 card-title mb-3">Daftar Permintaan Pengguna</h4>
+                    <h4 class="col-sm-12 col-md-6 card-title mb-3">Daftar Calon User</h4>
                 </div>
 
                 @if (session('status'))
@@ -31,10 +31,10 @@
                         <thead>
                             <tr>
                                 <th>No</th>
-                                <th>Fullname</th>
+                                <th>Nama</th>
                                 <th>Email</th>
                                 <th>Role</th> 
-                                <th>Action</th>
+                                <th>Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -49,7 +49,7 @@
                                 <td>{{ $user->role->name }}</td>
                                 <td>
                                     <a href="{{ route('users.detail', $user->id) }}">
-                                        <button class="btn btn-warning ripple btn-sm m-1 edit-btn" type="button">Detail</button>
+                                        <button class="btn btn-primary ripple btn-sm m-1 edit-btn" type="button">Detail</button>
                                     </a>
                                     <!-- <form action="{{ route('users.destroy', $user) }}" method="POST" style="display:inline;">
                                         @csrf
@@ -111,18 +111,4 @@
         }
     }
 </script>
-<style>
-    .add-new-btn {
-        background-color: #0a6e44;
-        border: none;
-        color: white;
-    }
-
-    .edit-btn,
-    .delete-btn {
-        background-color: #0182bd;
-        border: none;
-        color: white;
-    }
-</style>
 @endsection

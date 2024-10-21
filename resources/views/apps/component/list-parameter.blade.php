@@ -43,7 +43,7 @@
                                 <th scope="col">No</th>
                                 <th scope="col">Fitur</th>
                                 <th scope="col">Nilai</th>
-                                <th scope="col">Action</th>
+                                <th scope="col">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -57,7 +57,7 @@
                                         @if (in_array('edit_parameter', $routes_user))
                                             <a
                                                 href="{{ route('masterdata_edit_parameter', ['id' => $item->comp_id]) }}">
-                                                <button class="btn btn-edit ripple btn-sm m-1 edit-btn"
+                                                <button class="btn btn-primary ripple btn-sm m-1 edit-btn"
                                                     type="button">Edit</button>
                                             </a>
                                         @endif
@@ -114,17 +114,4 @@
         }
     }
 </script>
-<style>
-    .add-new-btn {
-        background-color: #0a6e44;
-        border: none;
-        color: white;
-    }
-
-    .edit-btn {
-        background-color: #0182bd;
-        border: none;
-        color: white;
-    }
-</style>
 @endsection

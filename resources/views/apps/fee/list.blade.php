@@ -13,22 +13,15 @@
 
 @section('main-content')
 <div class="breadcrumb">
-    <h1>Fee</h1>
+    <h1>Fee Transaksi</h1>
 </div>
 <div class="separator-breadcrumb border-top"></div>
 <div class="row mb-4">
-    <!-- <div class="col-lg-12 col-md-12 col-sm-12 d-flex justify-content-center mb-3">
-        <div class="input-group">
-            <a href="{{ route('fee_create') }}">
-                <button class="btn btn-warning ripple m-1 add-new-btn" type="button" @php if($username !=='selada_produktif' ) echo 'disabled' @endphp>Add New</button>
-            </a>
-        </div>
-    </div> -->
     <div class="col-md-12 mb-3">
         <div class="card text-left">
             <div class="card-body">
                 <div class="row">
-                    <h4 class="col-sm-12 col-md-6 card-title mb-3">List Fee</h4>
+                    <h4 class="col-sm-12 col-md-6 card-title mb-3">Daftar Fee</h4>
                 </div>
 
                 @if ($message = Session::get('success'))
@@ -53,7 +46,7 @@
                                 <th scope="col">Fitur</th>
                                 <th scope="col">Nominal</th>
                                 <th scope="col">Influx</th>
-                                <th scope="col">Action</th>
+                                <th scope="col">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -69,7 +62,7 @@
                                         @if (in_array('fee_edit', $routes_user))
                                             <a
                                                 href="{{ route('fee_edit', ['meta_id' => $group->meta_id, 'service_id' => $group->service_id, 'seq' => $group->seq, 'influx' => $group->influx]) }}">
-                                                <button class="btn btn-edit ripple btn-sm m-1 edit-btn"
+                                                <button class="btn btn-primary ripple btn-sm m-1 edit-btn"
                                                     type="button">Edit</button>
                                             </a>
                                         @endif
@@ -120,17 +113,4 @@
         }
     }
 </script>
-<style>
-    .add-new-btn {
-        background-color: #0a6e44;
-        border: none;
-        color: white;
-    }
-
-    .edit-btn {
-        background-color: #0182bd;
-        border: none;
-        color: white;
-    }
-</style>
 @endsection

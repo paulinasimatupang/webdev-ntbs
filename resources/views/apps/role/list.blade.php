@@ -11,7 +11,7 @@
 
 @section('main-content')
 <div class="breadcrumb">
-    <h1>Role Management</h1>
+    <h1>Role Akses</h1>
 </div>
 <div class="separator-breadcrumb border-top"></div>
 
@@ -32,7 +32,7 @@
         <div class="input-group">
             @if (in_array('roles.add', $routes_user))
                 <a href="{{ route('roles.add') }}">
-                    <button class="btn btn-warning ripple m-1 add-new-btn" type="button">Add Role</button>
+                    <button class="btn btn-success ripple m-1 add-new-btn" type="button">Tambah Role</button>
                 </a>
             @endif         
         </div>
@@ -41,7 +41,7 @@
         <div class="card text-left">
             <div class="card-body">
                 <div class="row">
-                    <h4 class="col-sm-12 col-md-6 card-title mb-3">List of Roles</h4>
+                    <h4 class="col-sm-12 col-md-6 card-title mb-3">Daftar Role</h4>
                 </div>
 
                 @if (session('status'))
@@ -69,13 +69,13 @@
                                     <td>
                                         @if (in_array('roles.addPermissionToRole', $routes_user))
                                             <a href="{{ route('roles.addPermissionToRole', $role) }}">
-                                                <button class="btn btn-primary" type="button">Add/Edit Permission</button>
+                                                <button class="btn btn-primary  ripple btn-sm m-1" type="button">Tambah/Edit Akses</button>
                                             </a>
                                         @endif
 
                                         @if (in_array('roles.edit', $routes_user))
                                             <a href="{{ route('roles.edit', $role) }}">
-                                                <button class="btn btn-success" type="button">Edit Role</button>
+                                                <button class="btn btn-primary ripple btn-sm m-1" type="button">Edit Role</button>
                                             </a>
                                         @endif
 
@@ -129,19 +129,4 @@
         }
     }
 </script>
-
-<style>
-    .add-new-btn {
-        background-color: #0a6e44;
-        border: none;
-        color: white;
-    }
-
-    .edit-btn,
-    .delete-btn {
-        background-color: #0182bd;
-        border: none;
-        color: white;
-    }
-</style>
 @endsection
