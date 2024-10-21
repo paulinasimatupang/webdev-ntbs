@@ -634,7 +634,7 @@ class TerminalsController extends Controller
                 $notificationService = new SendPushNotification();
                 $notificationService->sendNotificationToToken($fcmToken, [
                     'title' => 'IMEI Request Approved',
-                    'message' => "Your IMEI change request for terminal {$terminal->tid} has been approved.",
+                    'message' => "Permintaan penggantian IMEI untuk terminal {$terminal->tid} telah disetujui.",
                 ]);
             } else {
                 Log::warning("FCM token tidak valid atau tidak ditemukan untuk merchant MID: {$merchant->mid}");
@@ -687,7 +687,7 @@ class TerminalsController extends Controller
                 $notificationService = new SendPushNotification();
                 $notificationService->sendNotificationToToken($fcmToken, [
                     'title' => 'IMEI Request Rejected',
-                    'message' => "Your IMEI change request for terminal {$imeiRequest->tid} has been rejected.",
+                    'message' => "Permintaan penggantian IMEI untuk Terminal {$imeiRequest->tid} ditolak.",
                 ]);
             }
 
