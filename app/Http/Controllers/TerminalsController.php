@@ -150,10 +150,21 @@ class TerminalsController extends Controller
      */
     public function store(Request $request)
     {
+        // Check if user is authenticated
+        $user = auth()->user();
+        if (!$user) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
         DB::beginTransaction();
         try {
             $imei = $request->input('imei');
             $merchantId = $request->input('merchant_id');
+
+            // Validasi input
+            if (!$imei || !$merchantId) {
+                throw new \Exception('UUID atau Merchant ID tidak valid.');
+            }
 
             // Validasi merchant
             $merchant = Merchant::where('mid', $merchantId)->first();
@@ -167,16 +178,13 @@ class TerminalsController extends Controller
                 ->orderBy('created_at', 'desc')
                 ->first();
 
-            if ($lastTid) {
-                $newNumber = (int) substr($lastTid->tid, strlen($prefix)) + 1;
-                $tid = $prefix . str_pad($newNumber, 6, '0', STR_PAD_LEFT);
+            $tid = $lastTid
+                ? $prefix . str_pad((int) substr($lastTid->tid, strlen($prefix)) + 1, 6, '0', STR_PAD_LEFT)
+                : $prefix . '000001';
 
-                while (Terminal::where('tid', $tid)->exists()) {
-                    $newNumber++;
-                    $tid = $prefix . str_pad($newNumber, 6, '0', STR_PAD_LEFT);
-                }
-            } else {
-                $tid = $prefix . '000001';
+            // Pastikan TID unik
+            while (Terminal::where('tid', $tid)->exists()) {
+                $tid = $prefix . str_pad(++$newNumber, 6, '0', STR_PAD_LEFT);
             }
 
             // Simpan data terminal
@@ -187,46 +195,32 @@ class TerminalsController extends Controller
             ];
 
             $data = $this->repository->create($terminalData);
-
-            if ($data) {
-                $merchant->terminal_id = $tid;
-                $merchant->save();
-
-                $data->merchant_id = $merchant->mid;
-                $data->merchant_name = $merchant->name;
-                $data->merchant_address = $merchant->address;
-                $data->merchant_account_number = $merchant->no;
-                $data->save();
-
-                // Aktivasi terminal
-                $activated = $this->activateBilliton(new TerminalUpdateRequest([
-                    'merchant_id' => $merchantId,
-                    'tid' => $tid,
-                ]), $data->id);
-
-                if ($activated) {
-                    DB::commit();
-                    return response()->json([
-                        'success' => true,
-                        'message' => 'Terminal created and activated',
-                        'data' => $data,
-                    ], 201);
-                } else {
-                    DB::rollBack();
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Terminal created but activation failed',
-                    ], 500);
-                }
-            } else {
-                DB::rollBack();
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Failed to create terminal',
-                ], 500);
+            if (!$data) {
+                throw new \Exception('Failed to create terminal');
             }
+
+            // Simpan dan aktivasi terminal
+            $merchant->terminal_id = $tid;
+            $merchant->save();
+
+            $activated = $this->activateBilliton(new TerminalUpdateRequest([
+                'merchant_id' => $merchantId,
+                'tid' => $tid,
+            ]), $data->id);
+
+            if (!$activated) {
+                throw new \Exception('Terminal created but activation failed');
+            }
+
+            DB::commit();
+            return response()->json([
+                'success' => true,
+                'message' => 'Terminal created and activated',
+                'data' => $data,
+            ], 201);
         } catch (\Exception $e) {
             DB::rollBack();
+            \Log::error('Error creating terminal: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage(),
