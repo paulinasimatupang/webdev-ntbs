@@ -2,7 +2,7 @@
 
 @section('main-content')
     <div class="breadcrumb">
-        <h1>Detail Permintaan Agen</h1>
+        <h1>Detail Calon Agen</h1>
     </div>
     <div class="separator-breadcrumb border-top"></div>
 
