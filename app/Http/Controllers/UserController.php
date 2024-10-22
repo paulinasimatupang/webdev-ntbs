@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use App\Mail\sendPassword;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
@@ -122,11 +123,20 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'fullname' => 'required',
-            'email' => 'required',
-            'role_id' => 'required',
-        ]);
+        $rules = [
+            'username' => 'required|unique:users,username',
+        ];
+
+        $messages = [
+            'username.unique' => 'Username harus unik, username yang anda masukkan sudah terdaftar.',
+        ];
+
+        $validator = Validator::make($request->all(), $rules, $messages);
+        if ($validator->fails()) {
+            return redirect()->route('users.create')
+                ->withErrors($validator)
+                ->withInput();
+        }
 
         $role = Role::find($request->role_id);
         $status = ($role && $role->name == 'Super Admin' ||  $role->name == 'Supervisor Pusat') ? 1 : 0;
@@ -135,10 +145,17 @@ class UserController extends Controller
             'fullname' => $request->fullname,
             'email' => $request->email,
             'role_id' => $request->role_id,
+            'username' => $request->username,
+            'nrp' => $request->nrp,
+            'no_hp' => $request->no_hp,
             'status' => $status,
             'branchid' => $request->branch_id,
             'created_at' => now()
         ]);
+
+        if ($role && ($role->name == 'Super Admin' || $role->name == 'Supervisor Pusat')) {
+            return $this->acceptUser($user->id);
+        }
 
         return redirect()->route('users.menu')->with('success', 'User berhasil dibuat.');
     }
@@ -164,28 +181,8 @@ class UserController extends Controller
 
             Log::info('PasswordGenerate: ' . $password);
 
-            $prefix = 'NTBUS'; 
-            $lastUser = User::where('username', 'LIKE', $prefix . '%')
-                            ->orderBy('created_at', 'desc')
-                            ->first();
-
-            $newUsername = $prefix . '000001'; 
-            if ($lastUser) {
-                $lastUsername = $lastUser->username;
-                $number = substr($lastUsername, strlen($prefix));
-                $newNumber = (int)$number + 1;
-                $newNumberPadded = str_pad($newNumber, 6, '0', STR_PAD_LEFT);
-                $newUsername = $prefix . $newNumberPadded;
-            }
-
-            while (User::where('username', $newUsername)->exists()) {
-                $newNumber = (int)substr($newUsername, strlen($prefix)) + 1;
-                $newUsername = $prefix . str_pad($newNumber, 6, '0', STR_PAD_LEFT);
-            }
-
             $user->password = $passwordBcrypt;
             $user->status = 1;
-            $user->username = $newUsername;
             $user->updated_at = now();
             $user->save();
 
@@ -194,7 +191,7 @@ class UserController extends Controller
             $pesan .= '<p>Berikut informasi Anda yang telah terdaftar sebagai ' . htmlspecialchars($role_name) . ':</p>';
             $pesan .= '<p>Username: ' . htmlspecialchars($user->username) . '</p>';
             $pesan .= '<p>Password: ' . htmlspecialchars($password) . '</p>';
-            $pesan .= '<p>Gunakan Username dan Password di atas untuk mengakses halaman Portal.</p>';
+            $pesan .= '<p>Gunakan Username dan Password di atas untuk mengakses halaman http://reportntbs.selada.id/.</p>';
             $pesan .= '<p>Salam Hangat,</p>';
             $pesan .= '<p><b>NTBS LAKUPANDAI</b></p>';
 
