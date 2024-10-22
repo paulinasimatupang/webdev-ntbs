@@ -163,7 +163,7 @@ class TerminalsController extends Controller
 
             // Validasi input
             if (!$imei || !$merchantId) {
-                throw new \Exception('IMEI atau Merchant ID tidak valid.');
+                throw new \Exception('UUID atau Merchant ID tidak valid.');
             }
 
             // Validasi merchant
