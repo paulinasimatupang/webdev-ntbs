@@ -62,9 +62,14 @@
                                             <th scope="col">Kode Agen</th>
 					                        <th scope="col">No Rekening</th>
                                             <th scope="col">Nama</th>
+                                            <th scope="col">Jenis Kelamin</th>
                                             <th scope="col">Email</th>
                                             <th scope="col">Alamat</th>
+                                            <th scope="col">Latitude</th>
+                                            <th scope="col">Longitude</th>
                                             <th scope="col">No Telepon HP</th>
+                                            <th scope="col">Kode Cabang</th>
+                                            <th scope="col">Approval oleh</th>
                                             <th scope="col">Status Agen</th>
                                             <th scope="col">Tanggal Aktif</th>
                                             <th scope="col">Tanggal Nonaktif</th>
@@ -82,9 +87,14 @@
                                             <td>{{$item->mid}}</td>
 					                        <td>{{$item->no}}</td>
                                             <td>{{$item->name}}</td>
+                                            <td>{{$item->jenis_kelamin}}</td>
                                             <td>{{$item->email}}</td>
                                             <td>{{$item->address}}</td>
+                                            <td>{{$item->latitude}}</td>
+                                            <td>{{$item->longitude}}</td>
                                             <td>{{$item->phone}}</td>
+                                            <td>{{$item->branchid}}</td>
+                                            <td>{{$item->user->approval_by}}</td>
                                             <td>{{$item->status_text}}</td>
                                             <td>{{$item->active_at}}</td>
                                             <td>{{$item->resign_at}}</td>

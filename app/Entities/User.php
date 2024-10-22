@@ -39,7 +39,8 @@ class User extends Authenticatable implements JWTSubject, Auditable
         'branchid',
         'status',
         'fcm_token',
-        'finger_print'
+        'finger_print',
+        'approval_by'
 
     ];
     protected $table = 'users';

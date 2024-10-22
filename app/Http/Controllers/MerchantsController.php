@@ -91,6 +91,7 @@ class MerchantsController extends Controller
         $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
 
         $data = Merchant::select('*')
+                ->with('user')
                 ->whereIn('status_agen', [1, 2, 3]);
 
         $user = session()->get('user');
@@ -773,10 +774,10 @@ class MerchantsController extends Controller
                 throw new \Exception("Agen not found");
             }
 
-            $user = session()->get('user');
+            $user_login = session()->get('user');
 
             if ($merchant->status_agen == 0) {
-                $branchid = $user->branchid;
+                $branchid = $user_login->branchid;
 
                 $prefix = 'NTB';
                 $lastMID = Merchant::where('mid', 'LIKE', $prefix . $branchid .'%')
@@ -844,8 +845,11 @@ class MerchantsController extends Controller
                     $newUsername = $prefix . str_pad($newNumber, 6, '0', STR_PAD_LEFT);
                 }
 
+                
+
                 $user->password = $passwordBcrypt;
                 $user->status = 1;
+                $user->approval_by = $user_login->username;
                 $user->username = $newUsername;
                 $user->save();
 
