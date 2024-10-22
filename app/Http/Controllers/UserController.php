@@ -186,7 +186,7 @@ class UserController extends Controller
             $user->updated_at = now();
             $user->save();
 
-            $sender_email = env('MAIL_USERNAME');
+            // $sender_email = env('MAIL_USERNAME');
 
             $pesan = '<p>Halo ' . htmlspecialchars($user->fullname) . ',</p>';
             $pesan .= '<p>Pendaftaran Anda telah kami setujui, Anda telah terdaftar sebagai ' . htmlspecialchars($role_name) . ' pada Portal NTBS.</p>';
@@ -198,7 +198,7 @@ class UserController extends Controller
             $pesan .= '<p><b>NTBS LAKUPANDAI</b></p>';
 
             $detail_message = [
-                'sender' => $sender_email,
+                'sender' =>'administrator@selada.id',
                 'subject' => '[NTBS LAKUPANDAI] Pendaftaran User Portal NTBS Berhasil',
                 'isi' => $pesan
             ];
