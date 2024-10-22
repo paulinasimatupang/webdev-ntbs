@@ -150,6 +150,12 @@ class TerminalsController extends Controller
      */
     public function store(Request $request)
     {
+        // Check if user is authenticated
+        $user = auth()->user();
+        if (!$user) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
         DB::beginTransaction();
         try {
             $imei = $request->input('imei');
