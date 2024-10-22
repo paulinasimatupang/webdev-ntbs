@@ -97,9 +97,9 @@
                     <div class="form-group row">
                         <div class="col-sm-12 text-right">
                             <a href="{{ route('roles.list') }}">
-                                <button type="button" class="btn btn-danger">Back</button>
+                                <button type="button" class="btn btn-secondary">Kembali</button>
                             </a>
-                            <button type="submit" class="btn btn-primary">Update</button>
+                            <button type="submit" class="btn btn-primary">Simpan</button>
                         </div>
                     </div>
                 </form>

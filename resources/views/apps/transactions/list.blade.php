@@ -140,12 +140,15 @@
                         <h4 class="col-sm-9 col-md-6 card-title mb-3" style="line-height: 2.1rem;">Daftar Transaksi Agen</h4>
                         <div class="col-sm-3 col-md-12 mb-3">
                             <div class="export-button-wrapper" style="float: right;">
+                            @if (in_array('transactions.csv', $routes_user))
                                 <a id="export-to-excel" href="{{ route('transactions.csv') }}" 
-                                    class="btn" 
-                                    style="background-color: #4CAF50; color: white; border-color: #4CAF50;">
-                                        <img src="{{ asset('assets/images/new_features/xls.png') }}" alt="Excel Icon" style="width: 20px; height: 20px; margin-right: 5px;">
-                                        Ekspor Excel
-                                    </a>
+                                class="btn" 
+                                style="background-color: #4CAF50; color: white; border-color: #4CAF50;">
+                                    <img src="{{ asset('assets/images/new_features/xls.png') }}" alt="Excel Icon" 
+                                        style="width: 20px; height: 20px; margin-right: 5px;">
+                                    Ekspor Excel
+                                </a>
+                            @endif
                                 <!-- <a id="export-to-pdf" href="{{ route('transactions.pdf') }}" class="btn btn-outline-secondary">Export to PDF</a> -->
                             </div>
                         </div>

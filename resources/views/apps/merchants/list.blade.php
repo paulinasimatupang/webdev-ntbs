@@ -22,6 +22,7 @@
                         <div class="card-body">
                             <div class="row">
                                 <h4 class=" col-sm-9 col-md-6 card-title mb-3">Daftar Agen </h4>
+                                @if (in_array('merchants.excel', $routes_user))
                                 <div class="col-sm-3 col-md-12 mb-3">
                                     <div class="export-button-wrapper" style="float: right;">
                                     <a id="export-to-excel" href="{{ route('merchants.excel') }}" 
@@ -38,6 +39,7 @@
                                     </a>
                                     </div>
                                 </div>
+                                @endif
                             </div>
                             
                             @if ($message = Session::get('success'))
