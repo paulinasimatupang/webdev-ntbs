@@ -23,6 +23,7 @@ use Prettus\Validator\Exceptions\ValidatorException;
 use Illuminate\Support\Facades\Log;
 
 use App\Entities\Merchant;
+use App\Entities\Terminal;
 use App\Entities\User;
 use App\Entities\Role;
 
