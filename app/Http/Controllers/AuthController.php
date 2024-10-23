@@ -34,7 +34,6 @@ use App\Entities\Role;
  */
 class AuthController extends Controller
 {
-
     public function register(Request $request)
     {
         DB::beginTransaction();
@@ -639,15 +638,21 @@ class AuthController extends Controller
         }
 
         $terminal = Terminal::where('merchant_id', $user->merchant->mid)->first();
-
-        if($terminal->imei === $request->uid){
+        if (!$terminal) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Terminal tidak ditemukan.',
             ], 404);
         }
 
-        $user->password = Hash::make($request->new_password);
+        if ($terminal->imei !== $request->uid) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'UID tidak cocok dengan IMEI terminal.',
+            ], 400);
+        }
+
+        $user->password = bcrypt($request->new_password);
         $user->save();
 
         return response()->json([
@@ -655,6 +660,7 @@ class AuthController extends Controller
             'message' => 'Password berhasil diperbarui.',
         ], 200);
     }
+
 
     public function updateFCMToken(Request $request)
     {
