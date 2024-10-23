@@ -638,7 +638,7 @@ class AuthController extends Controller
             ], 404);
         }
 
-        $terminal = Terminal::where('mid', $user->merchant->mid)->first();
+        $terminal = Terminal::where('merchant_id', $user->merchant->mid)->first();
 
         if($terminal->imei === $request->uid){
             return response()->json([
