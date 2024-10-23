@@ -639,7 +639,7 @@ class AuthController extends Controller
 
         $terminal = Terminal::where('mid', $user->merchant->mid)->first();
 
-        if($terminal->imei === $uid){
+        if($terminal->imei === $request->uid){
             return response()->json([
                 'status' => 'error',
                 'message' => 'Terminal tidak ditemukan.',

@@ -214,8 +214,6 @@ Route::middleware('auth:api')->post('pengaduan/create', 'PengaduanController@cre
 Route::post('get/phone', 'AuthController@getPhoneByUsername');
 Route::post('reset/password', 'AuthController@resetPassword');
 Route::middleware('auth:api')->get('pengaduan/history', 'PengaduanController@history_pengaduan');
-
 Route::middleware('auth:api')->get('/service/param2/{service_id}', 'ServiceBillerController@getParam2');
-
 Route::middleware('auth:api')->get('/get/nominal/{opt_id}', 'OptionValueController@get_nominal');
 Route::middleware('auth:api')->post('/auth/forgot_pin', 'AuthController@forgot_pin');
